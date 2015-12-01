@@ -1,10 +1,13 @@
 {
-  "name": "meteor-up",
+  "name": "mup",
   "version": "1.0.0",
   "description": "Production Quality Meteor Deployments",
   "main": "index.js",
   "babel": {
-    "presets": ["es2015"]
+    "presets": [
+      "es2015",
+      "stage-0"
+    ]
   },
   "scripts": {
     "lint": "./node_modules/.bin/eslint ./lib",
@@ -35,7 +38,10 @@
     "eslint-plugin-babel": "2.x.x"
   },
   "dependencies": {
-    "babel-core": "6.2.1",
-    "babel-preset-es2015": "6.1.18"
+    "babel-core": "6.x.x",
+    "babel-polyfill": "6.x.x",
+    "babel-preset-es2015": "6.x.x",
+    "babel-preset-stage-0": "6.x.x",
+    "silent-npm-registry-client": "1.x.x"
   }
 }
