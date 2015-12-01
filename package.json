@@ -1,0 +1,41 @@
+{
+  "name": "meteor-up",
+  "version": "1.0.0",
+  "description": "Production Quality Meteor Deployments",
+  "main": "index.js",
+  "babel": {
+    "presets": ["es2015"]
+  },
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint ./lib",
+    "lintfix": "./node_modules/.bin/eslint ./lib --fix",
+    "testonly": "./node_modules/.bin/mocha $npm_package_options_mocha",
+    "test": "npm run lint && npm run testonly"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kadirahq/meteor-up.git"
+  },
+  "keywords": [
+    "meteor"
+  ],
+  "author": "Kadira Inc.",
+  "license": "MIT",
+  "options": {
+    "mocha": "--require scripts/mocha-bootload lib/**/__tests__/**/*.js"
+  },
+  "bugs": {
+    "url": "https://github.com/kadirahq/meteor-up/issues"
+  },
+  "homepage": "https://github.com/kadirahq/meteor-up#readme",
+  "devDependencies": {
+    "mocha": "2.x.x",
+    "eslint": "1.x.x",
+    "babel-eslint": "4.x.x",
+    "eslint-plugin-babel": "2.x.x"
+  },
+  "dependencies": {
+    "babel-core": "6.2.1",
+    "babel-preset-es2015": "6.1.18"
+  }
+}
