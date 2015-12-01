@@ -1,0 +1,29 @@
+{
+  "name": "meteor-up",
+  "version": "1.0.0",
+  "description": "Production Quality Meteor Deployments",
+  "main": "index.js",
+  "babel": {
+    "presets": ["es2015"]
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kadirahq/meteor-up.git"
+  },
+  "keywords": [
+    "meteor"
+  ],
+  "author": "Kadira Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kadirahq/meteor-up/issues"
+  },
+  "homepage": "https://github.com/kadirahq/meteor-up#readme",
+  "dependencies": {
+    "babel-core": "6.2.1",
+    "babel-preset-es2015": "6.1.18"
+  }
+}
