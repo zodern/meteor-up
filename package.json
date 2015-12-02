@@ -9,6 +9,9 @@
       "stage-0"
     ]
   },
+  "bin": {
+    "mup": "./index.js"
+  },
   "scripts": {
     "lint": "./node_modules/.bin/eslint ./lib",
     "lintfix": "./node_modules/.bin/eslint ./lib --fix",
