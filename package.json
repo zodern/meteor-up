@@ -14,9 +14,7 @@
   },
   "scripts": {
     "lint": "./node_modules/.bin/eslint ./lib",
-    "lintfix": "./node_modules/.bin/eslint ./lib --fix",
-    "testonly": "./node_modules/.bin/mocha $npm_package_options_mocha",
-    "test": "npm run lint && npm run testonly"
+    "test": "./node_modules/.bin/mocha $npm_package_options_mocha"
   },
   "repository": {
     "type": "git",
