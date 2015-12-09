@@ -14,9 +14,7 @@
   },
   "scripts": {
     "lint": "./node_modules/.bin/eslint ./lib",
-    "lintfix": "./node_modules/.bin/eslint ./lib --fix",
-    "testonly": "./node_modules/.bin/mocha $npm_package_options_mocha",
-    "test": "npm run lint && npm run testonly"
+    "test": "./node_modules/.bin/mocha $npm_package_options_mocha"
   },
   "repository": {
     "type": "git",
@@ -28,7 +26,7 @@
   "author": "Kadira Inc.",
   "license": "MIT",
   "options": {
-    "mocha": "--require scripts/mocha-bootload lib/**/__tests__/**/*.js"
+    "mocha": "--no-colors --require scripts/mocha-bootload lib/**/__tests__/**/*.js"
   },
   "bugs": {
     "url": "https://github.com/kadirahq/meteor-up/issues"
