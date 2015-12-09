@@ -1,4 +1,5 @@
 require('babel-core/register');
+require('babel-polyfill');
 
 // add a __rootdir global to avoid '../../../../../'
 // like paths when requiring package files.
