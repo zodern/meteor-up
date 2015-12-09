@@ -28,7 +28,7 @@
   "author": "Kadira Inc.",
   "license": "MIT",
   "options": {
-    "mocha": "--require scripts/mocha-bootload lib/**/__tests__/**/*.js"
+    "mocha": "--no-colors --require scripts/mocha-bootload lib/**/__tests__/**/*.js"
   },
   "bugs": {
     "url": "https://github.com/kadirahq/meteor-up/issues"
