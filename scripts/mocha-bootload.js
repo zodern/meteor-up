@@ -7,6 +7,7 @@ var path = require('path');
 __rootdir = path.resolve(__dirname, '..');
 
 process.on('unhandledRejection', function (error) {
-  console.error('Unhandled Promise Rejection:');
-  console.error(error && error.stack || error);
+  //console.error('Unhandled Promise Rejection:');
+  //console.error(error && error.stack || error);
+  throw error;
 });
