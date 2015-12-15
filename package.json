@@ -33,10 +33,11 @@
   },
   "homepage": "https://github.com/kadirahq/meteor-up#readme",
   "devDependencies": {
-    "mocha": "2.x.x",
-    "eslint": "1.x.x",
     "babel-eslint": "4.x.x",
-    "eslint-plugin-babel": "2.x.x"
+    "eslint": "1.x.x",
+    "eslint-plugin-babel": "2.x.x",
+    "mocha": "2.x.x",
+    "ssh2": "^0.4.12"
   },
   "dependencies": {
     "archiver": "^0.20.0",
