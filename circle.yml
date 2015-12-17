@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - ssh-kaygen -f tests/new -t rsa -N ''
+    - ssh-keygen -f tests/new -t rsa -N ''
     - ssh-add tests/new
     - docker build -t  mybase ~/meteor-up/tests/
     - docker run -d --name 'mydoc' -t mybase /sbin/my_init
