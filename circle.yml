@@ -7,4 +7,4 @@ test:
   override:
     - ssh -t $TEST_USER@$TEST_SERVER 'bash ~/meteor-up/tests/test-run.sh'
   post:
-    - ssh -t $TEST_USER@$TEST_SERVER 'rm -rf ~/meteor-up ~/tmp/*'
+    - ssh -t $TEST_USER@$TEST_SERVER 'rm -rf ~/meteor-up ~/tmp/* && sudo docker rm -f mydoc'
