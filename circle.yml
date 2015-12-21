@@ -1,6 +1,7 @@
 dependencies:
   pre:
     - rsync -avz ~/meteor-up $TEST_USER@$TEST_SERVER:~/ --exclude '*node_modules*' --exclude '.git' --exclude '*/.meteor/local/*'
+    - ssh -t $TEST_USER@$TEST_SERVER 'bash ~/meteor-up/tests/test-setup.sh'
 
 test:
   override:
