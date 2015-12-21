@@ -7,5 +7,5 @@ dependencies:
     - ssh-keygen -f tests/new -t rsa -N ''
     - ssh-add tests/new
     - docker build -t  mybase ~/meteor-up/tests/
-    - sudo docker run --privileged=true -d --name 'mydoc' -t mybase /sbin/my_init
+    - sudo docker run --privileged=true -v /var/run/docker.sock:/var/run/docker.sock -d --name 'mydoc' -t mybase /sbin/my_init
     - echo "export PROD_SERVER=$(docker inspect -format '{{ .NetworkSettings.IPAddress }}' 'mydoc')" >> ~/.circlerc
