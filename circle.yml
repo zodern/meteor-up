@@ -1,5 +1,3 @@
-machine:
-
 dependencies:
   pre:
     - rsync -avz ~/meteor-up $TEST_USER@$TEST_SERVER:~/
