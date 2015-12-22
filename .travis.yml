@@ -1,0 +1,23 @@
+sudo: required
+
+language: node
+
+services:
+  - docker
+
+before_install:
+  - cp -rf tests/ /tmp
+  - eval `ssh-agent`
+  - ssh-keygen -f tests/new -t rsa -N ''
+  - ssh-add tests/new
+  - docker build -t mybase tests/
+  - sudo docker run --privileged=true -d --name 'mydoc' -t mybase /sbin/my_init
+  - sleep 10
+  - export TEST_SERVER=$(docker inspect -format '{{ .NetworkSettings.IPAddress }}' 'mydoc')
+  - export TEST_USER=root
+
+install:
+  - npm install
+
+script:
+  - npm test
