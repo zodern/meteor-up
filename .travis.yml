@@ -18,6 +18,7 @@ before_install:
 
 install:
   - npm install
+  - npm link
 
 script:
   - npm test
