@@ -2,19 +2,28 @@
 Meteor Up 1.0 is still in development. We need help porting old mup and mupx features to this version. Bug Fixes and feature implementations can be submitted as pull request on the master branch on this repo. Make sure your modifications does not break any of the current unit tests.
 
 ## Running Unit Tests
-Our test suit is written using [mocha](https://mochajs.org/) + [sheljs](https://github.com/shelljs/shelljs) and parallelized using [GNU parallel](http://www.gnu.org/software/parallel/) + docker. Parallel testing currently only supports on Ubuntu (14.04).
+Our test suit is written using [mocha](https://mochajs.org/) + [sheljs](https://github.com/shelljs/shelljs) and parallelized using [GNU parallel](http://www.gnu.org/software/parallel/) + docker. Parallel testing currently only tested on Ubuntu (14.04).
+
+### Running Unit Tests Parallelly
+Parallel testing works by creating dokcer instances per each test case given and actually deploying a meteor app inside that using meteor up. So the box running tests should have a higher CPU/RAM depending on your MOCHA_PARALLEL setting.
 
 Before running the unit tests, make sure the user account running the unit tests is in the sudoers list. Test suit depends on node, docker, meteor and gnu parallel. If any of them are not available, test suit will automatically install them.
 
-Tests can be run in parallel using
+* Get a Ubuntu (14.04) box (Our setup is 4vCPU/10GB ram VM for 6 parallel tests)
+* Clone your meteor up fork into `~/meteor-up`
+* Decide your parallelism setting (default is 4)
 ```
-export MOCHA_PARALLEL=<number of cores * 1.5> #default is 4 
+export MOCHA_PARALLEL=<number of cores * 1.5>
+```
+* Start testing
+```
 bash <meteor-up dir>/tests/test-run.sh
 ```
 
-Test can be run in serial on a single server using
+### Running Unit Tests Serially
+If you don't have access to a high end box, You can run unit tests serially on the development box or low end remote box. This will not use docker-in-docker setup. Instead, it will deploy meteor app on the given server using meteor up. Either use `ssh-agent` or modify `<meteor-up dir>/tests/project-1/mup.js` file to setup authentication to test box.
 ```
-export PROD_SERVER=<server ip>
+export PROD_SERVER=<server ip> #localhost for local testing
 export PROD_SERVER_USER=<server user>
 npm test
 
@@ -22,8 +31,6 @@ npm test
 npm test -- -g "<regex>"
 #ex npm test -- -g "meteor.deploy"
 ```
-
-Either use `ssh-agent` or modify `<meteor-up dir>/tests/project-1/mup.js` file to add authentication. 
 ### A note about docker
 Since we are using docker in docker for parallel testing, Aufs storage driver for docker(the default) should be disabled. Our test script automatically does this by setting `DOCKER_OPTS="--storage-driver=devicemapper"` in `/etc/default/docker`. In case you installed docker yourself. You should set this manually.
 
