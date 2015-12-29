@@ -1,0 +1,7 @@
+meteor.setup
+meteor.push
+meteor.envconfig
+meteor.start
+meteor.deploy
+meteor.logs
+meteor.stop
