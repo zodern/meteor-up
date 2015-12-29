@@ -22,6 +22,8 @@ npm test
 npm test -- -g "<regex>"
 #ex npm test -- -g "meteor.deploy"
 ```
+
+Either use `ssh-agent` or modify `<meteor-up dir>/tests/project-1/mup.js` file to add authentication. 
 ### A note about docker
 Since we are using docker in docker for parallel testing, Aufs storage driver for docker(the default) should be disabled. Our test script automatically does this by setting `DOCKER_OPTS="--storage-driver=devicemapper"` in `/etc/default/docker`. In case you installed docker yourself. You should set this manually.
 
