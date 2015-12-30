@@ -5,7 +5,7 @@ export MOCHA_PARALLEL="${MOCHA_PARALLEL:-4}"
 #seting up env
 command -v node >/dev/null 2>&1 || { curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash - && sudo apt-get install -qq -y nodejs; }
 #command -v docker >/dev/null 2>&1 || { wget -qO- https://get.docker.com/ | sudo sh && sudo service docker start; }
-command -v docker >/dev/null 2>&1 || { wget -qO- https://get.docker.com/ | sudo sh && echo 'DOCKER_OPTS="--storage-driver=devicemapper"' | sudo tee --append /etc/default/docker >/dev/null && sudo service docker start; }
+command -v docker >/dev/null 2>&1 || { wget -qO- https://get.docker.com/ | sudo sh && echo 'DOCKER_OPTS="--storage-driver=devicemapper"' | sudo tee --append /etc/default/docker >/dev/null && sudo service docker start || sudo service docker restart; }
 command -v meteor >/dev/null 2>&1 || { curl https://install.meteor.com/ | sh; }
 command -v parallel >/dev/null 2>&1 || { sudo apt-get -qq -y install parallel; }
 
@@ -31,7 +31,7 @@ echo '' > ~/.ssh/known_hosts
 ssh-keygen -f new -t rsa -N ''
 eval `ssh-agent` 
 ssh-add new 
-sudo docker rm -f $(docker ps -aq) 2>/dev/null
+sudo docker rm -f $(sudo docker ps -aq) 2>/dev/null
 sudo docker build -t mybase .
 
 cd $MUP_DIR
