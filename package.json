@@ -33,19 +33,24 @@
   },
   "homepage": "https://github.com/kadirahq/meteor-up#readme",
   "devDependencies": {
-    "mocha": "2.x.x",
-    "eslint": "1.x.x",
     "babel-eslint": "4.x.x",
-    "eslint-plugin-babel": "2.x.x"
+    "eslint": "1.x.x",
+    "eslint-plugin-babel": "2.x.x",
+    "mocha": "2.x.x",
+    "ssh2": "0.4.x"
   },
   "dependencies": {
+    "archiver": "0.20.x",
     "babel-core": "6.x.x",
     "babel-polyfill": "6.x.x",
     "babel-preset-es2015": "6.x.x",
     "babel-preset-stage-0": "6.x.x",
+    "bluebird": "3.x.x",
     "debug": "2.x.x",
     "nodemiral": "1.x.x",
     "shelljs": "0.5.x",
-    "silent-npm-registry-client": "1.x.x"
+    "silent-npm-registry-client": "1.x.x",
+    "underscore": "1.x.x",
+    "uuid": "2.x.x"
   }
 }
