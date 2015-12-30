@@ -1,6 +1,6 @@
 ## Implementing Features and Bug Fixes
 
-Meteor Up 1.0 is still in development. We need help porting old mup and mupx features to this version. Bug Fixes and feature implementations can be submitted as pull request on the master branch on this repo. Make sure your modifications does not break any of the current unit tests.
+Meteor Up 1.0 is still in development. We need help porting old mup and mupx features to this version. Bug Fixes and feature implementations can be submitted as pull request on the master branch on this repo. Make sure your modifications does not break any of the current tests.
 
 ## Running Tests
 Our test suit is written using [mocha](https://mochajs.org/) + [sheljs](https://github.com/shelljs/shelljs) and parallelized using [GNU parallel](http://www.gnu.org/software/parallel/) + docker. Parallel testing currently only tested on Ubuntu (14.04).
@@ -8,7 +8,7 @@ Our test suit is written using [mocha](https://mochajs.org/) + [sheljs](https://
 ### Running Tests Parallelly
 Parallel testing works by creating docker instances per each test case given and actually deploying a meteor app inside that using meteor up. So the box running tests should have a higher CPU/RAM depending on your MOCHA_PARALLEL setting.
 
-Before running the unit tests, make sure the server's user account running the unit tests is in the sudoers list. Test suit depends on node, docker, meteor and gnu parallel. If any of them are not available, test suit will automatically install them.
+Before running the tests, make sure the server's user account running the tests is in the sudoers list. Test suit depends on node, docker, meteor and gnu parallel. If any of them are not available, test suit will automatically install them.
 
 #### How to run tests
 
@@ -23,9 +23,9 @@ export MOCHA_PARALLEL=<number of cores * 1.5>
 bash <meteor-up dir>/tests/test-run.sh
 ```
 
-### Running Unit Tests Serially
+### Running Tests Serially
 
-If you don't have access to a high end box, You can run unit tests serially on the development box or low end remote box. This will not use docker. Instead, it will deploy meteor app on the given server using meteor up. Either use `ssh-agent` or modify `<meteor-up dir>/tests/project-1/mup.js` file to setup authentication to test box.
+If you don't have access to a high end box, You can run tests serially on the development box or low end remote box. This will not use docker. Instead, it will deploy meteor app on the given server using meteor up. Either use `ssh-agent` or modify `<meteor-up dir>/tests/project-1/mup.js` file to setup authentication to test box.
 ```
 export PROD_SERVER=<server ip> #localhost for local testing
 export PROD_SERVER_USER=<server user>
