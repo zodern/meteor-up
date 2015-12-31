@@ -8,6 +8,7 @@ command -v node >/dev/null 2>&1 || { curl -sL https://deb.nodesource.com/setup_5
 command -v docker >/dev/null 2>&1 || { wget -qO- https://get.docker.com/ | sudo sh && echo 'DOCKER_OPTS="--storage-driver=devicemapper"' | sudo tee --append /etc/default/docker >/dev/null && sudo service docker start || sudo service docker restart; }
 command -v meteor >/dev/null 2>&1 || { curl https://install.meteor.com/ | sh; }
 command -v parallel >/dev/null 2>&1 || { sudo apt-get -qq -y install parallel; }
+command -v mkfs.xfs >/dev/null 2>&1 || { sudo apt-get -qq -y install xfsprogs; }
 
 #running a single test
 function run_test {

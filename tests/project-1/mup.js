@@ -21,7 +21,6 @@ module.exports = {
 
   mongo: {
     oplog: true,
-    port: 27017,
     servers: {
       mymongo: {},
     },
