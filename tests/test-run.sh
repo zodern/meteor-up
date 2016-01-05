@@ -12,7 +12,7 @@ command -v mkfs.xfs >/dev/null 2>&1 || { sudo apt-get -qq -y install xfsprogs; }
 
 #running a single test
 function run_test {
-    DOCKER_ID=$(sudo docker run --privileged=true -d -t mybase /sbin/my_init)
+    DOCKER_ID=$(sudo docker run -v /tmp/tests/new.pub:/root/.ssh/authorized_keys --privileged=true -d -t mybase /sbin/my_init)
     sleep 5
     export PROD_SERVER_USER=root
     export PROD_SERVER=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' $DOCKER_ID)
@@ -24,16 +24,20 @@ export -f run_test
 
 MUP_DIR=~/meteor-up
 {
-rm -rf /tmp/tests
+sudo rm -rf /tmp/tests
 cp -rf $MUP_DIR/tests /tmp
 cd /tmp/tests/
 rm -rf new*
 echo '' > ~/.ssh/known_hosts
 ssh-keygen -f new -t rsa -N ''
+chmod 600 new.pub
+sudo chown root:root new.pub
 eval `ssh-agent` 
 ssh-add new 
 sudo docker rm -f $(sudo docker ps -aq) 2>/dev/null
-sudo docker build -t mybase .
+if [[ -z $(sudo docker images -aq mybase) ]]; then
+    sudo docker build -t mybase .
+fi
 
 cd $MUP_DIR
 npm install
