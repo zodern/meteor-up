@@ -34,6 +34,7 @@
   "homepage": "https://github.com/kadirahq/meteor-up#readme",
   "devDependencies": {
     "babel-eslint": "4.x.x",
+    "chai": "^3.4.1",
     "eslint": "1.x.x",
     "eslint-plugin-babel": "2.x.x",
     "mocha": "2.x.x",

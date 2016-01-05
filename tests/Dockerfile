@@ -9,14 +9,10 @@ CMD ["/sbin/my_init"]
 
 #Install wget
 RUN apt-get update
-RUN apt-get -y install wget
+RUN apt-get -y install wget tree
 
 #Enable ssh
 RUN rm -f /etc/service/sshd/down
-
-#ADD keys
-ADD new.pub /tmp/new.pub
-RUN cat /tmp/new.pub >> /root/.ssh/authorized_keys && rm -f /tmp/new.pub
 
 #Expose ssh port
 EXPOSE 22
