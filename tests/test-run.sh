@@ -18,7 +18,7 @@ function run_test {
     export PROD_SERVER=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' $DOCKER_ID)
     cd ~/meteor-up
     npm test -- -g $1
-    sudo docker rm -f $DOCKER_ID > /dev/null
+    sudo docker rm -f $(sudo docker stop $DOCKER_ID) > /dev/null
 }
 export -f run_test
 

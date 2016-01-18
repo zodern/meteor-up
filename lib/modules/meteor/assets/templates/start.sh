@@ -5,7 +5,6 @@ APP_PATH=/opt/$APPNAME
 BUNDLE_PATH=$APP_PATH/current
 ENV_FILE=$APP_PATH/config/env.list
 PORT=<%= port %>
-USE_LOCAL_MONGO=<%= useLocalMongo? "1" : "0" %>
 
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
@@ -18,29 +17,18 @@ set +e
 docker pull meteorhacks/meteord:base
 set -e
 
-if [ "$USE_LOCAL_MONGO" == "1" ]; then
-  docker run \
-    -d \
-    --restart=always \
-    --publish=$PORT:80 \
-    --volume=$BUNDLE_PATH:/bundle \
-    --env-file=$ENV_FILE \
-    --link=mongodb:mongodb \
-    --hostname="$HOSTNAME-$APPNAME" \
-    --env=MONGO_URL=mongodb://mongodb:27017/$APPNAME \
-    --name=$APPNAME \
-    meteorhacks/meteord:base
-else
-  docker run \
-    -d \
-    --restart=always \
-    --publish=$PORT:80 \
-    --volume=$BUNDLE_PATH:/bundle \
-    --hostname="$HOSTNAME-$APPNAME" \
-    --env-file=$ENV_FILE \
-    --name=$APPNAME \
-    meteorhacks/meteord:base
-fi
+docker run \
+  -d \
+  --restart=always \
+  --publish=$PORT:80 \
+  --volume=$BUNDLE_PATH:/bundle \
+  --hostname="$HOSTNAME-$APPNAME" \
+  --env-file=$ENV_FILE \
+  <% if(useLocalMongo)  { %>--link=mongodb:mongodb --env=MONGO_URL=mongodb://mongodb:27017/$APPNAME <% } %>\
+  <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %>\
+  <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %>\
+  --name=$APPNAME \
+  meteorhacks/meteord:base
 
 <% if(typeof sslConfig === "object")  { %>
   # We don't need to fail the deployment because of a docker hub downtime
