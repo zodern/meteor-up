@@ -7,7 +7,8 @@ First setup Meteor Up
 ```
 git clone https://github.com/kadirahq/meteor-up
 cd meteor-up
-npm install -g
+npm install
+npm link
 ```
 
 Then setup your project
