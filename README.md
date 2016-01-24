@@ -19,7 +19,7 @@ mup init <your project>
 make changes to `mup.js`. and add a `settings.js` file. Then,
 ```
 mup setup
-mup deply
+mup deploy
 ```
 
 ## mup.js format
