@@ -47,13 +47,12 @@ module.exports = {
       ROOT_URL: 'app.com',
       MONGO_URL: 'mongodb://localhost/meteor'
     },
-    logs: { //optional 
+    logs: { //optional
       driver: 'syslog',
       opts: {
         url:'udp://syslogserverurl.com:1234'
       }
     }
-    setupMongo: 1,
     dockerImage: 'madushan1000/meteord-test' //optional
   },
 
@@ -64,5 +63,7 @@ module.exports = {
       one: {},
     },
   },
+  setupMongo: 1,
+  deployCheckWaitTime: 60
 };
 ```
