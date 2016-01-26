@@ -13,6 +13,8 @@ npm link
 
 Then setup your project
 ```
+mkdir .deploy
+cd .deploy
 mup init <your project>
 ```
 
