@@ -8,17 +8,17 @@ throw new Error(msg);
 module.exports = {
   mymeteor: {
     host: '1.2.3.4',
-    user: 'username',
+    username: 'username',
     pem: privateKey,
   },
   mymongo: {
     host: '1.2.3.4',
-    user: 'username',
+    username: 'username',
     pem: privateKey,
   },
   myproxy: {
     host: '1.2.3.4',
-    user: 'username',
-    pass: 'password',
+    username: 'username',
+    password: 'password',
   },
 };
