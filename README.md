@@ -32,7 +32,7 @@ module.exports = {
   servers: {
     one: {
       host: '1.2.3.4',
-      user: 'root'
+      username: 'root'
       // pem:
       // password:
       // or leave blank for authenticate from ssh-agent
