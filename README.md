@@ -1,7 +1,9 @@
 # meteor-up [![Stories in Ready](https://badge.waffle.io/kadirahq/meteor-up.svg?label=ready&title=Ready)](http://waffle.io/kadirahq/meteor-up)
-Production Quality Meteor Deployment to Anywhere
 
-This version of Meteor Up is still in development. To test it with your app,
+> This version of Meteor Up is still in development.
+> Please check [arunoda/meteor-up](https://github.com/arunoda/meteor-up) for the stable version.
+
+Production Quality Meteor Deployment to Anywhere
 
 First setup Meteor Up
 ```
