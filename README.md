@@ -27,7 +27,7 @@ mup deploy
 ```
 
 ## mup.js format
-Note that we are using a `mup.js` file instead of old `mup.json` file. You can write regular javascript code in this file to things like reading contents of ssh key file. A example format for this file as following.
+Note that we are using a `mup.js` file instead of the old `mup.json` file. You can write regular javascript code in this file to change things like reading the contents of an ssh key file. An example format for this file is as follows.
 
 ```js
 module.exports = {
