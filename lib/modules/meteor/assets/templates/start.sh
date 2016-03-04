@@ -14,7 +14,14 @@ docker rm -f $APPNAME-frontend
 
 # We don't need to fail the deployment because of a docker hub downtime
 set +e
+<% if(installAdditional.length > 0)  { %>
+docker build -t meteorhacks/meteord:app - << EOF
+FROM <%= image %>
+RUN apt-get install <%- installAdditional.join(' ') %> -y
+EOF
+<% } else { %>
 docker pull <%= image %>
+<% } %>
 set -e
 
 docker run \
@@ -28,7 +35,7 @@ docker run \
   <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %>\
   <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %>\
   --name=$APPNAME \
-  <%= image %>
+  <%= (installAdditional.length > 0) ? 'meteorhacks/meteord:app' : image %>
 
 <% if(typeof sslConfig === "object")  { %>
   # We don't need to fail the deployment because of a docker hub downtime
