@@ -1,3 +1,5 @@
+#!/usr/bin/env/node
+
 import modules from './modules/';
 import MupAPI from './mup-api';
 import checkUpdates from './updates';
