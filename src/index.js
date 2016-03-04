@@ -1,4 +1,4 @@
-#!/usr/bin/env/node
+#!/usr/bin/env node
 
 import modules from './modules/';
 import MupAPI from './mup-api';
