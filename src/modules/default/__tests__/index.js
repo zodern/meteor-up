@@ -7,7 +7,7 @@ import {describe, it} from 'mocha';
 import {countOccurences, runSSHCommand} from '../../utils';
 
 sh.config.silent = false;
-const servers = require(path.resolve(__rootdir, 'tests/servers'));
+const servers = require('../../../../tests/servers');
 
 describe('module - default', function () {
   this.timeout(600000);
@@ -40,7 +40,7 @@ describe('module - default', function () {
 
   describe('init', function () {
     it('should create "mup.js" and "setting.json" in ./tests/project-2', done => {
-      const dir = path.resolve(__rootdir, 'tests/project-tmp');
+      const dir = '../../../../tests/project-tmp';
       sh.mkdir(dir);
       sh.cd(dir);
       sh.exec('mup init');

@@ -6,7 +6,7 @@ import {describe, it} from 'mocha';
 import {countOccurences, runSSHCommand} from '../../utils';
 
 sh.config.silent = false;
-const servers = require(path.resolve(__rootdir, 'tests/servers'));
+const servers = require('../../../../tests/servers');
 
 describe('module - meteor', function () {
   this.timeout(600000);
@@ -27,7 +27,7 @@ describe('module - meteor', function () {
       await runSSHCommand(serverInfo, 'rm -rf /opt/myapp || :');
       await runSSHCommand(serverInfo, 'sudo apt-get -qq update && sudo apt-get -qq install -y tree');
 
-      sh.cd(path.resolve('/tmp/', 'tests/project-1'));
+      sh.cd(path.resolve('/tmp','tests/project-1'));
 
       const out = sh.exec('mup meteor setup');
       assert.equal(out.code, 0);
