@@ -4,11 +4,11 @@
   "description": "Production Quality Meteor Deployments",
   "main": "lib/index.js",
   "bin": {
-    "mup": "./lib/index.js"
+    "mup": "./index.js"
   },
   "scripts": {
     "prepublish": "nofat build",
-    "test": "nofat build && nofat test && nofat lint"
+    "test": "nofat test && nofat lint"
   },
   "repository": {
     "type": "git",
