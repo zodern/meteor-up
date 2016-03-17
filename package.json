@@ -7,7 +7,7 @@
     "mup": "./index.js"
   },
   "scripts": {
-    "prepublish": "nofat build",
+    "prepublish": "nofat make",
     "test": "nofat test && nofat lint"
   },
   "repository": {
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/kadirahq/meteor-up#readme",
   "devDependencies": {
-    "nofat": "0.7.0",
+    "nofat": "1.0.x",
     "ssh2": "0.4.x"
   },
   "dependencies": {
