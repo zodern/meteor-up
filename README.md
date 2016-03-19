@@ -20,11 +20,13 @@ cd .deploy
 mup init <your project>
 ```
 
-make changes to `mup.js`. and add a `settings.js` file. Then,
+make changes to `mup.js`. and add a `settings.json` file. Then,
 ```
 mup setup
 mup deploy
 ```
+
+Your `settings.json` file should be in the same directory, and it will automatically be used.
 
 ## mup.js format
 Note that we are using a `mup.js` file instead of the old `mup.json` file. You can write regular javascript code in this file to change things like reading the contents of an ssh key file. An example format for this file is as follows.
