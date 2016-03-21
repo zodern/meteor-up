@@ -53,6 +53,10 @@ module.exports = {
       ROOT_URL: 'app.com',
       MONGO_URL: 'mongodb://localhost/meteor'
     },
+    variablesFromLocalEnv: { //optional
+      'AWS_KEY',
+      'AWS_SECRET',
+    },
     logs: { //optional
       driver: 'syslog',
       opts: {
