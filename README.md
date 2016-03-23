@@ -72,3 +72,16 @@ module.exports = {
   },
 };
 ```
+## FAQ
+Q) I get an deploy verification error with logs like below (Similar to issue [88](https://github.com/kadirahq/meteor-up/issues/88))
+```
+Verifying Deployment: FAILED
+
+Error: 
+-----------------------------------STDERR-----------------------------------
+ run:
+npm WARN deprecated 
+npm WARN deprecated   npm -g install npm@latest
+npm WARN deprecated
+```
+A) Try increasing the value of `deployCheckWaitTime` field in `mup.js` file.
