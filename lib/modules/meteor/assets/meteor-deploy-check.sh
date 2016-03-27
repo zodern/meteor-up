@@ -16,17 +16,28 @@ revert_app (){
     echo "=> Redeploying previous version of the app" 1>&2
     echo " " 1>&2
   fi
-  
-  echo 
+
+  echo
   echo "To see more logs type 'mup logs --tail=50'"
   echo ""
+}
+
+poll (){
+  wget -qO - "localhost:$PORT" >/dev/null
 }
 
 elaspsed=0
 while [[ true ]]; do
   sleep 1
   elaspsed=$((elaspsed+1))
-  curl localhost:$PORT && exit 0
+
+  if poll; then
+    if [ -d last ]; then
+      sudo rm -rf last
+      echo "=> Folder 'last' was successfully deleted"
+    fi
+    exit 0
+  fi
 
   if [ "$elaspsed" == "$DEPLOY_CHECK_WAIT_TIME" ]; then
     revert_app
