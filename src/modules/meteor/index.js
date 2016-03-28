@@ -161,7 +161,7 @@ export function start(api) {
   list.executeScript('Verifying Deployment', {
     script: path.resolve(__dirname, 'assets/meteor-deploy-check.sh'),
     vars: {
-      deployCheckWaitTime: config.deployCheckWaitTime || 10,
+      deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
       port: config.env.PORT || 80
     }

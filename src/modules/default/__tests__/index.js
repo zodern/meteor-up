@@ -13,7 +13,7 @@ describe('module - default', function () {
   this.timeout(600000);
 
   describe('deploy', function () {
-    it('should deploy meteor app on "meteor" vm', async done => {
+    it('should deploy meteor app on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
       sh.exec('mup setup');
@@ -21,16 +21,16 @@ describe('module - default', function () {
       const out = sh.exec('mup deploy');
 
       expect(out.code).to.be.equal(0);
-      expect(countOccurences('Bulding App Bundle Locally', out.output)).to.be.equal(1);
+      expect(countOccurences('Building App Bundle Locally', out.output)).to.be.equal(1);
       expect(countOccurences('Pushing Meteor App Bundle to The Server: SUCCESS', out.output)).to.be.equal(1);
       expect(countOccurences('Pushing the Startup Script: SUCCESS', out.output)).to.be.equal(1);
       expect(countOccurences('Sending Environment Variables: SUCCESS', out.output)).to.be.equal(1);
       expect(countOccurences('Start Meteor: SUCCESS', out.output)).to.be.equal(1);
       expect(countOccurences('Verifying Deployment: SUCCESS', out.output)).to.be.equal(1);
-      expect((await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code).to.be.equal(0);
-      expect((await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0')).code).to.be.equal(0);
-
-      done();
+      const ssh1 = await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017');
+      expect(ssh1.code).to.be.equal(0);
+      const ssh2 = await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0');
+      expect(ssh2.code).to.be.equal(0);
     });
   });
 
@@ -39,29 +39,27 @@ describe('module - default', function () {
   });
 
   describe('init', function () {
-    it('should create "mup.js" and "setting.json" in ./tests/project-2', done => {
-      const dir = '../../../../tests/project-tmp';
+    it('should create "mup.js" and "setting.json" in /tmp/project-tmp', () => {
+      const dir = '/tmp/project-tmp';
       sh.mkdir(dir);
       sh.cd(dir);
       sh.exec('mup init');
       expect(fs.existsSync(path.resolve(dir, 'mup.js'))).to.true;
       expect(fs.existsSync(path.resolve(dir, 'settings.json'))).to.true;
       sh.rm('-rf', dir);
-      done();
     });
   });
 
   describe('logs', function () {
-    it('should pull the logs from meteor app', done => {
+    it('should pull the logs from meteor app', () => {
       sh.cd(path.resolve('/tmp/', 'tests/project-1'));
       const out = sh.exec('mup logs');
       expect(out.code).to.be.equal(0);
-      done();
     });
   });
 
   describe('reconfig', function () {
-    it('should reconfig meteor app on "meteor" vm', async done => {
+    it('should reconfig meteor app on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
       sh.exec('mup setup && mup deploy');
@@ -73,13 +71,11 @@ describe('module - default', function () {
       expect(countOccurences('Start Meteor: SUCCESS', out.output)).to.be.equal(1);
       expect(countOccurences('Verifying Deployment: SUCCESS', out.output)).to.be.equal(1);
       expect((await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0')).code).to.be.equal(0);
-
-      done();
     });
   });
 
   describe('restart', function () {
-    it('should restart meteor app on "meteor" vm', async done => {
+    it('should restart meteor app on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
       sh.exec('mup setup && mup deploy');
@@ -91,13 +87,11 @@ describe('module - default', function () {
       expect(countOccurences('Start Meteor: SUCCESS', out.output)).to.be.equal(1);
       expect(countOccurences('Verifying Deployment: SUCCESS', out.output)).to.be.equal(1);
       expect((await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0')).code).to.be.equal(0);
-
-      done();
     });
   });
 
   describe('setup', function () {
-    it('should setup "meteor" vm', async done => {
+    it('should setup "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
 
@@ -108,16 +102,14 @@ describe('module - default', function () {
       expect(countOccurences('setup environment: SUCCESS', out.output)).to.be.equal(1);
       expect(countOccurences('start mongo: SUCCESS', out.output)).to.be.equal(1);
       expect((await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code).to.be.equal(0);
-
-      done();
     });
   });
 
   describe('start', function () {
-    it('should start meteor app on "meteor" vm', async done => {
+    it('should start meteor app on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
-      sh.exec('mup setup && mup deploy && mup stop');
+      sh.exec('mup setup && mup meteor push && mup meteor envconfig');
 
       const out = sh.exec('mup start');
 
@@ -125,13 +117,11 @@ describe('module - default', function () {
       expect(countOccurences('Start Meteor: SUCCESS', out.output)).to.be.equal(1);
       expect(countOccurences('Verifying Deployment: SUCCESS', out.output)).to.be.equal(1);
       expect((await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0')).code).to.be.equal(0);
-
-      done();
     });
   });
 
   describe('stop', function () {
-    it('should stop meteor app on "meteor" vm', async done => {
+    it('should stop meteor app on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
       sh.exec('mup setup && mup deploy');
@@ -141,15 +131,13 @@ describe('module - default', function () {
       expect(out.code).to.be.equal(0);
       expect(countOccurences('Stop Meteor: SUCCESS', out.output)).to.be.equal(1);
       expect((await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0')).code).to.be.equal(7);
-
-      done();
     });
   });
 
   describe('syslog', function () {
     const serverInfo = servers['mymeteor'];
 
-    it('should write meteor logst to syslog on "meteor" vm', async done => {
+    it('should write meteor logst to syslog on "meteor" vm', async () => {
 
       sh.cd(path.resolve('/tmp', 'tests/project-2'));
 
@@ -158,8 +146,6 @@ describe('module - default', function () {
       expect(out.code).to.be.equal(0);
 
       expect(countOccurences('=> Starting meteor app on port:80', out.output)).gte(1);
-
-      done();
     });
   });
 });

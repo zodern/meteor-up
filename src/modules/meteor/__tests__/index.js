@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import assert from 'assert';
+import {expect} from 'chai';
 import path from 'path';
 import sh from 'shelljs';
 import {describe, it} from 'mocha';
@@ -20,10 +21,9 @@ describe('module - meteor', function () {
   });
 
   describe('setup', function () {
-    it('should setup enviranment on "meteor" vm', async done => {
+    it('should setup enviranment on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
 
-      await cleanup(serverInfo);
       await runSSHCommand(serverInfo, 'rm -rf /opt/myapp || :');
       await runSSHCommand(serverInfo, 'sudo apt-get -qq update && sudo apt-get -qq install -y tree');
 
@@ -39,16 +39,12 @@ describe('module - meteor', function () {
       assert.equal(countOccurences('/opt/myapp', sshOut.output), 3);
       assert.equal(countOccurences('/opt/myapp/config', sshOut.output), 1);
       assert.equal(countOccurences('/opt/myapp/tmp', sshOut.output), 1);
-
-      done();
     });
   });
 
   describe('push', function () {
-    it('should push meteor app bundle to "meteor" vm', async done => {
+    it('should push meteor app bundle to "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
-
-      await cleanup(serverInfo);
 
       sh.cd(path.resolve('/tmp','tests/project-1'));
 
@@ -65,15 +61,12 @@ describe('module - meteor', function () {
 
       const sshOut2 = await runSSHCommand(serverInfo, 'ls -al /opt/myapp/config/start.sh');
       assert.equal(sshOut2.code, 0);
-
-      done();
     });
   });
 
   describe('envconfig',function () {
     const serverInfo = servers['mymeteor'];
-    it('should send the enviranment variables to "meteor" vm', async done => {
-      await cleanup(serverInfo);
+    it('should send the enviranment variables to "meteor" vm', async () => {
 
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
 
@@ -87,8 +80,6 @@ describe('module - meteor', function () {
 
       const sshOut = await runSSHCommand(serverInfo, 'ls -al /opt/myapp/config/env.list');
       assert.equal(sshOut.code, 0);
-
-      done();
     });
   });
 
@@ -96,13 +87,11 @@ describe('module - meteor', function () {
   describe('start', function () {
     const serverInfo = servers['mymeteor'];
 
-    it('should start meteor on "meteor" vm', async done => {
-
-      await cleanup(serverInfo);
+    it('should start meteor on "meteor" vm', async () => {
 
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
 
-      sh.exec('mup docker setup && mup meteor setup && mup meteor push && mup meteor envconfig');
+      sh.exec('mup setup && mup meteor push && mup meteor envconfig');
       const out = sh.exec('mup meteor start');
       assert.equal(out.code, 0);
 
@@ -111,20 +100,16 @@ describe('module - meteor', function () {
 
       const sshOut = await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0');
       assert.equal(sshOut.code, 0);
-
-      done();
     });
   });
 
   describe('deploy', function () {
     const serverInfo = servers['mymeteor'];
-    it('should deploy meteor app on "meteor" vm', async done => {
-
-      await cleanup(serverInfo);
+    it('should deploy meteor app on "meteor" vm', async () => {
 
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
 
-      sh.exec('mup docker setup && mup meteor setup');
+      sh.exec('mup setup');
       const out = sh.exec('mup meteor deploy');
       assert.equal(out.code, 0);
 
@@ -139,8 +124,6 @@ describe('module - meteor', function () {
 
       const sshOut = await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0');
       assert.equal(sshOut.code, 0);
-
-      done();
     });
   });
 
@@ -156,13 +139,11 @@ describe('module - meteor', function () {
 
   describe('stop', function () {
     const serverInfo = servers['mymeteor'];
-    it('should stop meteor app on "meteor" vm', async done => {
-
-      await cleanup(serverInfo);
+    it('should stop meteor app on "meteor" vm', async () => {
 
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
 
-      sh.exec('mup docker setup && mup meteor setup && mup meteor deploy');
+      sh.exec('mup setup && mup deploy');
       const out = sh.exec('mup meteor stop');
       assert.equal(out.code, 0);
 
@@ -171,8 +152,6 @@ describe('module - meteor', function () {
 
       const sshOut = await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0');
       assert.equal(sshOut.code, 7);
-
-      done();
     });
   });
 });

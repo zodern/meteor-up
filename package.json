@@ -8,7 +8,8 @@
   },
   "scripts": {
     "prepublish": "nofat make",
-    "test": "nofat test && nofat lint"
+     "test": "nofat test",
+     "lint": "nofat lint"
   },
   "repository": {
     "type": "git",
