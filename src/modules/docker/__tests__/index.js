@@ -6,8 +6,7 @@ import sh from 'shelljs';
 import {countOccurences, runSSHCommand} from '../../utils';
 
 sh.config.silent = false;
-// require server ssh auth information from tests directory
-const servers = require(path.resolve(__rootdir, 'tests/servers'));
+const servers = require('../../../../tests/servers');
 
 
 describe('module - docker', function () {
@@ -28,7 +27,7 @@ describe('module - docker', function () {
       return async function (done) {
         this.timeout(60000);
 
-        sh.cd(path.resolve(__rootdir, 'tests/project-1'));
+        sh.cd('../../../../tests/project-1');
 
         const out = sh.exec('mup docker setup');
         assert.equal(out.code, 0);

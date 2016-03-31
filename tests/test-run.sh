@@ -32,8 +32,8 @@ echo '' > ~/.ssh/known_hosts
 ssh-keygen -f new -t rsa -N ''
 chmod 600 new.pub
 sudo chown root:root new.pub
-eval `ssh-agent` 
-ssh-add new 
+eval `ssh-agent`
+ssh-add new
 sudo docker rm -f $(sudo docker ps -aq) 2>/dev/null
 if [[ -z $(sudo docker images -aq mybase) ]]; then
     sudo docker build -t mybase .
@@ -41,6 +41,8 @@ fi
 
 cd $MUP_DIR
 npm install
+npm run prepublish
 sudo npm link
 } > /dev/null
+
 parallel --progress -j $MOCHA_PARALLEL run_test ::: </tmp/tests/tests.list
