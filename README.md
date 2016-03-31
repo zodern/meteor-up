@@ -1,7 +1,7 @@
 # meteor-up [![Stories in Ready](https://badge.waffle.io/kadirahq/meteor-up.svg?label=ready&title=Ready)](http://waffle.io/kadirahq/meteor-up)
 
 > This version of Meteor Up is still in development.
-> Please check [arunoda/meteor-up](https://github.com/arunoda/meteor-up) for the stable version.
+> Please check [arunoda/meteor-up](https://github.com/arunoda/meteor-up/tree/mupx) for the stable version.
 
 Production Quality Meteor Deployment to Anywhere
 
@@ -20,11 +20,13 @@ cd .deploy
 mup init <your project>
 ```
 
-make changes to `mup.js`. and add a `settings.js` file. Then,
+make changes to `mup.js`. and add a `settings.json` file. Then,
 ```
 mup setup
 mup deploy
 ```
+
+Your `settings.json` file should be in the same directory, and it will automatically be used.
 
 ## mup.js format
 Note that we are using a `mup.js` file instead of the old `mup.json` file. You can write regular javascript code in this file to change things like reading the contents of an ssh key file. An example format for this file is as follows.
@@ -70,3 +72,16 @@ module.exports = {
   },
 };
 ```
+## FAQ
+Q) I get an deploy verification error with logs like below (Similar to issue [88](https://github.com/kadirahq/meteor-up/issues/88))
+```
+Verifying Deployment: FAILED
+
+Error: 
+-----------------------------------STDERR-----------------------------------
+ run:
+npm WARN deprecated 
+npm WARN deprecated   npm -g install npm@latest
+npm WARN deprecated
+```
+A) Try increasing the value of `deployCheckWaitTime` field in `mup.js` file.
