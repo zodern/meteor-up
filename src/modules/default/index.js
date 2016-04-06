@@ -20,9 +20,13 @@ export function init(/* api */) {
   log('exec => mup init');
 
   // TODO check if mup.js or settings.json files exists
-  const src = path.resolve(__dirname, 'template/*');
-  const dst = process.cwd();
-  sh.cp(src, dst);
+  const mupJs = path.resolve(__dirname, 'template/mup.js.sample');
+  const settinsJson = path.resolve(__dirname, 'template/settings.json');
+  const mupJsDst = path.resolve(process.cwd(), 'mup.js');
+  const settingsJsonDst = path.resolve(process.cwd(), 'settings.json');
+
+  sh.cp(mupJs, mupJsDst);
+  sh.cp(settinsJson, settingsJsonDst);
 }
 
 export function logs(api) {
