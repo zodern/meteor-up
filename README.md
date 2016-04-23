@@ -1,4 +1,4 @@
-# meteor-up [![Stories in Ready](https://badge.waffle.io/kadirahq/meteor-up.svg?label=ready&title=Ready)](http://waffle.io/kadirahq/meteor-up)
+# meteor-up [![Stories in Ready](https://badge.waffle.io/kitmi/meteor-up.png?label=ready&title=Ready)](https://waffle.io/kitmi/meteor-up)
 
 > This version of Meteor Up is still in development.
 > Please check [arunoda/meteor-up](https://github.com/arunoda/meteor-up/tree/mupx) for the stable version.
@@ -78,10 +78,10 @@ Q) I get an deploy verification error with logs like below (Similar to issue [88
 ```
 Verifying Deployment: FAILED
 
-Error: 
+Error:
 -----------------------------------STDERR-----------------------------------
  run:
-npm WARN deprecated 
+npm WARN deprecated
 npm WARN deprecated   npm -g install npm@latest
 npm WARN deprecated
 ```
