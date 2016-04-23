@@ -1,6 +1,7 @@
 var spawn = require('child_process').spawn;
-var archiver = require('archiver');
+//var archiver = require('archiver');
 var fs = require('fs');
+var pathBasename = require('path').basename;
 var pathResolve = require('path').resolve;
 var _ = require('underscore');
 
@@ -14,7 +15,12 @@ function buildApp(appPath, buildLocaltion, buildOptions) {
     };
     buildMeteorApp(appPath, buildLocaltion, buildOptions, function(code) {
       if (code === 0) {
-        archiveIt(buildLocaltion, callback);
+        //archiveIt(buildLocaltion, callback);
+        let bundleName = pathBasename(pathResolve(appPath));
+        let bundlePath = pathResolve(buildLocaltion, 'bundle.tar.gz')
+        let sourceDir = pathResolve(buildLocaltion, bundleName + '.tar.gz');
+        fs.renameSync(sourceDir, bundlePath);
+        callback();        
       } else {
         console.log("\n=> Build Error. Check the logs printed above.");
         callback(new Error("build-error"));
@@ -26,7 +32,8 @@ function buildApp(appPath, buildLocaltion, buildOptions) {
 function buildMeteorApp(appPath, buildLocaltion, buildOptions, callback) {
   var executable = buildOptions.executable || 'meteor';
   var args = [
-    "build", "--directory", buildLocaltion,
+    //"build", "--directory", buildLocaltion, directly build archive instead
+    "build", buildLocaltion,
     "--architecture", "os.linux.x86_64",
     "--server", "http://localhost:3000"
   ];

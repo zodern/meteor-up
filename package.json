@@ -1,7 +1,7 @@
 {
   "name": "mup",
   "version": "1.0.0",
-  "description": "Production Quality Meteor Deployments",
+  "description": "Production Quality Meteor Deployments (kitmi version)",
   "main": "lib/index.js",
   "bin": {
     "mup": "./index.js"
@@ -13,23 +13,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kadirahq/meteor-up.git"
+    "url": "git+https://github.com/kitmi/meteor-up.git"
   },
   "keywords": [
     "meteor"
   ],
-  "author": "Kadira Inc.",
+  "contributors": [ { "name": "Kadira Inc." }, { "name": "rockie"} ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kadirahq/meteor-up/issues"
+    "url": "https://github.com/kitmi/meteor-up/issues"
   },
-  "homepage": "https://github.com/kadirahq/meteor-up#readme",
+  "homepage": "https://github.com/kitmi/meteor-up#readme",
   "devDependencies": {
     "nofat": "1.0.x",
     "ssh2": "0.4.x"
   },
   "dependencies": {
-    "archiver": "0.20.x",
     "babel-polyfill": "6.6.1",
     "bluebird": "3.x.x",
     "debug": "2.x.x",
