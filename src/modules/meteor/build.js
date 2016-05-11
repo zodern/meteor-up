@@ -40,6 +40,10 @@ function buildMeteorApp(appPath, buildLocaltion, buildOptions, callback) {
     args.push(JSON.stringify(buildOptions.mobileSettings));
   }
 
+  if(buildOptions.serverOnly) {
+    args.push('--server-only');
+  }
+
   var isWin = /^win/.test(process.platform);
   if(isWin) {
     // Sometimes cmd.exe not available in the path
