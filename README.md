@@ -50,6 +50,13 @@ module.exports = {
     servers: {
       one: {}, two: {}, three: {} //list of servers to deploy, from the 'servers' list
     },
+    buildOptions: {
+      serverOnly: true,
+      debug: true,
+      mobileSettings: {
+        yourMobileSetting: "setting value"
+      }
+    },
     env: {
       ROOT_URL: 'app.com',
       MONGO_URL: 'mongodb://localhost/meteor'
