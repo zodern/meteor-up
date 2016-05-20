@@ -66,7 +66,7 @@ export function setup(api) {
   return runTaskList(list, sessions);
 }
 
-export function push(api) {
+export async function push(api) {
   log('exec => mup meteor push');
   const config = api.getConfig().meteor;
   if (!config) {
@@ -78,38 +78,36 @@ export function push(api) {
   var buildLocation = path.resolve('/tmp', uuid.v4());
   var bundlePath = path.resolve(buildLocation, 'bundle.tar.gz');
 
-  return buildApp(config.path, buildLocation, config.buildOptions || {})
-    .then(() => {
-      config.log = config.log || {
-        opts: {
-          'max-size': '100m',
-          'max-file': 10
-        }
-      };
-      const list = nodemiral.taskList('Pushing Meteor');
+  await buildApp(config.path, buildLocation, config.buildOptions || {});
+  config.log = config.log || {
+    opts: {
+      'max-size': '100m',
+      'max-file': 10
+    }
+  };
+  const list = nodemiral.taskList('Pushing Meteor');
 
-      list.copy('Pushing Meteor App Bundle to The Server', {
-        src: bundlePath,
-        dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
-        progressBar: config.enableUploadProgressBar
-      });
+  list.copy('Pushing Meteor App Bundle to The Server', {
+    src: bundlePath,
+    dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
+    progressBar: config.enableUploadProgressBar
+  });
 
-      list.copy('Pushing the Startup Script', {
-        src: path.resolve(__dirname, 'assets/templates/start.sh'),
-        dest: '/opt/' + config.name + '/config/start.sh',
-        vars: {
-          appName: config.name,
-          useLocalMongo: api.getConfig().mongo ? 1 : 0,
-          port: config.env.PORT || 80,
-          sslConfig: config.ssl,
-          logConfig: config.log,
-          image: config.dockerImage || 'meteorhacks/meteord:base'
-        }
-      });
+  list.copy('Pushing the Startup Script', {
+    src: path.resolve(__dirname, 'assets/templates/start.sh'),
+    dest: '/opt/' + config.name + '/config/start.sh',
+    vars: {
+      appName: config.name,
+      useLocalMongo: api.getConfig().mongo ? 1 : 0,
+      port: config.env.PORT || 80,
+      sslConfig: config.ssl,
+      logConfig: config.log,
+      image: config.dockerImage || 'meteorhacks/meteord:base'
+    }
+  });
 
-      const sessions = api.getSessions([ 'meteor' ]);
-      return runTaskList(list, sessions);
-    });
+  const sessions = api.getSessions([ 'meteor' ]);
+  return runTaskList(list, sessions, {series: true});
 }
 
 export function envconfig(api) {
@@ -138,7 +136,7 @@ export function envconfig(api) {
     }
   });
   const sessions = api.getSessions([ 'meteor' ]);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, {series: true});
 }
 
 export function start(api) {
@@ -202,5 +200,5 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions([ 'meteor' ]);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, {series: true});
 }
