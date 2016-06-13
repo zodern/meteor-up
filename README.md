@@ -6,6 +6,9 @@
 Production Quality Meteor Deployment to Anywhere
 
 First setup Meteor Up
+
+> Note. npm version 3 is required to setup developer dependencies correctly.
+
 ```
 git clone https://github.com/kadirahq/meteor-up
 cd meteor-up
