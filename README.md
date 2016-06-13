@@ -61,10 +61,10 @@ module.exports = {
       ROOT_URL: 'app.com',
       MONGO_URL: 'mongodb://localhost/meteor'
     },
-    logs: { //optional
+    log: { //optional
       driver: 'syslog',
       opts: {
-        url:'udp://syslogserverurl.com:1234'
+        "syslog-address":'udp://syslogserverurl.com:1234'
       }
     }
     dockerImage: 'madushan1000/meteord-test', //optional
