@@ -36,9 +36,17 @@ export default class MupAPI {
   getSettings() {
     if (!this.settings) {
       const filePath = path.join(this.base, 'settings.json');
-      this.settings = require(filePath);
+      try {
+        this.settings = require(filePath);
+      } catch (e) {
+        if(process.env.METEOR_SETTINGS) {
+          this.settings = JSON.parse(process.env.METEOR_SETTINGS);
+        } else {
+          console.error(`No Meteor Settings found, set 'METEOR_SETTINGS' environment variable or ensure a '%s' exists.`, filePath);
+          process.exit(1);
+        }
+      }
     }
-
     return this.settings;
   }
 
