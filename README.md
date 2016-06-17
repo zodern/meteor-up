@@ -6,6 +6,9 @@
 Production Quality Meteor Deployment to Anywhere
 
 First setup Meteor Up
+
+> Note. npm version 3 is required to setup developer dependencies correctly.
+
 ```
 git clone https://github.com/kadirahq/meteor-up
 cd meteor-up
@@ -50,14 +53,21 @@ module.exports = {
     servers: {
       one: {}, two: {}, three: {} //list of servers to deploy, from the 'servers' list
     },
+    buildOptions: {
+      serverOnly: true,
+      debug: true,
+      mobileSettings: {
+        yourMobileSetting: "setting value"
+      }
+    },
     env: {
       ROOT_URL: 'app.com',
       MONGO_URL: 'mongodb://localhost/meteor'
     },
-    logs: { //optional
+    log: { //optional
       driver: 'syslog',
       opts: {
-        url:'udp://syslogserverurl.com:1234'
+        "syslog-address":'udp://syslogserverurl.com:1234'
       }
     }
     dockerImage: 'madushan1000/meteord-test', //optional
