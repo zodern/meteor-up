@@ -17,7 +17,7 @@ set +e
 <% if(installAdditional && installAdditional.length > 0)  { %>
 docker build -t meteorhacks/meteord:app - << EOF
 FROM <%= image %>
-RUN apt-get install <%- installAdditional.join(' ') %> -y
+RUN apt-get update && apt-get install <%- installAdditional.join(' ') %> -y
 EOF
 <% } else { %>
 docker pull <%= image %>
@@ -38,17 +38,21 @@ docker run \
   <%= (installAdditional && installAdditional.length > 0) ? 'meteorhacks/meteord:app' : image %>
 
 <% if(typeof sslConfig === "object")  { %>
-  # We don't need to fail the deployment because of a docker hub downtime
-  set +e
-  docker pull meteorhacks/mup-frontend-server:latest
-  set -e
-  docker run \
-    -d \
-    --restart=always \
-    --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
-    --volume=/opt/$APPNAME/config/private.key:/private.key \
-    --link=$APPNAME:backend \
-    --publish=<%= sslConfig.port %>:443 \
-    --name=$APPNAME-frontend \
-    meteorhacks/mup-frontend-server /start.sh
+# We don't need to fail the deployment because of a docker hub downtime
+set +e
+docker build -t meteorhacks/mup-frontend-server-secure - << EOF
+FROM meteorhacks/mup-frontend-server:latest
+RUN apt-get update && apt-get install --only-upgrade libssl1.0.0 openssl -y
+EOF
+set -e
+
+docker run \
+  -d \
+  --restart=always \
+  --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
+  --volume=/opt/$APPNAME/config/private.key:/private.key \
+  --link=$APPNAME:backend \
+  --publish=<%= sslConfig.port %>:443 \
+  --name=$APPNAME-frontend \
+  meteorhacks/mup-frontend-server-secure /start.sh
 <% } %>
