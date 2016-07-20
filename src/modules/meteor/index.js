@@ -103,6 +103,7 @@ export function push(api) {
           port: config.env.PORT || 80,
           sslConfig: config.ssl,
           logConfig: config.log,
+          volumes: config.volumes,
           image: config.dockerImage || 'meteorhacks/meteord:base'
         }
       });
