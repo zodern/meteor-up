@@ -8,8 +8,9 @@
   },
   "scripts": {
     "prepublish": "nofat make",
-     "test": "nofat test",
-     "lint": "nofat lint"
+    "test": "nofat test",
+    "lint": "nofat lint",
+    "postinstall": "nofat make"
   },
   "repository": {
     "type": "git",
@@ -24,19 +25,17 @@
     "url": "https://github.com/kadirahq/meteor-up/issues"
   },
   "homepage": "https://github.com/kadirahq/meteor-up#readme",
-  "devDependencies": {
-    "nofat": "1.0.x",
-    "ssh2": "0.4.x"
-  },
   "dependencies": {
     "archiver": "0.20.x",
     "babel-polyfill": "6.6.1",
     "bluebird": "3.x.x",
     "debug": "2.x.x",
     "nodemiral": "1.x.x",
+    "nofat": "1.0.x",
     "shelljs": "0.5.x",
     "silent-npm-registry-client": "1.x.x",
     "source-map-support": "0.4.0",
+    "ssh2": "0.4.x",
     "underscore": "1.x.x",
     "uuid": "2.x.x"
   }
