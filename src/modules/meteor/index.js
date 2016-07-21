@@ -104,6 +104,7 @@ export function push(api) {
           sslConfig: config.ssl,
           logConfig: config.log,
           volumes: config.volumes,
+          runVariables: config.runVariables,
           image: config.dockerImage || 'meteorhacks/meteord:base'
         }
       });
