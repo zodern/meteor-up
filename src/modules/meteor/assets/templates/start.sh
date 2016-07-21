@@ -28,6 +28,7 @@ docker run \
   <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %>\
   <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %>\
   <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %>\
+  <% for(var runVariable in runVariables) { %> <%= runVariables[runVariable] %> <% } %>\
   --name=$APPNAME \
   <%= image %>
 
