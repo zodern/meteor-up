@@ -54,10 +54,13 @@ module.exports = {
       "/host/path": "/container/path", //passed as '-v /host/path:/container/path' to the docker run command
       "/second/host/path": "/second/container/path"
     },
-    runVariables:[ //optional, lets you add / overwrite any parameter on the docker run command
-      "--link=myCustomMongoDB:myCustomMongoDB", //linking example
-      "--memory-reservation 200M"//memory reservation example
-    ],
+    docker:{
+      image:'meteorhacks/meteord:base',//optional
+      args:[ //optional, lets you add / overwrite any parameter on the docker run command
+        "--link=myCustomMongoDB:myCustomMongoDB", //linking example
+        "--memory-reservation 200M"//memory reservation example
+      ]
+    },
     servers: {
       one: {}, two: {}, three: {} //list of servers to deploy, from the 'servers' list
     },
@@ -77,8 +80,7 @@ module.exports = {
       opts: {
         "syslog-address":'udp://syslogserverurl.com:1234'
       }
-    }
-    dockerImage: 'madushan1000/meteord-test', //optional
+    },
     deployCheckWaitTime: 60 //default 10
   },
 
