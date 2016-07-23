@@ -104,7 +104,10 @@ export function push(api) {
           sslConfig: config.ssl,
           logConfig: config.log,
           volumes: config.volumes,
-          image: config.dockerImage || 'meteorhacks/meteord:base'
+          docker: Object.assign({
+            image:config.dockerImage || 'meteorhacks/meteord:base',
+            args:[]
+          },config.docker)
         }
       });
 
