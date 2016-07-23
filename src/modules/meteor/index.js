@@ -105,7 +105,7 @@ export function push(api) {
           logConfig: config.log,
           volumes: config.volumes,
           docker: Object.assign({
-            image:'meteorhacks/meteord:base',
+            image:config.dockerImage || 'meteorhacks/meteord:base',
             args:[]
           },config.docker)
         }
