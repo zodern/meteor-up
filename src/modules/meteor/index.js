@@ -86,6 +86,12 @@ export function push(api) {
           'max-file': 10
         }
       };
+
+      const defaultDockerConfig = {
+        image: 'meteorhacks/meteord:base',
+        args: []
+      }
+
       const list = nodemiral.taskList('Pushing Meteor');
 
       list.copy('Pushing Meteor App Bundle to The Server', {
@@ -104,10 +110,7 @@ export function push(api) {
           sslConfig: config.ssl,
           logConfig: config.log,
           volumes: config.volumes,
-          docker: Object.assign({
-            image:config.dockerImage || 'meteorhacks/meteord:base',
-            args:[]
-          },config.docker)
+          docker: Object.assign(defaultDockerConfig, config.docker)
         }
       });
 

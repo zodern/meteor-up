@@ -20,6 +20,11 @@ export default class MupAPI {
       const filePath = path.join(this.base, 'mup.js');
       try {
         this.config = require(filePath);
+        // NOTE: backward compatibility
+        if (this.config.dockerImage && !this.config.docker) {
+          this.config.docker = {image: config.dockerImage};
+          delete this.config.dockerImage;
+        }
       } catch (e) {
         if(e.code == 'MODULE_NOT_FOUND') {
           console.error(`'mup.js' file not found. Run 'mup init' first.`);
