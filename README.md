@@ -54,6 +54,10 @@ module.exports = {
       "/host/path": "/container/path", //passed as '-v /host/path:/container/path' to the docker run command
       "/second/host/path": "/second/container/path"
     },
+    sslVolumes: { //optional, lets you add docker volumes to SSL frontend
+      "/host/path": "/container/path", //passed as '-v /host/path:/container/path' to the docker run command
+      "/second/host/path": "/second/container/path"
+    },
     servers: {
       one: {}, two: {}, three: {} //list of servers to deploy, from the 'servers' list
     },

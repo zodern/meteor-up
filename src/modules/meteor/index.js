@@ -105,6 +105,7 @@ export function push(api) {
           logConfig: config.log,
           installAdditional: config.installAdditional,
           volumes: config.volumes,
+          sslVolumes: config.sslVolumes,
           image: config.dockerImage || 'meteorhacks/meteord:base'
         }
       });

@@ -52,6 +52,7 @@ docker run \
   --restart=always \
   --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
   --volume=/opt/$APPNAME/config/private.key:/private.key \
+  <% for(var volume in sslVolumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %>\
   --link=$APPNAME:backend \
   --publish=<%= sslConfig.port %>:443 \
   --name=$APPNAME-frontend \
