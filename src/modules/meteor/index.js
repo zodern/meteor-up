@@ -103,8 +103,9 @@ export function push(api) {
           port: config.env.PORT || 80,
           sslConfig: config.ssl,
           logConfig: config.log,
-          image: config.dockerImage || 'meteorhacks/meteord:base',
-          installAdditional: config.installAdditional
+          installAdditional: config.installAdditional,
+          volumes: config.volumes,
+          image: config.dockerImage || 'meteorhacks/meteord:base'
         }
       });
 
