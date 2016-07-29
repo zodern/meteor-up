@@ -14,14 +14,7 @@ docker rm -f $APPNAME-frontend
 
 # We don't need to fail the deployment because of a docker hub downtime
 set +e
-<% if(installAdditional && installAdditional.length > 0)  { %>
-docker build -t meteorhacks/meteord:app - << EOF
-FROM <%= image %>
-RUN apt-get update && apt-get install <%- installAdditional.join(' ') %> -y
-EOF
-<% } else { %>
 docker pull <%= image %>
-<% } %>
 set -e
 
 docker run \
@@ -36,15 +29,12 @@ docker run \
   <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %>\
   <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %>\
   --name=$APPNAME \
-  <%= (installAdditional && installAdditional.length > 0) ? 'meteorhacks/meteord:app' : image %>
+  <%= image %>
 
 <% if(typeof sslConfig === "object")  { %>
 # We don't need to fail the deployment because of a docker hub downtime
 set +e
-docker build -t meteorhacks/mup-frontend-server-secure - << EOF
-FROM meteorhacks/mup-frontend-server:latest
-RUN apt-get update && apt-get install --only-upgrade libssl1.0.0 openssl -y
-EOF
+docker pull <%= sslImage %>
 set -e
 
 docker run \
@@ -56,5 +46,5 @@ docker run \
   --link=$APPNAME:backend \
   --publish=<%= sslConfig.port %>:443 \
   --name=$APPNAME-frontend \
-  meteorhacks/mup-frontend-server-secure /start.sh
+  <%= sslImage %> /start.sh
 <% } %>

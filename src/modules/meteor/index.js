@@ -106,7 +106,8 @@ export function push(api) {
           installAdditional: config.installAdditional,
           volumes: config.volumes,
           sslVolumes: config.sslVolumes,
-          image: config.dockerImage || 'meteorhacks/meteord:base'
+          image: config.dockerImage || 'meteorhacks/meteord:base',
+          sslImage: config.sslDockerImage || 'meteorhacks/mup-frontend-server:latest'
         }
       });
 
