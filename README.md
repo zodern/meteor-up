@@ -1,21 +1,8 @@
 # meteor-up [![Stories in Ready](https://badge.waffle.io/kadirahq/meteor-up.svg?label=ready&title=Ready)](http://waffle.io/kadirahq/meteor-up)
-
-> This version of Meteor Up is still in development.
-> Please check [arunoda/meteor-up](https://github.com/arunoda/meteor-up/tree/mupx) for the stable version.
-
 Production Quality Meteor Deployment to Anywhere
-
-First setup Meteor Up
-
-> Note. npm version 3 is required to setup developer dependencies correctly.
-
-```
-git clone https://github.com/kadirahq/meteor-up
-cd meteor-up
-npm install
-npm run prepublish
-npm link
-```
+### Using meteor-up
+Install
+> npm install -g mup
 
 Then setup your project
 ```
@@ -74,7 +61,7 @@ module.exports = {
         "syslog-address":'udp://syslogserverurl.com:1234'
       }
     }
-    dockerImage: 'madushan1000/meteord-test', //optional
+    dockerImage: 'kadirahq/meteord', //optional
     deployCheckWaitTime: 60 //default 10
   },
 
@@ -92,10 +79,10 @@ Q) I get an deploy verification error with logs like below (Similar to issue [88
 ```
 Verifying Deployment: FAILED
 
-Error: 
+Error:
 -----------------------------------STDERR-----------------------------------
  run:
-npm WARN deprecated 
+npm WARN deprecated
 npm WARN deprecated   npm -g install npm@latest
 npm WARN deprecated
 ```
