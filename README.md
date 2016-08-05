@@ -62,8 +62,8 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/) and it 
 
 This will create two files in your Meteor Up project directory:
 
-  * mup.js - Meteor Up configuration file
-  * settings.json - Settings for Meteor's [settings API](http://docs.meteor.com/#meteor_settings)
+  * `mup.js` - Meteor Up configuration file
+  * `settings.json` - Settings for Meteor's [settings API](http://docs.meteor.com/#meteor_settings)
 
 ### Example File
 
@@ -105,7 +105,7 @@ module.exports = {
       opts: {
         "syslog-address":'udp://syslogserverurl.com:1234'
       }
-    }
+    },
     dockerImage: 'kadirahq/meteord', //optional
     deployCheckWaitTime: 60 //default 10
   },
@@ -181,7 +181,7 @@ Here's the process:
 * First remove your `pem` field from the `mup.js`. So, your `mup.js` only has the username and host only.
 * Then start a ssh agent with `eval $(ssh-agent)`
 * Then add your ssh key with `ssh-add <path-to-key>`
-* Then you'll asked to enter the paraphrase to the key
+* Then you'll be asked to enter the paraphrase to the key
 * After that simply invoke `mup` commands and they'll just work
 * Once you've deployed your app kill the ssh agent with `ssh-agent -k`
 
@@ -191,7 +191,7 @@ Here's the process:
 
 Please ensure your key file (pem) is not protected by a passphrase. Also the setup process will require NOPASSWD access to sudo. (Since Meteor needs port 80, sudo access is required.)
 
-Make sure you also add your ssh key to the ```/YOUR_USERNAME/.ssh/authorized_keys``` list
+Make sure you also add your ssh key to the `/YOUR_USERNAME/.ssh/authorized_keys` list
 
 You can add your user to the sudo group:
 
@@ -217,9 +217,9 @@ Meteor Up uses Docker to run and manage your app. It uses [MeteorD](https://gith
 
 * your currently running meteor bundle lives at `/opt/<appName>/current`.
 * we've a demonized docker container running the above bundle.
-* docker container is started with `--restart=always` flag and it'll re-spawn the container if dies.
+* docker container is started with `--restart=always` flag and it'll re-spawn the container if it dies.
 * logs are maintained via Docker.
-* If you decided to use MongoDB, it'll be also running as a Docker conatiner. It's bound to the local interface and port 27017 (you cannot access from the outside)
+* if you decided to use MongoDB, it'll be also running as a Docker conatiner. It's bound to the local interface and port `27017` (you cannot access from the outside)
 * the database is named `<appName>`
 
 #### Multiple Deployment Targets
@@ -264,7 +264,7 @@ Meteor Up can enable SSL support for your app. It's uses the latest version of N
 
 To do that just add following configuration to your `mup.js` file.
 
-~~~js
+```js
 meteor: {
  ...
   {
@@ -276,7 +276,7 @@ meteor: {
   }
  ...
 }
-~~~
+```
 
 Now, simply do `mup setup` and then `mup deploy`. Now your app is running with a modern SSL setup.
 
@@ -309,7 +309,7 @@ where `<command>` is one of the `mup` commands such as `setup`, `deploy`, etc.
 `mup` is not backward compatible with Meteor Up 0.x. or `mupx`.
 
 * Docker is the now runtime for Meteor Up
-* We don't have use Upstart any more
+* We don't have to use Upstart any more
 * You don't need to setup NodeJS version or PhantomJS manually (MeteorD will take care of it)
 * We use a mongodb docker container to run the local mongodb data (it uses the old mongodb location)
 * It uses a Nginx and a different SSL configurations
