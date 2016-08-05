@@ -24,12 +24,11 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/) and it 
     - [Multiple Deployment Targets](#multiple-deployment-targets)
 - [Accessing the Database](#accessing-the-database)
 - [Multiple Deployments](#multiple-deployments)
-- [Server Specific Environment Variables](#server-specific-environment-variables)
 - [SSL Support](#ssl-support)
-- [Updating](#updating)
+- [Updating](#updating-mup)
 - [Troubleshooting](#troubleshooting)
 - [Migrating from Meteor Up 0.x](#migrating-from-meteor-up-0x)
-- [FAQ](#FAQ)
+- [FAQ](#faq)
 
 ### Features
 
@@ -295,8 +294,6 @@ You should try and keep `mup` up to date in order to keep up with the latest Met
 #### Check Logs
 If you suddenly can't deploy your app anymore, first use the `mup logs -f` command to check the logs for error messages.
 
-One of the most common problems is your Node version getting out of date. In that case, see “Updating” section above.
-
 #### Verbose Output
 If you need to see the output of `mup` (to see more precisely where it's failing or hanging, for example), run it like so:
 
@@ -327,7 +324,7 @@ If present remove nginx container with: `docker rm -f meteor-frontend`
 
 Then do `mup setup` and then `mup deploy`.
 
-#### FAQ
+### FAQ
 
 Q) I get an deploy verification error with logs like below (Similar to [issue 88](https://github.com/kadirahq/meteor-up/issues/88))
 
@@ -342,3 +339,11 @@ npm WARN deprecated   npm -g install npm@latest
 npm WARN deprecated
 ```
 A) Try increasing the value of deployCheckWaitTime field in mup.js file.
+
+Q) I get "Windows script error" on windows. ([issue 185](https://github.com/kadirahq/meteor-up/issues/185))
+
+A) This happens because windows trys to run `mup.js` config file instead of the actual `mup` binary. Use the absolute path to the `mup` binary `C:/<where mup is installed>/mup setup` 
+
+Q) Mup commands silently fails when I have a `~` in a relative path. ([issue 189](https://github.com/kadirahq/meteor-up/issues/189))
+
+A) Mup doesn't support `~` alias for home directory, use the absolute path.
