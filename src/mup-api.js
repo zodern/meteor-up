@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import nodemiral from 'nodemiral';
+import expandHomeDir from 'expand-home-dir';
 
 export default class MupAPI {
   constructor(base, args) {
@@ -102,7 +103,7 @@ export default class MupAPI {
       }
 
       if (info.pem) {
-        auth.pem = fs.readFileSync(path.resolve(info.pem), 'utf8');
+        auth.pem = fs.readFileSync(path.resolve(expandHomeDir(info.pem)), 'utf8');
       } else if (info.password) {
         auth.password = info.password;
       } else if (sshAgent && fs.existsSync(sshAgent)) {
