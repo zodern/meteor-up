@@ -266,13 +266,11 @@ To do that just add following configuration to your `mup.js` file.
 ```js
 meteor: {
  ...
-  {
-    "ssl": {
-      "certificate": "./bundle.crt", // this is a bundle of certificates
-      "key": "./private.key", // this is the private key of the certificate
-      "port": 443 // 443 is the default value and it's the standard HTTPS port
-    }
-  }
+ "ssl": {
+   "certificate": "./bundle.crt", // this is a bundle of certificates
+   "key": "./private.key", // this is the private key of the certificate
+   "port": 443 // 443 is the default value and it's the standard HTTPS port
+ }
  ...
 }
 ```
