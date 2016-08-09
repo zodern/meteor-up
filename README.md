@@ -266,13 +266,11 @@ To do that just add following configuration to your `mup.js` file.
 ```js
 meteor: {
  ...
-  {
-    "ssl": {
-      "certificate": "./bundle.crt", // this is a bundle of certificates
-      "key": "./private.key", // this is the private key of the certificate
-      "port": 443 // 443 is the default value and it's the standard HTTPS port
-    }
-  }
+ "ssl": {
+   "crt": "./bundle.crt", // this is a bundle of certificates
+   "key": "./private.key", // this is the private key of the certificate
+   "port": 443 // 443 is the default value and it's the standard HTTPS port
+ }
  ...
 }
 ```
@@ -342,7 +340,7 @@ A) Try increasing the value of deployCheckWaitTime field in mup.js file.
 
 Q) I get "Windows script error" on windows. ([issue 185](https://github.com/kadirahq/meteor-up/issues/185))
 
-A) This happens because windows trys to run `mup.js` config file instead of the actual `mup` binary. Use the absolute path to the `mup` binary `C:/<where mup is installed>/mup setup` 
+A) This happens because windows trys to run `mup.js` config file instead of the actual `mup` binary. Use the absolute path to the `mup` binary `C:/<where mup is installed>/mup setup`
 
 Q) Mup commands silently fails when I have a `~` in a relative path. ([issue 189](https://github.com/kadirahq/meteor-up/issues/189))
 
