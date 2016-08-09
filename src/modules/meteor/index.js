@@ -10,6 +10,7 @@ const log = debug('mup:module:meteor');
 
 export function help(/* api */) {
   log('exec => mup meteor help');
+  console.log('mup meteor', Object.keys(this));
 }
 
 export function logs(api) {
@@ -43,13 +44,15 @@ export function setup(api) {
   });
 
   if (config.ssl) {
+    const basePath = api.getBasePath();
+
     list.copy('Copying SSL Certificate Bundle', {
-      src: config.ssl.crt,
+      src: path.resolve(basePath, config.ssl.crt),
       dest: '/opt/' + config.name + '/config/bundle.crt'
     });
 
     list.copy('Copying SSL Private Key', {
-      src: config.ssl.key,
+      src: path.resolve(basePath, config.ssl.key),
       dest: '/opt/' + config.name + '/config/private.key'
     });
 
@@ -77,8 +80,9 @@ export function push(api) {
   console.log('Building App Bundle Locally');
   var buildLocation = path.resolve('/tmp', uuid.v4());
   var bundlePath = path.resolve(buildLocation, 'bundle.tar.gz');
+  const appPath = path.resolve(api.getBasePath(), config.path);
 
-  return buildApp(config.path, buildLocation, config.buildOptions || {})
+  return buildApp(appPath, buildLocation, config.buildOptions || {})
     .then(() => {
       config.log = config.log || {
         opts: {

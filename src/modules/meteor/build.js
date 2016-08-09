@@ -60,6 +60,10 @@ function buildMeteorApp(appPath, buildLocaltion, buildOptions, callback) {
   meteor.stdout.pipe(process.stdout, {end: false});
   meteor.stderr.pipe(process.stderr, {end: false});
 
+  meteor.on('error', (e) => {
+    console.log(options);
+    console.log(e);
+  });
   meteor.on('close', callback);
 }
 

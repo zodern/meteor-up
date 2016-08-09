@@ -8,8 +8,8 @@
   },
   "scripts": {
     "prepublish": "nofat make",
-     "test": "nofat test",
-     "lint": "nofat lint"
+    "test": "nofat test",
+    "lint": "nofat lint"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,7 @@
     "archiver": "1.x.x",
     "babel-polyfill": "6.6.1",
     "bluebird": "3.x.x",
+    "commander": "2.9.x",
     "debug": "2.x.x",
     "nodemiral": "1.x.x",
     "shelljs": "0.5.x",
