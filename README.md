@@ -86,7 +86,7 @@ module.exports = {
       "/second/host/path": "/second/container/path"
     },
     servers: {
-      one: {}, two: {}, three: {} //list of servers to deploy, from the 'servers' list
+      one: {}, two: {}, three: {} // list of servers to deploy, from the 'servers' list
     },
     buildOptions: {
       serverOnly: true,
@@ -109,13 +109,19 @@ module.exports = {
     deployCheckWaitTime: 60 //default 10
   },
 
-  mongo: { //optional
+  mongo: { // optional
     oplog: true,
     port: 27017,
     servers: {
       one: {},
     },
   },
+  buildOptions: { // optional
+    debug: false, // default
+    cleanAfterBuild: true, // default
+    mobileSettings: {}, // defaults to empty; you can pass a json object, not a filename
+    buildLocation: '/my/build/folder' // defaults to /tmp/<uuid>
+  }
 };
 ```
 
@@ -340,7 +346,7 @@ A) Try increasing the value of deployCheckWaitTime field in mup.js file.
 
 Q) I get "Windows script error" on windows. ([issue 185](https://github.com/kadirahq/meteor-up/issues/185))
 
-A) This happens because windows trys to run `mup.js` config file instead of the actual `mup` binary. Use the absolute path to the `mup` binary `C:/<where mup is installed>/mup setup` 
+A) This happens because windows trys to run `mup.js` config file instead of the actual `mup` binary. Use the absolute path to the `mup` binary `C:/<where mup is installed>/mup setup`
 
 Q) Mup commands silently fails when I have a `~` in a relative path. ([issue 189](https://github.com/kadirahq/meteor-up/issues/189))
 
