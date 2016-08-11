@@ -80,6 +80,7 @@ export function push(api) {
   buildOptions.buildLocation = buildOptions.buildLocation || path.resolve('/tmp', uuid.v4());
 
   console.log('Building App Bundle Locally');
+
   var bundlePath = path.resolve(buildOptions.buildLocation, 'bundle.tar.gz');
   const appPath = path.resolve(api.getBasePath(), config.path);
 

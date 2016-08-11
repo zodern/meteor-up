@@ -86,7 +86,7 @@ module.exports = {
       "/second/host/path": "/second/container/path"
     },
     servers: {
-      one: {}, two: {}, three: {} //list of servers to deploy, from the 'servers' list
+      one: {}, two: {}, three: {} // list of servers to deploy, from the 'servers' list
     },
     buildOptions: {
       serverOnly: true,
@@ -109,7 +109,7 @@ module.exports = {
     deployCheckWaitTime: 60 //default 10
   },
 
-  mongo: { //optional
+  mongo: { // optional
     oplog: true,
     port: 27017,
     servers: {
