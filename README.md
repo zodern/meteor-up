@@ -116,6 +116,12 @@ module.exports = {
       one: {},
     },
   },
+  buildOptions: { // optional
+    debug: false, // default
+    cleanAfterBuild: true, // default
+    mobileSettings: {}, // defaults to empty; you can pass a json object, not a filename
+    buildLocation: '/my/build/folder' // defaults to /tmp/<uuid>
+  }
 };
 ```
 

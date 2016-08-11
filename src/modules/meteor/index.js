@@ -76,13 +76,14 @@ export function push(api) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
+  var buildOptions = config.buildOptions || {};
+  buildOptions.buildLocation = buildOptions.buildLocation || path.resolve('/tmp', uuid.v4());
 
   console.log('Building App Bundle Locally');
-  var buildLocation = path.resolve('/tmp', uuid.v4());
-  var bundlePath = path.resolve(buildLocation, 'bundle.tar.gz');
+  var bundlePath = path.resolve(buildOptions.buildLocation, 'bundle.tar.gz');
   const appPath = path.resolve(api.getBasePath(), config.path);
 
-  return buildApp(appPath, buildLocation, config.buildOptions || {})
+  return buildApp(appPath, buildOptions)
     .then(() => {
       config.log = config.log || {
         opts: {
