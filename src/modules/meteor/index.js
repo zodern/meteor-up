@@ -46,15 +46,17 @@ export function setup(api) {
   if (config.ssl) {
     const basePath = api.getBasePath();
 
-    list.copy('Copying SSL Certificate Bundle', {
-      src: path.resolve(basePath, config.ssl.crt),
-      dest: '/opt/' + config.name + '/config/bundle.crt'
-    });
+    if (config.ssl.upload !== false) {
+      list.copy('Copying SSL Certificate Bundle', {
+        src: path.resolve(basePath, config.ssl.crt),
+        dest: '/opt/' + config.name + '/config/bundle.crt'
+      });
 
-    list.copy('Copying SSL Private Key', {
-      src: path.resolve(basePath, config.ssl.key),
-      dest: '/opt/' + config.name + '/config/private.key'
-    });
+      list.copy('Copying SSL Private Key', {
+        src: path.resolve(basePath, config.ssl.key),
+        dest: '/opt/' + config.name + '/config/private.key'
+      });
+    }
 
     list.executeScript('Verifying SSL Configurations', {
       script: path.resolve(__dirname, 'assets/verify-ssl-config.sh'),

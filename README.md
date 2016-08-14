@@ -194,7 +194,7 @@ Here's the process:
 * After that simply invoke `mup` commands and they'll just work
 * Once you've deployed your app kill the ssh agent with `ssh-agent -k`
 
-#### Ssh based authentication with `sudo`
+#### SSH based authentication with `sudo`
 
 **If your username is `root` or using AWS EC2, you don't need to follow these steps**
 
@@ -276,16 +276,18 @@ To do that just add following configuration to your `mup.js` file.
 ```js
 meteor: {
  ...
- "ssl": {
-   "crt": "./bundle.crt", // this is a bundle of certificates
-   "key": "./private.key", // this is the private key of the certificate
-   "port": 443 // 443 is the default value and it's the standard HTTPS port
+ ssl: {
+   crt: './bundle.crt', // this is a bundle of certificates
+   key: './private.key', // this is the private key of the certificate
+   port: 443 // 443 is the default value and it's the standard HTTPS port
  }
  ...
 }
 ```
 
 Now, simply do `mup setup` and then `mup deploy`. Now your app is running with a modern SSL setup.
+
+If your certificate and key are already at the right location on your server and you would like to prevent Mup to override them while still needing an SSL setup, you can add `upload: false` to `mup.js` in the `meteor.ssl` object.
 
 To learn more about the SSL setup refer to the [`mup-frontend-server`](https://github.com/meteorhacks/mup-frontend-server) project.
 
