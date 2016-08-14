@@ -71,10 +71,13 @@ module.exports = {
   servers: {
     one: {
       host: '1.2.3.4',
-      username: 'root'
+      username: 'root',
       // pem:
       // password:
       // or leave blank for authenticate from ssh-agent
+      opts: {
+          port: 22,
+      },
     }
   },
 
@@ -91,6 +94,8 @@ module.exports = {
     buildOptions: {
       serverOnly: true,
       debug: true,
+      cleanAfterBuild: true, // default
+      buildLocation: '/my/build/folder' // defaults to /tmp/<uuid>
       mobileSettings: {
         yourMobileSetting: "setting value"
       }
@@ -105,6 +110,11 @@ module.exports = {
         "syslog-address":'udp://syslogserverurl.com:1234'
       }
     },
+    ssl: {
+      port: 443,
+      crt: 'bundle.crt',
+      key: 'private.key',
+    },
     dockerImage: 'kadirahq/meteord', //optional
     deployCheckWaitTime: 60 //default 10
   },
@@ -116,12 +126,6 @@ module.exports = {
       one: {},
     },
   },
-  buildOptions: { // optional
-    debug: false, // default
-    cleanAfterBuild: true, // default
-    mobileSettings: {}, // defaults to empty; you can pass a json object, not a filename
-    buildLocation: '/my/build/folder' // defaults to /tmp/<uuid>
-  }
 };
 ```
 
@@ -152,18 +156,18 @@ When building the meteor app, we can invoke few options. So, you can mention the
 ~~~js
 ...
 meteor: {
-  "buildOptions": {
+  buildOptions: {
     // build with the debug mode on
-    "debug": true,
+    debug: true,
     // mobile setting for cordova apps
-    "mobileSettings": {
-      "public": {
-        "meteor-up": "rocks"
+    mobileSettings: {
+      public: {
+        'meteor-up': 'rocks',
       }
     },
     // executable used to build the meteor project
     // you can set a local repo path if needed
-    "executable": "meteor"
+    executable: 'meteor',
   }
 }
 ...
