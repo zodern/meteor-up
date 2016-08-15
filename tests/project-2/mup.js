@@ -19,7 +19,8 @@ module.exports = {
     },
     log: {
       driver: 'syslog'
-    }
+    },
+    deployCheckWaitTime: 120
   },
 
   mongo: {
