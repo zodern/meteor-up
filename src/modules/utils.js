@@ -21,7 +21,7 @@ export function runTaskList(list, sessions, opts) {
 }
 
 export function getDockerLogs(name, sessions, args) {
-  const command = 'sudo docker logs ' + args.join(' ') + ' ' + name;
+  const command = 'sudo docker ' + args.join(' ') + ' ' + name;
 
   var promises = _.map(sessions, session => {
     var host = '[' + session._host + ']';

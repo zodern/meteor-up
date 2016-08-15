@@ -54,7 +54,6 @@ export default class MupAPI {
         filePath = path.join(this.base, 'settings.json');
       }
       this.settings = require(filePath);
-      console.log(this.settings);
     }
 
     return this.settings;

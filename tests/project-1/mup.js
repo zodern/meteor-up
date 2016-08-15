@@ -17,6 +17,7 @@ module.exports = {
       ROOT_URL: 'http://'+servers.mymeteor.host+'.com',
       MONGO_URL: 'mongodb://'+servers.mymongo.host+'/meteor'
     },
+    deployCheckWaitTime: 120
   },
 
   mongo: {

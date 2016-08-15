@@ -14,7 +14,6 @@ program
   .option('--config <filePath>', 'mup.js config file', setConfigPath)
   .parse(process.argv);
 
-
 function argAction(arg, subarg) {
 
   let moduleArg = arg;
@@ -42,6 +41,14 @@ function argAction(arg, subarg) {
     console.error('error: unknown command %s', command);
     module.help(args);
     process.exit(1);
+  }
+
+  if(program.settings) {
+    args.splice(0, 2);
+  }
+
+  if(program.config) {
+    args.splice(0, 2);
   }
 
   checkUpdates().then(() => {

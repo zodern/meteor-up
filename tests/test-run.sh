@@ -1,7 +1,7 @@
 #!/bin/bash
 export LANG=en
 export LC_ALL=en_US.UTF-8
-export MOCHA_PARALLEL="${MOCHA_PARALLEL:-7}"
+export MOCHA_PARALLEL="${MOCHA_PARALLEL:-2}"
 #seting up env
 command -v node >/dev/null 2>&1 || { curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash - && sudo apt-get install -qq -y nodejs; }
 #command -v docker >/dev/null 2>&1 || { wget -qO- https://get.docker.com/ | sudo sh && sudo service docker start; }
