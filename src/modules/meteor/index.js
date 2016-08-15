@@ -78,6 +78,15 @@ export function push(api) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
+  if (!config.docker) {
+    if(config.dockerImage) {
+      config.docker = {image: config.dockerImage};
+      delete config.dockerImage;
+    } else {
+      config.docker = {image: 'kadirahq/meteord'};
+    }
+  }
+
   var buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation || path.resolve('/tmp', uuid.v4());
 
@@ -112,7 +121,7 @@ export function push(api) {
           sslConfig: config.ssl,
           logConfig: config.log,
           volumes: config.volumes,
-          image: config.dockerImage || 'meteorhacks/meteord:base'
+          docker: config.docker
         }
       });
 
