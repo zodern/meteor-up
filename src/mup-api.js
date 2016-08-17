@@ -3,28 +3,40 @@ import path from 'path';
 import nodemiral from 'nodemiral';
 
 export default class MupAPI {
-  constructor(base, args) {
+  constructor(base, args, configPath, settingsPath) {
     this.base = base;
     this.args = args;
     this.config = null;
     this.settings = null;
     this.sessions = null;
+    this.configPath = configPath;
+    this.settingsPath = settingsPath;
   }
 
   getArgs() {
     return this.args;
   }
 
+  getBasePath() {
+    return this.base;
+  }
+
   getConfig() {
     if (!this.config) {
-      const filePath = path.join(this.base, 'mup.js');
+      let filePath;
+      if(this.configPath) {
+        filePath = path.resolve(this.configPath);
+        this.base = path.dirname(this.configPath);
+      } else {
+        filePath = path.join(this.base, 'mup.js');
+      }
       try {
         this.config = require(filePath);
       } catch (e) {
         if(e.code == 'MODULE_NOT_FOUND') {
           console.error(`'mup.js' file not found. Run 'mup init' first.`);
         } else {
-          console.error(e.message);
+          console.error(e);
         }
         process.exit(1);
       }
@@ -35,8 +47,14 @@ export default class MupAPI {
 
   getSettings() {
     if (!this.settings) {
-      const filePath = path.join(this.base, 'settings.json');
+      let filePath;
+      if(this.settingsPath) {
+        filePath = path.resolve(this.settingsPath);
+      } else {
+        filePath = path.join(this.base, 'settings.json');
+      }
       this.settings = require(filePath);
+      console.log(this.settings);
     }
 
     return this.settings;

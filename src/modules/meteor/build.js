@@ -4,7 +4,7 @@ var fs = require('fs');
 var pathResolve = require('path').resolve;
 var _ = require('underscore');
 
-function buildApp(appPath, buildLocaltion, buildOptions) {
+function buildApp(appPath, buildOptions) {
   return new Promise((resolve, reject) => {
     const callback = (err) => {
       if(err) {
@@ -12,9 +12,9 @@ function buildApp(appPath, buildLocaltion, buildOptions) {
       }
       resolve();
     };
-    buildMeteorApp(appPath, buildLocaltion, buildOptions, function(code) {
+    buildMeteorApp(appPath, buildOptions, function(code) {
       if (code === 0) {
-        archiveIt(buildLocaltion, callback);
+        archiveIt(buildOptions.buildLocation, callback);
       } else {
         console.log("\n=> Build Error. Check the logs printed above.");
         callback(new Error("build-error"));
@@ -23,10 +23,10 @@ function buildApp(appPath, buildLocaltion, buildOptions) {
   });
 }
 
-function buildMeteorApp(appPath, buildLocaltion, buildOptions, callback) {
+function buildMeteorApp(appPath, buildOptions, callback) {
   var executable = buildOptions.executable || 'meteor';
   var args = [
-    "build", "--directory", buildLocaltion,
+    "build", "--directory", buildOptions.buildLocation,
     "--architecture", "os.linux.x86_64",
     "--server", "http://localhost:3000"
   ];
@@ -60,13 +60,17 @@ function buildMeteorApp(appPath, buildLocaltion, buildOptions, callback) {
   meteor.stdout.pipe(process.stdout, {end: false});
   meteor.stderr.pipe(process.stderr, {end: false});
 
+  meteor.on('error', (e) => {
+    console.log(options);
+    console.log(e);
+  });
   meteor.on('close', callback);
 }
 
-function archiveIt(buildLocaltion, callback) {
+function archiveIt(buildLocation, callback) {
   callback = _.once(callback);
-  var bundlePath = pathResolve(buildLocaltion, 'bundle.tar.gz');
-  var sourceDir = pathResolve(buildLocaltion, 'bundle');
+  var bundlePath = pathResolve(buildLocation, 'bundle.tar.gz');
+  var sourceDir = pathResolve(buildLocation, 'bundle');
 
   var output = fs.createWriteStream(bundlePath);
   var archive = archiver('tar', {
