@@ -138,25 +138,33 @@ export function envconfig(api) {
     process.exit(1);
   }
 
-  const list = nodemiral.taskList('Configuring  Meteor Environment Variables');
-
-  var env = _.clone(config.env);
-  env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
-  // sending PORT to the docker container is useless.
-  // It'll run on PORT 80 and we can't override it
-  // Changing the port is done via the start.sh script
-  delete env.PORT;
-
-  list.copy('Sending Environment Variables', {
-    src: path.resolve(__dirname, 'assets/templates/env.list'),
-    dest: '/opt/' + config.name + '/config/env.list',
-    vars: {
-      env: env || {},
-      appName: config.name
-    }
-  });
   const sessions = api.getSessions([ 'meteor' ]);
-  return runTaskList(list, sessions);
+
+  const tasks = sessions.map((session) => {
+    const list = nodemiral.taskList('Configuring  Meteor Environment Variables');
+
+    var env = _.clone(config.env);
+    env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
+    // sending PORT to the docker container is useless.
+    // It'll run on PORT 80 and we can't override it
+    // Changing the port is done via the start.sh script
+    delete env.PORT;
+
+    _.extend(env, session._options.env);
+
+    list.copy('Sending Environment Variables', {
+      src: path.resolve(__dirname, 'assets/templates/env.list'),
+      dest: '/opt/' + config.name + '/config/env.list',
+      vars: {
+        env: env || {},
+        appName: config.name
+      }
+    });
+
+    return runTaskList(list, session);
+  });
+
+  return Promise.all(tasks);
 }
 
 export function start(api) {
