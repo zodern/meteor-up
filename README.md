@@ -84,6 +84,7 @@ module.exports = {
   meteor: {
     name: 'app',
     path: '../app',
+    port: 000, // Optional. Useful when deploying multiple instances
     volumes: { //optional, lets you add docker volumes
       "/host/path": "/container/path", //passed as '-v /host/path:/container/path' to the docker run command
       "/second/host/path": "/second/container/path"
