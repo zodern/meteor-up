@@ -262,6 +262,16 @@ We need to have two separate Meteor Up projects. For that, create two directorie
 
 In the staging `mup.js`, add a field called `appName` with the value `staging`. You can add any name you prefer instead of `staging`. Since we are running our staging app on port 8000, add an environment variable called `PORT` with the value 8000.
 
+You might also have to tell docker to use this custom port like this :
+
+```js
+meteor: {
+ ...
+ port: 8000
+ ...
+}
+```
+
 Now setup both projects and deploy as you need.
 
 ### Changing `appName`
