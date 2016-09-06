@@ -102,7 +102,7 @@ module.exports = {
       serverOnly: true,
       debug: true,
       cleanAfterBuild: true, // default
-      buildLocation: '/my/build/folder' // defaults to /tmp/<uuid>
+      buildLocation: '/my/build/folder', // defaults to /tmp/<uuid>
       mobileSettings: {
         yourMobileSetting: "setting value"
       }
