@@ -68,15 +68,16 @@ echo "Ran <%= docker.image %>"
       --name $APPNAME-frontend \
       --restart=always \
       --link=$APPNAME:backend \
-      -v /opt/$APPNAME/config/conf.d  \
-      -v /opt/$APPNAME/config/vhost.d \
-      -v /opt/$APPNAME/config/html \
+      -v /opt/$APPNAME/config/conf.d:/etc/nginx/conf.d  \
+      -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
+      -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       nginx
     echo "Ran nginx"
     docker run -d \
       --name $APPNAME-nginx-gen \
       --restart=always \
+      --volumes-from nginx \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       -v /opt/$APPNAME/config/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro \
       -v /var/run/docker.sock:/tmp/docker.sock:ro \
