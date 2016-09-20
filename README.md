@@ -84,6 +84,7 @@ module.exports = {
   meteor: {
     name: 'app',
     path: '../app',
+    // port: 000, Optional. Useful when deploying multiple instances
     volumes: { //optional, lets you add docker volumes
       "/host/path": "/container/path", //passed as '-v /host/path:/container/path' to the docker run command
       "/second/host/path": "/second/container/path"
@@ -260,6 +261,16 @@ Let's assume, we need to deploy production and staging versions of the app to th
 We need to have two separate Meteor Up projects. For that, create two directories and initialize Meteor Up and add the necessary configurations.
 
 In the staging `mup.js`, add a field called `appName` with the value `staging`. You can add any name you prefer instead of `staging`. Since we are running our staging app on port 8000, add an environment variable called `PORT` with the value 8000.
+
+You might also have to tell docker to use this custom port like this :
+
+```js
+meteor: {
+ ...
+ port: 8000
+ ...
+}
+```
 
 Now setup both projects and deploy as you need.
 
