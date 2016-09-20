@@ -109,8 +109,10 @@ module.exports = {
       }
     },
     env: {
-      ROOT_URL: 'app.com',
-      MONGO_URL: 'mongodb://localhost/meteor'
+      ROOT_URL: 'http://app.com', //Must be valid url (used for deploy verification)
+      MONGO_URL: 'mongodb://localhost/meteor',
+      PORT: 80, //Optional, defaults to 80
+      BIND: '0.0.0.0' //Optional, defaults to 0.0.0.0
     },
     log: { //optional
       driver: 'syslog',
@@ -268,11 +270,31 @@ You might also have to tell docker to use this custom port like this :
 meteor: {
  ...
  port: 8000
- ...
+ ..
+ env: {
+  ...
+  PORT: 8000
+  ...
+ }
 }
 ```
 
 Now setup both projects and deploy as you need.
+
+### Listening to specific IP address (IP Binding)
+
+If you want Docker to listen only on a specific IP address, such as `127.0.0.1`, add and environment variable called `BIND` with the value of the IP address you want to listen to.
+
+```js
+meteor: {
+ ...
+ env: {
+  ...
+  BIND: '127.0.0.1'
+  ...
+ }
+}
+```
 
 ### Changing `appName`
 

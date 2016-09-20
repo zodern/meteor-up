@@ -5,6 +5,7 @@ APP_PATH=/opt/$APPNAME
 BUNDLE_PATH=$APP_PATH/current
 ENV_FILE=$APP_PATH/config/env.list
 PORT=<%= port %>
+BIND=<%= bind %>
 
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
@@ -20,7 +21,7 @@ set -e
 docker run \
   -d \
   --restart=always \
-  --publish=$PORT:80 \
+  --publish=$BIND$PORT:80 \
   --volume=$BUNDLE_PATH:/bundle \
   --hostname="$HOSTNAME-$APPNAME" \
   --env-file=$ENV_FILE \

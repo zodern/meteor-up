@@ -19,8 +19,10 @@ module.exports = {
       serverOnly: true,
     },
     env: {
-      ROOT_URL: 'app.com',
-      MONGO_URL: 'mongodb://localhost/meteor'
+      ROOT_URL: 'http://app.com',
+      MONGO_URL: 'mongodb://localhost/meteor',
+      PORT: 80,
+      BIND: '0.0.0.0'
     },
 
     //dockerImage: 'kadirahq/meteord'

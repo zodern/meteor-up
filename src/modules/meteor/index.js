@@ -124,6 +124,7 @@ export function push(api) {
           appName: config.name,
           useLocalMongo: api.getConfig().mongo ? 1 : 0,
           port: config.env.PORT || 80,
+          bind: config.env.BIND ? config.env.BIND + ':' : '',
           sslConfig: config.ssl,
           logConfig: config.log,
           volumes: config.volumes,
