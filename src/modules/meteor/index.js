@@ -188,7 +188,7 @@ export function start(api) {
     vars: {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
-      port: config.env.PORT || 80
+      port: config.env.VERIFICATION_PORT || config.env.PORT || 80
     }
   });
 

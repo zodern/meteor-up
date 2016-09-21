@@ -296,6 +296,21 @@ meteor: {
 }
 ```
 
+### Verification Port
+
+If you are deploying under a proxy and need a different deployment verification port, add and environment variable called `VERIFICATION_PORT` with the value of the port you are publishing your application to.
+
+```js
+meteor: {
+ ...
+ env: {
+  ...
+  VERIFICATION_PORT: 80
+  ...
+ }
+}
+```
+
 ### Changing `appName`
 
 It's pretty okay to change the `appName`. But before you do so, you need to stop the project with older `appName`
