@@ -132,7 +132,7 @@ export function push(api) {
       });
 
       const sessions = api.getSessions([ 'meteor' ]);
-      return runTaskList(list, sessions);
+      return runTaskList(list, sessions, {series: true});
     });
 }
 
@@ -162,7 +162,7 @@ export function envconfig(api) {
     }
   });
   const sessions = api.getSessions([ 'meteor' ]);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, {series: true});
 }
 
 export function start(api) {
