@@ -32,6 +32,7 @@ docker run \
   <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %>\
   <% for(var args in docker.args) { %> <%= docker.args[args] %> <% } %>\
   <% if(typeof sslConfig.autogenerate === "object")  { %> \
+    -e "VIRTUAL_HOST=proclaim.32past8.com" \
     -e "LETSENCRYPT_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_EMAIL=<%= sslConfig.autogenerate.email %>" \
   <% } %> \
@@ -50,50 +51,63 @@ sleep 15s
     docker rm -f $APPNAME-nginx-letsencrypt
     echo "Removed $APPNAME-nginx-letsencrypt"
 
-    docker rm -f $APPNAME-nginx-gen
-    echo "Removed $APPNAME-nginx-gen"
-
-    docker rm -f $APPNAME-frontend
-    echo "Removed $APPNAME-frontend"
+    # docker rm -f $APPNAME-nginx-gen
+    # echo "Removed $APPNAME-nginx-gen"
+    #
+    # docker rm -f $APPNAME-frontend
+    # echo "Removed $APPNAME-frontend"
+    docker rm -f $APPNAME-nginx-proxy
+    echo "Removed $APPNAME-nginx-proxy"
     set -e
 
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
     docker pull jrcs/letsencrypt-nginx-proxy-companion:latest
-    docker pull jwilder/docker-gen:latest
-    docker pull nginx:latest
+    docker pull jwilder/nginx-proxy
+    # docker pull jwilder/docker-gen:latest
+    # docker pull nginx:latest
     set -e
     echo "Pulled autogenerate images"
     docker run -d -p 80:80 -p 443:443 \
-      --name $APPNAME-frontend \
-      --restart=always \
+      --name $APPNAME-nginx-proxy \
       -e "HTTPS_METHOD=noredirect" \
-      --link=$APPNAME:backend \
-      -v /opt/$APPNAME/config/conf.d:/etc/nginx/conf.d  \
+      -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
       -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
-      -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
-      nginx
-    echo "Ran nginx"
-    sleep 15s
-
-    docker run -d \
-      --name $APPNAME-nginx-gen \
-      --restart=always \
-      --volumes-from $APPNAME-frontend \
-      -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
-      -v /opt/$APPNAME/config/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro \
       -v /var/run/docker.sock:/tmp/docker.sock:ro \
-      jwilder/docker-gen \
-      -notify-sighup $APPNAME-frontend -watch -only-exposed -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
-    echo "Ran jwilder/docker-gen"
+      jwilder/nginx-proxy
+      echo "Ran nginx-proxy"
+
+    # docker run -d -p 80:80 -p 443:443 \
+    #   --name $APPNAME-frontend \
+    #   --restart=always \
+    #   -e "HTTPS_METHOD=noredirect" \
+    #   --link=$APPNAME:backend \
+    #   -v /opt/$APPNAME/config/conf.d:/etc/nginx/conf.d  \
+    #   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
+    #   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
+    #   -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
+    #   nginx
+    # echo "Ran nginx"
+    # sleep 15s
+    #
+    # docker run -d \
+    #   --name $APPNAME-nginx-gen \
+    #   --restart=always \
+    #   --volumes-from $APPNAME-frontend \
+    #   -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
+    #   -v /opt/$APPNAME/config/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro \
+    #   -v /var/run/docker.sock:/tmp/docker.sock:ro \
+    #   jwilder/docker-gen \
+    #   -notify-sighup $APPNAME-frontend -watch -only-exposed -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+    # echo "Ran jwilder/docker-gen"
     sleep 15s
 
     docker run -d \
       --name $APPNAME-nginx-letsencrypt \
       --restart=always\
       -e "NGINX_DOCKER_GEN_CONTAINER=$APPNAME-nginx-gen" \
-      --volumes-from $APPNAME-frontend \
+      --volumes-from $APPNAME-nginx-proxy \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:rw \
       -v /var/run/docker.sock:/var/run/docker.sock:ro \
       jrcs/letsencrypt-nginx-proxy-companion
