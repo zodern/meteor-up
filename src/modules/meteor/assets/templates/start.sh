@@ -32,13 +32,13 @@ docker run \
   <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %>\
   <% for(var args in docker.args) { %> <%= docker.args[args] %> <% } %>\
   <% if(typeof sslConfig.autogenerate === "object")  { %> \
-    -e "VIRTUAL_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_EMAIL=<%= sslConfig.autogenerate.email %>" \
   <% } %> \
   --name=$APPNAME \
   <%= docker.image %>
 echo "Ran <%= docker.image %>"
+sleep 15s
 
 <% if(typeof sslConfig === "object")  { %>
   <% if(typeof sslConfig.autogenerate === "object")  { %>
@@ -67,6 +67,7 @@ echo "Ran <%= docker.image %>"
     docker run -d -p 80:80 -p 443:443 \
       --name $APPNAME-frontend \
       --restart=always \
+      -e "HTTPS_METHOD=noredirect" \
       --link=$APPNAME:backend \
       -v /opt/$APPNAME/config/conf.d:/etc/nginx/conf.d  \
       -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
@@ -74,16 +75,20 @@ echo "Ran <%= docker.image %>"
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       nginx
     echo "Ran nginx"
+    sleep 15s
+
     docker run -d \
       --name $APPNAME-nginx-gen \
       --restart=always \
-      --volumes-from nginx \
+      --volumes-from $APPNAME-frontend \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       -v /opt/$APPNAME/config/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro \
       -v /var/run/docker.sock:/tmp/docker.sock:ro \
       jwilder/docker-gen \
-      -notify-sighup nginx -watch -only-exposed -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+      -notify-sighup $APPNAME-frontend -watch -only-exposed -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
     echo "Ran jwilder/docker-gen"
+    sleep 15s
+
     docker run -d \
       --name $APPNAME-nginx-letsencrypt \
       --restart=always\
