@@ -42,6 +42,9 @@ function buildMeteorApp(appPath, buildOptions, callback) {
 
   if(buildOptions.serverOnly) {
     args.push('--server-only');
+  } else if(!buildOptions.mobileSettings) {
+    args.push('--mobile-settings');
+    args.push(appPath + 'settings.json');
   }
 
   var isWin = /^win/.test(process.platform);
