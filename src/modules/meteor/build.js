@@ -27,8 +27,7 @@ function buildMeteorApp(appPath, buildOptions, callback) {
   var executable = buildOptions.executable || 'meteor';
   var args = [
     "build", "--directory", buildOptions.buildLocation,
-    "--architecture", "os.linux.x86_64",
-    "--server", "http://localhost:3000"
+    "--architecture", "os.linux.x86_64"
   ];
 
   if(buildOptions.debug) {
@@ -45,6 +44,15 @@ function buildMeteorApp(appPath, buildOptions, callback) {
   } else if(!buildOptions.mobileSettings) {
     args.push('--mobile-settings');
     args.push(appPath + '/settings.json');
+  }
+
+  if(buildOptions.server) {
+    args.push('--server');
+    args.push(buildOptions.server);
+  }
+
+  if (buildOptions.allowIncompatibleUpdates) {
+    args.push('--allow-incompatible-updates');
   }
 
   var isWin = /^win/.test(process.platform);
