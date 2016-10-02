@@ -51,8 +51,8 @@ function buildMeteorApp(appPath, buildOptions, callback) {
     args.push(buildOptions.server);
   }
 
-  if (buildOptions.allowIncompatibleUpdates) {
-    args.push('--allow-incompatible-updates');
+  if (buildOptions.allowIncompatibleUpdate) {
+    args.push('--allow-incompatible-update');
   }
 
   var isWin = /^win/.test(process.platform);
