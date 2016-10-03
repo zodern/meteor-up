@@ -56,7 +56,6 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/) and it 
 ### Creating a Meteor Up Project
     cd my-app-folder
     mkdir .deploy
-    cd .deploy
     mup init
 
 This will create two files in your Meteor Up project directory:
