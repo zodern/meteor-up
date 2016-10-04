@@ -52,6 +52,8 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/) and it 
 ### Installation
 
     npm install -g mup
+    
+`ssh2` package is needed, if you haven't yet please install it by `npm install -g ssh2`
 
 ### Creating a Meteor Up Project
     cd my-app-folder
