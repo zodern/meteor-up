@@ -46,15 +46,17 @@ export function setup(api) {
   if (config.ssl) {
     const basePath = api.getBasePath();
 
-    list.copy('Copying SSL Certificate Bundle', {
-      src: path.resolve(basePath, config.ssl.crt),
-      dest: '/opt/' + config.name + '/config/bundle.crt'
-    });
+    if (config.ssl.upload !== false) {
+      list.copy('Copying SSL Certificate Bundle', {
+        src: path.resolve(basePath, config.ssl.crt),
+        dest: '/opt/' + config.name + '/config/bundle.crt'
+      });
 
-    list.copy('Copying SSL Private Key', {
-      src: path.resolve(basePath, config.ssl.key),
-      dest: '/opt/' + config.name + '/config/private.key'
-    });
+      list.copy('Copying SSL Private Key', {
+        src: path.resolve(basePath, config.ssl.key),
+        dest: '/opt/' + config.name + '/config/private.key'
+      });
+    }
 
     list.executeScript('Verifying SSL Configurations', {
       script: path.resolve(__dirname, 'assets/verify-ssl-config.sh'),
@@ -76,6 +78,21 @@ export function push(api) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
+  if (!config.docker) {
+    if(config.dockerImage) {
+      config.docker = {image: config.dockerImage};
+      delete config.dockerImage;
+    } else {
+      config.docker = {image: 'kadirahq/meteord'};
+    }
+  }
+  if (config.dockerImageFrontendServer) {
+    config.docker.imageFrontendServer = config.dockerImageFrontendServer;
+  }
+  if (!config.docker.imageFrontendServer) {
+    config.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
+  }
+
   var buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation || path.resolve('/tmp', uuid.v4());
 
@@ -112,13 +129,12 @@ export function push(api) {
           installAdditional: config.installAdditional,
           volumes: config.volumes,
           sslVolumes: config.sslVolumes,
-          image: config.dockerImage || 'meteorhacks/meteord:base',
-          sslImage: config.sslDockerImage || 'meteorhacks/mup-frontend-server:latest'
+          docker: config.docker
         }
       });
 
       const sessions = api.getSessions([ 'meteor' ]);
-      return runTaskList(list, sessions);
+      return runTaskList(list, sessions, {series: true});
     });
 }
 
@@ -148,7 +164,7 @@ export function envconfig(api) {
     }
   });
   const sessions = api.getSessions([ 'meteor' ]);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, {series: true});
 }
 
 export function start(api) {
