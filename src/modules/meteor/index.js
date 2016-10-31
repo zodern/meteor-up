@@ -86,6 +86,12 @@ export function push(api) {
       config.docker = {image: 'kadirahq/meteord'};
     }
   }
+  if (config.dockerImageFrontendServer) {
+    config.docker.imageFrontendServer = config.dockerImageFrontendServer;
+  }
+  if (!config.docker.imageFrontendServer) {
+    config.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
+  }
 
   var buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation || path.resolve('/tmp', uuid.v4());
@@ -126,7 +132,7 @@ export function push(api) {
       });
 
       const sessions = api.getSessions([ 'meteor' ]);
-      return runTaskList(list, sessions);
+      return runTaskList(list, sessions, {series: true});
     });
 }
 
@@ -156,7 +162,7 @@ export function envconfig(api) {
     }
   });
   const sessions = api.getSessions([ 'meteor' ]);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, {series: true});
 }
 
 export function start(api) {

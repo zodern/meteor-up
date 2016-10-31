@@ -18,7 +18,7 @@ if [ ! "$hasDocker" ]; then
 
   # Required to update system
   sudo apt-get update
-  sudo apt-get -y install wget lxc iptables
+  sudo apt-get -y install wget lxc iptables curl
 
   # Install docker
   wget -qO- https://get.docker.com/ | sudo sh

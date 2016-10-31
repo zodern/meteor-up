@@ -85,7 +85,7 @@ sleep 15s
   <% } else { %>
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
-    docker pull meteorhacks/mup-frontend-server:latest
+    docker pull <%= docker.imageFrontendServer %>
     set -e
     docker run \
       -d \
@@ -95,6 +95,6 @@ sleep 15s
       --link=$APPNAME:backend \
       --publish=<%= sslConfig.port %>:443 \
       --name=$APPNAME-frontend \
-      meteorhacks/mup-frontend-server /start.sh
+      <%= docker.imageFrontendServer %> /start.sh
   <% } %>
 <% } %>
