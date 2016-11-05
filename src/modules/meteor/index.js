@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
 import uuid from 'uuid';
@@ -96,45 +97,53 @@ export function push(api) {
   var buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation || path.resolve('/tmp', uuid.v4());
 
-  console.log('Building App Bundle Locally');
 
   var bundlePath = path.resolve(buildOptions.buildLocation, 'bundle.tar.gz');
   const appPath = path.resolve(api.getBasePath(), config.path);
 
-  return buildApp(appPath, buildOptions)
-    .then(() => {
-      config.log = config.log || {
-        opts: {
-          'max-size': '100m',
-          'max-file': 10
-        }
-      };
-      const list = nodemiral.taskList('Pushing Meteor');
+  if (buildOptions.deployCachedBuild && fs.existsSync(bundlePath)) {
+    console.log(`Using Cached App Bundle at ${bundlePath}`);
+    return postBuild(api, config, bundlePath);
+  } else {
+    console.log('Building App Bundle Locally');
 
-      list.copy('Pushing Meteor App Bundle to The Server', {
-        src: bundlePath,
-        dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
-        progressBar: config.enableUploadProgressBar
-      });
-
-      list.copy('Pushing the Startup Script', {
-        src: path.resolve(__dirname, 'assets/templates/start.sh'),
-        dest: '/opt/' + config.name + '/config/start.sh',
-        vars: {
-          appName: config.name,
-          useLocalMongo: api.getConfig().mongo ? 1 : 0,
-          port: config.env.PORT || 80,
-          sslConfig: config.ssl,
-          logConfig: config.log,
-          volumes: config.volumes,
-          docker: config.docker
-        }
-      });
-
-      const sessions = api.getSessions([ 'meteor' ]);
-      return runTaskList(list, sessions, {series: true});
-    });
+    return buildApp(appPath, buildOptions)
+      .then(() => postBuild(api, config, bundlePath));
+  }
 }
+
+function postBuild(api, config, bundlePath) {
+  config.log = config.log || {
+    opts: {
+      'max-size': '100m',
+      'max-file': 10
+    }
+  };
+  const list = nodemiral.taskList('Pushing Meteor');
+
+  list.copy('Pushing Meteor App Bundle to The Server', {
+    src: bundlePath,
+    dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
+    progressBar: config.enableUploadProgressBar
+  });
+
+  list.copy('Pushing the Startup Script', {
+    src: path.resolve(__dirname, 'assets/templates/start.sh'),
+    dest: '/opt/' + config.name + '/config/start.sh',
+    vars: {
+      appName: config.name,
+      useLocalMongo: api.getConfig().mongo ? 1 : 0,
+      port: config.env.PORT || 80,
+      sslConfig: config.ssl,
+      logConfig: config.log,
+      volumes: config.volumes,
+      docker: config.docker
+    }
+  });
+
+  const sessions = api.getSessions([ 'meteor' ]);
+  return runTaskList(list, sessions, {series: true});
+};
 
 export function envconfig(api) {
   log('exec => mup meteor envconfig');
