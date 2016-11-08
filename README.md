@@ -105,6 +105,7 @@ module.exports = {
       debug: true,
       cleanAfterBuild: true, // default
       buildLocation: '/my/build/folder', // defaults to /tmp/<uuid>
+      deployCachedBuild: false, // allows re-use of previous build if buildLocation given, defaults to false
       mobileSettings: {
         yourMobileSetting: "setting value"
       }

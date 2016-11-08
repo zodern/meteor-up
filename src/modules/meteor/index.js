@@ -101,7 +101,7 @@ export function push(api) {
   var bundlePath = path.resolve(buildOptions.buildLocation, 'bundle.tar.gz');
   const appPath = path.resolve(api.getBasePath(), config.path);
 
-  if (buildOptions.deployCachedBuild && fs.existsSync(bundlePath)) {
+  if (!api.isForceRebuild() && buildOptions.deployCachedBuild && fs.existsSync(bundlePath)) {
     console.log(`Using Cached App Bundle at ${bundlePath}`);
     return postBuild(api, config, bundlePath);
   } else {
