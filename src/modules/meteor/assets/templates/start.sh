@@ -22,7 +22,11 @@ echo "Pulled <%= docker.image %>"
 docker run \
   -d \
   --restart=always \
+  <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
   --expose=80 \
+  <% } else { %> \
+  --publish=$PORT:80 \
+  <% } %> \
   --volume=$BUNDLE_PATH:/bundle \
   --hostname="$HOSTNAME-$APPNAME" \
   --env-file=$ENV_FILE \
