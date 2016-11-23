@@ -20,7 +20,7 @@ set -e
 docker run \
   -d \
   --restart=always \
-  --publish=$PORT:80 \
+  --publish=$PORT:<%= docker.imagePort %> \
   --volume=$BUNDLE_PATH:/bundle \
   --hostname="$HOSTNAME-$APPNAME" \
   --env-file=$ENV_FILE \

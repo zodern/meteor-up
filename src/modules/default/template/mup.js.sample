@@ -25,6 +25,7 @@ module.exports = {
 
     docker: {
       // image: 'kadirahq/meteord', // (optional)
+      // imagePort: 80, // (default: 80, some images EXPOSE different ports)
     },
 
     deployCheckWaitTime: 60

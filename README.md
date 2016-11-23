@@ -91,6 +91,7 @@ module.exports = {
     },
     docker: {
       image: 'kadirahq/meteord', // (optional)
+      imagePort: 80, // (optional, default: 80)
       // image: 'abernix/meteord:base', // use this image if using Meteor 1.4+
       args:[ // lets you add/overwrite any parameter on the docker run command (optional)
         "--link=myCustomMongoDB:myCustomMongoDB", // linking example

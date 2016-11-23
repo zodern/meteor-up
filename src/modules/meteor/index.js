@@ -93,6 +93,10 @@ export function push(api) {
     config.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
   }
 
+  // If imagePort is not set, go with port 80 which was the traditional
+  // port used by kadirahq/meteord and meteorhacks/meteord
+  config.docker.imagePort = config.docker.imagePort || 80;
+
   var buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation || path.resolve('/tmp', uuid.v4());
 
