@@ -95,6 +95,9 @@ module.exports = {
       args:[ // lets you add/overwrite any parameter on the docker run command (optional)
         "--link=myCustomMongoDB:myCustomMongoDB", // linking example
         "--memory-reservation 200M" // memory reservation example
+      ],
+      networks: [ //lets you add network connections to perform after run (runs docker network connect <net name> for each network listed here)
+        'net1'
       ]
     },
     servers: {

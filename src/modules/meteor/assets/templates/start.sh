@@ -48,3 +48,8 @@ docker run \
     --name=$APPNAME-frontend \
     <%= docker.imageFrontendServer %> /start.sh
 <% } %>
+
+<% for(var network in docker.networks) { %>
+docker network connect <%=  docker.networks[network] %>
+
+<% } %>
