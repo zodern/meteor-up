@@ -50,6 +50,6 @@ docker run \
 <% } %>
 
 <% for(var network in docker.networks) { %>
-docker network connect <%=  docker.networks[network] %>
+docker network connect <%=  docker.networks[network] %> $APPNAME
 
 <% } %>
