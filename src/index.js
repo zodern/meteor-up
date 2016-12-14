@@ -17,6 +17,7 @@ program
   .parse(process.argv);
 
 function argAction(arg, subarg) {
+
   let moduleArg = arg;
   let command = subarg;
 
