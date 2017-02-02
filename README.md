@@ -319,6 +319,9 @@ You should try and keep `mup` up to date in order to keep up with the latest Met
 
 ### Troubleshooting
 
+#### Node Versions
+Are your server's and deployment machine's node version in sync? If not you will run into issues (as per the official meteor guide).
+
 #### Check Logs
 If you suddenly can't deploy your app anymore, first use the `mup logs -f` command to check the logs for error messages.
 
