@@ -144,7 +144,7 @@ export function envconfig(api) {
     process.exit(1);
   }
 
-  const list = nodemiral.taskList('Configuring  Meteor Environment Variables');
+  const list = nodemiral.taskList('Configuring Meteor Environment Variables');
 
   var env = _.clone(config.env);
   env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
