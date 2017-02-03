@@ -3,7 +3,7 @@ import path from 'path';
 import nodemiral from 'nodemiral';
 
 export default class MupAPI {
-  constructor(base, args, configPath, settingsPath) {
+  constructor(base, args, configPath, settingsPath, forceRebuild) {
     this.base = base;
     this.args = args;
     this.config = null;
@@ -11,6 +11,7 @@ export default class MupAPI {
     this.sessions = null;
     this.configPath = configPath;
     this.settingsPath = settingsPath;
+    this.forceRebuild = forceRebuild;
   }
 
   getArgs() {
@@ -68,6 +69,10 @@ export default class MupAPI {
     const api = Object.create(this);
     api.sessions = this._pickSessions(modules);
     return api;
+  }
+
+  isForceRebuild() {
+    return this.forceRebuild;
   }
 
   _pickSessions(modules = []) {

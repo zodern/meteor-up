@@ -5,6 +5,7 @@ import program from 'commander';
 
 let settingsPath;
 let configPath;
+let forceRebuild = false;
 const args = process.argv.slice(2);
 
 program
@@ -12,6 +13,7 @@ program
   .action(argAction)
   .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
   .option('--config <filePath>', 'mup.js config file', setConfigPath)
+  .option('--rebuild', 'Force app rebuild')
   .parse(process.argv);
 
 function argAction(arg, subarg) {
@@ -51,9 +53,14 @@ function argAction(arg, subarg) {
     args.splice(0, 2);
   }
 
+  if(program.rebuild) {
+    forceRebuild = true;
+    args.splice(0, 2);
+  }
+
   checkUpdates().then(() => {
     const base = process.cwd();
-    const api = new MupAPI(base, args, configPath, settingsPath);
+    const api = new MupAPI(base, args, configPath, settingsPath, forceRebuild);
     module[command](api);
   });
 }
