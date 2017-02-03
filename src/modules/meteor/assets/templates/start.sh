@@ -36,7 +36,7 @@ docker run \
   <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %>\
   <% for(var args in docker.args) { %> <%= docker.args[args] %> <% } %>\
   <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
-    -e "VIRTUAL_HOST=$HOSTNAME" \
+    -e "VIRTUAL_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_EMAIL=<%= sslConfig.autogenerate.email %>" \
   <% } %> \
@@ -80,7 +80,6 @@ sleep 15s
     docker run -d \
       --name $APPNAME-nginx-letsencrypt \
       --restart=always\
-      -e "NGINX_DOCKER_GEN_CONTAINER=$APPNAME-nginx-gen" \
       --volumes-from $APPNAME-nginx-proxy \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:rw \
       -v /var/run/docker.sock:/var/run/docker.sock:ro \
