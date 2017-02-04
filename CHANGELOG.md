@@ -1,3 +1,6 @@
+# 1.1.1
+- Fixed some files had windows line endings
+
 # 1.1
 
 - Add let's encrypt support (@mbabauer)
