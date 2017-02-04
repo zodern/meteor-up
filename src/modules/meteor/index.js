@@ -43,7 +43,7 @@ export function setup(api) {
     },
   });
 
-  if (config.ssl) {
+  if (config.ssl && typeof config.ssl.autogenerate !== 'object') {
     const basePath = api.getBasePath();
 
     if (config.ssl.upload !== false) {
