@@ -143,13 +143,13 @@ module.exports = {
 
     mup setup
 
-This will set up the server for the `mup` deployments. It will take around 2-5 minutes depending on the server's performance and network availability.
+Running this locally will set up the remote server(s) you have specified in mup.js for the `mup` deployments. It will take around 2-5 minutes depending on the server's performance and network availability.
 
 ### Deploying an App
 
     mup deploy
 
-This will bundle the Meteor project and deploy it to the server. The bundling process is exactly how `meteor deploy` does it.
+This will bundle the Meteor project locally and deploy it to the remote server(s). The bundling process is exactly how `meteor deploy` does it.
 
 ### Other Utility Commands
 
