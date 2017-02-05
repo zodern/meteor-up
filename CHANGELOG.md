@@ -1,3 +1,6 @@
+# 1.1.2 
+- Fixed `mup setup` when using let's encrypt 
+
 # 1.1.1
 - Fixed some files had windows line endings
 
