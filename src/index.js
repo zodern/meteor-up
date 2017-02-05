@@ -8,14 +8,37 @@ let configPath;
 const args = process.argv.slice(2);
 
 program
-  .arguments('<arg> [subarg]')
+  .arguments('<command> [subcommand]')
   .action(argAction)
   .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
   .option('--config <filePath>', 'mup.js config file', setConfigPath)
+  .on('--help', function(){
+    console.log('   Commands:');
+
+    function listModuleCommands(commands) {
+      Object.keys(commands).forEach((command) => {
+        if (command === 'default') {
+          listModuleCommands(commands['default']);
+          return;
+        }
+        console.log(`     ${command}`);
+      })
+    }
+
+    listModuleCommands(modules)
+  
+    console.log('');
+    console.log('    For list of subcommands, run ')
+    console.log('      mup <command> help')
+  })
   .parse(process.argv);
 
-function argAction(arg, subarg) {
+if (program.args.length === 0) {
+  program.help();
+  process.exit(0);
+}
 
+function argAction(arg, subarg) {
   let moduleArg = arg;
   let command = subarg;
 
@@ -24,21 +47,37 @@ function argAction(arg, subarg) {
     moduleArg = 'default';
   }
 
+  if (moduleArg === 'default' && command === 'help') {
+    program.help();
+    process.exit();
+  }
+
   let module;
 
   if(modules[moduleArg]) {
     module = modules[moduleArg];
   } else {
     console.error('No such module');
+    program.help();
+    process.exit(1);
   }
 
   if(!command) {
+    if (moduleArg === 'default') {
+      program.help();
+    } else {
     module.help(args);
+    }
     process.exit(0);
   }
 
   if (!module[command]) {
     console.error('error: unknown command %s', command);
+    if (moduleArg === 'default') {
+      program.help();
+      process.exit(1);
+    }
+
     module.help(args);
     process.exit(1);
   }

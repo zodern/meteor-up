@@ -43,7 +43,7 @@ export function setup(api) {
     },
   });
 
-  if (config.ssl) {
+  if (config.ssl && typeof config.ssl.autogenerate !== 'object') {
     const basePath = api.getBasePath();
 
     if (config.ssl.upload !== false) {
@@ -145,7 +145,7 @@ export function envconfig(api) {
     process.exit(1);
   }
 
-  const list = nodemiral.taskList('Configuring  Meteor Environment Variables');
+  const list = nodemiral.taskList('Configuring Meteor Environment Variables');
 
   var env = _.clone(config.env);
   env.METEOR_SETTINGS = JSON.stringify(api.getSettings());

@@ -125,9 +125,11 @@ module.exports = {
       }
     },
     ssl: {
-      port: 443,
-      crt: 'bundle.crt',
-      key: 'private.key',
+      // Enables let's encrypt (optional)
+      autogenerate: {
+        email: 'email.address@domain.com',
+        domains: 'website.com,www.website.com' // comma seperated list of domains
+      }
     },
     deployCheckWaitTime: 60 // default 10
   },
@@ -321,10 +323,30 @@ You can keep multiple configuration and settings files in the same directory and
     mup deploy --config=mup-staging.js --settings=staging-settings.json
 
 ### SSL Support
+Meteor UP can enable SSL support for your app. It can either autogenerate the certificates, or upload them from your dev computer.
 
-Meteor Up can enable SSL support for your app. It uses the latest version of Nginx for that.
+### Autogenerate certificates
 
-To do that, just add following configuration to your `mup.js` file.
+Meteor Up can use Let's Encrypt to generate certificates for you. Add the following to your `mup.js` file:
+
+```js
+meteor: {
+  ...
+  ssl: {
+    autogenerate: {
+      email: 'email.address@domain.com',
+      domains: 'website.com,www.website.com'
+    }
+  }
+}
+
+```
+
+Then run `mup deploy`. It will automatically create certificates and set up SSL, which can take up to a few minutes. The certificates will be automatically renewed when they expire within 30 days.
+
+### Upload certificates
+
+To upload certificates instead of having the server generate them for you, just add the following configuration to your `mup.js` file.
 
 ```js
 meteor: {
@@ -342,7 +364,7 @@ Now simply do `mup setup` and then `mup deploy`. Your app is now running with a 
 
 If your certificate and key are already in the right location on your server and you would like to prevent Mup from overriding  them while still needing an SSL setup, you can add `upload: false` to `mup.js` in the `meteor.ssl` object.
 
-To learn more about the SSL setup, refer to the [`mup-frontend-server`](https://github.com/meteorhacks/mup-frontend-server) project.
+To learn more about SSL setup when using your own certificates, refer to the [`mup-frontend-server`](https://github.com/meteorhacks/mup-frontend-server) project.
 
 ### Updating Mup
 
