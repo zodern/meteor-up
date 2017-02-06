@@ -25,6 +25,7 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
 - [Accessing the Database](#accessing-the-database)
 - [Multiple Deployments](#multiple-deployments)
 - [SSL Support](#ssl-support)
+- [Change MongoDB Version](#change-mongodb-version)
 - [Updating](#updating-mup)
 - [Troubleshooting](#troubleshooting)
 - [Migrating from Meteor Up 0.x](#migrating-from-meteor-up-0x)
@@ -132,6 +133,7 @@ module.exports = {
   mongo: { // (optional)
     oplog: true,
     port: 27017,
+    version: '3.4.1' // (optional), default is 3.4.1
     servers: {
       one: {},
     },
@@ -330,6 +332,26 @@ Now simply do `mup setup` and then `mup deploy`. Your app is now running with a 
 If your certificate and key are already in the right location on your server and you would like to prevent Mup from overriding  them while still needing an SSL setup, you can add `upload: false` to `mup.js` in the `meteor.ssl` object.
 
 To learn more about SSL setup when using your own certificates, refer to the [`mup-frontend-server`](https://github.com/meteorhacks/mup-frontend-server) project.
+
+### Change Mongodb Version
+
+If you have not deployed to the server, you can change the mongo version by adding:
+
+```js
+
+mongo: {
+  ...
+  version: '<desired version>'
+}
+
+```
+
+If you have deployed to the server, it involves a couple more steps.
+
+1) Go to the [MongoDB manual](https://docs.mongodb.com/manual/) > Release Notes > Current version of Mongodb > Upgrade or Downgrade Standalone
+2) Follow the directions listed there. You can access the MongoDB console by running `docker exec -it mongodb mongo` on the server.
+3) During the steps for install or replace binaries or restarting mongodb, instead change the version in your `mup.js` and run `mup setup`. 
+4) To verify that it worked, run `docker ps` to check if mongodb keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
 
 ### Updating Mup
 
