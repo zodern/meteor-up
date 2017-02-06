@@ -3,6 +3,9 @@ import * as _ from 'underscore';
 import {promisify} from 'bluebird';
 import {Client} from 'ssh2';
 import path from 'path';
+import debug from 'debug';
+
+const log = debug('mup:utils');
 
 export function runTaskList(list, sessions, opts) {
   return new Promise((resolve, reject) => {
@@ -22,6 +25,9 @@ export function runTaskList(list, sessions, opts) {
 
 export function getDockerLogs(name, sessions, args) {
   const command = 'sudo docker ' + args.join(' ') + ' ' + name;
+
+  log(`getDockerLogs command: ${command}`)
+
 
   var promises = _.map(sessions, session => {
     var host = '[' + session._host + ']';

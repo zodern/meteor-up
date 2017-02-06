@@ -1,6 +1,7 @@
 import fs from 'fs';
-import path from 'path';
 import nodemiral from 'nodemiral';
+import parseJson from 'parse-json';
+import path from 'path';
 
 export default class MupAPI {
   constructor(base, args, configPath, settingsPath) {
@@ -24,7 +25,7 @@ export default class MupAPI {
   getConfig() {
     if (!this.config) {
       let filePath;
-      if(this.configPath) {
+      if (this.configPath) {
         filePath = path.resolve(this.configPath);
         this.base = path.dirname(this.configPath);
       } else {
@@ -33,7 +34,7 @@ export default class MupAPI {
       try {
         this.config = require(filePath);
       } catch (e) {
-        if(e.code == 'MODULE_NOT_FOUND') {
+        if (e.code == 'MODULE_NOT_FOUND') {
           console.error(`'mup.js' file not found. Run 'mup init' first.`);
         } else {
           console.error(e);
@@ -48,12 +49,28 @@ export default class MupAPI {
   getSettings() {
     if (!this.settings) {
       let filePath;
-      if(this.settingsPath) {
+      if (this.settingsPath) {
         filePath = path.resolve(this.settingsPath);
       } else {
         filePath = path.join(this.base, 'settings.json');
       }
-      this.settings = require(filePath);
+
+      try {
+        this.settings = fs.readFileSync(filePath).toString();
+      } catch (e) {
+        console.log(`Unable to load settings.json at ${filePath}`);
+        if (e.code !== 'ENOENT') {
+          console.log(e);
+        }
+        process.exit(1);
+      }
+      try {
+        this.settings = parseJson(this.settings);
+      } catch (e) {
+        console.log('Error parsing settings file:');
+        console.log(e.message);
+        process.exit(1);
+      }
     }
 
     return this.settings;
@@ -109,8 +126,8 @@ export default class MupAPI {
       }
 
       const info = config.servers[name];
-      const auth = {username: info.username};
-      const opts = {ssh: {}};
+      const auth = { username: info.username };
+      const opts = { ssh: {} };
 
       var sshAgent = process.env.SSH_AUTH_SOCK;
 

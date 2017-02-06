@@ -3,6 +3,8 @@
 - Change mongo version
 - `uploadProgressBar` is part of default `mup.js`
 - Add trailing commas to mup.js (@ffxsam)
+- Improve message when settings.json is not found or is invalid
+- Loads and parses settings.json before building the app
 - Improve message when given unknown command
 - Fix switching from auto-generated ssl certificates to upload certificates
 - Fix `Error: Cannot find module 'ssh2'`

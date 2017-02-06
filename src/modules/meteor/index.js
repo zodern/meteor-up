@@ -1,10 +1,13 @@
-import path from 'path';
+import * as _ from 'underscore';
+
+import {getDockerLogs, runTaskList} from '../utils';
+
+import buildApp from './build.js';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
+import path from 'path';
 import uuid from 'uuid';
-import * as _ from 'underscore';
-import {runTaskList, getDockerLogs} from '../utils';
-import buildApp from './build.js';
+
 const log = debug('mup:module:meteor');
 
 
@@ -197,6 +200,9 @@ export function start(api) {
 
 export function deploy(api) {
   log('exec => mup meteor deploy');
+
+  // validate settings and config before starting
+  const settings = api.getSettings();
   const config = api.getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
