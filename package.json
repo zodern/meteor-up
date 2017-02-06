@@ -33,6 +33,7 @@
     "bluebird": "3.x.x",
     "commander": "2.9.x",
     "debug": "2.x.x",
+    "expand-home-dir": "0.0.3",
     "nodemiral": "1.x.x",
     "shelljs": "0.5.x",
     "silent-npm-registry-client": "2.x.x",
