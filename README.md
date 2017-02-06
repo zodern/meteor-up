@@ -101,7 +101,7 @@ module.exports = {
       one: {}, two: {}, three: {} // list of servers to deploy, from the 'servers' list
     },
     buildOptions: {
-      serverOnly: true,
+      serverOnly: true, // skip building mobile apps, but still build the web.cordova architecture
       debug: true,
       cleanAfterBuild: true, // default
       buildLocation: '/my/build/folder', // defaults to /tmp/<uuid>
