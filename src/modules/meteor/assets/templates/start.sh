@@ -13,6 +13,13 @@ docker rm -f $APPNAME
 docker rm -f $APPNAME-frontend
 echo "Removed $APPNAME-frontend"
 
+# Remove let's encrypt containers if exists
+docker rm -f $APPNAME-nginx-letsencrypt
+echo "Removed $APPNAME-nginx-letsencrypt"
+
+docker rm -f $APPNAME-nginx-proxy
+echo "Removed $APPNAME-nginx-proxy"
+
 # We don't need to fail the deployment because of a docker hub downtime
 set +e
 docker pull <%= docker.image %>
@@ -50,14 +57,6 @@ sleep 15s
     echo "Running autogenerate"
     # Get the nginx template for nginx-gen
     wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl -O /opt/$APPNAME/config/nginx.tmpl
-
-    set +e
-    docker rm -f $APPNAME-nginx-letsencrypt
-    echo "Removed $APPNAME-nginx-letsencrypt"
-
-    docker rm -f $APPNAME-nginx-proxy
-    echo "Removed $APPNAME-nginx-proxy"
-    set -e
 
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
