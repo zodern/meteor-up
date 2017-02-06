@@ -1,5 +1,6 @@
 # Next
 - Support Meteor 1.4 by default (@ffxsam)
+- Change mongo version
 - `uploadProgressBar` is part of default `mup.js`
 - Add trailing commas to mup.js (@ffxsam)
 - Fix `Error: Cannot find module 'ssh2'`

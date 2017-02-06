@@ -56,6 +56,7 @@ export function start(api) {
 
   const mongoSessions = api.getSessions([ 'mongo' ]);
   const meteorSessions = api.getSessions([ 'meteor' ]);
+  const config = api.getConfig().mongo
 
   if ( meteorSessions.length !== 1 || mongoSessions[0]._host !== meteorSessions[0]._host) {
     log('Skipping mongodb start. Incompatible config');
@@ -65,7 +66,10 @@ export function start(api) {
   const list = nodemiral.taskList('Start Mongo');
 
   list.executeScript('start mongo', {
-    script: path.resolve(__dirname, 'assets/mongo-start.sh')
+    script: path.resolve(__dirname, 'assets/mongo-start.sh'),
+    vars: {
+      mongoVersion: config.version || '3.4.1'
+    }
   });
 
   const sessions = api.getSessions([ 'mongo' ]);
