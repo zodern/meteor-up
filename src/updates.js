@@ -1,5 +1,7 @@
 import Npm from 'silent-npm-registry-client';
 import pkg from '../package.json';
+import boxen from 'boxen';
+import chalk from 'chalk';
 
 export default function () {
   return new Promise(function (resolve, reject) {
@@ -26,7 +28,9 @@ export default function () {
       (remote[1] === local[1] && remote[2] > local[2]);
 
       if (available) {
-        console.log('update %s => %s', pkg.version, npmVersion);
+        let text = `update available ${pkg.version} => ${npmVersion}`;
+        text += `\nTo update, run ${chalk.green('npm i -g mup')}`;
+        console.log(boxen(text, { padding: 1, margin: 1, align: 'center', borderColor: 'yellow'}));
       }
 
       resolve();

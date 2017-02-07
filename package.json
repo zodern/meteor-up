@@ -31,6 +31,8 @@
     "archiver": "1.x.x",
     "babel-polyfill": "6.6.1",
     "bluebird": "3.x.x",
+    "boxen": "^1.0.0",
+    "chalk": "^1.1.3",
     "commander": "2.9.x",
     "debug": "2.x.x",
     "joi": "^10.2.1",
