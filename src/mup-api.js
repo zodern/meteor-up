@@ -2,6 +2,7 @@ import fs from 'fs';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
+import validateConfig from './validate/index';
 
 export default class MupAPI {
   constructor(base, args, configPath, settingsPath) {
@@ -20,6 +21,34 @@ export default class MupAPI {
 
   getBasePath() {
     return this.base;
+  }
+
+  validateConfig(configPath) {
+    let valid = validateConfig(this.config);
+
+    let invalid = valid.errors.length > 0 || valid.warnings.length > 0;
+
+    if (invalid) {
+      console.log(`loaded mup.js from ${configPath}`)
+    }
+
+    if (valid.errors.length > 0) {
+      console.log(`mup.js has ${valid.errors.length} errors:`);
+      valid.errors.forEach((error) => {
+        console.log(`  - ${error}`);
+      });
+    }
+    if (valid.warnings.length > 0) {
+      console.log(`mup.js has ${valid.warnings.length} warnings:`);
+      valid.warnings.forEach((warning) => {
+        console.log(`   - ${warning}`);
+      });
+    }
+
+    if (invalid) {
+      console.log('If you think there is a bug in the mup.js validator, please');
+      console.log('create an issue at https://github.com/zodern/meteor-up.');
+    }
   }
 
   getConfig() {
@@ -41,6 +70,7 @@ export default class MupAPI {
         }
         process.exit(1);
       }
+      this.validateConfig(filePath);
     }
 
     return this.config;

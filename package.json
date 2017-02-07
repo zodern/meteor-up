@@ -33,6 +33,7 @@
     "bluebird": "3.x.x",
     "commander": "2.9.x",
     "debug": "2.x.x",
+    "joi": "^10.2.1",
     "nodemiral": "1.x.x",
     "parse-json": "^2.2.0",
     "shelljs": "0.5.x",

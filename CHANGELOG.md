@@ -1,6 +1,7 @@
 # Next
 - Support Meteor 1.4 by default (@ffxsam)
 - Change mongo version
+- Validates `mup.js` and displays problems found in it
 - `uploadProgressBar` is part of default `mup.js`
 - Add trailing commas to mup.js (@ffxsam)
 - Improve message when settings.json is not found or is invalid
