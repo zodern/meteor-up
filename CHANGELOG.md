@@ -1,4 +1,4 @@
-# Next
+# 1.2.0
 - Support Meteor 1.4 by default (@ffxsam)
 - Change mongo version
 - Validates `mup.js` and displays problems found in it
