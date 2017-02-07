@@ -127,7 +127,11 @@ module.exports = {
         domains: 'website.com,www.website.com' // comma seperated list of domains
       }
     },
-    deployCheckWaitTime: 60 // default 10
+    deployCheckWaitTime: 60, // default 10
+
+    // Shows progress bar while uploading bundle to server (optional)
+    // You might need to disable it on CI servers
+    enableUploadProgressBar: true // default false.
   },
 
   mongo: { // (optional)
