@@ -93,10 +93,12 @@ module.exports = {
     docker: {
       image: 'kadirahq/meteord', // (optional)
       // image: 'abernix/meteord:base', // use this image if using Meteor 1.4+
-      args:[ // lets you add/overwrite any parameter on the docker run command (optional)
+      args: [ // lets you add/overwrite any parameter on the docker run command (optional)
         "--link=myCustomMongoDB:myCustomMongoDB", // linking example
         "--memory-reservation 200M" // memory reservation example
-      ]
+      ],
+      // (optional) Only used if using your own ssl certificates. Default is "meteorhacks/mup-frontend-server"
+      imageFrontendServer: 'meteorhacks/mup-frontend-server'
     },
     servers: {
       one: {}, two: {}, three: {} // list of servers to deploy, from the 'servers' list
@@ -354,7 +356,7 @@ If you have deployed to the server, it involves a couple more steps.
 
 1) Go to the [MongoDB manual](https://docs.mongodb.com/manual/) > Release Notes > Current version of Mongodb > Upgrade or Downgrade Standalone
 2) Follow the directions listed there. You can access the MongoDB console by running `docker exec -it mongodb mongo` on the server.
-3) During the steps for install or replace binaries or restarting mongodb, instead change the version in your `mup.js` and run `mup setup`. 
+3) During the steps for install or replace binaries or restarting mongodb, instead change the version in your `mup.js` and run `mup setup`.
 4) To verify that it worked, run `docker ps` to check if mongodb keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
 
 ### Updating Mup
