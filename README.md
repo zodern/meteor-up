@@ -111,7 +111,7 @@ module.exports = {
       }
     },
     env: {
-      ROOT_URL: 'http://app.com',
+      ROOT_URL: 'http://app.com', // set to https to force redirect from http
       MONGO_URL: 'mongodb://localhost/meteor'
     },
     log: { // (optional)
