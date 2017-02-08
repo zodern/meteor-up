@@ -68,6 +68,7 @@ sleep 15s
     docker run -d -p 80:80 -p 443:443 \
       --name $APPNAME-nginx-proxy \
       -e "HTTPS_METHOD=noredirect" \
+      -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
       -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
