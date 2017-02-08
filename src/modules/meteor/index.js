@@ -185,7 +185,8 @@ export function start(api) {
   list.executeScript('Start Meteor', {
     script: resolve(__dirname, 'assets/meteor-start.sh'),
     vars: {
-      appName: config.name
+      appName: config.name,
+      nginxClientUploadLimit: config.nginxClientUploadLimit || '10M'
     }
   });
 
