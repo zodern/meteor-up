@@ -1,6 +1,7 @@
-import path from 'path';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
+import path from 'path';
+import { resolve } from '../utils';
 import {runTaskList} from '../utils';
 const log = debug('mup:module:docker');
 
@@ -13,7 +14,7 @@ export function setup(api) {
   const list = nodemiral.taskList('Setup Docker');
 
   list.executeScript('setup docker', {
-    script: path.resolve(__dirname, 'assets/docker-setup.sh')
+    script: resolve(__dirname, 'assets/docker-setup.sh')
   });
 
   const sessions = api.getSessions([ 'meteor', 'mongo', 'proxy' ]);

@@ -35,6 +35,7 @@
     "chalk": "^1.1.3",
     "commander": "2.9.x",
     "debug": "2.x.x",
+    "expand-tilde": "^2.0.2",
     "joi": "^10.2.1",
     "nodemiral": "1.x.x",
     "parse-json": "^2.2.0",

@@ -2,6 +2,7 @@ import fs from 'fs';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
+import { resolve } from './modules/utils';
 import validateConfig from './validate/index';
 
 export default class MupAPI {
@@ -55,7 +56,7 @@ export default class MupAPI {
     if (!this.config) {
       let filePath;
       if (this.configPath) {
-        filePath = path.resolve(this.configPath);
+        filePath = resolve(this.configPath);
         this.base = path.dirname(this.configPath);
       } else {
         filePath = path.join(this.base, 'mup.js');
@@ -80,7 +81,7 @@ export default class MupAPI {
     if (!this.settings) {
       let filePath;
       if (this.settingsPath) {
-        filePath = path.resolve(this.settingsPath);
+        filePath = resolve(this.settingsPath);
       } else {
         filePath = path.join(this.base, 'settings.json');
       }
@@ -166,7 +167,7 @@ export default class MupAPI {
       }
 
       if (info.pem) {
-        auth.pem = fs.readFileSync(path.resolve(info.pem), 'utf8');
+        auth.pem = fs.readFileSync(resolve(info.pem), 'utf8');
       } else if (info.password) {
         auth.password = info.password;
       } else if (sshAgent && fs.existsSync(sshAgent)) {

@@ -1,6 +1,10 @@
 import * as _ from 'underscore';
 
-import {getDockerLogs, runTaskList} from '../utils';
+import {
+  getDockerLogs,
+  resolve,
+  runTaskList,
+} from '../utils';
 
 import buildApp from './build.js';
 import debug from 'debug';
@@ -25,7 +29,7 @@ export function logs(api) {
   }
 
   const args = api.getArgs();
-  const sessions = api.getSessions([ 'meteor' ]);
+  const sessions = api.getSessions(['meteor']);
   return getDockerLogs(config.name, sessions, args);
 }
 
@@ -40,7 +44,7 @@ export function setup(api) {
   const list = nodemiral.taskList('Setup Meteor');
 
   list.executeScript('Setup Environment', {
-    script: path.resolve(__dirname, 'assets/meteor-setup.sh'),
+    script: resolve(__dirname, 'assets/meteor-setup.sh'),
     vars: {
       name: config.name,
     },
@@ -51,25 +55,25 @@ export function setup(api) {
 
     if (config.ssl.upload !== false) {
       list.copy('Copying SSL Certificate Bundle', {
-        src: path.resolve(basePath, config.ssl.crt),
+        src: resolve(basePath, config.ssl.crt),
         dest: '/opt/' + config.name + '/config/bundle.crt'
       });
 
       list.copy('Copying SSL Private Key', {
-        src: path.resolve(basePath, config.ssl.key),
+        src: resolve(basePath, config.ssl.key),
         dest: '/opt/' + config.name + '/config/private.key'
       });
     }
 
     list.executeScript('Verifying SSL Configurations', {
-      script: path.resolve(__dirname, 'assets/verify-ssl-config.sh'),
+      script: resolve(__dirname, 'assets/verify-ssl-config.sh'),
       vars: {
         name: config.name
       },
     });
   }
 
-  const sessions = api.getSessions([ 'meteor' ]);
+  const sessions = api.getSessions(['meteor']);
 
   return runTaskList(list, sessions);
 }
@@ -82,11 +86,11 @@ export function push(api) {
     process.exit(1);
   }
   if (!config.docker) {
-    if(config.dockerImage) {
-      config.docker = {image: config.dockerImage};
+    if (config.dockerImage) {
+      config.docker = { image: config.dockerImage };
       delete config.dockerImage;
     } else {
-      config.docker = {image: 'kadirahq/meteord'};
+      config.docker = { image: 'kadirahq/meteord' };
     }
   }
   if (config.dockerImageFrontendServer) {
@@ -97,12 +101,12 @@ export function push(api) {
   }
 
   var buildOptions = config.buildOptions || {};
-  buildOptions.buildLocation = buildOptions.buildLocation || path.resolve('/tmp', uuid.v4());
+  buildOptions.buildLocation = buildOptions.buildLocation || resolve('/tmp', uuid.v4());
 
   console.log('Building App Bundle Locally');
 
-  var bundlePath = path.resolve(buildOptions.buildLocation, 'bundle.tar.gz');
-  const appPath = path.resolve(api.getBasePath(), config.path);
+  var bundlePath = resolve(buildOptions.buildLocation, 'bundle.tar.gz');
+  const appPath = resolve(api.getBasePath(), config.path);
 
   return buildApp(appPath, buildOptions)
     .then(() => {
@@ -121,7 +125,7 @@ export function push(api) {
       });
 
       list.copy('Pushing the Startup Script', {
-        src: path.resolve(__dirname, 'assets/templates/start.sh'),
+        src: resolve(__dirname, 'assets/templates/start.sh'),
         dest: '/opt/' + config.name + '/config/start.sh',
         vars: {
           appName: config.name,
@@ -134,8 +138,8 @@ export function push(api) {
         }
       });
 
-      const sessions = api.getSessions([ 'meteor' ]);
-      return runTaskList(list, sessions, {series: true});
+      const sessions = api.getSessions(['meteor']);
+      return runTaskList(list, sessions, { series: true });
     });
 }
 
@@ -157,15 +161,15 @@ export function envconfig(api) {
   delete env.PORT;
 
   list.copy('Sending Environment Variables', {
-    src: path.resolve(__dirname, 'assets/templates/env.list'),
+    src: resolve(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + config.name + '/config/env.list',
     vars: {
       env: env || {},
       appName: config.name
     }
   });
-  const sessions = api.getSessions([ 'meteor' ]);
-  return runTaskList(list, sessions, {series: true});
+  const sessions = api.getSessions(['meteor']);
+  return runTaskList(list, sessions, { series: true });
 }
 
 export function start(api) {
@@ -179,14 +183,14 @@ export function start(api) {
   const list = nodemiral.taskList('Start Meteor');
 
   list.executeScript('Start Meteor', {
-    script: path.resolve(__dirname, 'assets/meteor-start.sh'),
+    script: resolve(__dirname, 'assets/meteor-start.sh'),
     vars: {
       appName: config.name
     }
   });
 
   list.executeScript('Verifying Deployment', {
-    script: path.resolve(__dirname, 'assets/meteor-deploy-check.sh'),
+    script: resolve(__dirname, 'assets/meteor-deploy-check.sh'),
     vars: {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
@@ -194,8 +198,8 @@ export function start(api) {
     }
   });
 
-  const sessions = api.getSessions([ 'meteor' ]);
-  return runTaskList(list, sessions, {series: true});
+  const sessions = api.getSessions(['meteor']);
+  return runTaskList(list, sessions, { series: true });
 }
 
 export function deploy(api) {
@@ -225,12 +229,12 @@ export function stop(api) {
   const list = nodemiral.taskList('Stop Meteor');
 
   list.executeScript('Stop Meteor', {
-    script: path.resolve(__dirname, 'assets/meteor-stop.sh'),
+    script: resolve(__dirname, 'assets/meteor-stop.sh'),
     vars: {
       appName: config.name
     }
   });
 
-  const sessions = api.getSessions([ 'meteor' ]);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions);
 }

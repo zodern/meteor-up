@@ -73,7 +73,7 @@ module.exports = {
     one: {
       host: '1.2.3.4',
       username: 'root',
-      // pem: '/home/user/.ssh/id_rsa', // mup doesn't support '~' alias for home directory
+      // pem: '/home/user/.ssh/id_rsa',
       // password: 'password',
       // or leave blank to authenticate using ssh-agent
       opts: {
@@ -84,7 +84,7 @@ module.exports = {
 
   meteor: {
     name: 'app',
-    path: '../app', // mup doesn't support '~' alias for home directory
+    path: '../app',
     // port: 000, // useful when deploying multiple instances (optional)
     volumes: { // lets you add docker volumes (optional)
       "/host/path": "/container/path", // passed as '-v /host/path:/container/path' to the docker run command
@@ -420,8 +420,3 @@ A) Try increasing the value of the `deployCheckWaitTime` field in `mup.js`.
 Q) I get "Windows script error" in Windows. ([issue 185](https://github.com/kadirahq/meteor-up/issues/185))
 
 A) This happens because Windows tries to run the `mup.js` config file instead of the actual `mup` binary. Use the absolute path to the `mup` binary: `C:/<where mup is installed>/mup setup`
-
-
-Q) Mup commands silently fail when I have a `~` in a relative path. ([issue 189](https://github.com/kadirahq/meteor-up/issues/189))
-
-A) Mup doesn't support the `~` alias for the home directory, use the absolute path instead.

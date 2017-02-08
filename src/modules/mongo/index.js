@@ -1,8 +1,11 @@
-import path from 'path';
+import * as docker from '../docker/';
+
+import {getDockerLogs, resolve, runTaskList} from '../utils';
+
 import debug from 'debug';
 import nodemiral from 'nodemiral';
-import {runTaskList, getDockerLogs} from '../utils';
-import * as docker from '../docker/';
+import path from 'path';
+
 const log = debug('mup:module:mongo');
 
 export function dump(/* api */) {
@@ -38,11 +41,11 @@ export function setup(api) {
   const list = nodemiral.taskList('Setup Mongo');
 
   list.executeScript('setup environment', {
-    script: path.resolve(__dirname, 'assets/mongo-setup.sh')
+    script: resolve(__dirname, 'assets/mongo-setup.sh')
   });
 
   list.copy('copying mongodb.conf', {
-    src: path.resolve(__dirname, 'assets/mongodb.conf'),
+    src: resolve(__dirname, 'assets/mongodb.conf'),
     dest: '/opt/mongodb/mongodb.conf'
   });
 
@@ -66,7 +69,7 @@ export function start(api) {
   const list = nodemiral.taskList('Start Mongo');
 
   list.executeScript('start mongo', {
-    script: path.resolve(__dirname, 'assets/mongo-start.sh'),
+    script: resolve(__dirname, 'assets/mongo-start.sh'),
     vars: {
       mongoVersion: config.version || '3.4.1'
     }
@@ -81,7 +84,7 @@ export function stop(api) {
   const list = nodemiral.taskList('Stop Mongo');
 
   list.executeScript('stop mongo', {
-    script: path.resolve(__dirname, 'assets/mongo-stop.sh')
+    script: resolve(__dirname, 'assets/mongo-stop.sh')
   });
 
   const sessions = api.getSessions([ 'mongo' ]);

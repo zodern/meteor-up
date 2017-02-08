@@ -1,7 +1,8 @@
 var spawn = require('child_process').spawn;
 var archiver = require('archiver');
 var fs = require('fs');
-var pathResolve = require('path').resolve;
+
+import { resolve as pathResolve } from '../utils';
 var _ = require('underscore');
 
 function buildApp(appPath, buildOptions) {

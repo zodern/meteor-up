@@ -1,9 +1,12 @@
-import path from 'path';
-import debug from 'debug';
-import sh from 'shelljs';
+import * as docker from '../docker/';
 import * as meteor from '../meteor/';
 import * as mongo from '../mongo/';
-import * as docker from '../docker/';
+
+import debug from 'debug';
+import path from 'path';
+import { resolve } from '../utils';
+import sh from 'shelljs';
+
 const log = debug('mup:module:default');
 
 sh.config.silent = true;
@@ -20,10 +23,10 @@ export function init(/* api */) {
   log('exec => mup init');
 
   // TODO check if mup.js or settings.json files exists
-  const mupJs = path.resolve(__dirname, 'template/mup.js.sample');
-  const settinsJson = path.resolve(__dirname, 'template/settings.json');
-  const mupJsDst = path.resolve(process.cwd(), 'mup.js');
-  const settingsJsonDst = path.resolve(process.cwd(), 'settings.json');
+  const mupJs = resolve(__dirname, 'template/mup.js.sample');
+  const settinsJson = resolve(__dirname, 'template/settings.json');
+  const mupJsDst = resolve(process.cwd(), 'mup.js');
+  const settingsJsonDst = resolve(process.cwd(), 'settings.json');
 
   sh.cp(mupJs, mupJsDst);
   sh.cp(settinsJson, settingsJsonDst);

@@ -1,9 +1,11 @@
-import fs from 'fs';
 import * as _ from 'underscore';
-import {promisify} from 'bluebird';
-import {Client} from 'ssh2';
-import path from 'path';
+
+import { Client } from 'ssh2';
 import debug from 'debug';
+import expandTilde from 'expand-tilde';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'bluebird';
 
 const log = debug('mup:utils');
 
@@ -59,7 +61,7 @@ export function runSSHCommand(info, command) {
     };
 
     if (info.pem) {
-      ssh.privateKey = fs.readFileSync(path.resolve(info.pem), 'utf8');
+      ssh.privateKey = fs.readFileSync(resolve(info.pem), 'utf8');
     } else if (info.password) {
       ssh.password = info.password;
     } else if (sshAgent && fs.existsSync(sshAgent)) {
@@ -90,7 +92,7 @@ export function runSSHCommand(info, command) {
 
         stream.once('close', function (code) {
           conn.end();
-          resolve({code, output});
+          resolve({ code, output });
         });
       });
     });
@@ -101,4 +103,11 @@ export function countOccurences(needle, haystack) {
   const regex = new RegExp(needle, 'g');
   const match = haystack.match(regex) || [];
   return match.length;
+}
+
+export function resolve(...paths) {
+  paths = paths.map((path) => {
+    return expandTilde(path);
+  });
+  return path.resolve(...paths);
 }
