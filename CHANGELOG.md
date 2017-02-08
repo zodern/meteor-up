@@ -1,3 +1,11 @@
+# Next
+- All paths support "~"
+- Add `server`, `allowIncompatibleUpdates` to build config (@alvelig)
+- Allow `mobile-settings` build option to share `settings.json` file (@alvelig)
+- Add `mup --version` command
+- Fix validating env `variables` and `imageFrontendServer`
+
+
 # 1.2.0
 - Support Meteor 1.4 by default (@ffxsam)
 - Change mongo version
