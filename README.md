@@ -108,11 +108,15 @@ module.exports = {
       debug: true,
       cleanAfterBuild: true, // default
       buildLocation: '/my/build/folder', // defaults to /tmp/<uuid>
-      
-      //set serverOnly: false if want to build mobile apps
-      mobileSettings: false, // get mobileSettings from settings.json file in app root (--mobile-settings settings.json) 
-      server: 'http://app.com', // your app url for mobile app access (--server http://app.com)
-      allowIncompatibleUpdates: true, //adds --allow-incompatible-updates key to build command
+
+      //set serverOnly: false if want to build mobile apps when deploying
+
+      // Remove this property for mobileSettings to use your settings.json. (optional)
+      mobileSettings: {
+        yourMobileSetting: "setting value"
+      },
+      server: 'http://app.com', // your app url for mobile app access (optional)
+      allowIncompatibleUpdates: true, //adds --allow-incompatible-updates arg to build command (optional)
     },
     env: {
       ROOT_URL: 'http://app.com', // set to https to force redirect from http

@@ -20,6 +20,8 @@ const schema = joi.object().keys({
     debug: joi.bool(),
     cleanAfterBuild: joi.bool(),
     mobileSettings: joi.object(),
+    server: joi.string().uri(),
+    allowIncompatibleUpdates: joi.boolean(),
     executable: joi.string()
   }),
   env: joi.object().keys({
