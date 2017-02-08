@@ -1,6 +1,7 @@
 #!/bin/bash
 
 APPNAME=<%= appName %>
+CLIENTSIZE=<% nginxClientUploadLimit %>
 APP_PATH=/opt/$APPNAME
 BUNDLE_PATH=$APP_PATH/current
 ENV_FILE=$APP_PATH/config/env.list
@@ -57,7 +58,15 @@ sleep 15s
     echo "Running autogenerate"
     # Get the nginx template for nginx-gen
     wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl -O /opt/$APPNAME/config/nginx.tmpl
-
+    
+    # Update nginx config based on user input or default passed by js
+    sudo cat <<EOT >> /opt/$APPNAME/config/nginx-default.conf
+    {
+      client_max_body_size $CLIENTSIZE;		    
+    }
+    EOT
+    
+    
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
     docker pull jrcs/letsencrypt-nginx-proxy-companion:latest
@@ -68,6 +77,7 @@ sleep 15s
     docker run -d -p 80:80 -p 443:443 \
       --name $APPNAME-nginx-proxy \
       -e "HTTPS_METHOD=noredirect" \
+      -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
       -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
