@@ -12,6 +12,7 @@ const schema = joi.object().keys({
   dockerImage: joi.string(),
   docker: joi.object().keys({
     image: joi.string().trim(),
+    imageFrontendServer: joi.string(),
     args: joi.array().items(joi.string().label('docker.args array items'))
   }),
   buildOptions: joi.object().keys({
@@ -24,7 +25,7 @@ const schema = joi.object().keys({
   env: joi.object().keys({
     'ROOT_URL': joi.string().required(),
     'MONGO_URL': joi.string()
-  }).pattern(/[\s\S]*/, joi.string()),
+  }).pattern(/[\s\S]*/, [joi.string(), joi.number()]),
   log: joi.object().keys({
     driver: joi.string(),
     opts: joi.object()
