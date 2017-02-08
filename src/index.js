@@ -1,6 +1,7 @@
 import MupAPI from './mup-api';
 import checkUpdates from './updates';
 import modules from './modules/';
+import pkg from '../package.json';
 import program from 'commander';
 
 let settingsPath;
@@ -9,6 +10,7 @@ const args = process.argv.slice(2);
 
 program
   .arguments('<command> [subcommand]')
+  .version(pkg.version)
   .action(argAction)
   .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
   .option('--config <filePath>', 'mup.js config file', setConfigPath)
