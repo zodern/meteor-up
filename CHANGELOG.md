@@ -1,7 +1,7 @@
-# Next
+# 1.2.1
 - All paths support "~"
-- Add `server`, `allowIncompatibleUpdates` to build config (@alvelig)
-- Allow `mobile-settings` build option to share `settings.json` file (@alvelig)
+- Add `server` and `allowIncompatibleUpdates` to build config (@alvelig)
+- Allow `mobile-settings` build option to use `settings.json` file (@alvelig)
 - Add `mup --version` command
 - Fix validating env `variables` and `imageFrontendServer`
 
