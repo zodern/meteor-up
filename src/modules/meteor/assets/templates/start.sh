@@ -1,7 +1,7 @@
 #!/bin/bash
 
 APPNAME=<%= appName %>
-CLIENTSIZE=<% nginxClientUploadLimit %>
+CLIENTSIZE=<%= nginxClientUploadLimit %>
 APP_PATH=/opt/$APPNAME
 BUNDLE_PATH=$APP_PATH/current
 ENV_FILE=$APP_PATH/config/env.list
