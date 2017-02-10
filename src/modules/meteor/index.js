@@ -134,7 +134,8 @@ export function push(api) {
           sslConfig: config.ssl,
           logConfig: config.log,
           volumes: config.volumes,
-          docker: config.docker
+          docker: config.docker,
+          nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
         }
       });
 
@@ -185,7 +186,7 @@ export function start(api) {
   list.executeScript('Start Meteor', {
     script: resolve(__dirname, 'assets/meteor-start.sh'),
     vars: {
-      appName: config.name
+      appName: config.name,     
     }
   });
 
