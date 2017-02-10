@@ -9,7 +9,8 @@ const schema = joi.object().keys({
         'ipv6'
       ]
     }),
-    joi.string().uri()
+    joi.string().uri(),
+    joi.string().trim()
   ).required(),
   username: joi.string().required(),
   pem: joi.string().trim(),

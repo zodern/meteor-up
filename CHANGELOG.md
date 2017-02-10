@@ -1,5 +1,6 @@
 # Next
 - Displays better message if it can not find the meteor app
+- Improve validating server's `host` in config
 
 # 1.2.1
 - All paths support "~"
