@@ -352,7 +352,10 @@ If you would like to increase the client upload limits, you can change it by add
 
 meteor: {
    ...
-   nginxClientUploadLimit: '<desired amount>' // Default is 10M
+   nginx: {
+     clientUploadLimit: '<desired amount>' // Default is 10M
+   }
+   ...
 }
 
 ```
