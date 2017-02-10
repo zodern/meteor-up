@@ -6,6 +6,23 @@ import { resolve as pathResolve } from '../utils';
 var _ = require('underscore');
 
 function buildApp(appPath, buildOptions) {
+  // Check if the folder exists
+  try {
+    fs.statSync(pathResolve(appPath));
+  } catch (e) {
+    console.log(e);
+    console.log(`${pathResolve(appPath)} does not exist`);
+    process.exit(1);
+  }
+  // Make sure it is a Meteor app
+  try {
+    // checks for release file since there also is a .meteor folder in the user's home
+    fs.statSync(pathResolve(appPath, '.meteor/release'));
+  } catch (e) {
+   console.log(`${pathResolve(appPath)} is not a meteor app`)
+   process.exit(1);
+  }
+
   return new Promise((resolve, reject) => {
     const callback = (err) => {
       if(err) {
@@ -88,7 +105,7 @@ function archiveIt(buildLocation, callback) {
   var archive = archiver('tar', {
     gzip: true,
     gzipOptions: {
-      level: 6
+      level: 9
     }
   });
 

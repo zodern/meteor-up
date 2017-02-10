@@ -1,3 +1,6 @@
+# Next
+- Displays better message if it can not find the meteor app
+
 # 1.2.1
 - All paths support "~"
 - Add `server` and `allowIncompatibleUpdates` to build config (@alvelig)
