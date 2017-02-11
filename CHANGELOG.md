@@ -1,6 +1,7 @@
 # Next
 - Configure nginx max client upload size, and increase default to `10M` (@shadowcodex)
 - Displays better message if it can not find the meteor app
+- Displays message if can not find pem for server
 - Improve validating server's `host` in config
 - Update documentation on using `mup` on Windows
 
