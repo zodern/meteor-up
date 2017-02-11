@@ -3,6 +3,7 @@
 - Displays better message if it can not find the meteor app
 - Displays message if can not find pem for server
 - Improve validating server's `host` in config
+- Validator checks for `http://` or `https://` in `ROOT_URL`
 - Update documentation on using `mup` on Windows
 
 # 1.2.1
