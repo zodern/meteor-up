@@ -33,6 +33,9 @@ const schema = joi.object().keys({
     opts: joi.object()
   }),
   volumes: joi.object(),
+  nginx: joi.object().keys({
+    clientUploadLimit: joi.string().trim()
+  }),
   ssl: joi.object().keys({
     autogenerate: joi.object().keys({
       email: joi.string().email().required(),

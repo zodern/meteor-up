@@ -1,6 +1,8 @@
 # Next
+- Configure nginx max client upload size, and increase default to `10M` (@shadowcodex)
 - Displays better message if it can not find the meteor app
 - Improve validating server's `host` in config
+- Update documentation on using `mup` on Windows
 
 # 1.2.1
 - All paths support "~"
@@ -8,7 +10,6 @@
 - Allow `mobile-settings` build option to use `settings.json` file (@alvelig)
 - Add `mup --version` command
 - Fix validating env `variables` and `imageFrontendServer`
-
 
 # 1.2.0
 - Support Meteor 1.4 by default (@ffxsam)

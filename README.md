@@ -446,4 +446,5 @@ A) Try increasing the value of the `deployCheckWaitTime` field in `mup.js`.
 
 Q) I get "Windows script error" in Windows. ([issue 185](https://github.com/kadirahq/meteor-up/issues/185))
 
-A) This happens because Windows tries to run the `mup.js` config file instead of the actual `mup` binary. Use the absolute path to the `mup` binary: `C:/<where mup is installed>/mup setup`
+A) This happens because Windows tries to run the `mup.js` config file instead of the actual `mup` binary. 
+Use `mup.cmd` instead of `mup`, or use `PowerShell` instead of `Command Prompt`

@@ -116,6 +116,9 @@ export function push(api) {
           'max-file': 10
         }
       };
+      
+      config.nginx = config.nginx || {};
+
       const list = nodemiral.taskList('Pushing Meteor');
 
       list.copy('Pushing Meteor App Bundle to The Server', {
