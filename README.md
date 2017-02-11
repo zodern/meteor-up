@@ -4,9 +4,12 @@
 
 Meteor Up is a command line tool that allows you to deploy any [Meteor](http://meteor.com) app to your own server. It currently supports Ubuntu.
 
+This repository formerly was at `kadirahq/meteor-up`.
+
 You can install and use Meteor Up on Linux, Mac and Windows.
 
 This version of Meteor Up is powered by [Docker](http://www.docker.com/), making deployment easy to manage and reducing a lot of server specific errors.
+
 
 **Table of Contents**
 
@@ -42,6 +45,7 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
 * Password or Private Key (pem) based server authentication
 * Access logs from the terminal (supports log tailing)
 * Support for custom docker images
+* Support for auto-generating SSL certificates using Let's Encrypt
 
 ### Server Configuration
 

@@ -50,7 +50,7 @@ export default class MupAPI {
       console.log(
         'If you think there is a bug in the mup.js validator, please'
       );
-      console.log('create an issue at https://github.com/zodern/meteor-up.');
+      console.log('create an issue at https://github.com/zodern/meteor-up');
     }
   }
 
