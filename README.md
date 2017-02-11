@@ -447,7 +447,7 @@ npm WARN deprecated
 A) Try increasing the value of the `deployCheckWaitTime` field in `mup.js`.
 
 
-Q) I get "Windows script error" in Windows. ([issue 185](https://github.com/kadirahq/meteor-up/issues/185))
+Q) I get "Windows script error" in Windows, or it opens mup.js in an editor.
 
-A) This happens because Windows tries to run the `mup.js` config file instead of the actual `mup` binary. 
+A) This happens because Windows tries to run the `mup.js` config file instead of the actual `mup` binary.
 Use `mup.cmd` instead of `mup`, or use `PowerShell` instead of `Command Prompt`
