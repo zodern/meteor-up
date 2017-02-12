@@ -7,6 +7,7 @@ env:
   node: true
   mocha: true
 ecmaFeatures:
+  accessor-pairs: 2
   arrowFunctions: true
   binaryLiterals: true
   blockBindings: true
@@ -48,16 +49,16 @@ rules:
   camelcase:
   - 2
   - properties: always
-  comma-dangle: 0
+  comma-dangle: 2
   comma-spacing: 0
   comma-style:
   - 2
   - last
-  complexity: 0
+  complexity: [1, 6]
   computed-property-spacing:
   - 2
   - never
-  consistent-return: 0
+  consistent-return: 2
   consistent-this: 0
   curly:
   - 2
@@ -71,6 +72,7 @@ rules:
   eqeqeq: 2
   func-names: 0
   func-style: 0
+  global-require: 2
   generator-star-spacing:
   - 0
   - before: true
@@ -109,15 +111,16 @@ rules:
   no-array-constructor: 2
   no-bitwise: 0
   no-caller: 2
-  no-catch-shadow: 0
+  no-case-declarations: 2
+  no-catch-shadow: 2
   no-class-assign: 2
   no-cond-assign: 2
   no-console: 0
   no-const-assign: 2
   no-constant-condition: 2
   no-continue: 0
-  no-control-regex: 0
-  no-debugger: 1
+  no-control-regex: 2
+  no-debugger: 2
   no-delete-var: 2
   no-div-regex: 2
   no-dupe-args: 2
@@ -125,6 +128,7 @@ rules:
   no-duplicate-case: 2
   no-else-return: 2
   no-empty: 2
+  no-empty-pattern: 2
   no-empty-character-class: 2
   no-eq-null: 0
   no-eval: 2
@@ -151,7 +155,7 @@ rules:
   no-labels: 0
   no-lone-blocks: 2
   no-lonely-if: 2
-  no-loop-func: 0
+  no-loop-func: 2
   no-mixed-requires:
   - 2
   - true
@@ -159,11 +163,11 @@ rules:
   no-multi-spaces: 2
   no-multi-str: 2
   no-multiple-empty-lines: 0
-  no-native-reassign: 0
+  no-native-reassign: 2
   no-negated-in-lhs: 2
   no-nested-ternary: 0
   no-new: 2
-  no-new-func: 0
+  no-new-func: 2
   no-new-object: 2
   no-new-require: 2
   no-new-wrappers: 2
@@ -181,7 +185,7 @@ rules:
   no-restricted-modules: 0
   no-return-assign: 2
   no-script-url: 2
-  no-self-compare: 0
+  no-self-compare: 2
   no-sequences: 2
   no-shadow: 2
   no-shadow-restricted-names: 2
@@ -268,7 +272,7 @@ rules:
   - always
   strict: 0
   use-isnan: 2
-  valid-jsdoc: 0
+  valid-jsdoc: 2
   valid-typeof: 2
   vars-on-top: 0
   wrap-iife: 2
