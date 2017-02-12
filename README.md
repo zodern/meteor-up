@@ -1,4 +1,4 @@
-# meteor-up [![Stories in Ready](https://badge.waffle.io/kadirahq/meteor-up.svg?label=ready&title=Ready)](http://waffle.io/kadirahq/meteor-up)
+# meteor-up [![Code Climate](https://codeclimate.com/github/zodern/meteor-up/badges/gpa.svg)](https://codeclimate.com/github/zodern/meteor-up)
 
 #### Production Quality Meteor Deployments
 
