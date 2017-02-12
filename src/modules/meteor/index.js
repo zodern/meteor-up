@@ -1,21 +1,15 @@
 import * as _ from 'underscore';
 
-import {
-  getDockerLogs,
-  resolve,
-  runTaskList,
-} from '../utils';
+import { getDockerLogs, resolvePath, runTaskList } from '../utils';
 
 import buildApp from './build.js';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
-import path from 'path';
 import uuid from 'uuid';
 
 const log = debug('mup:module:meteor');
 
-
-export function help(/* api */) {
+export function help() {
   log('exec => mup meteor help');
   console.log('mup meteor', Object.keys(this));
 }
@@ -44,10 +38,10 @@ export function setup(api) {
   const list = nodemiral.taskList('Setup Meteor');
 
   list.executeScript('Setup Environment', {
-    script: resolve(__dirname, 'assets/meteor-setup.sh'),
+    script: resolvePath(__dirname, 'assets/meteor-setup.sh'),
     vars: {
-      name: config.name,
-    },
+      name: config.name
+    }
   });
 
   if (config.ssl && typeof config.ssl.autogenerate !== 'object') {
@@ -55,21 +49,21 @@ export function setup(api) {
 
     if (config.ssl.upload !== false) {
       list.copy('Copying SSL Certificate Bundle', {
-        src: resolve(basePath, config.ssl.crt),
+        src: resolvePath(basePath, config.ssl.crt),
         dest: '/opt/' + config.name + '/config/bundle.crt'
       });
 
       list.copy('Copying SSL Private Key', {
-        src: resolve(basePath, config.ssl.key),
+        src: resolvePath(basePath, config.ssl.key),
         dest: '/opt/' + config.name + '/config/private.key'
       });
     }
 
     list.executeScript('Verifying SSL Configurations', {
-      script: resolve(__dirname, 'assets/verify-ssl-config.sh'),
+      script: resolvePath(__dirname, 'assets/verify-ssl-config.sh'),
       vars: {
         name: config.name
-      },
+      }
     });
   }
 
@@ -101,46 +95,51 @@ export function push(api) {
   }
 
   var buildOptions = config.buildOptions || {};
-  buildOptions.buildLocation = buildOptions.buildLocation || resolve('/tmp', uuid.v4());
+  buildOptions.buildLocation = buildOptions.buildLocation ||
+    resolvePath('/tmp', uuid.v4());
 
   console.log('Building App Bundle Locally');
 
-  var bundlePath = resolve(buildOptions.buildLocation, 'bundle.tar.gz');
-  const appPath = resolve(api.getBasePath(), config.path);
+  var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+  const appPath = resolvePath(api.getBasePath(), config.path);
 
-  return buildApp(appPath, buildOptions)
-    .then(() => {
-      config.log = config.log || {
+  return buildApp(appPath, buildOptions).then(() => {
+    config.log = config.log ||
+      {
         opts: {
           'max-size': '100m',
           'max-file': 10
         }
       };
-      const list = nodemiral.taskList('Pushing Meteor');
 
-      list.copy('Pushing Meteor App Bundle to The Server', {
-        src: bundlePath,
-        dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
-        progressBar: config.enableUploadProgressBar
-      });
+    config.nginx = config.nginx || {};
 
-      list.copy('Pushing the Startup Script', {
-        src: resolve(__dirname, 'assets/templates/start.sh'),
-        dest: '/opt/' + config.name + '/config/start.sh',
-        vars: {
-          appName: config.name,
-          useLocalMongo: api.getConfig().mongo ? 1 : 0,
-          port: config.env.PORT || 80,
-          sslConfig: config.ssl,
-          logConfig: config.log,
-          volumes: config.volumes,
-          docker: config.docker
-        }
-      });
+    const list = nodemiral.taskList('Pushing Meteor');
 
-      const sessions = api.getSessions(['meteor']);
-      return runTaskList(list, sessions, { series: true });
+    list.copy('Pushing Meteor App Bundle to The Server', {
+      src: bundlePath,
+      dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
+      progressBar: config.enableUploadProgressBar
     });
+
+    list.copy('Pushing the Startup Script', {
+      src: resolvePath(__dirname, 'assets/templates/start.sh'),
+      dest: '/opt/' + config.name + '/config/start.sh',
+      vars: {
+        appName: config.name,
+        useLocalMongo: api.getConfig().mongo ? 1 : 0,
+        port: config.env.PORT || 80,
+        sslConfig: config.ssl,
+        logConfig: config.log,
+        volumes: config.volumes,
+        docker: config.docker,
+        nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
+      }
+    });
+
+    const sessions = api.getSessions(['meteor']);
+    return runTaskList(list, sessions, { series: true });
+  });
 }
 
 export function envconfig(api) {
@@ -161,7 +160,7 @@ export function envconfig(api) {
   delete env.PORT;
 
   list.copy('Sending Environment Variables', {
-    src: resolve(__dirname, 'assets/templates/env.list'),
+    src: resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + config.name + '/config/env.list',
     vars: {
       env: env || {},
@@ -183,14 +182,14 @@ export function start(api) {
   const list = nodemiral.taskList('Start Meteor');
 
   list.executeScript('Start Meteor', {
-    script: resolve(__dirname, 'assets/meteor-start.sh'),
+    script: resolvePath(__dirname, 'assets/meteor-start.sh'),
     vars: {
       appName: config.name
     }
   });
 
   list.executeScript('Verifying Deployment', {
-    script: resolve(__dirname, 'assets/meteor-deploy-check.sh'),
+    script: resolvePath(__dirname, 'assets/meteor-deploy-check.sh'),
     vars: {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
@@ -206,16 +205,14 @@ export function deploy(api) {
   log('exec => mup meteor deploy');
 
   // validate settings and config before starting
-  const settings = api.getSettings();
+  api.getSettings();
   const config = api.getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
-  return push(api)
-    .then(() => envconfig(api))
-    .then(() => start(api));
+  return push(api).then(() => envconfig(api)).then(() => start(api));
 }
 
 export function stop(api) {
@@ -229,7 +226,7 @@ export function stop(api) {
   const list = nodemiral.taskList('Stop Meteor');
 
   list.executeScript('Stop Meteor', {
-    script: resolve(__dirname, 'assets/meteor-stop.sh'),
+    script: resolvePath(__dirname, 'assets/meteor-stop.sh'),
     vars: {
       appName: config.name
     }

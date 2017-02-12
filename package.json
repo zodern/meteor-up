@@ -1,6 +1,6 @@
 {
   "name": "mup",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Production Quality Meteor Deployments",
   "main": "lib/index.js",
   "bin": {
@@ -9,7 +9,7 @@
   "scripts": {
     "prepublish": "nofat make",
     "test": "nofat test",
-    "lint": "nofat lint"
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/kadirahq/meteor-up#readme",
   "devDependencies": {
+    "eslint": "^3.15.0",
     "nofat": "1.0.x"
   },
   "dependencies": {

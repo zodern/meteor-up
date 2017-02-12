@@ -24,39 +24,59 @@ const schema = joi.object().keys({
     allowIncompatibleUpdates: joi.boolean(),
     executable: joi.string()
   }),
-  env: joi.object().keys({
-    'ROOT_URL': joi.string().required(),
-    'MONGO_URL': joi.string()
-  }).pattern(/[\s\S]*/, [joi.string(), joi.number()]),
+  env: joi
+    .object()
+    .keys({
+      ROOT_URL: joi
+        .string()
+        .regex(new RegExp('^(http|https)://', 'i'))
+        .required(),
+      MONGO_URL: joi.string()
+    })
+    .pattern(/[\s\S]*/, [joi.string(), joi.number()]),
   log: joi.object().keys({
     driver: joi.string(),
     opts: joi.object()
   }),
   volumes: joi.object(),
-  ssl: joi.object().keys({
-    autogenerate: joi.object().keys({
-      email: joi.string().email().required(),
-      domains: joi.string().required()
-    }).label('autogenerate'),
-    crt: joi.string().trim(),
-    key: joi.string().trim(),
-    port: joi.number()
-  }).and('crt', 'key')
+  nginx: joi.object().keys({
+    clientUploadLimit: joi.string().trim()
+  }),
+  ssl: joi
+    .object()
+    .keys({
+      autogenerate: joi
+        .object()
+        .keys({
+          email: joi.string().email().required(),
+          domains: joi.string().required()
+        })
+        .label('autogenerate'),
+      crt: joi.string().trim(),
+      key: joi.string().trim(),
+      port: joi.number()
+    })
+    .and('crt', 'key')
     .without('autogenerate', ['crt', 'key'])
     .or('crt', 'autogenerate')
     .label('ssl')
 });
 
-export default function (config) {
+export default function(config) {
   let details = [];
-  // console.log( joi.validate(config.meteor, schema, {convert: false}))
-  details = combineErrorDetails(details, joi.validate(config.meteor, schema, {convert: false}));
+  details = combineErrorDetails(
+    details,
+    joi.validate(config.meteor, schema, { convert: false })
+  );
   if (config.meteor.name.indexOf(' ') > -1) {
     details.push({
       message: '"name" has a space'
     });
   }
-  details = combineErrorDetails(details, serversExist(config.servers, config.meteor.servers));
+  details = combineErrorDetails(
+    details,
+    serversExist(config.servers, config.meteor.servers)
+  );
 
   return addLocation(details, 'meteor');
 }

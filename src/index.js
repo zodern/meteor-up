@@ -14,24 +14,24 @@ program
   .action(argAction)
   .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
   .option('--config <filePath>', 'mup.js config file', setConfigPath)
-  .on('--help', function () {
+  .on('--help', function() {
     console.log('   Commands:');
 
     function listModuleCommands(commands) {
-      Object.keys(commands).forEach((command) => {
+      Object.keys(commands).forEach(command => {
         if (command === 'default') {
           listModuleCommands(commands['default']);
           return;
         }
         console.log(`     ${command}`);
-      })
+      });
     }
 
-    listModuleCommands(modules)
+    listModuleCommands(modules);
 
     console.log('');
-    console.log('    For list of subcommands, run ')
-    console.log('      mup <command> help')
+    console.log('    For list of subcommands, run ');
+    console.log('      mup <command> help');
   })
   .parse(process.argv);
 

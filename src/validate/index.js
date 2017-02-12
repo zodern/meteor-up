@@ -9,7 +9,7 @@ const schema = joi.object().keys({
   servers: joi.object(),
   meteor: joi.object(),
   mongo: joi.object()
-})
+});
 
 function validateAll(config) {
   let details = [];
