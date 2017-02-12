@@ -4,7 +4,7 @@ import * as mongo from '../mongo/';
 
 import debug from 'debug';
 import path from 'path';
-import { resolve } from '../utils';
+import { resolvePath } from '../utils';
 import sh from 'shelljs';
 
 const log = debug('mup:module:default');
@@ -23,10 +23,10 @@ export function init(/* api */) {
   log('exec => mup init');
 
   // TODO check if mup.js or settings.json files exists
-  const mupJs = resolve(__dirname, 'template/mup.js.sample');
-  const settinsJson = resolve(__dirname, 'template/settings.json');
-  const mupJsDst = resolve(process.cwd(), 'mup.js');
-  const settingsJsonDst = resolve(process.cwd(), 'settings.json');
+  const mupJs = resolvePath(__dirname, 'template/mup.js.sample');
+  const settinsJson = resolvePath(__dirname, 'template/settings.json');
+  const mupJsDst = resolvePath(process.cwd(), 'mup.js');
+  const settingsJsonDst = resolvePath(process.cwd(), 'settings.json');
 
   sh.cp(mupJs, mupJsDst);
   sh.cp(settinsJson, settingsJsonDst);

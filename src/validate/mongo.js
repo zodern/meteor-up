@@ -12,6 +12,9 @@ const schema = joi.object().keys({
 export default function (config) {
   let details = [];
   details = combineErrorDetails(details, joi.validate(config.mongo, schema));
-  details = combineErrorDetails(details, serversExist(config.servers, config.mongo.servers));
+  details = combineErrorDetails(
+    details,
+    serversExist(config.servers, config.mongo.servers)
+  );
   return addLocation(details, 'mongo');
 }

@@ -13,10 +13,12 @@ export function runTaskList(list, sessions, opts) {
   return new Promise((resolve, reject) => {
     list.run(sessions, opts, summaryMap => {
       for (var host in summaryMap) {
-        const summary = summaryMap[host];
-        if (summary.error) {
-          reject(summary.error);
-          return;
+        if (summaryMap.hasOwnProperty(host)) {
+          const summary = summaryMap[host];
+          if (summary.error) {
+            reject(summary.error);
+            return;
+          }
         }
       }
 
@@ -28,8 +30,7 @@ export function runTaskList(list, sessions, opts) {
 export function getDockerLogs(name, sessions, args) {
   const command = 'sudo docker ' + args.join(' ') + ' ' + name;
 
-  log(`getDockerLogs command: ${command}`)
-
+  log(`getDockerLogs command: ${command}`);
 
   var promises = _.map(sessions, session => {
     var host = '[' + session._host + ']';
@@ -56,12 +57,12 @@ export function runSSHCommand(info, command) {
     var sshAgent = process.env.SSH_AUTH_SOCK;
     var ssh = {
       host: info.host,
-      port: (info.opts && info.opts.port || 22),
+      port: info.opts && info.opts.port || 22,
       username: info.username
     };
 
     if (info.pem) {
-      ssh.privateKey = fs.readFileSync(resolve(info.pem), 'utf8');
+      ssh.privateKey = fs.readFileSync(resolvePath(info.pem), 'utf8');
     } else if (info.password) {
       ssh.password = info.password;
     } else if (sshAgent && fs.existsSync(sshAgent)) {
@@ -105,9 +106,9 @@ export function countOccurences(needle, haystack) {
   return match.length;
 }
 
-export function resolve(...paths) {
-  paths = paths.map((path) => {
-    return expandTilde(path);
+export function resolvePath(...paths) {
+  let expandedPaths = paths.map(_path => {
+    return expandTilde(_path);
   });
-  return path.resolve(...paths);
+  return path.resolve(...expandedPaths);
 }

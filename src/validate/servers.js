@@ -22,9 +22,9 @@ const schema = joi.object().keys({
 
 export default function validateServers(servers) {
   let details = [];
-  Object.keys(servers).forEach((key) => {
+  Object.keys(servers).forEach(key => {
     let result = joi.validate(servers[key], schema, {
-        convert: false
+      convert: false
     });
     details = combineErrorDetails(details, result);
   });

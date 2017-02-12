@@ -2,7 +2,7 @@ import fs from 'fs';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
-import { resolve } from './modules/utils';
+import { resolvePath } from './modules/utils';
 import validateConfig from './validate/index';
 
 export default class MupAPI {
@@ -58,7 +58,7 @@ export default class MupAPI {
     if (!this.config) {
       let filePath;
       if (this.configPath) {
-        filePath = resolve(this.configPath);
+        filePath = resolvePath(this.configPath);
         this.base = path.dirname(this.configPath);
       } else {
         filePath = path.join(this.base, 'mup.js');
@@ -66,8 +66,8 @@ export default class MupAPI {
       try {
         this.config = require(filePath);
       } catch (e) {
-        if (e.code == 'MODULE_NOT_FOUND') {
-          console.error(`'mup.js' file not found. Run 'mup init' first.`);
+        if (e.code === 'MODULE_NOT_FOUND') {
+          console.error('"mup.js" file not found. Run "mup init" first.');
         } else {
           console.error(e);
         }
@@ -83,7 +83,7 @@ export default class MupAPI {
     if (!this.settings) {
       let filePath;
       if (this.settingsPath) {
-        filePath = resolve(this.settingsPath);
+        filePath = resolvePath(this.settingsPath);
       } else {
         filePath = path.join(this.base, 'settings.json');
       }
@@ -170,10 +170,10 @@ export default class MupAPI {
 
       if (info.pem) {
         try {
-          auth.pem = fs.readFileSync(resolve(info.pem), 'utf8');
+          auth.pem = fs.readFileSync(resolvePath(info.pem), 'utf8');
         } catch (e) {
-          console.error(`Unable to load pem at "${resolve(info.pem)}"`);
-          console.error(`for server "${name}"`)
+          console.error(`Unable to load pem at "${resolvePath(info.pem)}"`);
+          console.error(`for server "${name}"`);
           if (e.code !== 'ENOENT') {
             console.log(e);
           }
@@ -185,7 +185,7 @@ export default class MupAPI {
         opts.ssh.agent = sshAgent;
       } else {
         console.error(
-          "error: server %s doesn't have password, ssh-agent or pem",
+          'error: server %s doesn\'t have password, ssh-agent or pem',
           name
         );
         process.exit(1);

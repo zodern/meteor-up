@@ -2,40 +2,40 @@ var spawn = require('child_process').spawn;
 var archiver = require('archiver');
 var fs = require('fs');
 
-import { resolve as pathResolve } from '../utils';
+import { resolvePath } from '../utils';
 var _ = require('underscore');
 
 function buildApp(appPath, buildOptions) {
   // Check if the folder exists
   try {
-    fs.statSync(pathResolve(appPath));
+    fs.statSync(resolvePath(appPath));
   } catch (e) {
     console.log(e);
-    console.log(`${pathResolve(appPath)} does not exist`);
+    console.log(`${resolvePath(appPath)} does not exist`);
     process.exit(1);
   }
   // Make sure it is a Meteor app
   try {
     // checks for release file since there also is a .meteor folder in the user's home
-    fs.statSync(pathResolve(appPath, '.meteor/release'));
+    fs.statSync(resolvePath(appPath, '.meteor/release'));
   } catch (e) {
-   console.log(`${pathResolve(appPath)} is not a meteor app`)
-   process.exit(1);
+    console.log(`${resolvePath(appPath)} is not a meteor app`);
+    process.exit(1);
   }
 
-  return new Promise((resolve, reject) => {
-    const callback = (err) => {
-      if(err) {
+  return new Promise((resolvePath, reject) => {
+    const callback = err => {
+      if (err) {
         return reject(err);
       }
-      resolve();
+      resolvePath();
     };
-    buildMeteorApp(appPath, buildOptions, function(code) {
+    buildMeteorApp(appPath, buildOptions, function (code) {
       if (code === 0) {
         archiveIt(buildOptions.buildLocation, callback);
       } else {
-        console.log("\n=> Build Error. Check the logs printed above.");
-        callback(new Error("build-error"));
+        console.log('\n=> Build Error. Check the logs printed above.');
+        callback(new Error('build-error'));
       }
     });
   });
@@ -44,27 +44,27 @@ function buildApp(appPath, buildOptions) {
 function buildMeteorApp(appPath, buildOptions, callback) {
   var executable = buildOptions.executable || 'meteor';
   var args = [
-    "build", "--directory", buildOptions.buildLocation,
-    "--architecture", "os.linux.x86_64"
+    'build', '--directory', buildOptions.buildLocation,
+    '--architecture', 'os.linux.x86_64'
   ];
 
-  if(buildOptions.debug) {
-    args.push("--debug");
+  if (buildOptions.debug) {
+    args.push('--debug');
   }
 
-  if(buildOptions.mobileSettings) {
+  if (buildOptions.mobileSettings) {
     args.push('--mobile-settings');
     args.push(JSON.stringify(buildOptions.mobileSettings));
   }
 
-  if(buildOptions.serverOnly) {
+  if (buildOptions.serverOnly) {
     args.push('--server-only');
-  } else if(!buildOptions.mobileSettings) {
+  } else if (!buildOptions.mobileSettings) {
     args.push('--mobile-settings');
     args.push(appPath + '/settings.json');
   }
 
-  if(buildOptions.server) {
+  if (buildOptions.server) {
     args.push('--server');
     args.push(buildOptions.server);
   }
@@ -74,22 +74,22 @@ function buildMeteorApp(appPath, buildOptions, callback) {
   }
 
   var isWin = /^win/.test(process.platform);
-  if(isWin) {
+  if (isWin) {
     // Sometimes cmd.exe not available in the path
     // See: http://goo.gl/ADmzoD
-    executable = process.env.comspec || "cmd.exe";
-    args = ["/c", "meteor"].concat(args);
+    executable = process.env.comspec || 'cmd.exe';
+    args = [ '/c', 'meteor' ].concat(args);
   }
 
   var options = {cwd: appPath};
   var meteor = spawn(executable, args, options);
-  var stdout = "";
-  var stderr = "";
+  var stdout = '';
+  var stderr = '';
 
   meteor.stdout.pipe(process.stdout, {end: false});
   meteor.stderr.pipe(process.stderr, {end: false});
 
-  meteor.on('error', (e) => {
+  meteor.on('error', e => {
     console.log(options);
     console.log(e);
   });
@@ -98,8 +98,8 @@ function buildMeteorApp(appPath, buildOptions, callback) {
 
 function archiveIt(buildLocation, callback) {
   callback = _.once(callback);
-  var bundlePath = pathResolve(buildLocation, 'bundle.tar.gz');
-  var sourceDir = pathResolve(buildLocation, 'bundle');
+  var bundlePath = resolvePath(buildLocation, 'bundle.tar.gz');
+  var sourceDir = resolvePath(buildLocation, 'bundle');
 
   var output = fs.createWriteStream(bundlePath);
   var archive = archiver('tar', {
@@ -112,8 +112,8 @@ function archiveIt(buildLocation, callback) {
   archive.pipe(output);
   output.once('close', callback);
 
-  archive.once('error', function(err) {
-    console.log("=> Archiving failed:", err.message);
+  archive.once('error', function (err) {
+    console.log('=> Archiving failed:', err.message);
     callback(err);
   });
 
