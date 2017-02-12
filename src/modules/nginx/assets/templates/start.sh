@@ -1,0 +1,50 @@
+#!/bin/bash
+
+APPNAME=<%= appName %>
+APP_PATH=/opt/$APPNAME
+ENV_FILE=$APP_PATH/config/env.list
+ENV_FILE_LETSENCRYPT=$APP_PATH/config/env_letsencrypt.list
+HTTP_PORT=<%= httpPort %>
+
+# Remove previous version of the app, if exists
+docker rm -f $APPNAME
+echo "Removed $APPNAME"
+
+# Remove let's encrypt containers if exists
+docker rm -f $APPNAME-letsencrypt
+echo "Removed $APPNAME-letsencrypt"
+
+# We don't need to fail the deployment because of a docker hub downtime
+set +e
+docker pull jrcs/letsencrypt-nginx-proxy-companion:latest
+docker pull jwilder/nginx-proxy
+set -e
+echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
+
+
+docker run -d -p $HTTP_PORT:80 \
+  <% if(httpsPort) { %> \
+ -p <%= httpsPort %>:443 \
+  <% } %> \
+  --name $APPNAME \
+  --env-file=$ENV_FILE \
+  -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
+  -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
+  -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
+  -v /var/run/docker.sock:/tmp/docker.sock:ro \
+  jwilder/nginx-proxy
+echo "Ran nginx-proxy as $APPNAME"
+sleep 15s
+
+<% if(httpsPort) { %> \
+  docker run -d \
+    --name $APPNAME-letsencrypt \
+    --env-file=$ENV_FILE_LETSENCRYPT \
+    --restart=always\
+    --volumes-from $APPNAME \
+    -v /opt/$APPNAME/certs:/etc/nginx/certs:rw \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    jrcs/letsencrypt-nginx-proxy-companion
+  echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
+<% } %>
+
