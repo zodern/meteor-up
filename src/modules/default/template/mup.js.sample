@@ -49,6 +49,7 @@ module.exports = {
     oplog: true,
     port: 27017,
     version: '3.4.1',
+    dbDir: '/var/lib/mongodb', // (optional) default is '/var/lib/mongodb'
     servers: {
       one: {},
     },
