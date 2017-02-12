@@ -1,21 +1,15 @@
 import * as _ from 'underscore';
 
-import {
-  getDockerLogs,
-  resolvePath,
-  runTaskList,
-} from '../utils';
+import { getDockerLogs, resolvePath, runTaskList } from '../utils';
 
 import buildApp from './build.js';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
-import path from 'path';
 import uuid from 'uuid';
 
 const log = debug('mup:module:meteor');
 
-
-export function help(/* api */) {
+export function help() {
   log('exec => mup meteor help');
   console.log('mup meteor', Object.keys(this));
 }
@@ -29,7 +23,7 @@ export function logs(api) {
   }
 
   const args = api.getArgs();
-  const sessions = api.getSessions([ 'meteor' ]);
+  const sessions = api.getSessions(['meteor']);
   return getDockerLogs(config.name, sessions, args);
 }
 
@@ -46,8 +40,8 @@ export function setup(api) {
   list.executeScript('Setup Environment', {
     script: resolvePath(__dirname, 'assets/meteor-setup.sh'),
     vars: {
-      name: config.name,
-    },
+      name: config.name
+    }
   });
 
   if (config.ssl && typeof config.ssl.autogenerate !== 'object') {
@@ -69,11 +63,11 @@ export function setup(api) {
       script: resolvePath(__dirname, 'assets/verify-ssl-config.sh'),
       vars: {
         name: config.name
-      },
+      }
     });
   }
 
-  const sessions = api.getSessions([ 'meteor' ]);
+  const sessions = api.getSessions(['meteor']);
 
   return runTaskList(list, sessions);
 }
@@ -101,50 +95,51 @@ export function push(api) {
   }
 
   var buildOptions = config.buildOptions || {};
-  buildOptions.buildLocation = buildOptions.buildLocation || resolvePath('/tmp', uuid.v4());
+  buildOptions.buildLocation = buildOptions.buildLocation ||
+    resolvePath('/tmp', uuid.v4());
 
   console.log('Building App Bundle Locally');
 
   var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
   const appPath = resolvePath(api.getBasePath(), config.path);
 
-  return buildApp(appPath, buildOptions)
-    .then(() => {
-      config.log = config.log || {
+  return buildApp(appPath, buildOptions).then(() => {
+    config.log = config.log ||
+      {
         opts: {
           'max-size': '100m',
           'max-file': 10
         }
       };
 
-      config.nginx = config.nginx || {};
+    config.nginx = config.nginx || {};
 
-      const list = nodemiral.taskList('Pushing Meteor');
+    const list = nodemiral.taskList('Pushing Meteor');
 
-      list.copy('Pushing Meteor App Bundle to The Server', {
-        src: bundlePath,
-        dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
-        progressBar: config.enableUploadProgressBar
-      });
-
-      list.copy('Pushing the Startup Script', {
-        src: resolvePath(__dirname, 'assets/templates/start.sh'),
-        dest: '/opt/' + config.name + '/config/start.sh',
-        vars: {
-          appName: config.name,
-          useLocalMongo: api.getConfig().mongo ? 1 : 0,
-          port: config.env.PORT || 80,
-          sslConfig: config.ssl,
-          logConfig: config.log,
-          volumes: config.volumes,
-          docker: config.docker,
-          nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
-        }
-      });
-
-      const sessions = api.getSessions([ 'meteor' ]);
-      return runTaskList(list, sessions, { series: true });
+    list.copy('Pushing Meteor App Bundle to The Server', {
+      src: bundlePath,
+      dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
+      progressBar: config.enableUploadProgressBar
     });
+
+    list.copy('Pushing the Startup Script', {
+      src: resolvePath(__dirname, 'assets/templates/start.sh'),
+      dest: '/opt/' + config.name + '/config/start.sh',
+      vars: {
+        appName: config.name,
+        useLocalMongo: api.getConfig().mongo ? 1 : 0,
+        port: config.env.PORT || 80,
+        sslConfig: config.ssl,
+        logConfig: config.log,
+        volumes: config.volumes,
+        docker: config.docker,
+        nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
+      }
+    });
+
+    const sessions = api.getSessions(['meteor']);
+    return runTaskList(list, sessions, { series: true });
+  });
 }
 
 export function envconfig(api) {
@@ -172,7 +167,7 @@ export function envconfig(api) {
       appName: config.name
     }
   });
-  const sessions = api.getSessions([ 'meteor' ]);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, { series: true });
 }
 
@@ -189,7 +184,7 @@ export function start(api) {
   list.executeScript('Start Meteor', {
     script: resolvePath(__dirname, 'assets/meteor-start.sh'),
     vars: {
-      appName: config.name,
+      appName: config.name
     }
   });
 
@@ -202,7 +197,7 @@ export function start(api) {
     }
   });
 
-  const sessions = api.getSessions([ 'meteor' ]);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, { series: true });
 }
 
@@ -210,16 +205,14 @@ export function deploy(api) {
   log('exec => mup meteor deploy');
 
   // validate settings and config before starting
-  const settings = api.getSettings();
+  api.getSettings();
   const config = api.getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
-  return push(api)
-    .then(() => envconfig(api))
-    .then(() => start(api));
+  return push(api).then(() => envconfig(api)).then(() => start(api));
 }
 
 export function stop(api) {
@@ -239,6 +232,6 @@ export function stop(api) {
     }
   });
 
-  const sessions = api.getSessions([ 'meteor' ]);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions);
 }

@@ -1,10 +1,7 @@
-import * as docker from '../docker/';
-
 import { getDockerLogs, resolvePath, runTaskList } from '../utils';
 
 import debug from 'debug';
 import nodemiral from 'nodemiral';
-import path from 'path';
 
 const log = debug('mup:module:mongo');
 
@@ -20,15 +17,15 @@ export function logs(api) {
   log('exec => mup mongo logs');
 
   const args = api.getArgs();
-  const sessions = api.getSessions([ 'mongo' ]);
+  const sessions = api.getSessions(['mongo']);
   return getDockerLogs('mongodb', sessions, args);
 }
 
 export function setup(api) {
   log('exec => mup mongo setup');
 
-  const mongoSessions = api.getSessions([ 'mongo' ]);
-  const meteorSessions = api.getSessions([ 'meteor' ]);
+  const mongoSessions = api.getSessions(['mongo']);
+  const meteorSessions = api.getSessions(['meteor']);
 
   if (meteorSessions.length !== 1) {
     console.log(
@@ -53,7 +50,7 @@ export function setup(api) {
     dest: '/opt/mongodb/mongodb.conf'
   });
 
-  const sessions = api.getSessions([ 'mongo' ]);
+  const sessions = api.getSessions(['mongo']);
 
   return runTaskList(list, sessions);
 }
@@ -61,8 +58,8 @@ export function setup(api) {
 export function start(api) {
   log('exec => mup mongo start');
 
-  const mongoSessions = api.getSessions([ 'mongo' ]);
-  const meteorSessions = api.getSessions([ 'meteor' ]);
+  const mongoSessions = api.getSessions(['mongo']);
+  const meteorSessions = api.getSessions(['meteor']);
   const config = api.getConfig().mongo;
 
   if (
@@ -82,7 +79,7 @@ export function start(api) {
     }
   });
 
-  const sessions = api.getSessions([ 'mongo' ]);
+  const sessions = api.getSessions(['mongo']);
   return runTaskList(list, sessions);
 }
 
@@ -94,6 +91,6 @@ export function stop(api) {
     script: resolvePath(__dirname, 'assets/mongo-stop.sh')
   });
 
-  const sessions = api.getSessions([ 'mongo' ]);
+  const sessions = api.getSessions(['mongo']);
   return runTaskList(list, sessions);
 }

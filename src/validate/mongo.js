@@ -9,7 +9,7 @@ const schema = joi.object().keys({
   servers: joi.object().keys()
 });
 
-export default function (config) {
+export default function(config) {
   let details = [];
   details = combineErrorDetails(details, joi.validate(config.mongo, schema));
   details = combineErrorDetails(

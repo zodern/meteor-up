@@ -1,3 +1,4 @@
+/* eslint-disable */
 var path = require('path');
 
 var meteorPath = path.resolve('..', 'helloapp');
@@ -6,33 +7,30 @@ var servers = require(serverFile);
 
 module.exports = {
   servers: servers,
-
   meteor: {
     name: 'myapp',
     path: meteorPath,
     servers: {
-      mymeteor: {},
+      mymeteor: {}
     },
     env: {
-      ROOT_URL: 'http://'+servers.mymeteor.host+'.com',
-      MONGO_URL: 'mongodb://'+servers.mymongo.host+'/meteor'
+      ROOT_URL: 'http://' + servers.mymeteor.host + '.com',
+      MONGO_URL: 'mongodb://' + servers.mymongo.host + '/meteor'
     },
     log: {
       driver: 'syslog'
     },
     deployCheckWaitTime: 120
   },
-
   mongo: {
     oplog: true,
     servers: {
-      mymongo: {},
-    },
+      mymongo: {}
+    }
   },
-
   proxy: {
     servers: {
-      myproxy: {},
-    },
-  },
+      myproxy: {}
+    }
+  }
 };

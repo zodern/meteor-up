@@ -16,27 +16,28 @@ function buildApp(appPath, buildOptions) {
   }
   // Make sure it is a Meteor app
   try {
-    // checks for release file since there also is a .meteor folder in the user's home
+    // checks for release file since there also is a
+    // .meteor folder in the user's home
     fs.statSync(resolvePath(appPath, '.meteor/release'));
   } catch (e) {
     console.log(`${resolvePath(appPath)} is not a meteor app`);
     process.exit(1);
   }
 
-  return new Promise((resolvePath, reject) => {
+  return new Promise((resolve, reject) => {
     const callback = err => {
       if (err) {
         return reject(err);
       }
-      resolvePath();
+      resolve();
     };
-    buildMeteorApp(appPath, buildOptions, function (code) {
+    buildMeteorApp(appPath, buildOptions, function(code) {
       if (code === 0) {
         archiveIt(buildOptions.buildLocation, callback);
-      } else {
-        console.log('\n=> Build Error. Check the logs printed above.');
-        callback(new Error('build-error'));
+        return;
       }
+      console.log('\n=> Build Error. Check the logs printed above.');
+      callback(new Error('build-error'));
     });
   });
 }
@@ -44,8 +45,11 @@ function buildApp(appPath, buildOptions) {
 function buildMeteorApp(appPath, buildOptions, callback) {
   var executable = buildOptions.executable || 'meteor';
   var args = [
-    'build', '--directory', buildOptions.buildLocation,
-    '--architecture', 'os.linux.x86_64'
+    'build',
+    '--directory',
+    buildOptions.buildLocation,
+    '--architecture',
+    'os.linux.x86_64'
   ];
 
   if (buildOptions.debug) {
@@ -78,16 +82,14 @@ function buildMeteorApp(appPath, buildOptions, callback) {
     // Sometimes cmd.exe not available in the path
     // See: http://goo.gl/ADmzoD
     executable = process.env.comspec || 'cmd.exe';
-    args = [ '/c', 'meteor' ].concat(args);
+    args = ['/c', 'meteor'].concat(args);
   }
 
-  var options = {cwd: appPath};
+  var options = { cwd: appPath };
   var meteor = spawn(executable, args, options);
-  var stdout = '';
-  var stderr = '';
 
-  meteor.stdout.pipe(process.stdout, {end: false});
-  meteor.stderr.pipe(process.stderr, {end: false});
+  meteor.stdout.pipe(process.stdout, { end: false });
+  meteor.stderr.pipe(process.stderr, { end: false });
 
   meteor.on('error', e => {
     console.log(options);
@@ -96,8 +98,8 @@ function buildMeteorApp(appPath, buildOptions, callback) {
   meteor.on('close', callback);
 }
 
-function archiveIt(buildLocation, callback) {
-  callback = _.once(callback);
+function archiveIt(buildLocation, cb) {
+  var callback = _.once(cb);
   var bundlePath = resolvePath(buildLocation, 'bundle.tar.gz');
   var sourceDir = resolvePath(buildLocation, 'bundle');
 
@@ -112,7 +114,7 @@ function archiveIt(buildLocation, callback) {
   archive.pipe(output);
   output.once('close', callback);
 
-  archive.once('error', function (err) {
+  archive.once('error', function(err) {
     console.log('=> Archiving failed:', err.message);
     callback(err);
   });

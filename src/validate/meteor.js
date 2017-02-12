@@ -33,7 +33,7 @@ const schema = joi.object().keys({
         .required(),
       MONGO_URL: joi.string()
     })
-    .pattern(/[\s\S]*/, [ joi.string(), joi.number() ]),
+    .pattern(/[\s\S]*/, [joi.string(), joi.number()]),
   log: joi.object().keys({
     driver: joi.string(),
     opts: joi.object()
@@ -57,12 +57,12 @@ const schema = joi.object().keys({
       port: joi.number()
     })
     .and('crt', 'key')
-    .without('autogenerate', [ 'crt', 'key' ])
+    .without('autogenerate', ['crt', 'key'])
     .or('crt', 'autogenerate')
     .label('ssl')
 });
 
-export default function (config) {
+export default function(config) {
   let details = [];
   details = combineErrorDetails(
     details,

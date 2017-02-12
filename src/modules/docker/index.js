@@ -1,11 +1,10 @@
 import debug from 'debug';
 import nodemiral from 'nodemiral';
-import path from 'path';
 import { resolvePath } from '../utils';
-import {runTaskList} from '../utils';
+import { runTaskList } from '../utils';
 const log = debug('mup:module:docker');
 
-export function help(/* api */) {
+export function help() {
   log('exec => mup docker help');
 }
 
@@ -17,12 +16,15 @@ export function setup(api) {
     script: resolvePath(__dirname, 'assets/docker-setup.sh')
   });
 
-  const sessions = api.getSessions([ 'meteor', 'mongo', 'proxy' ]);
-  const rsessions = sessions.reduce((prev, curr) => {
-    if (prev.map(session => session._host).indexOf(curr._host) === -1) {
-      prev.push(curr);
-    }
-    return prev;
-  }, []);
+  const sessions = api.getSessions(['meteor', 'mongo', 'proxy']);
+  const rsessions = sessions.reduce(
+    (prev, curr) => {
+      if (prev.map(session => session._host).indexOf(curr._host) === -1) {
+        prev.push(curr);
+      }
+      return prev;
+    },
+    []
+  );
   return runTaskList(list, rsessions);
 }

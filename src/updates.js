@@ -3,8 +3,8 @@ import boxen from 'boxen';
 import chalk from 'chalk';
 import pkg from '../package.json';
 
-export default function () {
-  return new Promise(function (resolve) {
+export default function() {
+  return new Promise(function(resolve) {
     const params = {
       timeout: 1000,
       package: pkg.name,
@@ -13,7 +13,7 @@ export default function () {
 
     const npm = new Npm();
     const uri = 'https://registry.npmjs.org/npm';
-    npm.distTags.fetch(uri, params, function (err, res) {
+    npm.distTags.fetch(uri, params, function(err, res) {
       if (err) {
         resolve();
         return;

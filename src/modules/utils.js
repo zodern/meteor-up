@@ -70,15 +70,15 @@ export function runSSHCommand(info, command) {
     }
     conn.connect(ssh);
 
-    conn.once('error', function (err) {
+    conn.once('error', function(err) {
       if (err) {
         reject(err);
       }
     });
 
     // TODO handle error events
-    conn.once('ready', function () {
-      conn.exec(command, function (err, stream) {
+    conn.once('ready', function() {
+      conn.exec(command, function(err, stream) {
         if (err) {
           conn.end();
           reject(err);
@@ -87,11 +87,11 @@ export function runSSHCommand(info, command) {
 
         let output = '';
 
-        stream.on('data', function (data) {
+        stream.on('data', function(data) {
           output += data;
         });
 
-        stream.once('close', function (code) {
+        stream.once('close', function(code) {
           conn.end();
           resolve({ code, output });
         });

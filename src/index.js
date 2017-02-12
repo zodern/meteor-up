@@ -14,7 +14,7 @@ program
   .action(argAction)
   .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
   .option('--config <filePath>', 'mup.js config file', setConfigPath)
-  .on('--help', function () {
+  .on('--help', function() {
     console.log('   Commands:');
 
     function listModuleCommands(commands) {

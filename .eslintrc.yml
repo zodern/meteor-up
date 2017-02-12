@@ -37,7 +37,7 @@ rules:
   - as-needed
   array-bracket-spacing:
   - 2
-  - always
+  - never
   arrow-spacing: 2
   block-scoped-var: 0
   brace-style:
@@ -97,8 +97,8 @@ rules:
   max-depth: 0
   max-len:
   - 2
-  - 80
-  - 4
+  - code: 80
+  - ignoreStrings: true
   max-nested-callbacks: 0
   max-params: 0
   max-statements: 0
@@ -253,7 +253,7 @@ rules:
   - always
   space-before-function-paren:
   - 2
-  - anonymous: always
+  - anonymous: never
     named: never
   space-in-parens: 0
   space-infix-ops:

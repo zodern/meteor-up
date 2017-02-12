@@ -3,7 +3,6 @@ import * as meteor from '../meteor/';
 import * as mongo from '../mongo/';
 
 import debug from 'debug';
-import path from 'path';
 import { resolvePath } from '../utils';
 import sh from 'shelljs';
 
@@ -16,10 +15,10 @@ export function deploy(api) {
   return meteor.deploy(api);
 }
 
-export function help(api) {
+export function help() {
   log('exec => mup help');
 }
-export function init(/* api */) {
+export function init() {
   log('exec => mup init');
 
   // TODO check if mup.js or settings.json files exists
@@ -39,30 +38,26 @@ export function logs(api) {
 
 export function reconfig(api) {
   log('exec => mup reconfig');
-  return meteor.envconfig(api)
-    .then(() => meteor.start(api));
+  return meteor.envconfig(api).then(() => meteor.start(api));
 }
 
 export function restart(api) {
   log('exec => mup restart');
-  return meteor.stop(api)
-    .then(() => meteor.start(api));
+  return meteor.stop(api).then(() => meteor.start(api));
 }
 
 export function setup(api) {
   log('exec => mup setup');
   const config = api.getConfig();
-  return docker.setup(api)
-    .then(() => {
-      if (config.mongo) {
-        return Promise.all([
-          meteor.setup(api),
-          mongo.setup(api)
-        ])
-          .then(() => (mongo.start(api)));
-      }
-      return meteor.setup(api);
-    });
+  return docker.setup(api).then(() => {
+    if (config.mongo) {
+      return Promise.all([
+        meteor.setup(api),
+        mongo.setup(api)
+      ]).then(() => mongo.start(api));
+    }
+    return meteor.setup(api);
+  });
 }
 
 export function start(api) {

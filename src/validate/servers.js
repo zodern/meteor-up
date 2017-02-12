@@ -2,16 +2,15 @@ import { combineErrorDetails } from './utils';
 import joi from 'joi';
 
 const schema = joi.object().keys({
-  host: joi.alternatives(
-    joi.string().ip({
-      version: [
-        'ipv4',
-        'ipv6'
-      ]
-    }),
-    joi.string().uri(),
-    joi.string().trim()
-  ).required(),
+  host: joi
+    .alternatives(
+      joi.string().ip({
+        version: ['ipv4', 'ipv6']
+      }),
+      joi.string().uri(),
+      joi.string().trim()
+    )
+    .required(),
   username: joi.string().required(),
   pem: joi.string().trim(),
   password: joi.string(),

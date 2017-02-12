@@ -1,22 +1,21 @@
+import { countOccurences, runSSHCommand } from '../../utils';
 /* eslint-disable max-len */
-import {describe, it} from 'mocha';
+import { describe, it } from 'mocha';
+
 import assert from 'assert';
-import path from 'path';
 import sh from 'shelljs';
-import {countOccurences, runSSHCommand} from '../../utils';
 
 sh.config.silent = false;
 const servers = require('../../../../tests/servers');
 
-
-describe('module - docker', function () {
+describe('module - docker', function() {
   it('TODO write tests');
 
-  describe('help', function () {
+  describe('help', function() {
     it('TODO write tests');
   });
 
-  describe('setup', function () {
+  describe('setup', function() {
     // reuse this function for 3 tests below
     // TODO break this into multiple functions
     // so parts can be used for other tests
@@ -24,7 +23,7 @@ describe('module - docker', function () {
       // TODO get server name form mup.js file
       const serverInfo = servers['my' + name];
 
-      return async function (done) {
+      return async function(done) {
         this.timeout(60000);
 
         sh.cd('../../../../tests/project-1');
