@@ -6,7 +6,7 @@ import * as _ from 'underscore';
 
 import {
   getDockerLogs,
-  resolve,
+  resolvePath,
   runTaskList,
 } from '../utils';
 
@@ -47,14 +47,14 @@ export function setup(api) {
 	const list = nodemiral.taskList('Setup nginx');
 	
 	list.executeScript('Setup Environment', {
-		script: resolve(__dirname, 'assets/nginx-setup.sh'),
+		script: resolvePath(__dirname, 'assets/nginx-setup.sh'),
 		vars: {
 			name: config.name,
 		},
 	});
 	
 	list.copy('Pushing the Startup Script', {
-		src: resolve(__dirname, 'assets/templates/start.sh'),
+		src: resolvePath(__dirname, 'assets/templates/start.sh'),
 		dest: '/opt/' + config.name + '/config/start.sh',
 		vars: {
 			appName: config.name,
@@ -65,7 +65,7 @@ export function setup(api) {
 	
 	const sessions = api.getSessions(['nginx']);
 	
-	return runTaskList(list, sessions);
+	return runTaskList(list, sessions, { series: true });
 }
 
 export function envconfig(api) {
@@ -81,7 +81,7 @@ export function envconfig(api) {
   var env = _.clone(config.env);
 
   list.copy('Sending nginx Environment Variables', {
-    src: resolve(__dirname, 'assets/templates/env.list'),
+    src: resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + config.name + '/config/env.list',
     vars: {
       env: env || {},
@@ -90,7 +90,7 @@ export function envconfig(api) {
   var envLetsencrypt = _.clone(config.envLetsencrypt);
 
   list.copy('Sending Letsencrypt Environment Variables', {
-    src: resolve(__dirname, 'assets/templates/env.list'),
+    src: resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + config.name + '/config/env_letsencrypt.list',
     vars: {
       env: envLetsencrypt || {},
@@ -111,7 +111,7 @@ export function start(api) {
   const list = nodemiral.taskList('Start nginx');
 
   list.executeScript('Start nginx', {
-    script: resolve(__dirname, 'assets/nginx-start.sh'),
+    script: resolvePath(__dirname, 'assets/nginx-start.sh'),
     vars: {
       appName: config.name
     }
@@ -132,7 +132,7 @@ export function stop(api) {
   const list = nodemiral.taskList('Stop nginx');
 
   list.executeScript('Stop nginx', {
-    script: resolve(__dirname, 'assets/nginx-stop.sh'),
+    script: resolvePath(__dirname, 'assets/nginx-stop.sh'),
     vars: {
       appName: config.name
     }

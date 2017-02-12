@@ -130,6 +130,7 @@ export function push(api) {
         useLocalMongo: api.getConfig().mongo ? 1 : 0,
         port: config.env.PORT || 80,
         sslConfig: config.ssl,
+        nginxConfig: config.nginx,
         logConfig: config.log,
         volumes: config.volumes,
         docker: config.docker,

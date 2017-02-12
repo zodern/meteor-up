@@ -4,11 +4,13 @@ import joi from 'joi';
 import validateMeteor from './meteor';
 import validateMongo from './mongo';
 import validateServer from './servers';
+import validateNginx from './nginx';
 
 const schema = joi.object().keys({
   servers: joi.object(),
   meteor: joi.object(),
-  mongo: joi.object()
+  mongo: joi.object(),
+  nginx: joi.object()
 });
 
 function validateAll(config) {
@@ -30,6 +32,11 @@ function validateAll(config) {
 
   if (config.meteor) {
     results = validateMeteor(config);
+    details = combineErrorDetails(details, results);
+  }
+  
+  if (config.nginx) {
+    results = validateNginx(config);
     details = combineErrorDetails(details, results);
   }
 
