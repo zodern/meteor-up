@@ -28,6 +28,7 @@ docker run -d -p $HTTP_PORT:80 \
   <% } %> \
   --name $APPNAME \
   --env-file=$ENV_FILE \
+  --restart=always\
   -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
