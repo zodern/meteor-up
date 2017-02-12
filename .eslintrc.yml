@@ -98,7 +98,6 @@ rules:
   max-len:
   - 2
   - code: 80
-  - ignoreStrings: true
   max-nested-callbacks: 0
   max-params: 0
   max-statements: 0
