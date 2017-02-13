@@ -21,8 +21,6 @@ module.exports = {
     env: {
       ROOT_URL: 'app.com',
       MONGO_URL: 'mongodb://localhost/meteor',
-      PORT: 80,
-      BIND: '0.0.0.0',
     },
 
     // change to 'kadirahq/meteord' if your app is not using Meteor 1.4

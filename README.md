@@ -307,7 +307,7 @@ Now set up both projects and deploy as you need.
 
 ### Listening to specific IP address (IP Binding)
 
-If you want Docker to listen only on a specific IP address, such as `127.0.0.1`, add and environment variable called `BIND` with the value of the IP address you want to listen to.
+If you want Docker to listen only on a specific IP address, such as `127.0.0.1`, add an environment variable called `BIND` with the value of the IP address you want to listen to.
 
 ```js
 meteor: {
@@ -322,7 +322,7 @@ meteor: {
 
 ### Verification Port
 
-If you are deploying under a proxy and need a different deployment verification port, add and environment variable called `VERIFICATION_PORT` with the value of the port you are publishing your application to.
+If you are deploying under a proxy and need a different deployment verification port, add an environment variable called `VERIFICATION_PORT` with the value of the port you are publishing your application to.
 
 ```js
 meteor: {
