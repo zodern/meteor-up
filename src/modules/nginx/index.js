@@ -59,7 +59,8 @@ export function setup(api) {
 		vars: {
 			appName: config.name,
 			httpPort: config.httpPort || 80,
-			httpsPort: config.httpsPort
+			httpsPort: config.httpsPort,
+			clientUploadLimit: config.clientUploadLimit
 		}
 	});
 	

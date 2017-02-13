@@ -10,6 +10,7 @@ const schema = joi.object().keys({
   name: joi.string().min(1).required(),
   httpPort: joi.number(),
   httpsPort: joi.number(),
+  clientUploadLimit: joi.number(),
   env: joi
     .object()
     .keys({

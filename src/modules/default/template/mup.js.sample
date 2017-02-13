@@ -67,6 +67,8 @@ module.exports = {
   //	// HTTPS_METHOD=nohttp - disable the non-SSL site entirely
   //	// HTTPS_METHOD=nohttps - disable the https site 
   //	httpsPort: 443,
+  //	// (optional) Set proxy wide upload limit. Setting 0 will disable the limit.
+  //	clientUploadLimit: 0,
   //	env: {
   //		DEFAULT_HOST: 'foo.bar.com'
   //	},
