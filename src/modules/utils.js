@@ -1,17 +1,24 @@
-import fs from 'fs';
 import * as _ from 'underscore';
-import {promisify} from 'bluebird';
-import {Client} from 'ssh2';
+
+import { Client } from 'ssh2';
+import debug from 'debug';
+import expandTilde from 'expand-tilde';
+import fs from 'fs';
 import path from 'path';
+import { promisify } from 'bluebird';
+
+const log = debug('mup:utils');
 
 export function runTaskList(list, sessions, opts) {
   return new Promise((resolve, reject) => {
     list.run(sessions, opts, summaryMap => {
       for (var host in summaryMap) {
-        const summary = summaryMap[host];
-        if (summary.error) {
-          reject(summary.error);
-          return;
+        if (summaryMap.hasOwnProperty(host)) {
+          const summary = summaryMap[host];
+          if (summary.error) {
+            reject(summary.error);
+            return;
+          }
         }
       }
 
@@ -22,6 +29,8 @@ export function runTaskList(list, sessions, opts) {
 
 export function getDockerLogs(name, sessions, args) {
   const command = 'sudo docker ' + args.join(' ') + ' ' + name;
+
+  log(`getDockerLogs command: ${command}`);
 
   var promises = _.map(sessions, session => {
     var host = '[' + session._host + ']';
@@ -48,12 +57,12 @@ export function runSSHCommand(info, command) {
     var sshAgent = process.env.SSH_AUTH_SOCK;
     var ssh = {
       host: info.host,
-      port: (info.opts && info.opts.port || 22),
+      port: info.opts && info.opts.port || 22,
       username: info.username
     };
 
     if (info.pem) {
-      ssh.privateKey = fs.readFileSync(path.resolve(info.pem), 'utf8');
+      ssh.privateKey = fs.readFileSync(resolvePath(info.pem), 'utf8');
     } else if (info.password) {
       ssh.password = info.password;
     } else if (sshAgent && fs.existsSync(sshAgent)) {
@@ -61,15 +70,15 @@ export function runSSHCommand(info, command) {
     }
     conn.connect(ssh);
 
-    conn.once('error', function (err) {
+    conn.once('error', function(err) {
       if (err) {
         reject(err);
       }
     });
 
     // TODO handle error events
-    conn.once('ready', function () {
-      conn.exec(command, function (err, stream) {
+    conn.once('ready', function() {
+      conn.exec(command, function(err, stream) {
         if (err) {
           conn.end();
           reject(err);
@@ -78,13 +87,13 @@ export function runSSHCommand(info, command) {
 
         let output = '';
 
-        stream.on('data', function (data) {
+        stream.on('data', function(data) {
           output += data;
         });
 
-        stream.once('close', function (code) {
+        stream.once('close', function(code) {
           conn.end();
-          resolve({code, output});
+          resolve({ code, output });
         });
       });
     });
@@ -95,4 +104,11 @@ export function countOccurences(needle, haystack) {
   const regex = new RegExp(needle, 'g');
   const match = haystack.match(regex) || [];
   return match.length;
+}
+
+export function resolvePath(...paths) {
+  let expandedPaths = paths.map(_path => {
+    return expandTilde(_path);
+  });
+  return path.resolve(...expandedPaths);
 }

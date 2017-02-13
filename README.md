@@ -1,12 +1,15 @@
-# meteor-up [![Stories in Ready](https://badge.waffle.io/kadirahq/meteor-up.svg?label=ready&title=Ready)](http://waffle.io/kadirahq/meteor-up)
+# meteor-up [![Code Climate](https://img.shields.io/codeclimate/github/zodern/meteor-up.svg?style=flat-square)](https://codeclimate.com/github/zodern/meteor-up) [![Waffle.io](https://img.shields.io/waffle/label/zodern/meteor-up/ready.svg?style=flat-square)](https://waffle.io/zodern/meteor-up)
 
 #### Production Quality Meteor Deployments
 
 Meteor Up is a command line tool that allows you to deploy any [Meteor](http://meteor.com) app to your own server. It currently supports Ubuntu.
 
+This repository formerly was at `kadirahq/meteor-up`.
+
 You can install and use Meteor Up on Linux, Mac and Windows.
 
 This version of Meteor Up is powered by [Docker](http://www.docker.com/), making deployment easy to manage and reducing a lot of server specific errors.
+
 
 **Table of Contents**
 
@@ -25,6 +28,8 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
 - [Accessing the Database](#accessing-the-database)
 - [Multiple Deployments](#multiple-deployments)
 - [SSL Support](#ssl-support)
+- [Nginx Upload Size](#nginx-upload)
+- [Change MongoDB Version](#change-mongodb-version)
 - [Updating](#updating-mup)
 - [Troubleshooting](#troubleshooting)
 - [Migrating from Meteor Up 0.x](#migrating-from-meteor-up-0x)
@@ -40,6 +45,7 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
 * Password or Private Key (pem) based server authentication
 * Access logs from the terminal (supports log tailing)
 * Support for custom docker images
+* Support for auto-generating SSL certificates using Let's Encrypt
 
 ### Server Configuration
 
@@ -64,6 +70,8 @@ This will create two files in your Meteor Up project directory:
   * `mup.js` - Meteor Up configuration file
   * `settings.json` - Settings for Meteor's [settings API](http://docs.meteor.com/#meteor_settings)
 
+**If you are using Meteor Up in Command Prompt on Windows, use `mup.cmd` instead of `mup`**
+
 ### Example File
 
 ```js
@@ -72,7 +80,7 @@ module.exports = {
     one: {
       host: '1.2.3.4',
       username: 'root',
-      // pem: '/home/user/.ssh/id_rsa', // mup doesn't support '~' alias for home directory
+      // pem: '/home/user/.ssh/id_rsa',
       // password: 'password',
       // or leave blank to authenticate using ssh-agent
       opts: {
@@ -83,7 +91,7 @@ module.exports = {
 
   meteor: {
     name: 'app',
-    path: '../app', // mup doesn't support '~' alias for home directory
+    path: '../app',
     // port: 000, // useful when deploying multiple instances (optional)
     volumes: { // lets you add docker volumes (optional)
       "/host/path": "/container/path", // passed as '-v /host/path:/container/path' to the docker run command
@@ -92,9 +100,12 @@ module.exports = {
     docker: {
       image: 'kadirahq/meteord', // (optional)
       // image: 'abernix/meteord:base', // use this image if using Meteor 1.4+
-      args:[ // lets you add/overwrite any parameter on the docker run command (optional)
+      args: [ // lets you add/overwrite any parameter on the docker run command (optional)
         "--link=myCustomMongoDB:myCustomMongoDB", // linking example
         "--memory-reservation 200M" // memory reservation example
+      ],
+      // (optional) Only used if using your own ssl certificates. Default is "meteorhacks/mup-frontend-server"
+      imageFrontendServer: 'meteorhacks/mup-frontend-server'
       ],
       networks: [ //lets you add network connections to perform after run (runs docker network connect <net name> for each network listed here)
         'net1'
@@ -104,16 +115,22 @@ module.exports = {
       one: {}, two: {}, three: {} // list of servers to deploy, from the 'servers' list
     },
     buildOptions: {
-      serverOnly: true,
+      serverOnly: true, // skip building mobile apps, but still build the web.cordova architecture
       debug: true,
       cleanAfterBuild: true, // default
       buildLocation: '/my/build/folder', // defaults to /tmp/<uuid>
+
+      //set serverOnly: false if want to build mobile apps when deploying
+
+      // Remove this property for mobileSettings to use your settings.json. (optional)
       mobileSettings: {
         yourMobileSetting: "setting value"
-      }
+      },
+      server: 'http://app.com', // your app url for mobile app access (optional)
+      allowIncompatibleUpdates: true, //adds --allow-incompatible-updates arg to build command (optional)
     },
     env: {
-      ROOT_URL: 'http://app.com',
+      ROOT_URL: 'http://app.com', // set to https to force redirect from http
       MONGO_URL: 'mongodb://localhost/meteor'
       PORT: 80, // (optional) defaults to 80
       BIND: '0.0.0.0' // (optional) defaults to 0.0.0.0
@@ -131,12 +148,17 @@ module.exports = {
         domains: 'website.com,www.website.com' // comma seperated list of domains
       }
     },
-    deployCheckWaitTime: 60 // default 10
+    deployCheckWaitTime: 60, // default 10
+
+    // Shows progress bar while uploading bundle to server (optional)
+    // You might need to disable it on CI servers
+    enableUploadProgressBar: true // default false.
   },
 
   mongo: { // (optional)
     oplog: true,
     port: 27017,
+    version: '3.4.1' // (optional), default is 3.4.1
     servers: {
       one: {},
     },
@@ -144,17 +166,18 @@ module.exports = {
 };
 ```
 
+
 ### Setting Up a Server
 
     mup setup
 
-This will set up the server for the `mup` deployments. It will take around 2-5 minutes depending on the server's performance and network availability.
+Running this locally will set up the remote server(s) you have specified in mup.js for the `mup` deployments. It will take around 2-5 minutes depending on the server's performance and network availability.
 
 ### Deploying an App
 
     mup deploy
 
-This will bundle the Meteor project and deploy it to the server. The bundling process is exactly how `meteor deploy` does it.
+This will bundle the Meteor project locally and deploy it to the remote server(s). The bundling process is exactly how `meteor deploy` does it.
 
 ### Other Utility Commands
 
@@ -366,6 +389,44 @@ If your certificate and key are already in the right location on your server and
 
 To learn more about SSL setup when using your own certificates, refer to the [`mup-frontend-server`](https://github.com/meteorhacks/mup-frontend-server) project.
 
+### Nginx Upload
+
+If you would like to increase the client upload limits, you can change it by adding:
+
+***This Only Works if you are using the Let's Encrypt Autogenerated SSL's as it uses a different nginx container***
+
+```js
+
+meteor: {
+   ...
+   nginx: {
+     clientUploadLimit: '<desired amount>' // Default is 10M
+   }
+   ...
+}
+
+```
+
+### Change Mongodb Version
+
+If you have not deployed to the server, you can change the mongo version by adding:
+
+```js
+
+mongo: {
+  ...
+  version: '<desired version>'
+}
+
+```
+
+If you have deployed to the server, it involves a couple more steps.
+
+1) Go to the [MongoDB manual](https://docs.mongodb.com/manual/) > Release Notes > Current version of Mongodb > Upgrade or Downgrade Standalone
+2) Follow the directions listed there. You can access the MongoDB console by running `docker exec -it mongodb mongo` on the server.
+3) During the steps for install or replace binaries or restarting mongodb, instead change the version in your `mup.js` and run `mup setup`.
+4) To verify that it worked, run `docker ps` to check if mongodb keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
+
 ### Updating Mup
 
 To update `mup` to the latest version, just type:
@@ -426,11 +487,7 @@ npm WARN deprecated
 A) Try increasing the value of the `deployCheckWaitTime` field in `mup.js`.
 
 
-Q) I get "Windows script error" in Windows. ([issue 185](https://github.com/kadirahq/meteor-up/issues/185))
+Q) I get "Windows script error" in Windows, or it opens mup.js in an editor.
 
-A) This happens because Windows tries to run the `mup.js` config file instead of the actual `mup` binary. Use the absolute path to the `mup` binary: `C:/<where mup is installed>/mup setup`
-
-
-Q) Mup commands silently fail when I have a `~` in a relative path. ([issue 189](https://github.com/kadirahq/meteor-up/issues/189))
-
-A) Mup doesn't support the `~` alias for the home directory, use the absolute path instead.
+A) This happens because Windows tries to run the `mup.js` config file instead of the actual `mup` binary.
+Use `mup.cmd` instead of `mup`, or use `PowerShell` instead of `Command Prompt`

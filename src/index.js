@@ -1,6 +1,7 @@
-import modules from './modules/';
 import MupAPI from './mup-api';
 import checkUpdates from './updates';
+import modules from './modules/';
+import pkg from '../package.json';
 import program from 'commander';
 
 let settingsPath;
@@ -9,27 +10,28 @@ const args = process.argv.slice(2);
 
 program
   .arguments('<command> [subcommand]')
+  .version(pkg.version)
   .action(argAction)
   .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
   .option('--config <filePath>', 'mup.js config file', setConfigPath)
-  .on('--help', function(){
+  .on('--help', function() {
     console.log('   Commands:');
 
     function listModuleCommands(commands) {
-      Object.keys(commands).forEach((command) => {
+      Object.keys(commands).forEach(command => {
         if (command === 'default') {
           listModuleCommands(commands['default']);
           return;
         }
         console.log(`     ${command}`);
-      })
+      });
     }
 
-    listModuleCommands(modules)
-  
+    listModuleCommands(modules);
+
     console.log('');
-    console.log('    For list of subcommands, run ')
-    console.log('      mup <command> help')
+    console.log('    For list of subcommands, run ');
+    console.log('      mup <command> help');
   })
   .parse(process.argv);
 
@@ -42,7 +44,7 @@ function argAction(arg, subarg) {
   let moduleArg = arg;
   let command = subarg;
 
-  if(!command && !modules[moduleArg]) {
+  if (!command && !modules[moduleArg]) {
     command = moduleArg;
     moduleArg = 'default';
   }
@@ -54,19 +56,19 @@ function argAction(arg, subarg) {
 
   let module;
 
-  if(modules[moduleArg]) {
+  if (modules[moduleArg]) {
     module = modules[moduleArg];
   } else {
-    console.error('No such module');
+    console.error(`No such module ${moduleArg}`);
     program.help();
     process.exit(1);
   }
 
-  if(!command) {
+  if (!command) {
     if (moduleArg === 'default') {
       program.help();
     } else {
-    module.help(args);
+      module.help(args);
     }
     process.exit(0);
   }
@@ -82,12 +84,24 @@ function argAction(arg, subarg) {
     process.exit(1);
   }
 
-  if(program.settings) {
-    args.splice(0, 2);
+  if (program.settings) {
+    let settingsIndex = argIndex(args, '--settings');
+
+    if (args[settingsIndex].indexOf('--settings=') === 0) {
+      args.splice(settingsIndex, 1);
+    } else {
+      args.splice(settingsIndex, 2);
+    }
   }
 
-  if(program.config) {
-    args.splice(0, 2);
+  if (program.config) {
+    let configIndex = argIndex(args, '--config');
+
+    if (args[configIndex].indexOf('--config=') === 0) {
+      args.splice(configIndex, 1);
+    } else {
+      args.splice(configIndex, 2);
+    }
   }
 
   checkUpdates().then(() => {
@@ -95,6 +109,14 @@ function argAction(arg, subarg) {
     const api = new MupAPI(base, args, configPath, settingsPath);
     module[command](api);
   });
+}
+
+function argIndex(list, string) {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].indexOf(string) === 0) {
+      return i;
+    }
+  }
 }
 
 function handleErrors(e) {

@@ -1,13 +1,13 @@
-import {describe, it} from 'mocha';
+import { describe, it } from 'mocha';
 
-describe('module - proxy', function () {
+describe('module - proxy', function() {
   it('TODO write tests');
 
-  describe('help', function () {
+  describe('help', function() {
     it('TODO write tests');
   });
 
-  describe('setup', function () {
+  describe('setup', function() {
     it('TODO write tests');
   });
 });

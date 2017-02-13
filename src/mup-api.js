@@ -1,6 +1,9 @@
 import fs from 'fs';
-import path from 'path';
 import nodemiral from 'nodemiral';
+import parseJson from 'parse-json';
+import path from 'path';
+import { resolvePath } from './modules/utils';
+import validateConfig from './validate/index';
 
 export default class MupAPI {
   constructor(base, args, configPath, settingsPath) {
@@ -21,11 +24,41 @@ export default class MupAPI {
     return this.base;
   }
 
+  validateConfig(configPath) {
+    let valid = validateConfig(this.config);
+
+    let invalid = valid.errors.length > 0 || valid.warnings.length > 0;
+
+    if (invalid) {
+      console.log(`loaded mup.js from ${configPath}`);
+    }
+
+    if (valid.errors.length > 0) {
+      console.log(`mup.js has ${valid.errors.length} errors:`);
+      valid.errors.forEach(error => {
+        console.log(`  - ${error}`);
+      });
+    }
+    if (valid.warnings.length > 0) {
+      console.log(`mup.js has ${valid.warnings.length} warnings:`);
+      valid.warnings.forEach(warning => {
+        console.log(`   - ${warning}`);
+      });
+    }
+
+    if (invalid) {
+      console.log(
+        'If you think there is a bug in the mup.js validator, please'
+      );
+      console.log('create an issue at https://github.com/zodern/meteor-up');
+    }
+  }
+
   getConfig() {
     if (!this.config) {
       let filePath;
-      if(this.configPath) {
-        filePath = path.resolve(this.configPath);
+      if (this.configPath) {
+        filePath = resolvePath(this.configPath);
         this.base = path.dirname(this.configPath);
       } else {
         filePath = path.join(this.base, 'mup.js');
@@ -33,13 +66,14 @@ export default class MupAPI {
       try {
         this.config = require(filePath);
       } catch (e) {
-        if(e.code == 'MODULE_NOT_FOUND') {
-          console.error(`'mup.js' file not found. Run 'mup init' first.`);
+        if (e.code === 'MODULE_NOT_FOUND') {
+          console.error('"mup.js" file not found. Run "mup init" first.');
         } else {
           console.error(e);
         }
         process.exit(1);
       }
+      this.validateConfig(filePath);
     }
 
     return this.config;
@@ -48,12 +82,28 @@ export default class MupAPI {
   getSettings() {
     if (!this.settings) {
       let filePath;
-      if(this.settingsPath) {
-        filePath = path.resolve(this.settingsPath);
+      if (this.settingsPath) {
+        filePath = resolvePath(this.settingsPath);
       } else {
         filePath = path.join(this.base, 'settings.json');
       }
-      this.settings = require(filePath);
+
+      try {
+        this.settings = fs.readFileSync(filePath).toString();
+      } catch (e) {
+        console.log(`Unable to load settings.json at ${filePath}`);
+        if (e.code !== 'ENOENT') {
+          console.log(e);
+        }
+        process.exit(1);
+      }
+      try {
+        this.settings = parseJson(this.settings);
+      } catch (e) {
+        console.log('Error parsing settings file:');
+        console.log(e.message);
+        process.exit(1);
+      }
     }
 
     return this.settings;
@@ -109,8 +159,8 @@ export default class MupAPI {
       }
 
       const info = config.servers[name];
-      const auth = {username: info.username};
-      const opts = {ssh: {}};
+      const auth = { username: info.username };
+      const opts = { ssh: {} };
 
       var sshAgent = process.env.SSH_AUTH_SOCK;
 
@@ -119,7 +169,16 @@ export default class MupAPI {
       }
 
       if (info.pem) {
-        auth.pem = fs.readFileSync(path.resolve(info.pem), 'utf8');
+        try {
+          auth.pem = fs.readFileSync(resolvePath(info.pem), 'utf8');
+        } catch (e) {
+          console.error(`Unable to load pem at "${resolvePath(info.pem)}"`);
+          console.error(`for server "${name}"`);
+          if (e.code !== 'ENOENT') {
+            console.log(e);
+          }
+          process.exit(1);
+        }
       } else if (info.password) {
         auth.password = info.password;
       } else if (sshAgent && fs.existsSync(sshAgent)) {
