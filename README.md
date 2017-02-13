@@ -1,4 +1,4 @@
-# meteor-up [![Code Climate](https://codeclimate.com/github/zodern/meteor-up/badges/gpa.svg)](https://codeclimate.com/github/zodern/meteor-up)
+# meteor-up [![Code Climate](https://img.shields.io/codeclimate/github/zodern/meteor-up.svg?style=flat-square)](https://codeclimate.com/github/zodern/meteor-up) [![Waffle.io](https://img.shields.io/waffle/label/zodern/meteor-up/ready.svg?style=flat-square)](https://waffle.io/zodern/meteor-up)
 
 #### Production Quality Meteor Deployments
 
