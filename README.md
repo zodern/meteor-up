@@ -217,6 +217,18 @@ meteor: {
 
 Meteor Up checks if the deployment is successful or not just after the deployment. By default, it will wait 15 seconds before the check. You can configure the wait time with the `meteor.deployCheckWaitTime` option in `mup.js`.
 
+### Deploy check port
+
+If you are deploying under a proxy/firewall and need a different port to be checked after deploy, add a variable called `deployCheckPort` with the value of the port you are publishing your application to.
+
+```js
+meteor: {
+ ...
+  deployCheckPort: 80
+ ...
+}
+```
+
 #### SSH keys with passphrase (or ssh-agent support)
 
 > This only tested with Mac/Linux
@@ -317,18 +329,6 @@ meteor: {
   bind: '127.0.0.1'
   ...
  }
-}
-```
-
-### Deploy check port
-
-If you are deploying under a proxy/firewall and need a different port to be checked after deploy, add a variable called `deployCheckPort` with the value of the port you are publishing your application to.
-
-```js
-meteor: {
- ...
-  deployCheckPort: 80
- ...
 }
 ```
 
