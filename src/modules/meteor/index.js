@@ -120,8 +120,8 @@ export function push(api) {
 
     const list = nodemiral.taskList('Pushing Meteor');
 
-    if(config.docker && config.docker.bind){
-        bindAddress = config.docker.bind;
+    if (config.docker && config.docker.bind){
+      bindAddress = config.docker.bind;
     }
 
     list.copy('Pushing Meteor App Bundle to The Server', {
