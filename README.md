@@ -107,6 +107,7 @@ module.exports = {
       // (optional) Only used if using your own ssl certificates. Default is "meteorhacks/mup-frontend-server"
       imageFrontendServer: 'meteorhacks/mup-frontend-server'
       ],
+      bind: '127.0.0.1', //lets you bind the docker container to a specific network interface (optional)
       networks: [ //lets you add network connections to perform after run (runs docker network connect <net name> for each network listed here)
         'net1'
       ]
@@ -132,8 +133,6 @@ module.exports = {
     env: {
       ROOT_URL: 'http://app.com', // set to https to force redirect from http
       MONGO_URL: 'mongodb://localhost/meteor'
-      PORT: 80, // (optional) defaults to 80
-      BIND: '0.0.0.0' // (optional) defaults to 0.0.0.0
     },
     log: { // (optional)
       driver: 'syslog',
@@ -149,6 +148,7 @@ module.exports = {
       }
     },
     deployCheckWaitTime: 60, // default 10
+    deployCheckPort: 80 // lets you define which port to check after the deploy process, if it differs from the meteor port you are serving (like meteor behind a proxy/firewall) (optional)
 
     // Shows progress bar while uploading bundle to server (optional)
     // You might need to disable it on CI servers
@@ -307,31 +307,46 @@ Now set up both projects and deploy as you need.
 
 ### Listening to specific IP address (IP Binding)
 
-If you want Docker to listen only on a specific IP address, such as `127.0.0.1`, add an environment variable called `BIND` with the value of the IP address you want to listen to.
+If you want Docker to listen only on a specific network interface, such as `127.0.0.1`, add a variable called `bind` with the value of the IP address you want to listen to.
 
 ```js
 meteor: {
  ...
- env: {
+ docker: {
   ...
-  BIND: '127.0.0.1'
+  bind: '127.0.0.1'
   ...
  }
 }
 ```
 
-### Verification Port
+### Deploy check port
 
-If you are deploying under a proxy and need a different deployment verification port, add an environment variable called `VERIFICATION_PORT` with the value of the port you are publishing your application to.
+If you are deploying under a proxy/firewall and need a different port to be checked after deploy, add a variable called `deployCheckPort` with the value of the port you are publishing your application to.
 
 ```js
 meteor: {
  ...
- env: {
-  ...
-  VERIFICATION_PORT: 80
-  ...
- }
+  deployCheckPort: 80
+ ...
+}
+```
+
+### Docker networks
+
+If you need to connect your docker container to one or more networks add a variable called `networks` inside the docker configuration. This is an array containing all network names to which it has to connect.
+
+```js
+meteor: {
+ ...
+  docker: {
+    ...
+    networks: [
+      'myNetwork1'
+    ]
+    ...
+  }
+ ...
 }
 ```
 

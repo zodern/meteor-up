@@ -34,7 +34,7 @@ docker run \
   <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
   --expose=80 \
   <% } else { %> \
-  --publish=$BIND$PORT:80 \
+  --publish=$BIND:$PORT:80 \
   <% } %> \
   --volume=$BUNDLE_PATH:/bundle \
   --hostname="$HOSTNAME-$APPNAME" \
@@ -104,7 +104,7 @@ EOT
       --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
       --volume=/opt/$APPNAME/config/private.key:/private.key \
       --link=$APPNAME:backend \
-      --publish=$BIND<%= sslConfig.port %>:443 \
+      --publish=$BIND:<%= sslConfig.port %>:443 \
       --name=$APPNAME-frontend \
       <%= docker.imageFrontendServer %> /start.sh
   <% } %>

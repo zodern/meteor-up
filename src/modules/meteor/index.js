@@ -128,8 +128,8 @@ export function push(api) {
       vars: {
         appName: config.name,
         useLocalMongo: api.getConfig().mongo ? 1 : 0,
-        port: config.env.PORT || 80,
-        bind: config.env.BIND ? config.env.BIND + ':' : '',
+        port: config.port || 80,
+        bind: (config.docker && config.docker.bind) ? config.docker.bind : '0.0.0.0',
         sslConfig: config.ssl,
         logConfig: config.log,
         volumes: config.volumes,
