@@ -21,6 +21,13 @@ docker pull jwilder/nginx-proxy
 set -e
 echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
 
+<% if(typeof clientUploadLimit === 'number') { %>
+# This updates nginx for all vhosts
+sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
+client_max_body_size <%= clientUploadLimit %>;
+EOT
+<% } %>
+
 
 docker run -d -p $HTTP_PORT:80 \
   <% if(httpsPort) { %> \
@@ -32,6 +39,9 @@ docker run -d -p $HTTP_PORT:80 \
   -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
+  <% if(typeof clientUploadLimit === 'number') { %> \
+  -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
+  <% } %> \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
   jwilder/nginx-proxy
 echo "Ran nginx-proxy as $APPNAME"
