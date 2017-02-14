@@ -27,6 +27,7 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
     - [Multiple Deployment Targets](#multiple-deployment-targets)
 - [Accessing the Database](#accessing-the-database)
 - [Multiple Deployments](#multiple-deployments)
+- [Multiple Deployments with single reverse proxy](#multiple-deployments-with-single-reverse-proxy)
 - [SSL Support](#ssl-support)
 - [Nginx Upload Size](#nginx-upload)
 - [Change MongoDB Version](#change-mongodb-version)
@@ -142,6 +143,11 @@ module.exports = {
         domains: 'website.com,www.website.com' // comma seperated list of domains
       }
     },
+    // Set this to signal that there is a shared nginx i.e. don't start one for this app and use the shared
+    nginx: { // (optional) shared nginx frontend
+      domains: 'website.com,www.website.com', // comma seperated list of domains - same as ssl.autogenerate.domains - sets value of VIRTUAL_HOST
+      name: 'nginx-shared' // Name of the shared nginx container - defines the dir (e.g. /opt/nginx-shared) to place uploaded certificates.
+    },
     deployCheckWaitTime: 60, // default 10
 
     // Shows progress bar while uploading bundle to server (optional)
@@ -157,6 +163,39 @@ module.exports = {
       one: {},
     },
   },
+  nginx: { // (optional) shared nginx.
+    name: 'nginx-shared', // Create /opt/nginx-shared dir
+    httpPort: 80, // (optional) The port number to listen to for http connections. Default 80.
+    // (optional) The port to listen for htts connections. If set then SSL is
+    // enabled on the shared nginx.
+    // App can control how https and http are handled by adding HTTPS_METHOD
+    // env variable to the app container with value:
+    // HTTPS_METHOD=redirect - this is the default and it will redirect http to https
+    // HTTPS_METHOD=noredirect - allow serving the app from http and https
+    // HTTPS_METHOD=nohttp - disable the non-SSL site entirely
+    // HTTPS_METHOD=nohttps - disable the https site
+    httpsPort: 443,
+    // (optional) Set proxy wide upload limit. Setting 0 will disable the limit.
+    clientUploadLimit: 0,
+    env: { // (optional)
+      DEFAULT_HOST: 'foo.bar.com'
+    },
+    envLetsencrypt: { // (optional) env for the jrcs/letsencrypt-nginx-proxy-companion container
+      // Directory URI for the CA ACME API endpoint (default: https://acme-v01.api.letsencrypt.org/directory).
+      // If you set it's value to https://acme-staging.api.letsencrypt.org/directory letsencrypt will use test
+      // servers that don't have the 5 certs/week/domain limits.
+      ACME_CA_URI:  'https://acme-v01.api.letsencrypt.org/directory',
+      // Set it to true to enable debugging of the entrypoint script and generation of LetsEncrypt certificates,
+      // which could help you pin point any configuration issues.
+      DEBUG: true,
+      // If for some reason you can't use the docker --volumes-from option, you can specify the name or id of
+      // the nginx-proxy container with this variable
+      NGINX_PROXY_CONTAINER: 'id or name'
+    },
+    servers: {
+      one: {}
+    }
+  }
 };
 ```
 
@@ -298,6 +337,62 @@ meteor: {
 ```
 
 Now set up both projects and deploy as you need.
+
+### Multiple Deployments with single reverse proxy
+
+Meteor Up can create a single nginx proxy that will serve multiple Meteor apps each with its own domain or subdomain.
+In order to do this add (in the mup.js of one of the Meteor apps) a section that defines the shared nginx proxy:
+```js
+  nginx: { // (optional) shared nginx.
+    name: 'nginx-shared', // Create /opt/nginx-shared dir
+    httpPort: 80, // (optional) The port number to listen to for http connections. Default 80.
+    // (optional) The port to listen for htts connections. If set then SSL is
+    httpsPort: 443,
+    // (optional) Set proxy wide upload limit. Setting 0 will disable the limit.
+    clientUploadLimit: 0,
+    env: { // (optional)
+      DEFAULT_HOST: 'foo.bar.com'
+    },
+    envLetsencrypt: { // (optional) env for the jrcs/letsencrypt-nginx-proxy-companion container
+      // Directory URI for the CA ACME API endpoint (default: https://acme-v01.api.letsencrypt.org/directory).
+      // If you set it's value to https://acme-staging.api.letsencrypt.org/directory letsencrypt will use test
+      // servers that don't have the 5 certs/week/domain limits.
+      ACME_CA_URI:  'https://acme-v01.api.letsencrypt.org/directory',
+      // Set it to true to enable debugging of the entrypoint script and generation of LetsEncrypt certificates,
+      // which could help you pin point any configuration issues.
+      DEBUG: true,
+      // If for some reason you can't use the docker --volumes-from option, you can specify the name or id of
+      // the nginx-proxy container with this variable
+      NGINX_PROXY_CONTAINER: 'id or name'
+    },
+    servers: {
+      one: {}
+    }
+  }
+}
+```
+Then use the following commands to run the shared nginx proxy:
+
+    mup nginx setup
+    mup nginx envconfig
+    mup nginx start
+
+This should be done before deploying the first Meteor app.
+
+And in the mup.js of all the Meteor apps add an nginx object in the meteor object:
+```js
+meteor: {
+  ...
+  // Set this to signal that there is a shared nginx i.e. don't start one for this app and use the shared
+  nginx: { // (optional) shared nginx frontend
+    domains: 'website.com,www.website.com', // comma seperated list of domains - same as ssl.autogenerate.domains - sets value of VIRTUAL_HOST
+    name: 'nginx-shared' // Name of the shared nginx container - defines the dir (e.g. /opt/nginx-shared) to place uploaded certificates.
+  },
+  ...
+}
+```
+This will signal Meteor Up to deploy the app under the assumption that there is a shared nginx proxy running (i.e. won't start the an nginx container and will export the port vs publish).
+If the ssl object also exists in the Meteor app mup.js file, then the correct configuration will be applied in order to autogenerate certificates or copy them as usual.
 
 ### Changing `appName`
 
