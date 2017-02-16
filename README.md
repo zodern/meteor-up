@@ -92,7 +92,6 @@ module.exports = {
   meteor: {
     name: 'app',
     path: '../app',
-    // port: 000, // useful when deploying multiple instances (optional)
     volumes: { // lets you add docker volumes (optional)
       "/host/path": "/container/path", // passed as '-v /host/path:/container/path' to the docker run command
       "/second/host/path": "/second/container/path"
@@ -126,6 +125,7 @@ module.exports = {
       allowIncompatibleUpdates: true, //adds --allow-incompatible-updates arg to build command (optional)
     },
     env: {
+      // PORT: 8000, // useful when deploying multiple instances (optional)
       ROOT_URL: 'http://app.com', // set to https to force redirect from http
       MONGO_URL: 'mongodb://localhost/meteor'
     },
