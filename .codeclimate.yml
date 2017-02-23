@@ -1,0 +1,23 @@
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - ruby
+      - javascript
+      - python
+      - php
+  eslint:
+    enabled: true
+    channel: "eslint-3"
+  fixme:
+    enabled: true
+  shellcheck:
+    enabled: true
+ratings:
+  paths:
+  - "**.js"
+  - "**.sh"
+exclude_paths:
+- "tests/"
+- "**/__tests__/"
