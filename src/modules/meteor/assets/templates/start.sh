@@ -54,17 +54,13 @@ echo "Ran <%= docker.image %>"
 sleep 15s
 
 <% if(typeof sslConfig === "object")  { %>
+
   <% if(typeof sslConfig.autogenerate === "object")  { %>
-    echo "Running autogenerate"
+    # If using let's encrypt pull and setup the companion proxy
+    echo "Running Autogenerate Proxy"
     # Get the nginx template for nginx-gen
     wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl -O /opt/$APPNAME/config/nginx.tmpl
-    
-    # Update nginx config based on user input or default passed by js
-sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
-client_max_body_size $CLIENTSIZE;
-EOT
-    
-    
+
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
     docker pull jrcs/letsencrypt-nginx-proxy-companion:latest
@@ -72,11 +68,13 @@ EOT
     set -e
 
     echo "Pulled autogenerate images"
+    # proxy-frontend setup
     docker run -d -p 80:80 -p 443:443 \
+      -- restart=always \
       --name $APPNAME-nginx-proxy \
       -e "HTTPS_METHOD=noredirect" \
       -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
-      -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
+      -v /opt/$APPNAME/config/certs:/etc/nginx/certs:ro \
       -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
       -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
       -v /var/run/docker.sock:/tmp/docker.sock:ro \
@@ -84,27 +82,39 @@ EOT
       echo "Ran nginx-proxy"
     sleep 15s
 
+
+    # lets-encrypt proxy setup
     docker run -d \
       --name $APPNAME-nginx-letsencrypt \
       --restart=always\
       --volumes-from $APPNAME-nginx-proxy \
-      -v /opt/$APPNAME/certs:/etc/nginx/certs:rw \
+      -v /opt/$APPNAME/config/certs:/etc/nginx/certs:rw \
       -v /var/run/docker.sock:/var/run/docker.sock:ro \
       jrcs/letsencrypt-nginx-proxy-companion
     echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
   <% } else { %>
     # We don't need to fail the deployment because of a docker hub downtime
+    echo "Running Regular Proxy"
+    # Get the nginx template for nginx-gen
+    wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl -O /opt/$APPNAME/config/nginx.tmpl
+
+    # We don't need to fail the deployment because of a docker hub downtime
     set +e
-    docker pull <%= docker.imageFrontendServer %>
+    docker pull jwilder/nginx-proxy
     set -e
-    docker run \
-      -d \
-      --restart=always \
-      --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
-      --volume=/opt/$APPNAME/config/private.key:/private.key \
-      --link=$APPNAME:backend \
-      --publish=<%= sslConfig.port %>:443 \
-      --name=$APPNAME-frontend \
-      <%= docker.imageFrontendServer %> /start.sh
+
+    echo "Pulled autogenerate images"
+    docker run -d -p 80:80 -p <%= sslConfig.port %>:443 \
+      -- restart=always \
+      --name $APPNAME-nginx-proxy \
+      -e "HTTPS_METHOD=noredirect" \
+      -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
+      -v /opt/$APPNAME/config/certs:/etc/nginx/certs:ro \
+      -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
+      -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
+      -v /var/run/docker.sock:/tmp/docker.sock:ro \
+      jwilder/nginx-proxy
+      echo "Ran nginx-proxy"
+    sleep 15s
   <% } %>
 <% } %>

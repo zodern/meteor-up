@@ -50,12 +50,12 @@ export function setup(api) {
     if (config.ssl.upload !== false) {
       list.copy('Copying SSL Certificate Bundle', {
         src: resolvePath(basePath, config.ssl.crt),
-        dest: '/opt/' + config.name + '/config/bundle.crt'
+        dest: '/opt/' + config.name + '/config/certs/bundle.crt'
       });
 
       list.copy('Copying SSL Private Key', {
         src: resolvePath(basePath, config.ssl.key),
-        dest: '/opt/' + config.name + '/config/private.key'
+        dest: '/opt/' + config.name + '/config/certs/private.key'
       });
     }
 
@@ -119,6 +119,12 @@ export function push(api) {
     list.copy('Pushing Meteor App Bundle to The Server', {
       src: bundlePath,
       dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
+      progressBar: config.enableUploadProgressBar
+    });
+
+    list.copy('Pushing Nginx Settings to The Server', {
+      src: config.nginx.settingsPath || resolvePath(__dirname, '../proxy/assets/templates/nginx-default.conf'),
+      dest: '/opt/' + config.name + '/config/nginx-default.conf',
       progressBar: config.enableUploadProgressBar
     });
 
