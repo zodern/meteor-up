@@ -138,8 +138,7 @@ export function push(api) {
         sslConfig: config.ssl,
         logConfig: config.log,
         volumes: config.volumes,
-        docker: config.docker,
-        nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
+        docker: config.docker        
       }
     });
 
