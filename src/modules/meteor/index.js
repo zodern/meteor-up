@@ -50,12 +50,12 @@ export function setup(api) {
     if (config.ssl.upload !== false) {
       list.copy('Copying SSL Certificate Bundle', {
         src: resolvePath(basePath, config.ssl.crt),
-        dest: '/opt/' + config.name + '/config/certs/bundle.crt'
+        dest: '/opt/' + config.name + '/config/bundle.crt'
       });
 
       list.copy('Copying SSL Private Key', {
         src: resolvePath(basePath, config.ssl.key),
-        dest: '/opt/' + config.name + '/config/certs/private.key'
+        dest: '/opt/' + config.name + '/config/private.key'
       });
     }
 
@@ -122,8 +122,8 @@ export function push(api) {
       progressBar: config.enableUploadProgressBar
     });
 
-    list.copy('Pushing Nginx Settings to The Server', {
-      src: config.nginx.settingsPath || resolvePath(__dirname, '../proxy/assets/templates/nginx-default.conf'),
+    list.copy('Pushing Nginx Config to The Server', {
+      src: config.nginx.configPath || resolvePath(__dirname, '../proxy/assets/templates/nginx-default.conf'),
       dest: '/opt/' + config.name + '/config/nginx-default.conf',
       progressBar: config.enableUploadProgressBar
     });

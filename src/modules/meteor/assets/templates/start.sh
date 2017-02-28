@@ -109,7 +109,8 @@ sleep 15s
       --name $APPNAME-nginx-proxy \
       -e "HTTPS_METHOD=noredirect" \
       -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
-      -v /opt/$APPNAME/config/certs:/etc/nginx/certs:ro \
+      -v /opt/$APPNAME/config/bundle.crt:/etc/nginx/certs/bundle.crt:ro \
+      -v /opt/$APPNAME/config/private.key:/etc/nginx/certs/private.key:ro \
       -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
       -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
       -v /var/run/docker.sock:/tmp/docker.sock:ro \

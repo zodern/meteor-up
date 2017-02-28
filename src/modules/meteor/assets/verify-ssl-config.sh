@@ -16,8 +16,8 @@ set -e
 sudo docker run \
   --rm \
   --link=$DUMMY_SERVER_NAME:backend \
-  --volume=/opt/$APPNAME/config/certs/bundle.crt:/bundle.crt \
-  --volume=/opt/$APPNAME/config/certs/private.key:/private.key \
+  --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
+  --volume=/opt/$APPNAME/config/private.key:/private.key \
   meteorhacks/mup-frontend-server /verify.sh
 
 sudo docker rm -f $DUMMY_SERVER_NAME
