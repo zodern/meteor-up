@@ -122,6 +122,12 @@ export function push(api) {
       progressBar: config.enableUploadProgressBar
     });
 
+    list.copy('Pushing Nginx Config to The Server', {
+      src: config.nginx.configPath || resolvePath(__dirname, '../proxy/assets/templates/nginx-default.conf'),
+      dest: '/opt/' + config.name + '/config/nginx-default.conf',
+      progressBar: config.enableUploadProgressBar
+    });
+
     list.copy('Pushing the Startup Script', {
       src: resolvePath(__dirname, 'assets/templates/start.sh'),
       dest: '/opt/' + config.name + '/config/start.sh',
@@ -132,8 +138,7 @@ export function push(api) {
         sslConfig: config.ssl,
         logConfig: config.log,
         volumes: config.volumes,
-        docker: config.docker,
-        nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
+        docker: config.docker        
       }
     });
 
