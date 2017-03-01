@@ -29,7 +29,7 @@ echo "Pulled <%= docker.image %>"
 docker run \
   -d \
   --restart=always \
-  <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
+  <% if(typeof sslConfig === "object")  { %> \
   --expose=80 \
   <% } else { %> \
   --publish=$PORT:80 \
