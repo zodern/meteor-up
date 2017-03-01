@@ -9,7 +9,8 @@
   "scripts": {
     "prepublish": "nofat make",
     "test": "nofat test",
-    "lint": "eslint ."
+    "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" ."
+    "lint": "eslint . && npm run lint:defaultConfig -s",
   },
   "repository": {
     "type": "git",

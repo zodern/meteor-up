@@ -99,6 +99,7 @@ function buildMeteorApp(appPath, buildOptions, callback) {
 }
 
 function archiveIt(buildLocation, cb) {
+  console.log('Compressing app');
   var callback = _.once(cb);
   var bundlePath = resolvePath(buildLocation, 'bundle.tar.gz');
   var sourceDir = resolvePath(buildLocation, 'bundle');
