@@ -69,7 +69,7 @@ sleep 15s
     echo "Pulled autogenerate images"
     # proxy-frontend setup
     docker run -d -p 80:80 -p 443:443 \
-      -- restart=always \
+      --restart=always \
       --name $APPNAME-nginx-proxy \
       -e "HTTPS_METHOD=noredirect" \
       -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
@@ -104,7 +104,7 @@ sleep 15s
 
     echo "Pulled autogenerate images"
     docker run -d -p 80:80 -p <%= sslConfig.port %>:443 \
-      -- restart=always \
+      --restart=always \
       --name $APPNAME-nginx-proxy \
       -e "HTTPS_METHOD=noredirect" \
       -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
