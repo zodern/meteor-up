@@ -26,6 +26,7 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
     - [Deploy Wait Time](#deploy-wait-time)
     - [Multiple Deployment Targets](#multiple-deployment-targets)
 - [Accessing the Database](#accessing-the-database)
+- [Using External Mongo Instances](#accessing-the-database)
 - [Multiple Deployments](#multiple-deployments)
 - [SSL Support](#ssl-support)
 - [Nginx Upload Size](#nginx-upload)
@@ -276,6 +277,24 @@ You can't access the MongoDB from outside the server. To access the MongoDB shel
     docker exec -it mongodb mongo <appName>
 
 > Later on we'll be using a separate MongoDB instance for every app.
+
+### Using External Mongo Instances
+
+To not have a local docker instance of Mongo installed and run, simply comment
+out the `mongo` section in your `mup.js` config file:
+
+```
+//mongo: { // (optional)
+//  oplog: true,
+//  port: 27017,
+//  version: '3.4.1' // (optional), default is 3.4.1
+//  servers: {
+//  one: {},
+//    },
+//  },
+```
+You'll also need to change your `MONGO_URL` to point to your external Mongo
+instsance(s): `MONGO_URL: 'mongodb://some.other.ip.address:27017/dbname'`
 
 ### Multiple Deployments
 
