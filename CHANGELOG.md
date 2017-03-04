@@ -1,3 +1,11 @@
+# Next
+- Default config uses meteor.docker object instead of dockerImage @maxmatthews
+- Docker args from config are no longer escaped @maxmathews
+- Add buildLocation for validator @stubbegianni
+- Improved messages from validator
+- Fix nginx-proxy not starting on server restart
+- Fix documentation on changing port @maxmathews
+
 # 1.2.2
 - Configure nginx max client upload size, and increase default to `10M` (@shadowcodex)
 - Displays better message if it can not find the meteor app
