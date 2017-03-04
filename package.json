@@ -1,6 +1,6 @@
 {
   "name": "mup",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Production Quality Meteor Deployments",
   "main": "lib/index.js",
   "bin": {
@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "archiver": "1.x.x",
+    "babel-cli": "^6.23.0",
     "babel-polyfill": "6.6.1",
     "bluebird": "3.x.x",
     "boxen": "^1.0.0",

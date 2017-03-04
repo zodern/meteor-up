@@ -1,4 +1,4 @@
-# Next
+# 1.2.3
 - Default config uses meteor.docker object instead of dockerImage @maxmatthews
 - Docker args from config are no longer escaped @maxmathews
 - Add buildLocation for validator @stubbegianni
