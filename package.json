@@ -7,10 +7,12 @@
     "mup": "./index.js"
   },
   "scripts": {
-    "prepublish": "nofat make",
+    "prepublish": "npm run build -s",
+    "build": "babel src --out-dir lib --sourceRoot=./ --copy-files --presets=es2015,stage-3",
+    "build:watch": "npm run build -s -- -w",
     "test": "nofat test",
-    "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" ."
-    "lint": "eslint . && npm run lint:defaultConfig -s",
+    "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" .",
+    "lint": "eslint . && npm run lint:defaultConfig -s"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
   },
   "homepage": "https://github.com/kadirahq/meteor-up#readme",
   "devDependencies": {
+    "babel-preset-stage-3": "^6.22.0",
     "eslint": "^3.15.0",
     "nofat": "1.0.x"
   },

@@ -24,17 +24,23 @@ export function logs(api) {
 export function setup(api) {
   log('exec => mup mongo setup');
 
+  if (!api.getConfig().mongo) {
+    // could happen when running "mup mongo setup"
+    console.log('Not setting up built-in mongodb since there is no mongo config');
+    return;
+  }
+
   const mongoSessions = api.getSessions(['mongo']);
   const meteorSessions = api.getSessions(['meteor']);
 
   if (meteorSessions.length !== 1) {
     console.log(
-      'To use mup inbuilt mongodb setup, you should have only one meteor app server. To have more app servers, use an external mongodb setup'
+      'To use mup built-in mongodb setup, you should have only one meteor app server. To have more app servers, use an external mongodb setup'
     );
     return;
   } else if (mongoSessions[0]._host !== meteorSessions[0]._host) {
     console.log(
-      'To use mup inbuilt mongodb setup, you should have both meteor app and mongodb on the same server'
+      'To use mup built-in mongodb setup, you should have both meteor app and mongodb on the same server'
     );
     return;
   }
