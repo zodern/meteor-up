@@ -117,6 +117,7 @@ function argIndex(list, string) {
       return i;
     }
   }
+  return -1;
 }
 
 function handleErrors(e) {

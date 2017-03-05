@@ -9,16 +9,16 @@ module.exports = {  // eslint-disable-line no-unreachable
   mymeteor: {
     host: '1.2.3.4',
     username: 'username',
-    pem: privateKey,
+    pem: privateKey
   },
   mymongo: {
     host: '1.2.3.4',
     username: 'username',
-    pem: privateKey,
+    pem: privateKey
   },
   myproxy: {
     host: '1.2.3.4',
     username: 'username',
-    password: 'password',
-  },
+    password: 'password'
+  }
 };

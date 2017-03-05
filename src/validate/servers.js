@@ -23,7 +23,7 @@ const schema = joi.object().keys().pattern(/.*/, {
 
 export default function validateServers(servers) {
   let details = [];
-  let result = joi.validate(servers, schema, VALIDATE_OPTIONS)
-  details = combineErrorDetails(details, result)
+  let result = joi.validate(servers, schema, VALIDATE_OPTIONS);
+  details = combineErrorDetails(details, result);
   return addLocation(details, 'servers');
 }

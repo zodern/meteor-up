@@ -3,7 +3,9 @@ import fs from 'fs';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
-import { resolvePath } from './modules/utils';
+import {
+  resolvePath
+} from './modules/utils';
 import validateConfig from './validate/index';
 
 export default class MupAPI {
@@ -26,15 +28,18 @@ export default class MupAPI {
   }
 
   validateConfig(configPath) {
-     let problems = validateConfig(this.config);
+    let problems = validateConfig(this.config);
 
     if (problems.length > 0) {
+      let red = chalk.red;
+      let plural = problems.length > 1 ? 's' : 's';
+
       console.log(`loaded mup.js from ${configPath}`);
       console.log('');
-      console.log(chalk.red(`${problems.length} Validation Error${problems.length > 1 ? 's' : ''}:`));
+      console.log(red(`${problems.length} Validation Error${plural}`));
 
       problems.forEach((problem) => {
-        console.log(chalk.red(`  - ${problem}`));
+        console.log(red(`  - ${problem}`));
       });
 
       console.log('');
@@ -56,7 +61,7 @@ export default class MupAPI {
         filePath = path.join(this.base, 'mup.js');
       }
       try {
-        this.config = require(filePath);
+        this.config = require(filePath); // eslint-disable-line global-require
       } catch (e) {
         if (e.code === 'MODULE_NOT_FOUND') {
           console.error('"mup.js" file not found. Run "mup init" first.');
@@ -151,8 +156,12 @@ export default class MupAPI {
       }
 
       const info = config.servers[name];
-      const auth = { username: info.username };
-      const opts = { ssh: {} };
+      const auth = {
+        username: info.username
+      };
+      const opts = {
+        ssh: {}
+      };
 
       var sshAgent = process.env.SSH_AUTH_SOCK;
 

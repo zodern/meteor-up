@@ -27,7 +27,8 @@ function buildApp(appPath, buildOptions) {
   return new Promise((resolve, reject) => {
     const callback = err => {
       if (err) {
-        return reject(err);
+        reject(err);
+        return;
       }
       resolve();
     };

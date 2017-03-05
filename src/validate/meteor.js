@@ -1,4 +1,9 @@
-import { VALIDATE_OPTIONS, addLocation, combineErrorDetails, serversExist } from './utils';
+import {
+  VALIDATE_OPTIONS,
+  addLocation,
+  combineErrorDetails,
+  serversExist
+} from './utils';
 
 import joi from 'joi';
 
@@ -16,7 +21,9 @@ const schema = joi.object().keys({
     imageFrontendServer: joi.string(),
     args: joi.array().items(joi.string().label('docker.args array items')),
     bind: joi.string().trim(),
-    networks: joi.array().items(joi.string().label('docker.networks array items'))
+    networks: joi.array().items(
+      joi.string().label('docker.networks array items')
+    )
   }),
   buildOptions: joi.object().keys({
     serverOnly: joi.bool(),
