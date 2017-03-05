@@ -6,6 +6,7 @@ APP_PATH=/opt/$APPNAME
 BUNDLE_PATH=$APP_PATH/current
 ENV_FILE=$APP_PATH/config/env.list
 PORT=<%= port %>
+BIND=<%= bind %>
 
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
@@ -33,7 +34,7 @@ docker run \
   <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
   --expose=80 \
   <% } else { %> \
-  --publish=$PORT:80 \
+  --publish=$BIND:$PORT:80 \
   <% } %> \
   --volume=$BUNDLE_PATH:/bundle \
   --hostname="$HOSTNAME-$APPNAME" \
@@ -104,8 +105,13 @@ EOT
       --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
       --volume=/opt/$APPNAME/config/private.key:/private.key \
       --link=$APPNAME:backend \
-      --publish=<%= sslConfig.port %>:443 \
+      --publish=$BIND:<%= sslConfig.port %>:443 \
       --name=$APPNAME-frontend \
       <%= docker.imageFrontendServer %> /start.sh
   <% } %>
+<% } %>
+
+<% for(var network in docker.networks) { %>
+docker network connect <%=  docker.networks[network] %> $APPNAME
+
 <% } %>

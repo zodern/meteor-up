@@ -101,9 +101,13 @@ export function push(api) {
   console.log('Building App Bundle Locally');
 
   var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+
   const appPath = resolvePath(api.getBasePath(), config.path);
 
   return buildApp(appPath, buildOptions).then(() => {
+
+    var bindAddress = '0.0.0.0';
+
     config.log = config.log ||
       {
         opts: {
@@ -115,6 +119,10 @@ export function push(api) {
     config.nginx = config.nginx || {};
 
     const list = nodemiral.taskList('Pushing Meteor');
+
+    if (config.docker && config.docker.bind){
+      bindAddress = config.docker.bind;
+    }
 
     list.copy('Pushing Meteor App Bundle to The Server', {
       src: bundlePath,
@@ -128,7 +136,8 @@ export function push(api) {
       vars: {
         appName: config.name,
         useLocalMongo: api.getConfig().mongo ? 1 : 0,
-        port: config.env.PORT || 80,
+        port: config.port || 80,
+        bind: bindAddress,
         sslConfig: config.ssl,
         logConfig: config.log,
         volumes: config.volumes,
@@ -193,7 +202,7 @@ export function start(api) {
     vars: {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
-      port: config.env.PORT || 80
+      deployCheckPort: config.deployCheckPort || config.port || 80
     }
   });
 

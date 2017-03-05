@@ -8,12 +8,15 @@ const schema = joi.object().keys({
   port: joi.number(),
   servers: joi.object().required(),
   deployCheckWaitTime: joi.number(),
+  deployCheckPort: joi.number(),
   enableUploadProgressBar: joi.bool(),
   dockerImage: joi.string(),
   docker: joi.object().keys({
     image: joi.string().trim(),
     imageFrontendServer: joi.string(),
-    args: joi.array().items(joi.string().label('docker.args array items'))
+    args: joi.array().items(joi.string().label('docker.args array items')),
+    bind: joi.string().trim(),
+    networks: joi.array().items(joi.string().label('docker.networks array items'))
   }),
   buildOptions: joi.object().keys({
     serverOnly: joi.bool(),

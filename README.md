@@ -105,6 +105,11 @@ module.exports = {
       ],
       // (optional) Only used if using your own ssl certificates. Default is "meteorhacks/mup-frontend-server"
       imageFrontendServer: 'meteorhacks/mup-frontend-server'
+      ],
+      bind: '127.0.0.1', //lets you bind the docker container to a specific network interface (optional)
+      networks: [ //lets you add network connections to perform after run (runs docker network connect <net name> for each network listed here)
+        'net1'
+      ]
     },
     servers: {
       one: {}, two: {}, three: {} // list of servers to deploy, from the 'servers' list
@@ -143,6 +148,7 @@ module.exports = {
       }
     },
     deployCheckWaitTime: 60, // default 10
+    deployCheckPort: 80 // lets you define which port to check after the deploy process, if it differs from the meteor port you are serving (like meteor behind a proxy/firewall) (optional)
 
     // Shows progress bar while uploading bundle to server (optional)
     // You might need to disable it on CI servers
@@ -210,6 +216,18 @@ meteor: {
 #### Deploy Wait Time
 
 Meteor Up checks if the deployment is successful or not just after the deployment. By default, it will wait 15 seconds before the check. You can configure the wait time with the `meteor.deployCheckWaitTime` option in `mup.js`.
+
+### Deploy check port
+
+If you are deploying under a proxy/firewall and need a different port to be checked after deploy, add a variable called `deployCheckPort` with the value of the port you are publishing your application to.
+
+```js
+meteor: {
+ ...
+  deployCheckPort: 80
+ ...
+}
+```
 
 #### SSH keys with passphrase (or ssh-agent support)
 
@@ -302,6 +320,39 @@ meteor: {
 ```
 
 Now set up both projects and deploy as you need.
+
+### Listening to specific IP address (IP Binding)
+
+If you want Docker to listen only on a specific network interface, such as `127.0.0.1`, add a variable called `bind` with the value of the IP address you want to listen to.
+
+```js
+meteor: {
+ ...
+ docker: {
+  ...
+  bind: '127.0.0.1'
+  ...
+ }
+}
+```
+
+### Docker networks
+
+If you need to connect your docker container to one or more networks add a variable called `networks` inside the docker configuration. This is an array containing all network names to which it has to connect.
+
+```js
+meteor: {
+ ...
+  docker: {
+    ...
+    networks: [
+      'myNetwork1'
+    ]
+    ...
+  }
+ ...
+}
+```
 
 ### Changing `appName`
 
