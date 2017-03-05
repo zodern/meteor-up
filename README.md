@@ -1,4 +1,4 @@
-# meteor-up [![Code Climate](https://img.shields.io/codeclimate/github/zodern/meteor-up.svg?style=flat-square)](https://codeclimate.com/github/zodern/meteor-up) [![Waffle.io](https://img.shields.io/waffle/label/zodern/meteor-up/ready.svg?style=flat-square)](https://waffle.io/zodern/meteor-up)
+# meteor-up [![Travis branch](https://img.shields.io/travis/zodern/meteor-up/master.svg?style=flat-square)]() [![Code Climate](https://img.shields.io/codeclimate/github/zodern/meteor-up.svg?style=flat-square)](https://codeclimate.com/github/zodern/meteor-up) [![Waffle.io](https://img.shields.io/waffle/label/zodern/meteor-up/ready.svg?style=flat-square)](https://waffle.io/zodern/meteor-up)
 
 #### Production Quality Meteor Deployments
 
