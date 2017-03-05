@@ -456,6 +456,9 @@ You should try and keep `mup` up to date in order to keep up with the latest Met
 
 ### Troubleshooting
 
+#### Node Versions
+Are your node versions in sync between your server (i.e. node inside your Docker image) and deployment/bundling host? If not you will run into issues (as per the official Meteor guide).
+
 #### Check Logs
 If you suddenly can't deploy your app anymore, first use the `mup logs -f` command to check the logs for error messages.
 
