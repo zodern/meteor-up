@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
@@ -25,32 +26,23 @@ export default class MupAPI {
   }
 
   validateConfig(configPath) {
-    let valid = validateConfig(this.config);
+     let problems = validateConfig(this.config);
 
-    let invalid = valid.errors.length > 0 || valid.warnings.length > 0;
-
-    if (invalid) {
+    if (problems.length > 0) {
       console.log(`loaded mup.js from ${configPath}`);
-    }
+      console.log('');
+      console.log(chalk.red(`${problems.length} Validation Error${problems.length > 1 ? 's' : ''}:`));
 
-    if (valid.errors.length > 0) {
-      console.log(`mup.js has ${valid.errors.length} errors:`);
-      valid.errors.forEach(error => {
-        console.log(`  - ${error}`);
+      problems.forEach((problem) => {
+        console.log(chalk.red(`  - ${problem}`));
       });
-    }
-    if (valid.warnings.length > 0) {
-      console.log(`mup.js has ${valid.warnings.length} warnings:`);
-      valid.warnings.forEach(warning => {
-        console.log(`   - ${warning}`);
-      });
-    }
 
-    if (invalid) {
+      console.log('');
       console.log(
         'If you think there is a bug in the mup.js validator, please'
       );
       console.log('create an issue at https://github.com/zodern/meteor-up');
+      console.log('');
     }
   }
 

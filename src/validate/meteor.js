@@ -1,4 +1,4 @@
-import { addLocation, combineErrorDetails, serversExist } from './utils';
+import { VALIDATE_OPTIONS, addLocation, combineErrorDetails, serversExist } from './utils';
 
 import joi from 'joi';
 
@@ -22,6 +22,7 @@ const schema = joi.object().keys({
     serverOnly: joi.bool(),
     debug: joi.bool(),
     cleanAfterBuild: joi.bool(),
+    buildLocation: joi.bool(),
     mobileSettings: joi.object(),
     server: joi.string().uri(),
     allowIncompatibleUpdates: joi.boolean(),
@@ -69,7 +70,7 @@ export default function(config) {
   let details = [];
   details = combineErrorDetails(
     details,
-    joi.validate(config.meteor, schema, { convert: false })
+    joi.validate(config.meteor, schema, VALIDATE_OPTIONS)
   );
   if (config.meteor.name.indexOf(' ') > -1) {
     details.push({

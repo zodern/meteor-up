@@ -3,3 +3,4 @@ node_modules
 .vscode
 .tern-port
 .idea
+*.log
