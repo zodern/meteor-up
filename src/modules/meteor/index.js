@@ -106,7 +106,6 @@ export function push(api) {
   return buildApp(appPath, buildOptions).then(() => {
 
     var bindAddress = '0.0.0.0';
-
     config.log = config.log ||
       {
         opts: {
