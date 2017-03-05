@@ -101,7 +101,6 @@ export function push(api) {
   console.log('Building App Bundle Locally');
 
   var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
-
   const appPath = resolvePath(api.getBasePath(), config.path);
 
   return buildApp(appPath, buildOptions).then(() => {
@@ -136,7 +135,7 @@ export function push(api) {
       vars: {
         appName: config.name,
         useLocalMongo: api.getConfig().mongo ? 1 : 0,
-        port: config.port || 80,
+        port: config.env.port || 80,
         bind: bindAddress,
         sslConfig: config.ssl,
         logConfig: config.log,
@@ -202,7 +201,7 @@ export function start(api) {
     vars: {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
-      deployCheckPort: config.deployCheckPort || config.port || 80
+      deployCheckPort: config.deployCheckPort || config.env.port || 80
     }
   });
 

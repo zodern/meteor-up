@@ -30,7 +30,7 @@ describe('module - meteor', function() {
       await runSSHCommand(serverInfo, 'rm -rf /opt/myapp || :');
       await runSSHCommand(
         serverInfo,
-        'sudo apt-get -qq update && sudo apt-get -qq install -y tree'
+        'command -v tree >/dev/null 2>&1 || { sudo apt-get -qq update && sudo apt-get -qq install -y tree; }'
       );
 
       sh.cd(path.resolve('/tmp', 'tests/project-1'));

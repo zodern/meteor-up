@@ -1,4 +1,9 @@
-import { VALIDATE_OPTIONS, addLocation, combineErrorDetails, serversExist } from './utils';
+import {
+  VALIDATE_OPTIONS,
+  addLocation,
+  combineErrorDetails,
+  serversExist
+} from './utils';
 
 import joi from 'joi';
 
@@ -11,7 +16,8 @@ const schema = joi.object().keys({
 
 export default function(config) {
   let details = [];
-  details = combineErrorDetails(details, joi.validate(config.mongo, schema, VALIDATE_OPTIONS));
+  let validationErrors = joi.validate(config.mongo, schema, VALIDATE_OPTIONS);
+  details = combineErrorDetails(details, validationErrors);
   details = combineErrorDetails(
     details,
     serversExist(config.servers, config.mongo.servers)

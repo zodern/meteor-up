@@ -1,8 +1,7 @@
 export const VALIDATE_OPTIONS = {
   abortEarly: false,
   convert: false
-}
-
+};
 
 export function improveErrors(error) {
   // Todo: we can configure the joi messages instead of this
@@ -18,7 +17,7 @@ export function improveErrors(error) {
       ) +
       ' cannot both be defined';
   } else if (error.type === 'object.min') {
-     error.message = error.message.replace('.value', '');
+    error.message = error.message.replace('.value', '');
   }
 
   return error;
@@ -26,7 +25,8 @@ export function improveErrors(error) {
 
 export function addLocation(details, location) {
   return details.map(detail => {
-    // removes property name from message since it is already part of detail.path
+    // removes property name from message since it is
+    // already part of detail.path
     detail.message = detail.message.replace(/^".*?"\s+/, '');
 
     detail.message = `"${location}.${detail.path}" ${detail.message}`;
@@ -34,7 +34,7 @@ export function addLocation(details, location) {
   });
 }
 
-export function combineErrorDetails(details, results, rootPath) {
+export function combineErrorDetails(details, results) {
 
   if (results instanceof Array) {
     return details.concat(results);

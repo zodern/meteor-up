@@ -18,6 +18,7 @@ export function logs(api) {
 
   const args = api.getArgs();
   const sessions = api.getSessions(['mongo']);
+  args.shift(); // remove mongo from args sent to docker
   return getDockerLogs('mongodb', sessions, args);
 }
 
@@ -58,7 +59,7 @@ export function setup(api) {
 
   const sessions = api.getSessions(['mongo']);
 
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions); // eslint-disable-line consistent-return
 }
 
 export function start(api) {
@@ -86,7 +87,7 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions); // eslint-disable-line consistent-return
 }
 
 export function stop(api) {

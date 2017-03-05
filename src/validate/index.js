@@ -39,6 +39,6 @@ function validateAll(config) {
 export default function validate(config) {
   let errors = validateAll(config);
   return errors.map((error) => {
-    return error.message
+    return error.message;
   });
 }
