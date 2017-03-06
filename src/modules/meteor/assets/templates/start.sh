@@ -8,9 +8,11 @@ ENV_FILE=$APP_PATH/config/env.list
 PORT=<%= port %>
 
 # Remove previous version of the app, if exists
+docker network disconnect -f bridge $APPNAME
 docker rm -f $APPNAME
 
 # Remove frontend container if exists
+docker network disconnect -f bridge $APPNAME-frontend
 docker rm -f $APPNAME-frontend
 echo "Removed $APPNAME-frontend"
 
