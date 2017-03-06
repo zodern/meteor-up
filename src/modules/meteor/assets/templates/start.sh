@@ -11,6 +11,9 @@ BIND=<%= bind %>
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
 
+# Remove container network if still exists
+docker network disconnect bridge -f $APPNAME
+
 # Remove frontend container if exists
 docker rm -f $APPNAME-frontend
 echo "Removed $APPNAME-frontend"
