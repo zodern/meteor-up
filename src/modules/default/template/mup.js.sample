@@ -1,28 +1,33 @@
 module.exports = {
   servers: {
     one: {
+      // TODO: set host address, username, and authentication method
       host: '1.2.3.4',
       username: 'root',
-      // pem:
-      // password:
-      // or leave blank for authenticate from ssh-agent
+      // pem: './path/to/pem'
+      // password: 'server-password'
+      // or neither for authenticate from ssh-agent
     }
   },
 
   meteor: {
+    // TODO: change app name and path
     name: 'app',
     path: '../app',
+
     servers: {
       one: {},
     },
+
     buildOptions: {
       serverOnly: true,
     },
+
     env: {
-      ROOT_URL: 'app.com',
+      // TODO: Change to your app's url
+      ROOT_URL: 'http://app.com',
       MONGO_URL: 'mongodb://localhost/meteor',
     },
-
 
     docker: {
       // change to 'kadirahq/meteord' if your app is not using Meteor 1.4
@@ -40,7 +45,7 @@ module.exports = {
     port: 27017,
     version: '3.4.1',
     servers: {
-      one: {},
-    },
-  },
+      one: {}
+    }
+  }
 };
