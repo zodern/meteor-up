@@ -11,15 +11,26 @@ BIND=<%= bind %>
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
 
+# Remove container network if still exists
+docker network disconnect bridge -f $APPNAME
+<% for(var network in docker.networks) { %>
+docker network disconnect <%=  docker.networks[network] %> -f $APPNAME
+
+<% } %>
+
 # Remove frontend container if exists
 docker rm -f $APPNAME-frontend
+docker network disconnect bridge -f $APPNAME-frontend
 echo "Removed $APPNAME-frontend"
+
 
 # Remove let's encrypt containers if exists
 docker rm -f $APPNAME-nginx-letsencrypt
+docker network disconnect bridge -f $APPNAME-nginx-letsencrypt
 echo "Removed $APPNAME-nginx-letsencrypt"
 
 docker rm -f $APPNAME-nginx-proxy
+docker network disconnect bridge -f $APPNAME-nginx-proxy
 echo "Removed $APPNAME-nginx-proxy"
 
 # We don't need to fail the deployment because of a docker hub downtime
