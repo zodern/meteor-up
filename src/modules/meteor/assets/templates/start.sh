@@ -13,18 +13,19 @@ docker rm -f $APPNAME
 
 # Remove container network if still exists
 docker network disconnect bridge -f $APPNAME
+<% for(var network in docker.networks) { %>
+docker network disconnect <%=  docker.networks[network] %> -f $APPNAME
+
+<% } %>
 
 # Remove frontend container if exists
 docker rm -f $APPNAME-frontend
+docker network disconnect bridge -f $APPNAME-frontend
 echo "Removed $APPNAME-frontend"
 
-# Remove container network if still exists
-docker network disconnect bridge -f $APPNAME-frontend
 
 # Remove let's encrypt containers if exists
 docker rm -f $APPNAME-nginx-letsencrypt
-
-# Remove container network if still exists
 docker network disconnect bridge -f $APPNAME-nginx-letsencrypt
 echo "Removed $APPNAME-nginx-letsencrypt"
 
