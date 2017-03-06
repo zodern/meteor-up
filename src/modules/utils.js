@@ -28,7 +28,7 @@ export function runTaskList(list, sessions, opts) {
 }
 
 export function getDockerLogs(name, sessions, args) {
-  const command = 'sudo docker ' + args.join(' ') + ' ' + name;
+  const command = 'sudo docker ' + args.join(' ') + ' ' + name + ' 2>&1';
 
   log(`getDockerLogs command: ${command}`);
 
