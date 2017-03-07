@@ -6,6 +6,7 @@ import buildApp from './build.js';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
 import uuid from 'uuid';
+import os from 'os';
 
 const log = debug('mup:module:meteor');
 
@@ -96,7 +97,7 @@ export function push(api) {
 
   var buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation ||
-    resolvePath('/tmp', uuid.v4());
+    resolvePath(os.tmpdir(), uuid.v4());
 
   console.log('Building App Bundle Locally');
 
