@@ -6,6 +6,8 @@ import expandTilde from 'expand-tilde';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'bluebird';
+import stream from 'stream';
+import readline from 'readline';
 
 const log = debug('mup:utils');
 
@@ -27,18 +29,55 @@ export function runTaskList(list, sessions, opts) {
   });
 }
 
+// Implments a simple readable stream to pass
+// the logs from nodemiral to readline which
+// then splits it into individual lines.
+class Callback2Stream extends stream.Readable {
+  constructor(options) {
+    // Calls the stream.Readable(options) constructor
+    super(options);
+
+    this.data = [];
+  }
+  addData(data) {
+    if (this.reading) {
+      this.reading = this.push(data);
+    } else {
+      this.data.push(data);
+    }
+  }
+  _read() {
+    this.reading = true;
+    this.data.forEach(() => {
+      let shouldContinue = this.reading && this.push(this.data.shift());
+      if (!shouldContinue) {
+        this.reading = false;
+      }
+    });
+  }
+}
+
 export function getDockerLogs(name, sessions, args) {
   const command = 'sudo docker ' + args.join(' ') + ' ' + name + ' 2>&1';
 
   log(`getDockerLogs command: ${command}`);
 
-  var promises = _.map(sessions, session => {
-    var host = '[' + session._host + ']';
-    var options = {
+  let promises = _.map(sessions, session => {
+    const input = new Callback2Stream();
+    const host = '[' + session._host + ']';
+    const lineSeperator = readline.createInterface({
+      input,
+      terminal: true
+    });
+    lineSeperator.on('line', (data) => {
+      console.log(host + data);
+    });
+    const options = {
       onStdout: data => {
-        process.stdout.write(host + data);
+        input.addData(data);
       },
       onStderr: data => {
+        // the logs all come in on stdout so stderr isn't added to lineSeperator
         process.stdout.write(host + data);
       }
     };
@@ -78,7 +117,7 @@ export function runSSHCommand(info, command) {
 
     // TODO handle error events
     conn.once('ready', function() {
-      conn.exec(command, function(err, stream) {
+      conn.exec(command, function(err, outputStream) {
         if (err) {
           conn.end();
           reject(err);
@@ -87,11 +126,11 @@ export function runSSHCommand(info, command) {
 
         let output = '';
 
-        stream.on('data', function(data) {
+        outputStream.on('data', function(data) {
           output += data;
         });
 
-        stream.once('close', function(code) {
+        outputStream.once('close', function(code) {
           conn.end();
           resolve({ code, output });
         });
