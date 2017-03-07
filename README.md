@@ -104,8 +104,7 @@ module.exports = {
         "--memory-reservation 200M" // memory reservation example
       ],
       // (optional) Only used if using your own ssl certificates. Default is "meteorhacks/mup-frontend-server"
-      imageFrontendServer: 'meteorhacks/mup-frontend-server'
-      ],
+      imageFrontendServer: 'meteorhacks/mup-frontend-server',
       bind: '127.0.0.1', //lets you bind the docker container to a specific network interface (optional)
       networks: [ //lets you add network connections to perform after run (runs docker network connect <net name> for each network listed here)
         'net1'
@@ -131,7 +130,7 @@ module.exports = {
     },
     env: {
       // PORT: 8000, // useful when deploying multiple instances (optional)
-      ROOT_URL: 'http://app.com', // set to https to force redirect from http
+      ROOT_URL: 'http://app.com', // If you are using ssl, this needs to start with https
       MONGO_URL: 'mongodb://localhost/meteor'
     },
     log: { // (optional)
@@ -156,7 +155,6 @@ module.exports = {
   },
 
   mongo: { // (optional)
-    oplog: true,
     port: 27017,
     version: '3.4.1' // (optional), default is 3.4.1
     servers: {
@@ -456,8 +454,10 @@ You should try and keep `mup` up to date in order to keep up with the latest Met
 
 ### Troubleshooting
 
-#### Node Versions
-Are your node versions in sync between your server (i.e. node inside your Docker image) and deployment/bundling host? If not you will run into issues (as per the official Meteor guide).
+####
+
+#### Docker image
+Make sure that the docker image you are using supports your app's meteor version.
 
 #### Check Logs
 If you suddenly can't deploy your app anymore, first use the `mup logs -f` command to check the logs for error messages.
@@ -468,6 +468,17 @@ If you need to see the output of `mup` (to see more precisely where it's failing
     DEBUG=* mup <command>
 
 where `<command>` is one of the `mup` commands such as `setup`, `deploy`, etc.
+
+#### Common Problems
+
+> Verifying Deployment: FAILED
+
+If you do not see `=> Starting meteor app on port:80` in the logs, it might not have had enough time to finish running `npm install`. If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not.
+
+> Mup silently fails, mup.js file opens instead, or you get a Windows script error
+
+If you are using windows, make sure you run commands with `mup.cmd <command>` instead of `mup <command>`.
+If it silently fails for a different reason, please create an issue.
 
 ### Migrating from Meteor Up 0.x
 
@@ -491,25 +502,3 @@ Remove old mongodb container with: `docker rm -f mongodb`
 If present remove nginx container with: `docker rm -f meteor-frontend`
 
 Then do `mup setup` and then `mup deploy`.
-
-### FAQ
-
-Q) I get a deploy verification error with logs like below (Similar to [issue 88](https://github.com/kadirahq/meteor-up/issues/88))
-```
-Verifying Deployment: FAILED
-
-Error:
------------------------------------STDERR-----------------------------------
- run:
-npm WARN deprecated
-npm WARN deprecated   npm -g install npm@latest
-npm WARN deprecated
-```
-
-A) Try increasing the value of the `deployCheckWaitTime` field in `mup.js`.
-
-
-Q) I get "Windows script error" in Windows, or it opens mup.js in an editor.
-
-A) This happens because Windows tries to run the `mup.js` config file instead of the actual `mup` binary.
-Use `mup.cmd` instead of `mup`, or use `PowerShell` instead of `Command Prompt`
