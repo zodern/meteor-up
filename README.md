@@ -65,6 +65,8 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
     cd .deploy
     mup init
 
+***WARNING: Windows users need to use `mup.cmd` instead. As `mup` will result in unexpected behavior.
+
 This will create two files in your Meteor Up project directory:
 
   * `mup.js` - Meteor Up configuration file
