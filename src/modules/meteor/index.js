@@ -5,10 +5,23 @@ import { getDockerLogs, resolvePath, runTaskList } from '../utils';
 import buildApp from './build.js';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
+import random from 'random-seed';
 import uuid from 'uuid';
 import os from 'os';
 
 const log = debug('mup:module:meteor');
+
+function tmpBuildPath(appPath) {
+  let rand = random.create(appPath);
+  let uuidNumbers = [];
+  for (let i = 0; i < 16; i++) {
+    uuidNumbers.push(rand(255));
+  }
+  return resolvePath(
+    os.tmpdir(),
+    `mup-meteor-${uuid.v4({ random: uuidNumbers })}`
+  );
+}
 
 export function help() {
   log('exec => mup meteor help');
@@ -95,14 +108,14 @@ export function push(api) {
     config.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
   }
 
-  var buildOptions = config.buildOptions || {};
-  buildOptions.buildLocation = buildOptions.buildLocation ||
-    resolvePath(os.tmpdir(), uuid.v4());
+  const appPath = resolvePath(api.getBasePath(), config.path);
 
+  let buildOptions = config.buildOptions || {};
+  buildOptions.buildLocation = buildOptions.buildLocation ||
+    tmpBuildPath(appPath);
   console.log('Building App Bundle Locally');
 
   var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
-  const appPath = resolvePath(api.getBasePath(), config.path);
 
   return buildApp(appPath, buildOptions).then(() => {
     const list = nodemiral.taskList('Pushing Meteor App');
