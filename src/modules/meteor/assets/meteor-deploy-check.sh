@@ -9,6 +9,7 @@ cd $APP_PATH
 revert_app (){
   docker logs --tail=50 $APPNAME 1>&2
   if [ -d last ]; then
+    sudo mv current buggy
     sudo mv last current
     sudo bash $START_SCRIPT > /dev/null 2>&1
 
