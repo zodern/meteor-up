@@ -3,9 +3,7 @@ import fs from 'fs';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
-import {
-  resolvePath
-} from './modules/utils';
+import { resolvePath } from './modules/utils';
 import validateConfig from './validate/index';
 
 export default class MupAPI {
@@ -23,6 +21,10 @@ export default class MupAPI {
     return this.args;
   }
 
+  optionEnabled(long) {
+    return this.args.indexOf(`--${long}`) > -1;
+  }
+
   getBasePath() {
     return this.base;
   }
@@ -38,7 +40,7 @@ export default class MupAPI {
       console.log('');
       console.log(red(`${problems.length} Validation Error${plural}`));
 
-      problems.forEach((problem) => {
+      problems.forEach(problem => {
         console.log(red(`  - ${problem}`));
       });
 
@@ -186,7 +188,7 @@ export default class MupAPI {
         opts.ssh.agent = sshAgent;
       } else {
         console.error(
-          'error: server %s doesn\'t have password, ssh-agent or pem',
+          "error: server %s doesn't have password, ssh-agent or pem",
           name
         );
         process.exit(1);

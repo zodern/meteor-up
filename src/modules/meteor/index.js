@@ -86,7 +86,7 @@ export function setup(api) {
   return runTaskList(list, sessions);
 }
 
-export function push(api) {
+export async function push(api) {
   log('exec => mup meteor push');
   const config = api.getConfig().meteor;
   if (!config) {
@@ -113,22 +113,27 @@ export function push(api) {
   let buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation ||
     tmpBuildPath(appPath);
-  console.log('Building App Bundle Locally');
 
   var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
-  return buildApp(appPath, buildOptions).then(() => {
-    const list = nodemiral.taskList('Pushing Meteor App');
+  if (!api.optionEnabled('cached-build')) {
+    console.log('Building App Bundle Locally');
+    await buildApp(appPath, buildOptions);
+  } else {
+    console.log('Skipping build. Using previous build at');
+    console.log(`${buildOptions.buildLocation}`);
+  }
 
-    list.copy('Pushing Meteor App Bundle to The Server', {
-      src: bundlePath,
-      dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
-      progressBar: config.enableUploadProgressBar
-    });
+  const list = nodemiral.taskList('Pushing Meteor App');
 
-    const sessions = api.getSessions(['meteor']);
-    return runTaskList(list, sessions, { series: true });
+  list.copy('Pushing Meteor App Bundle to The Server', {
+    src: bundlePath,
+    dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
+    progressBar: config.enableUploadProgressBar
   });
+
+  const sessions = api.getSessions(['meteor']);
+  return runTaskList(list, sessions, { series: true });
 }
 
 export function envconfig(api) {
@@ -142,13 +147,12 @@ export function envconfig(api) {
     process.exit(1);
   }
 
-  config.log = config.log ||
-    {
-      opts: {
-        'max-size': '100m',
-        'max-file': 10
-      }
-    };
+  config.log = config.log || {
+    opts: {
+      'max-size': '100m',
+      'max-file': 10
+    }
+  };
 
   config.nginx = config.nginx || {};
 

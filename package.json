@@ -8,7 +8,7 @@
   },
   "scripts": {
     "prepublish": "npm run build -s",
-    "build": "babel src --out-dir lib --sourceRoot=./ --copy-files --presets=es2015,stage-3",
+    "build": "babel src --out-dir lib --sourceRoot=./ --copy-files --presets=es2015,es2016,es2017,stage-3",
     "build:watch": "npm run build -s -- -w",
     "test": "bash ./tests/run.sh",
     "test:custom-server": "nofat test",
@@ -41,6 +41,8 @@
     "archiver": "1.x.x",
     "babel-cli": "^6.23.0",
     "babel-polyfill": "6.6.1",
+    "babel-preset-es2016": "^6.22.0",
+    "babel-preset-es2017": "^6.22.0",
     "bluebird": "3.x.x",
     "boxen": "^1.0.0",
     "chai": "^3.5.0",

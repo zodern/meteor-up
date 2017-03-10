@@ -6,6 +6,7 @@ env:
   es6: true
   node: true
   mocha: true
+ecmaVersion: 2017
 ecmaFeatures:
   accessor-pairs: 2
   arrowFunctions: true
