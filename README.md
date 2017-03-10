@@ -480,6 +480,10 @@ If you do not see `=> Starting meteor app on port:80` in the logs, it might not 
 If you are using windows, make sure you run commands with `mup.cmd <command>` instead of `mup <command>`.
 If it silently fails for a different reason, please create an issue.
 
+> Error: spawn meteor ENOENT
+
+This usually happens when meteor is not installed.
+
 ### Migrating from Meteor Up 0.x
 
 `mup` is not backward compatible with Meteor Up 0.x. or `mupx`.
