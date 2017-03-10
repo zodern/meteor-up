@@ -18,7 +18,10 @@ export function runTaskList(list, sessions, opts) {
         if (summaryMap.hasOwnProperty(host)) {
           const summary = summaryMap[host];
           if (summary.error) {
-            reject(summary.error);
+            let error = summary.error;
+            error.nodemiralHistory = summary.history;
+            reject(error);
+
             return;
           }
         }

@@ -107,7 +107,18 @@ function argAction(arg, subarg) {
   checkUpdates().then(() => {
     const base = process.cwd();
     const api = new MupAPI(base, args, configPath, settingsPath);
-    module[command](api);
+    let potentialPromise = module[command](api);
+    if (potentialPromise && typeof potentialPromise.then === 'function') {
+      potentialPromise.catch(e => {
+        if (e.nodemiralHistory instanceof Array) {
+          // Error is from nodemiral when running a task list
+          // Nodemiral already displayed the error to the user
+          return;
+        }
+
+        console.log(e);
+      });
+    }
   });
 }
 
