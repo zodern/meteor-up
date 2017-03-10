@@ -177,6 +177,10 @@ Running this locally will set up the remote server(s) you have specified in mup.
 
 This will bundle the Meteor project locally and deploy it to the remote server(s). The bundling process is exactly how `meteor deploy` does it.
 
+    mup deploy --cached-build
+
+The `--cached-build` option will use the build from the last time you deployed the app. This is useful when the previous deploy failed from a network error or from a problem in the config.
+
 ### Other Utility Commands
 
 * `mup reconfig` - reconfigure app with new environment variables and Meteor settings
