@@ -1,6 +1,10 @@
 import * as _ from 'underscore';
 
-import { getDockerLogs, resolvePath, runTaskList } from '../utils';
+import {
+  getDockerLogs,
+  resolvePath,
+  runTaskList
+} from '../utils';
 
 import buildApp from './build.js';
 import debug from 'debug';
@@ -93,20 +97,6 @@ export async function push(api) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
-  if (!config.docker) {
-    if (config.dockerImage) {
-      config.docker = { image: config.dockerImage };
-      delete config.dockerImage;
-    } else {
-      config.docker = { image: 'kadirahq/meteord' };
-    }
-  }
-  if (config.dockerImageFrontendServer) {
-    config.docker.imageFrontendServer = config.dockerImageFrontendServer;
-  }
-  if (!config.docker.imageFrontendServer) {
-    config.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
-  }
 
   const appPath = resolvePath(api.getBasePath(), config.path);
 
@@ -160,6 +150,25 @@ export function envconfig(api) {
     bindAddress = config.docker.bind;
   }
 
+  if (!config.docker) {
+    if (config.dockerImage) {
+      config.docker = {
+        image: config.dockerImage
+      };
+      delete config.dockerImage;
+    } else {
+      config.docker = {
+        image: 'kadirahq/meteord'
+      };
+    }
+  }
+  if (config.dockerImageFrontendServer) {
+    config.docker.imageFrontendServer = config.dockerImageFrontendServer;
+  }
+  if (!config.docker.imageFrontendServer) {
+    config.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
+  }
+
   const list = nodemiral.taskList('Configuring App');
   list.copy('Pushing the Startup Script', {
     src: resolvePath(__dirname, 'assets/templates/start.sh'),
@@ -194,7 +203,9 @@ export function envconfig(api) {
   });
 
   const sessions = api.getSessions(['meteor']);
-  return runTaskList(list, sessions, { series: true });
+  return runTaskList(list, sessions, {
+    series: true
+  });
 }
 
 export function start(api) {
@@ -224,7 +235,9 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['meteor']);
-  return runTaskList(list, sessions, { series: true });
+  return runTaskList(list, sessions, {
+    series: true
+  });
 }
 
 export function deploy(api) {
