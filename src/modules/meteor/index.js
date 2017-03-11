@@ -8,6 +8,7 @@ import {
 
 import buildApp from './build.js';
 import debug from 'debug';
+import fs from 'fs';
 import nodemiral from 'nodemiral';
 import random from 'random-seed';
 import uuid from 'uuid';
@@ -110,6 +111,12 @@ export async function push(api) {
     console.log('Building App Bundle Locally');
     await buildApp(appPath, buildOptions);
   } else {
+    const buildCached = fs.existsSync(bundlePath);
+    if (!buildCached) {
+      console.log('Unable to use previous build. It doesn\'t exist.');
+      console.log('Remove the "--cached-build" option and try again.');
+      process.exit(1);
+    }
     console.log('Skipping build. Using previous build at');
     console.log(`${buildOptions.buildLocation}`);
   }
