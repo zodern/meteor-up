@@ -1,14 +1,31 @@
+const host = process.env.PROD_SERVER;
+const username = process.env.PROD_SERVER_USER;
+const pem = process.env.PROD_SERVER_PEM;
+const port = parseInt(process.env.PROD_SERVER_PORT, 10) || 22;
+
 module.exports = {
   mymeteor: {
-    host: process.env.PROD_SERVER,
-    username: process.env.PROD_SERVER_USER,
+    host,
+    username,
+    pem,
+    opts: {
+      port
+    }
   },
   mymongo: {
-    host: process.env.PROD_SERVER,
-    username: process.env.PROD_SERVER_USER,
+    host,
+    username,
+    pem,
+    opts: {
+      port
+    }
   },
   myproxy: {
-    host: process.env.PROD_SERVER,
-    username: process.env.PROD_SERVER_USER,
-  },
+    host,
+    username,
+    pem,
+    opts: {
+      port
+    }
+  }
 };
