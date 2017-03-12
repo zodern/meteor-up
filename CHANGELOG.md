@@ -1,3 +1,17 @@
+# Next
+- Add tips to default config, and comment what needs to be changed
+- `mup init` and `mup setup` suggests what to do next
+- Startup script is updated during `mup reconfig`
+- Default build path is consistent between deploys for each app
+- Add `--cached-build` flag to `mup deploy` which uses the build from the previous deploy
+- Configure additional docker networks, ip binding, and verification port @giordanocardillo 
+- Handles promise rejections
+- Fix docker not always disconnecting containers from networks @joaolboing 
+- Fix stderr sometimes in wrong place in logs
+- Fix some lines in logs would be missing the host name
+- Fix validating buildLocation
+- Fix path to temp folder on Windows
+
 # 1.2.3
 - Default config uses meteor.docker object instead of dockerImage @maxmatthews
 - Docker args from config are no longer escaped @maxmathews
