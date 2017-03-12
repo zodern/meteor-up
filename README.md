@@ -183,7 +183,7 @@ The `--cached-build` option will use the build from the last time you deployed t
 
 ### Other Utility Commands
 
-* `mup reconfig` - reconfigure app with new environment variables and Meteor settings
+* `mup reconfig` - reconfigures app with new environment variables, Meteor settings, and it updates the start script
 * `mup stop` - stop the app
 * `mup start` - start the app
 * `mup restart` - restart the app
