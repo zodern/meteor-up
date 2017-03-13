@@ -86,11 +86,15 @@ function buildMeteorApp(appPath, buildOptions, callback) {
     args = ['/c', 'meteor'].concat(args);
   }
 
-  var options = { cwd: appPath };
+  var options = {
+    cwd: appPath,
+    env: {
+      ...process.env,
+      METEOR_HEADLESS: 1
+    },
+    stdio: 'inherit'
+  };
   var meteor = spawn(executable, args, options);
-
-  meteor.stdout.pipe(process.stdout, { end: false });
-  meteor.stderr.pipe(process.stderr, { end: false });
 
   meteor.on('error', e => {
     console.log(options);
