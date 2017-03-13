@@ -1,3 +1,5 @@
+#!/bin/bash
+
 APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
 IMAGE=mup-<%= appName %>
