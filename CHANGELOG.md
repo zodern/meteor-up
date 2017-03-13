@@ -5,6 +5,7 @@
 - Default build path is consistent between deploys for each app
 - Add `--cached-build` flag to `mup deploy` which uses the build from the previous deploy
 - Configure additional docker networks, ip binding, and verification port @giordanocardillo 
+- Add `--verbose` flag to show output from `meteor build`
 - Handles promise rejections
 - Fix docker not always disconnecting containers from networks @joaolboing 
 - Fix stderr sometimes in wrong place in logs
