@@ -7,7 +7,7 @@ import { resolvePath } from './modules/utils';
 import validateConfig from './validate/index';
 
 export default class MupAPI {
-  constructor(base, args, configPath, settingsPath) {
+  constructor(base, args, configPath, settingsPath, verbose) {
     this.base = base;
     this.args = args;
     this.config = null;
@@ -15,6 +15,7 @@ export default class MupAPI {
     this.sessions = null;
     this.configPath = configPath;
     this.settingsPath = settingsPath;
+    this.verbose = verbose;
   }
 
   getArgs() {
@@ -27,6 +28,10 @@ export default class MupAPI {
 
   getBasePath() {
     return this.base;
+  }
+
+  getVerbose() {
+    return this.verbose;
   }
 
   validateConfig(configPath) {

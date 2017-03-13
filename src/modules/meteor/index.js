@@ -109,7 +109,7 @@ export async function push(api) {
 
   if (!api.optionEnabled('cached-build')) {
     console.log('Building App Bundle Locally');
-    await buildApp(appPath, buildOptions);
+    await buildApp(appPath, buildOptions, api.getVerbose());
   } else {
     const buildCached = fs.existsSync(bundlePath);
     if (!buildCached) {

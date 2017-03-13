@@ -5,7 +5,7 @@ var fs = require('fs');
 import { resolvePath } from '../utils';
 var _ = require('underscore');
 
-function buildApp(appPath, buildOptions) {
+function buildApp(appPath, buildOptions, verbose) {
   // Check if the folder exists
   try {
     fs.statSync(resolvePath(appPath));
@@ -32,7 +32,7 @@ function buildApp(appPath, buildOptions) {
       }
       resolve();
     };
-    buildMeteorApp(appPath, buildOptions, function(code) {
+    buildMeteorApp(appPath, buildOptions, verbose, function(code) {
       if (code === 0) {
         archiveIt(buildOptions.buildLocation, callback);
         return;
@@ -43,7 +43,7 @@ function buildApp(appPath, buildOptions) {
   });
 }
 
-function buildMeteorApp(appPath, buildOptions, callback) {
+function buildMeteorApp(appPath, buildOptions, verbose, callback) {
   var executable = buildOptions.executable || 'meteor';
   var args = [
     'build',
@@ -86,11 +86,21 @@ function buildMeteorApp(appPath, buildOptions, callback) {
     args = ['/c', 'meteor'].concat(args);
   }
 
-  var options = { cwd: appPath };
+  var options = {
+    cwd: appPath,
+    env: {
+      ...process.env,
+      METEOR_HEADLESS: 1
+    },
+    stdio: verbose ? 'inherit' : 'pipe'
+  };
+
   var meteor = spawn(executable, args, options);
 
-  meteor.stdout.pipe(process.stdout, { end: false });
-  meteor.stderr.pipe(process.stderr, { end: false });
+  if (!verbose) {
+    meteor.stdout.pipe(process.stdout, { end: false });
+    meteor.stderr.pipe(process.stderr, { end: false });
+  }
 
   meteor.on('error', e => {
     console.log(options);
