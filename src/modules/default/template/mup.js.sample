@@ -35,11 +35,12 @@ module.exports = {
       image: 'abernix/meteord:base',
     },
 
-    // This is the maximum time in seconds it will wait
-    // for your app to start
-    // Add 30 seconds if the server has 512mb of ram
-    // And 30 more if you have binary npm dependencies.
-    deployCheckWaitTime: 60,
+    docker: {
+      // image: 'kadirahq/meteord', // (optional)
+      // imagePort: 80, // (default: 80, some images EXPOSE different ports)
+    },
+
+    deployCheckWaitTime: 60
 
     // Show progress bar while uploading bundle to server
     // You might need to disable it on CI servers

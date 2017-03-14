@@ -45,7 +45,7 @@ docker run \
   <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
   --expose=80 \
   <% } else { %> \
-  --publish=$BIND:$PORT:80 \
+  --publish=$BIND:$PORT:<%= docker.imagePort %> \
   <% } %> \
   --volume=$BUNDLE_PATH:/bundle \
   --hostname="$HOSTNAME-$APPNAME" \

@@ -99,8 +99,12 @@ export async function push(api) {
     process.exit(1);
   }
 
-  const appPath = resolvePath(api.getBasePath(), config.path);
+  // If imagePort is not set, go with port 80 which was the traditional
+  // port used by kadirahq/meteord and meteorhacks/meteord
+  config.docker.imagePort = config.docker.imagePort || 80;
 
+  const appPath = resolvePath(api.getBasePath(), config.path);
+  
   let buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation ||
     tmpBuildPath(appPath);
