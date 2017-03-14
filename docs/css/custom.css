@@ -1,0 +1,84 @@
+.home-intro {
+    background-image: url(/meteor-up/imgs/space-bg-shadowcodex.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 800px;
+    width: 100%;
+    display: inline-block;
+    margin-top:-20px;
+}
+
+.home-banner {
+    margin-top: 135px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.home-topper {
+    font-weight: 100;
+    font-size: 20pt;
+    margin-bottom:5px;
+}
+
+.home-middle {
+    font-weight: 700;
+    font-size: 36pt;
+    margin-top:5px;
+}
+
+.home-botter{
+    font-weight: 100;
+    font-size: 15pt;    
+}
+
+.install-command {
+    margin-left: auto;
+    margin-right: auto;
+    display: inline-block;
+    padding: 20px;
+    background-color:#3d546b;
+    width: 500px;    
+}
+
+.section-title {
+    text-align: center;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #df691a;
+}
+
+.section-spacer {
+    height: 100px;
+    width: 100%;
+    display: block;
+}
+
+.blurb-img {
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:25px;
+    display:block;
+}
+
+.blurb-text {
+    text-align:center;
+    margin-top:10px;
+}
+
+.stat-num {
+    text-align: center;
+    font-weight: 100;
+    font-size: 72pt;
+}
+
+.stat-text {
+    text-align: center;
+    font-weight: 700;
+}
+
+.footer-btn {
+    margin-left: 5px;
+}
