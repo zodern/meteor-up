@@ -82,16 +82,20 @@ export function setup(api) {
 
   log('exec => mup setup');
   const config = api.getConfig();
-  return docker.setup(api).then(() => {
-    if (config.mongo) {
-      return Promise.all([
-        meteor.setup(api),
-        mongo.setup(api)
-      ]).then(() => mongo.start(api))
-        .then(displayNextSteps);
-    }
-    return meteor.setup(api).then(displayNextSteps);
-  });
+  return docker
+    .setup(api)
+    .then(meteor.setup.bind(null, api))
+    .then(() => {
+      if (config.mongo) {
+        return mongo.setup(api);
+      }
+    })
+    .then(() => {
+      if (config.mongo) {
+        return mongo.start(api);
+      }
+    })
+    .then(displayNextSteps);
 }
 
 export function start(api) {
