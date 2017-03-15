@@ -65,7 +65,6 @@ const schema = joi.object().keys({
     .and('crt', 'key')
     .without('autogenerate', ['crt', 'key'])
     .or('crt', 'autogenerate')
-    .label('ssl')
 });
 
 export default function(config) {

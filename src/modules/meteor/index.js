@@ -1,10 +1,6 @@
 import * as _ from 'underscore';
 
-import {
-  getDockerLogs,
-  resolvePath,
-  runTaskList
-} from '../utils';
+import { getDockerLogs, resolvePath, runTaskList } from '../utils';
 
 import buildApp from './build.js';
 import debug from 'debug';
@@ -67,6 +63,12 @@ export function setup(api) {
     const basePath = api.getBasePath();
 
     if (config.ssl.upload !== false) {
+      list.executeScript('Cleaning up SSL Certificates', {
+        script: resolvePath(__dirname, 'assets/ssl-cleanup.sh'),
+        vars: {
+          name: config.name
+        }
+      });
       list.copy('Copying SSL Certificate Bundle', {
         src: resolvePath(basePath, config.ssl.crt),
         dest: '/opt/' + config.name + '/config/bundle.crt'
@@ -99,12 +101,8 @@ export async function push(api) {
     process.exit(1);
   }
 
-  // If imagePort is not set, go with port 80 which was the traditional
-  // port used by kadirahq/meteord and meteorhacks/meteord
-  config.docker.imagePort = config.docker.imagePort || 80;
-
   const appPath = resolvePath(api.getBasePath(), config.path);
-  
+
   let buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation ||
     tmpBuildPath(appPath);
@@ -178,6 +176,14 @@ export function envconfig(api) {
   }
   if (!config.docker.imageFrontendServer) {
     config.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
+  }
+
+  // If imagePort is not set, go with port 80 which was the traditional
+  // port used by kadirahq/meteord and meteorhacks/meteord
+  config.docker.imagePort = config.docker.imagePort || 80;
+
+  if (config.ssl) {
+    config.ssl.port = config.ssl.port || 443;
   }
 
   const list = nodemiral.taskList('Configuring App');
