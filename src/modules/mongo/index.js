@@ -27,7 +27,9 @@ export function setup(api) {
 
   if (!api.getConfig().mongo) {
     // could happen when running "mup mongo setup"
-    console.log('Not setting up built-in mongodb since there is no mongo config');
+    console.log(
+      'Not setting up built-in mongodb since there is no mongo config'
+    );
     return;
   }
 
@@ -59,7 +61,7 @@ export function setup(api) {
 
   const sessions = api.getSessions(['mongo']);
 
-  return runTaskList(list, sessions); // eslint-disable-line consistent-return
+  return runTaskList(list, sessions, { verbose: api.getVerbose() }); // eslint-disable-line consistent-return
 }
 
 export function start(api) {
@@ -71,7 +73,7 @@ export function start(api) {
 
   if (
     meteorSessions.length !== 1 ||
-      mongoSessions[0]._host !== meteorSessions[0]._host
+    mongoSessions[0]._host !== meteorSessions[0]._host
   ) {
     log('Skipping mongodb start. Incompatible config');
     return;
@@ -87,7 +89,7 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions); // eslint-disable-line consistent-return
+  return runTaskList(list, sessions, { verbose: api.getVerbose() }); // eslint-disable-line consistent-return
 }
 
 export function stop(api) {
@@ -99,5 +101,5 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }

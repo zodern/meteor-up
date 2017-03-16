@@ -90,7 +90,7 @@ export function setup(api) {
 
   const sessions = api.getSessions(['meteor']);
 
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
 
 export async function push(api) {
@@ -132,7 +132,10 @@ export async function push(api) {
   });
 
   const sessions = api.getSessions(['meteor']);
-  return runTaskList(list, sessions, { series: true });
+  return runTaskList(list, sessions, {
+    series: true,
+    verbose: api.getVerbose()
+  });
 }
 
 export function envconfig(api) {
@@ -221,7 +224,8 @@ export function envconfig(api) {
 
   const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
-    series: true
+    series: true,
+    verbose: api.getVerbose()
   });
 }
 
@@ -253,7 +257,8 @@ export function start(api) {
 
   const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
-    series: true
+    series: true,
+    verbose: api.getVerbose()
   });
 }
 
@@ -289,5 +294,5 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['meteor']);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }

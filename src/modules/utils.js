@@ -11,7 +11,27 @@ import readline from 'readline';
 
 const log = debug('mup:utils');
 
+function addStdioHandlers(list) {
+  list._taskQueue = list._taskQueue.map(task => {
+    task.options.onStdout = () => {
+      return data => {
+        process.stdout.write(data);
+      };
+    };
+    task.options.onStderr = () => {
+      return data => {
+        process.stderr.write(data);
+      };
+    };
+    return task;
+  });
+}
+
 export function runTaskList(list, sessions, opts) {
+  if (opts && opts.verbose) {
+    addStdioHandlers(list);
+    delete opts.verbose;
+  }
   return new Promise((resolve, reject) => {
     list.run(sessions, opts, summaryMap => {
       for (var host in summaryMap) {
@@ -72,7 +92,7 @@ export function getDockerLogs(name, sessions, args) {
       input,
       terminal: true
     });
-    lineSeperator.on('line', (data) => {
+    lineSeperator.on('line', data => {
       console.log(host + data);
     });
     const options = {
@@ -99,7 +119,7 @@ export function runSSHCommand(info, command) {
     var sshAgent = process.env.SSH_AUTH_SOCK;
     var ssh = {
       host: info.host,
-      port: info.opts && info.opts.port || 22,
+      port: (info.opts && info.opts.port) || 22,
       username: info.username
     };
 

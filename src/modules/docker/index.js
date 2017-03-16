@@ -26,5 +26,5 @@ export function setup(api) {
     },
     []
   );
-  return runTaskList(list, rsessions);
+  return runTaskList(list, rsessions, { verbose: api.getVerbose() });
 }
