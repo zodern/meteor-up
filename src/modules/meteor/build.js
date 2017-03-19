@@ -105,6 +105,7 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
   meteor.on('error', e => {
     console.log(options);
     console.log(e);
+    console.log('This error usually happens when meteor is not installed.');
   });
   meteor.on('close', callback);
 }
