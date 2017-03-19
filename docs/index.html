@@ -1,0 +1,100 @@
+---
+layout: home
+title: 'Production Quality Meteor Deployment to Anywhere'
+description: 'Production Quality Meteor Deployment to Anywhere.'
+---
+<div class="container">
+    <br><br>
+    <h3 class="section-title">Why Meteor UP?</h3>
+    <div class="row">
+        <div class="col-xs-4">
+            <img class="blurb-img" src="{{site.baseurl}}/imgs/rocket.png">
+            <div class="blurb-text">
+                Ship your application with less headache and overhead.
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <img class="blurb-img" src="{{site.baseurl}}/imgs/swatches.png">
+            <div class="blurb-text">
+                Deploy from anywhere. Meteor Up runs on Windows, Mac, and Unix. 
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <img class="blurb-img" src="{{site.baseurl}}/imgs/global.png">
+            <div class="blurb-text">
+                You are free to deploy to any Ubuntu server you can ssh into. You are not tied to a specific platform or infrastructure as a service.
+            </div>
+        </div>
+    </div>
+    
+    <div class="section-spacer"></div>
+    
+    <h3 class="section-title">Easy Deplyment Using Docker</h3>
+    <div class="row">
+        <div class="col-xs-6">
+            <img class="img-responsive" src="{{site.baseurl}}/imgs/docker.png">
+        </div>
+        <div class="col-xs-6">
+            <h4><i class="glyphicon glyphicon-ok"></i> &nbsp;&nbsp;&nbsp; Docker Allows For Consistent Results</h4>
+            <p>Using docker we know that we are using the same meteor enviornment, 
+            same proxy, same everything every time. Once you setup your mup config, 
+            you no longer have to worry about will this work on this other server. 
+            Docker takes care of that for us.</p>
+            <br><br>
+            <h4><i class="glyphicon glyphicon-ok"></i> &nbsp;&nbsp;&nbsp; Custom Configurations</h4>
+            <p>Because we can mount volumes in Docker, that means we can pass configuration files to the underlying containers.
+            such as custom Nginx configurations, meteor settings, and more</p>
+            <br><br>
+            <h4><i class="glyphicon glyphicon-ok"></i> &nbsp;&nbsp;&nbsp; SSL Certificates</h4>
+            <p>Using the same volume mapping for configurations we can send SSL Certificates to a Nginx docker container. This allows us
+            to reverse proxy the application and serve it's content over https. The outside world does not directly talk to your application, but 
+            to the proxy. This is a more secure way to deploy your app.</p>
+            <br><br>
+        </div>
+    </div>   
+    
+    <div class="section-spacer"></div>
+    <div class="alert alert-dismissible alert-info">
+      <strong>Heads up!</strong> Now with Let's Encrypt integration, you don't even need to purchase an SSL. 
+      Meteor Up can auto generate that for you. For more information please look at the 
+      <a href="https://github.com/zodern/meteor-up#ssl-support" class="alert-link">github documentation</a> and the <a href="https://letsencrypt.org/" class="alert-link">let's encrpyt website</a>.
+    </div>
+    
+    <div class="section-spacer"></div>
+    
+    <h3 class="section-title">The Community</h3>
+    <div class="row">
+        <div class="col-xs-3">
+            <div class="stat-num">
+                615
+            </div>
+            <div class="stat-text">
+                <i class="glyphicon glyphicon-star"></i> &nbsp;&nbsp; Github Stars 
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="stat-num">
+                150
+            </div>
+            <div class="stat-text">
+                <i class="glyphicon glyphicon-random"></i> &nbsp;&nbsp; Github Forks 
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="stat-num">
+                31
+            </div>
+            <div class="stat-text">
+                <i class="glyphicon glyphicon-user"></i> &nbsp;&nbsp; Contributors
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="stat-num">
+                341
+            </div>
+            <div class="stat-text">
+                <i class="glyphicon glyphicon-time"></i> &nbsp;&nbsp; Code Commits
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,17 +1,49 @@
-import fs from 'fs';
 import * as _ from 'underscore';
-import {promisify} from 'bluebird';
-import {Client} from 'ssh2';
+
+import { Client } from 'ssh2';
+import debug from 'debug';
+import expandTilde from 'expand-tilde';
+import fs from 'fs';
 import path from 'path';
+import { promisify } from 'bluebird';
+import stream from 'stream';
+import readline from 'readline';
+
+const log = debug('mup:utils');
+
+function addStdioHandlers(list) {
+  list._taskQueue = list._taskQueue.map(task => {
+    task.options.onStdout = () => {
+      return data => {
+        process.stdout.write(data);
+      };
+    };
+    task.options.onStderr = () => {
+      return data => {
+        process.stderr.write(data);
+      };
+    };
+    return task;
+  });
+}
 
 export function runTaskList(list, sessions, opts) {
+  if (opts && opts.verbose) {
+    addStdioHandlers(list);
+    delete opts.verbose;
+  }
   return new Promise((resolve, reject) => {
     list.run(sessions, opts, summaryMap => {
       for (var host in summaryMap) {
-        const summary = summaryMap[host];
-        if (summary.error) {
-          reject(summary.error);
-          return;
+        if (summaryMap.hasOwnProperty(host)) {
+          const summary = summaryMap[host];
+          if (summary.error) {
+            let error = summary.error;
+            error.nodemiralHistory = summary.history;
+            reject(error);
+
+            return;
+          }
         }
       }
 
@@ -20,16 +52,55 @@ export function runTaskList(list, sessions, opts) {
   });
 }
 
-export function getDockerLogs(name, sessions, args) {
-  const command = 'sudo docker ' + args.join(' ') + ' ' + name;
+// Implments a simple readable stream to pass
+// the logs from nodemiral to readline which
+// then splits it into individual lines.
+class Callback2Stream extends stream.Readable {
+  constructor(options) {
+    // Calls the stream.Readable(options) constructor
+    super(options);
 
-  var promises = _.map(sessions, session => {
-    var host = '[' + session._host + ']';
-    var options = {
+    this.data = [];
+  }
+  addData(data) {
+    if (this.reading) {
+      this.reading = this.push(data);
+    } else {
+      this.data.push(data);
+    }
+  }
+  _read() {
+    this.reading = true;
+    this.data.forEach(() => {
+      let shouldContinue = this.reading && this.push(this.data.shift());
+      if (!shouldContinue) {
+        this.reading = false;
+      }
+    });
+  }
+}
+
+export function getDockerLogs(name, sessions, args) {
+  const command = 'sudo docker ' + args.join(' ') + ' ' + name + ' 2>&1';
+
+  log(`getDockerLogs command: ${command}`);
+
+  let promises = _.map(sessions, session => {
+    const input = new Callback2Stream();
+    const host = '[' + session._host + ']';
+    const lineSeperator = readline.createInterface({
+      input,
+      terminal: true
+    });
+    lineSeperator.on('line', data => {
+      console.log(host + data);
+    });
+    const options = {
       onStdout: data => {
-        process.stdout.write(host + data);
+        input.addData(data);
       },
       onStderr: data => {
+        // the logs all come in on stdout so stderr isn't added to lineSeperator
         process.stdout.write(host + data);
       }
     };
@@ -48,12 +119,12 @@ export function runSSHCommand(info, command) {
     var sshAgent = process.env.SSH_AUTH_SOCK;
     var ssh = {
       host: info.host,
-      port: (info.opts && info.opts.port || 22),
+      port: (info.opts && info.opts.port) || 22,
       username: info.username
     };
 
     if (info.pem) {
-      ssh.privateKey = fs.readFileSync(path.resolve(info.pem), 'utf8');
+      ssh.privateKey = fs.readFileSync(resolvePath(info.pem), 'utf8');
     } else if (info.password) {
       ssh.password = info.password;
     } else if (sshAgent && fs.existsSync(sshAgent)) {
@@ -61,15 +132,15 @@ export function runSSHCommand(info, command) {
     }
     conn.connect(ssh);
 
-    conn.once('error', function (err) {
+    conn.once('error', function(err) {
       if (err) {
         reject(err);
       }
     });
 
     // TODO handle error events
-    conn.once('ready', function () {
-      conn.exec(command, function (err, stream) {
+    conn.once('ready', function() {
+      conn.exec(command, function(err, outputStream) {
         if (err) {
           conn.end();
           reject(err);
@@ -78,13 +149,13 @@ export function runSSHCommand(info, command) {
 
         let output = '';
 
-        stream.on('data', function (data) {
+        outputStream.on('data', function(data) {
           output += data;
         });
 
-        stream.once('close', function (code) {
+        outputStream.once('close', function(code) {
           conn.end();
-          resolve({code, output});
+          resolve({ code, output });
         });
       });
     });
@@ -95,4 +166,11 @@ export function countOccurences(needle, haystack) {
   const regex = new RegExp(needle, 'g');
   const match = haystack.match(regex) || [];
   return match.length;
+}
+
+export function resolvePath(...paths) {
+  let expandedPaths = paths.map(_path => {
+    return expandTilde(_path);
+  });
+  return path.resolve(...expandedPaths);
 }

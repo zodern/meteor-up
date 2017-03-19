@@ -21,5 +21,5 @@ function isMupModule(name) {
 
 function loadModule(name) {
   const moduleDir = path.join(__dirname, name);
-  modules[name] = require(moduleDir);
+  modules[name] = require(moduleDir); // eslint-disable-line global-require
 }

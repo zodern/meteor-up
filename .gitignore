@@ -1,4 +1,7 @@
 lib
 node_modules
-.tern-port
+.vscode
 .idea
+*.log
+docs/_site
+.tern-port
