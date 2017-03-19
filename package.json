@@ -35,14 +35,15 @@
     "babel-preset-stage-3": "^6.22.0",
     "eslint": "^3.15.0",
     "eslint-plugin-babel": "^4.1.0",
-    "nofat": "1.0.x"
+    "nofat": "1.0.x",
+    "babel-cli": "^6.23.0",
+    "babel-preset-es2016": "^6.22.0",
+    "babel-preset-es2017": "^6.22.0",
+    "mocha": "^3.2.0"
   },
   "dependencies": {
     "archiver": "1.x.x",
-    "babel-cli": "^6.23.0",
     "babel-polyfill": "6.6.1",
-    "babel-preset-es2016": "^6.22.0",
-    "babel-preset-es2017": "^6.22.0",
     "bluebird": "3.x.x",
     "boxen": "^1.0.0",
     "chai": "^3.5.0",
@@ -51,13 +52,11 @@
     "debug": "2.x.x",
     "expand-tilde": "^2.0.2",
     "joi": "^10.2.1",
-    "mocha": "^3.2.0",
     "nodemiral": "1.x.x",
     "parse-json": "^2.2.0",
     "random-seed": "^0.3.0",
     "shelljs": "0.5.x",
     "silent-npm-registry-client": "2.x.x",
-    "source-map-support": "0.4.0",
     "ssh2": "0.4.x",
     "underscore": "1.x.x",
     "uuid": "2.x.x"
