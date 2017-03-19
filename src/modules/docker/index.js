@@ -12,7 +12,7 @@ export function setup(api) {
   log('exec => mup docker setup');
   const list = nodemiral.taskList('Setup Docker');
 
-  list.executeScript('setup docker', {
+  list.executeScript('Setup Docker', {
     script: resolvePath(__dirname, 'assets/docker-setup.sh')
   });
 

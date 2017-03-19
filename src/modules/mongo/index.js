@@ -50,11 +50,11 @@ export function setup(api) {
 
   const list = nodemiral.taskList('Setup Mongo');
 
-  list.executeScript('setup environment', {
+  list.executeScript('Setup Environment', {
     script: resolvePath(__dirname, 'assets/mongo-setup.sh')
   });
 
-  list.copy('copying mongodb.conf', {
+  list.copy('Copying mongodb.conf', {
     src: resolvePath(__dirname, 'assets/mongodb.conf'),
     dest: '/opt/mongodb/mongodb.conf'
   });
@@ -81,7 +81,7 @@ export function start(api) {
 
   const list = nodemiral.taskList('Start Mongo');
 
-  list.executeScript('start mongo', {
+  list.executeScript('Start Mongo', {
     script: resolvePath(__dirname, 'assets/mongo-start.sh'),
     vars: {
       mongoVersion: config.version || '3.4.1'
