@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "archiver": "1.x.x",
+    "async": "^2.1.5",
     "babel-polyfill": "6.6.1",
     "bluebird": "3.x.x",
     "boxen": "^1.0.0",
