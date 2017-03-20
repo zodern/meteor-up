@@ -61,7 +61,7 @@ export function setup(api) {
 
   const sessions = api.getSessions(['mongo']);
 
-  return runTaskList(list, sessions, { verbose: api.getVerbose() }); // eslint-disable-line consistent-return
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
 
 export function start(api) {
@@ -89,7 +89,7 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions, { verbose: api.getVerbose() }); // eslint-disable-line consistent-return
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
 
 export function stop(api) {

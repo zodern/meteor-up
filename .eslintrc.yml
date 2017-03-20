@@ -59,7 +59,7 @@ rules:
   computed-property-spacing:
   - 2
   - never
-  consistent-return: 2
+  consistent-return: 0
   consistent-this: 0
   curly:
   - 2

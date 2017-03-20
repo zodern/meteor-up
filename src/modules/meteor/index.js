@@ -110,6 +110,26 @@ export async function push(api) {
   var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
   if (!api.optionEnabled('cached-build')) {
+    // Check if using force-ssl package and ssl is not setup.
+    // This is a common problem people encounter when deploying
+    try {
+      var contents = fs
+        .readFileSync(resolvePath(appPath, '.meteor/versions'))
+        .toString();
+      // Looks for "force-ssl@" in the begining of a
+      // line or at the start of the file
+      var match = /(^|\s)force-ssl@/m;
+      if (match.test(contents)) {
+        console.log(
+          'Your app is using the "force-ssl" package, but ssl is not setup in your mup config.'
+        );
+        console.log('This can cause unexpected redirects.');
+      }
+    } catch (e) {
+      // This is optional functionality and if it fails
+      // it shouldn't prevent building.
+    }
+
     console.log('Building App Bundle Locally');
     await buildApp(appPath, buildOptions, api.getVerbose());
   } else {

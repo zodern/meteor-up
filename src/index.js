@@ -14,7 +14,10 @@ program
   .action(argAction)
   .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
   .option('--config <filePath>', 'mup.js config file', setConfigPath)
-  .option('--verbose', 'Print more output while building and running tasks on server')
+  .option(
+    '--verbose',
+    'Print more output while building and running tasks on server'
+  )
   .on('--help', function() {
     console.log('   Commands:');
 
@@ -107,7 +110,13 @@ function argAction(arg, subarg) {
 
   checkUpdates().then(() => {
     const base = process.cwd();
-    const api = new MupAPI(base, args, configPath, settingsPath, program.verbose);
+    const api = new MupAPI(
+      base,
+      args,
+      configPath,
+      settingsPath,
+      program.verbose
+    );
     let potentialPromise = module[command](api);
     if (potentialPromise && typeof potentialPromise.then === 'function') {
       potentialPromise.catch(e => {

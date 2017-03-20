@@ -14,7 +14,8 @@
     "test:custom-server": "nofat test",
     "test:parallel": "bash ./tests/run-parallel.sh",
     "lint": "eslint . && npm run lint:defaultConfig -s",
-    "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" ."
+    "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" .",
+    "lint:code": "eslint ."
   },
   "repository": {
     "type": "git",

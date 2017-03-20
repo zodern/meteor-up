@@ -193,7 +193,7 @@ export default class MupAPI {
         opts.ssh.agent = sshAgent;
       } else {
         console.error(
-          "error: server %s doesn't have password, ssh-agent or pem",
+          'error: server %s doesn\'t have password, ssh-agent or pem',
           name
         );
         process.exit(1);
