@@ -17,7 +17,7 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
 - [Server Configuration](#server-configuration)
 - [Installation](#installation)
 - [Creating a Meteor Up Project](#creating-a-meteor-up-project)
-- [Example File](#example-file)
+- [Example Config](#example-config)
 - [Setting Up a Server](#setting-up-a-server)
 - [Deploying an App](#deploying-an-app)
 - [Build Options](#build-options)
@@ -25,15 +25,15 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
     - [Server Setup Details](#server-setup-details)
     - [Deploy Wait Time](#deploy-wait-time)
     - [Multiple Deployment Targets](#multiple-deployment-targets)
-- [Accessing the Database](#accessing-the-database)
 - [Multiple Deployments](#multiple-deployments)
 - [SSL Support](#ssl-support)
 - [Nginx Upload Size](#nginx-upload)
-- [Change MongoDB Version](#change-mongodb-version)
+- [MongoDB](#mongodb)
+    - [Accessing the Database](#accessing-the-database)
+    - [Change MongoDB Version](#change-mongodb-version)
 - [Updating](#updating-mup)
 - [Troubleshooting](#troubleshooting)
 - [Migrating from Meteor Up 0.x](#migrating-from-meteor-up-0x)
-- [FAQ](#faq)
 
 ### Features
 
@@ -59,6 +59,8 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
 
     npm install -g mup
 
+`mup` should be installed on the computer you are deploying from.
+
 ### Creating a Meteor Up Project
     cd my-app-folder
     mkdir .deploy
@@ -72,7 +74,7 @@ This will create two files in your Meteor Up project directory:
   * `mup.js` - Meteor Up configuration file
   * `settings.json` - Settings for Meteor's [settings API](http://docs.meteor.com/#meteor_settings)
 
-### Example File
+### Example Config
 
 ```js
 module.exports = {
@@ -170,7 +172,9 @@ module.exports = {
 
     mup setup
 
-Running this locally will set up the remote server(s) you have specified in mup.js for the `mup` deployments. It will take around 2-5 minutes depending on the server's performance and network availability.
+Running this locally will set up the remote server(s) you have specified in mup.js. It will take around 2-5 minutes depending on the server's performance and network availability.
+
+It is safe to run `mup setup` multiple times if needed. After making changes to custom ssl certificates, mongodb, or servers in your config, you need to run `mup setup` for the changes to take effect.
 
 ### Deploying an App
 
@@ -218,9 +222,11 @@ meteor: {
 
 #### Deploy Wait Time
 
-Meteor Up checks if the deployment is successful or not just after the deployment. By default, it will wait 15 seconds before the check. You can configure the wait time with the `meteor.deployCheckWaitTime` option in `mup.js`.
+Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`.
 
-### Deploy check port
+Most docker images used with mup run `npm install` before starting the app. Especially for small servers, this can take awhile. If deployments fail with `Verifying Deployment: FAILED`, and it looks like npm didn't finish installing dependencies, try increasing the value in `meteor.deployCheckWaitTime`
+
+##### Deploy check port
 
 If you are deploying under a proxy/firewall and need a different port to be checked after deploy, add a variable called `deployCheckPort` with the value of the port you are publishing your application to.
 
@@ -289,14 +295,6 @@ Meteor Up uses Docker to run and manage your app. It uses [MeteorD](https://gith
 You can use an array to deploy to multiple servers at once.
 
 To deploy to *different* environments (e.g. staging, production, etc.), use separate Meteor Up configurations in separate directories, with each directory containing separate `mup.js` and `settings.json` files, and the `mup.js` files' `app` field pointing back to your app's local directory.
-
-### Accessing the Database
-
-You can't access the MongoDB from outside the server. To access the MongoDB shell you need to log into your server via SSH first and then run the following command:
-
-    docker exec -it mongodb mongo <appName>
-
-> Later on we'll be using a separate MongoDB instance for every app.
 
 ### Multiple Deployments
 
@@ -429,7 +427,17 @@ meteor: {
 
 ```
 
-### Change Mongodb Version
+### MongoDB
+
+#### Accessing the Database
+
+You can't access the MongoDB from outside the server. To access the MongoDB shell you need to log into your server via SSH first and then run the following command:
+
+    docker exec -it mongodb mongo <appName>
+
+> Later on we'll be using a separate MongoDB instance for every app.
+
+#### Change Mongodb Version
 
 If you have not deployed to the server, you can change the mongo version by adding:
 
@@ -449,17 +457,16 @@ If you have deployed to the server, it involves a couple more steps.
 3) During the steps for install or replace binaries or restarting mongodb, instead change the version in your `mup.js` and run `mup setup`.
 4) To verify that it worked, run `docker ps` to check if mongodb keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
 
+
 ### Updating Mup
 
 To update `mup` to the latest version, just type:
 
-    npm update mup -g
+    npm install -g mup
 
-You should try and keep `mup` up to date in order to keep up with the latest Meteor changes.
+mup usually will let you know when there is an update available. You should try and keep `mup` up to date in order to keep up with the latest Meteor changes.
 
 ### Troubleshooting
-
-####
 
 #### Docker image
 Make sure that the docker image you are using supports your app's meteor version.
@@ -470,7 +477,7 @@ If you suddenly can't deploy your app anymore, first use the `mup logs -f` comma
 #### Verbose Output
 If you need to see the output of `mup` (to see more precisely where it's failing or hanging, for example), run it like so:
 
-    DEBUG=* mup <command>
+    DEBUG=* mup <command> --verbose
 
 where `<command>` is one of the `mup` commands such as `setup`, `deploy`, etc.
 
@@ -488,6 +495,10 @@ If it silently fails for a different reason, please create an issue.
 > Error: spawn meteor ENOENT
 
 This usually happens when meteor is not installed.
+
+> Seems like random errors during build or deploy
+
+Make sure both the machines you are deploying from and to have enough ram.
 
 ### Migrating from Meteor Up 0.x
 
