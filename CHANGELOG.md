@@ -1,4 +1,18 @@
 # Next
+- Support changing docker exposed port @abernix
+- New `mup docker restart` command
+- New `mup docker ps` command. It accepts all arguments that `docker ps` accepts
+- Old ssh key and bundle are deleted before uploading new ones
+- Setting up Mongo and Meteor are no longer in parallel
+- `--verbose` flag also shows output from scripts run on the server
+- MongoDB is safely shutdown for `Start Mongo` and `Stop Mongo` task lists
+- Reduced number of dependencies installed
+- Better error message on meteor build spawn error
+- Setup tasks are consistently capitilized
+- Clearer validator message for `ROOT_URL`
+- Add warning message when using `force-ssl` without ssl setup
+
+# 1.2.4
 - Add tips to default config, and comment what needs to be changed
 - `mup init` and `mup setup` suggests what to do next
 - Startup script is updated during `mup reconfig`

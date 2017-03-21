@@ -141,7 +141,7 @@ describe('module - default', function() {
       );
       expect(
         countOccurences('Setup Environment: SUCCESS', out.output)
-      ).to.be.equal(1);
+      ).to.be.equal(2);
       expect(countOccurences('Start Mongo: SUCCESS', out.output)).to.be.equal(
         1
       );
