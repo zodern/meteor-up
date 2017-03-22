@@ -11,6 +11,7 @@
 - Setup tasks are consistently capitilized
 - Clearer validator message for `ROOT_URL`
 - Add warning message when using `force-ssl` without ssl setup
+- Validate `meteor.ssl.upload` @markreid
 
 # 1.2.4
 - Add tips to default config, and comment what needs to be changed
