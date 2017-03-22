@@ -68,7 +68,8 @@ const schema = joi.object().keys({
         .label('autogenerate'),
       crt: joi.string().trim(),
       key: joi.string().trim(),
-      port: joi.number()
+      port: joi.number(),
+      upload: joi.boolean()
     })
     .and('crt', 'key')
     .without('autogenerate', ['crt', 'key'])
