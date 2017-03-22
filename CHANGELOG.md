@@ -13,7 +13,7 @@
 - Add warning message when using `force-ssl` without ssl setup
 - Validate `meteor.ssl.upload` @markreid
 
-# 1.2.4
+## 1.2.4 - March 13, 2017
 - Add tips to default config, and comment what needs to be changed
 - `mup init` and `mup setup` suggests what to do next
 - Startup script is updated during `mup reconfig`
@@ -28,7 +28,7 @@
 - Fix validating buildLocation
 - Fix path to temp folder on Windows
 
-# 1.2.3
+## 1.2.3 - March 4, 2017
 - Default config uses meteor.docker object instead of dockerImage @maxmatthews
 - Docker args from config are no longer escaped @maxmathews
 - Add buildLocation for validator @stubbegianni
@@ -36,7 +36,7 @@
 - Fix nginx-proxy not starting on server restart
 - Fix documentation on changing port @maxmathews
 
-# 1.2.2
+## 1.2.2 - Feb 11, 2017
 - Configure nginx max client upload size, and increase default to `10M` (@shadowcodex)
 - Displays better message if it can not find the meteor app
 - Displays message if can not find pem for server
@@ -44,14 +44,14 @@
 - Validator checks for `http://` or `https://` in `ROOT_URL`
 - Update documentation on using `mup` on Windows
 
-# 1.2.1
+## 1.2.1 - Feb 8, 2017
 - All paths support "~"
 - Add `server` and `allowIncompatibleUpdates` to build config (@alvelig)
 - Allow `mobile-settings` build option to use `settings.json` file (@alvelig)
 - Add `mup --version` command
 - Fix validating env `variables` and `imageFrontendServer`
 
-# 1.2.0
+## 1.2.0 - Feb 7, 2017
 - Support Meteor 1.4 by default (@ffxsam)
 - Change mongo version
 - Validates `mup.js` and displays problems found in it
@@ -65,14 +65,13 @@
 - Fix `Error: Cannot find module 'ssh2'`
 - Fix `mup logs` when using custom configuration or settings files
 
-# 1.1.2
+## 1.1.2 - Feb 4, 2017
 - Fixed `mup setup` when using let's encrypt
 
-# 1.1.1
+## 1.1.1 - Feb 4, 2017
 - Fixed some files had windows line endings
 
-# 1.1
-
+## 1.1 - Feb 4, 2017
 - Add let's encrypt support (@mbabauer)
 - Fix typo (@timbrandin)
 - Help is shown for `mup` and `mup help`
