@@ -481,6 +481,10 @@ If you need to see the output of `mup` (to see more precisely where it's failing
 
 where `<command>` is one of the `mup` commands such as `setup`, `deploy`, etc.
 
+The environment variable `DEBUB=*` gives more information on what the `mup` cli is doing.
+
+The `--verbose` flag shows output from commands and scripts run on the server.
+
 #### Common Problems
 
 > Verifying Deployment: FAILED
