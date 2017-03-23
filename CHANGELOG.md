@@ -1,4 +1,4 @@
-# Next
+## 1.2.5 - March 22, 2017
 - Support changing docker exposed port @abernix
 - New `mup docker restart` command
 - New `mup docker ps` command. It accepts all arguments that `docker ps` accepts
