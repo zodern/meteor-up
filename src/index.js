@@ -1,48 +1,73 @@
-import MupAPI from './mup-api';
 import checkUpdates from './updates';
-import modules from './modules/';
+import modules, { addModuleCommands } from './modules/';
 import pkg from '../package.json';
-import program from 'commander';
+// import program from 'commander';
+import yargs from 'yargs';
+import chalk from 'chalk';
 
 let settingsPath;
 let configPath;
 const args = process.argv.slice(2);
 
-program
-  .arguments('<command> [subcommand]')
+let program = yargs
+  .usage(`\nUsage: ${chalk.yellow('mup')} <command> [args]`)
   .version(pkg.version)
-  .action(argAction)
-  .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
-  .option('--config <filePath>', 'mup.js config file', setConfigPath)
-  .option(
-    '--verbose',
-    'Print more output while building and running tasks on server'
-  )
-  .on('--help', function() {
-    console.log('   Commands:');
-
-    function listModuleCommands(commands) {
-      Object.keys(commands).forEach(command => {
-        if (command === 'default') {
-          listModuleCommands(commands['default']);
-          return;
-        }
-        console.log(`     ${command}`);
-      });
-    }
-
-    listModuleCommands(modules);
-
-    console.log('');
-    console.log('    For list of subcommands, run ');
-    console.log('      mup <command> help');
+  .alias('version', 'V')
+  .global('version', false)
+  .option('settings <file path>', {
+    description: 'Path to Meteor settings file',
+    requiresArg: true,
+    string: true
   })
-  .parse(process.argv);
+  .option('config <file path>', {
+    description: 'Path to mup.js config file',
+    requiresArg: true,
+    string: true
+  })
+  .option('verbose', {
+    description: 'Print output from build and server scripts',
+    boolean: true
+  })
+  .strict(true)
+  .alias('help', 'h')
+  .epilogue('for more information, read the docs at https://github.com/zodern/meteor-up')
+  .help('help');
 
-if (program.args.length === 0) {
-  program.help();
-  process.exit(0);
-}
+addModuleCommands(program);
+
+program = program.argv;
+
+// .action(argAction)
+// .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
+// .option('--config <filePath>', 'mup.js config file', setConfigPath)
+// .option(
+// '--verbose',
+// 'Print output during build and executing scripts'
+// )
+// .on('--help', function() {
+//   console.log('   Commands:');
+
+//   function listModuleCommands(commands) {
+//     Object.keys(commands).forEach(command => {
+//       if (command === 'default') {
+//         listModuleCommands(commands['default']);
+//         return;
+//       }
+//       console.log(`     ${command}`);
+//     });
+//   }
+
+//   listModuleCommands(modules);
+
+//   console.log('');
+//   console.log('    For list of subcommands, run ');
+//   console.log('      mup <command> help');
+// })
+// .parse(process.argv);
+// if (program.args.length === 0) {
+//   program.help();
+//   process.exit(0);
+// }
 
 function argAction(arg, subarg) {
   let moduleArg = arg;

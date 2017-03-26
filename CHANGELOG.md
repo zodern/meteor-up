@@ -1,3 +1,15 @@
+## Next
+- All commands have a description and are listed in help
+- All options are shown in help
+- Improve module help
+- Add help for subcommands
+- Help is shown when an unknown option is used
+- Remove `mup proxy` and `mup docker dump` commands which were placeholders.
+- Use Yargs instead of commander
+- `mup help <command>` can also be used for subcommand help
+- Remove  `mup meteor push`. `mup meteor deploy` should be used instead.
+- Remove `mup meteor envconfig`. `mup reconfig` should be used instead
+
 ## 1.2.5 - March 22, 2017
 - Support changing docker exposed port @abernix
 - New `mup docker restart` command

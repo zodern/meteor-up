@@ -61,6 +61,7 @@
     "silent-npm-registry-client": "2.x.x",
     "ssh2": "0.4.x",
     "underscore": "1.x.x",
-    "uuid": "2.x.x"
+    "uuid": "2.x.x",
+    "yargs": "^7.0.2"
   }
 }
