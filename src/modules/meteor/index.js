@@ -119,7 +119,7 @@ export async function push(api) {
       // Looks for "force-ssl@" in the begining of a
       // line or at the start of the file
       var match = /(^|\s)force-ssl@/m;
-      if (match.test(contents)) {
+      if (match.test(contents) && !config.ssl) {
         console.log(
           'Your app is using the "force-ssl" package, but ssl is not setup in your mup config.'
         );
