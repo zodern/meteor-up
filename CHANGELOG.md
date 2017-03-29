@@ -1,3 +1,6 @@
+## 1.2.6 - Match 29, 20 
+- Fix `force-ssl` warning appearing when ssl is setup correctly
+
 ## 1.2.5 - March 22, 2017
 - Support changing docker exposed port @abernix
 - New `mup docker restart` command
