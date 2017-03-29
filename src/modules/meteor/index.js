@@ -1,6 +1,8 @@
 import * as _ from 'underscore';
 
 import { getDockerLogs, resolvePath, runTaskList } from '../utils';
+import { getConfig, getSessions, getSettings, getArgs, getBasePath } from '../../mup-api';
+import { argv } from 'yargs';
 
 import buildApp from './build.js';
 import debug from 'debug';
@@ -29,22 +31,22 @@ export function help() {
   console.log('mup meteor', Object.keys(this));
 }
 
-export function logs(api) {
+export function logs() {
   log('exec => mup meteor logs');
-  const config = api.getConfig().meteor;
+  const config = getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
-  const args = api.getArgs();
-  const sessions = api.getSessions(['meteor']);
+  const args = getArgs();
+  const sessions = getSessions(['meteor']);
   return getDockerLogs(config.name, sessions, args);
 }
 
-export function setup(api) {
+export function setup() {
   log('exec => mup meteor setup');
-  const config = api.getConfig().meteor;
+  const config = getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -60,7 +62,7 @@ export function setup(api) {
   });
 
   if (config.ssl && typeof config.ssl.autogenerate !== 'object') {
-    const basePath = api.getBasePath();
+    const basePath = getBasePath();
 
     if (config.ssl.upload !== false) {
       list.executeScript('Cleaning up SSL Certificates', {
@@ -88,28 +90,28 @@ export function setup(api) {
     });
   }
 
-  const sessions = api.getSessions(['meteor']);
+  const sessions = getSessions(['meteor']);
 
-  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+  return runTaskList(list, sessions, { verbose: argv.verbose });
 }
 
-export async function push(api) {
+export async function push() {
   log('exec => mup meteor push');
-  const config = api.getConfig().meteor;
+  const config = getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
-  const appPath = resolvePath(api.getBasePath(), config.path);
+  const appPath = resolvePath(getBasePath(), config.path);
 
   let buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation ||
     tmpBuildPath(appPath);
 
   var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
-
-  if (!api.optionEnabled('cached-build')) {
+  console.dir(argv);
+  if (!argv['cached-build']) {
     // Check if using force-ssl package and ssl is not setup.
     // This is a common problem people encounter when deploying
     try {
@@ -131,7 +133,7 @@ export async function push(api) {
     }
 
     console.log('Building App Bundle Locally');
-    await buildApp(appPath, buildOptions, api.getVerbose());
+    await buildApp(appPath, buildOptions, argv.verbose);
   } else {
     const buildCached = fs.existsSync(bundlePath);
     if (!buildCached) {
@@ -151,17 +153,17 @@ export async function push(api) {
     progressBar: config.enableUploadProgressBar
   });
 
-  const sessions = api.getSessions(['meteor']);
+  const sessions = getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
-    verbose: api.getVerbose()
+    verbose: argv.verbose
   });
 }
 
-export function envconfig(api) {
+export function envconfig() {
   log('exec => mup meteor envconfig');
 
-  const config = api.getConfig().meteor;
+  const config = getConfig().meteor;
   let bindAddress = '0.0.0.0';
 
   if (!config) {
@@ -215,7 +217,7 @@ export function envconfig(api) {
     dest: '/opt/' + config.name + '/config/start.sh',
     vars: {
       appName: config.name,
-      useLocalMongo: api.getConfig().mongo ? 1 : 0,
+      useLocalMongo: getConfig().mongo ? 1 : 0,
       port: config.env.PORT || 80,
       bind: bindAddress,
       sslConfig: config.ssl,
@@ -227,7 +229,7 @@ export function envconfig(api) {
   });
 
   var env = _.clone(config.env);
-  env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
+  env.METEOR_SETTINGS = JSON.stringify(getSettings());
   // sending PORT to the docker container is useless.
   // It'll run on PORT 80 and we can't override it
   // Changing the port is done via the start.sh script
@@ -242,16 +244,16 @@ export function envconfig(api) {
     }
   });
 
-  const sessions = api.getSessions(['meteor']);
+  const sessions = getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
-    verbose: api.getVerbose()
+    verbose: argv.verbose
   });
 }
 
-export function start(api) {
+export function start() {
   log('exec => mup meteor start');
-  const config = api.getConfig().meteor;
+  const config = getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -275,30 +277,30 @@ export function start(api) {
     }
   });
 
-  const sessions = api.getSessions(['meteor']);
+  const sessions = getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
-    verbose: api.getVerbose()
+    verbose: argv.verbose
   });
 }
 
-export function deploy(api) {
+export function deploy() {
   log('exec => mup meteor deploy');
 
   // validate settings and config before starting
-  api.getSettings();
-  const config = api.getConfig().meteor;
+  getSettings();
+  const config = getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
-  return push(api).then(() => envconfig(api)).then(() => start(api));
+  return push().then(() => envconfig()).then(() => start());
 }
 
-export function stop(api) {
+export function stop() {
   log('exec => mup meteor stop');
-  const config = api.getConfig().meteor;
+  const config = getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -313,6 +315,6 @@ export function stop(api) {
     }
   });
 
-  const sessions = api.getSessions(['meteor']);
-  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+  const sessions = getSessions(['meteor']);
+  return runTaskList(list, sessions, { verbose: argv.verbose });
 }

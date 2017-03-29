@@ -4,10 +4,13 @@ import { resolvePath } from '../utils';
 import { runTaskList } from '../utils';
 import { each } from 'async';
 import chalk from 'chalk';
+import { getSessions, getArgs } from '../../mup-api';
+import { argv } from 'yargs';
+
 const log = debug('mup:module:docker');
 
-function uniqueSessions(api) {
-  const sessions = api.getSessions(['meteor', 'mongo', 'proxy']);
+function uniqueSessions() {
+  const sessions = getSessions(['meteor', 'mongo', 'proxy']);
   return sessions.reduce(
     (prev, curr) => {
       if (prev.map(session => session._host).indexOf(curr._host) === -1) {
@@ -19,11 +22,7 @@ function uniqueSessions(api) {
   );
 }
 
-export function help() {
-  log('exec => mup docker help');
-}
-
-export function setup(api) {
+export function setup() {
   log('exec => mup docker setup');
   const list = nodemiral.taskList('Setup Docker');
 
@@ -31,26 +30,26 @@ export function setup(api) {
     script: resolvePath(__dirname, 'assets/docker-setup.sh')
   });
 
-  const sessions = uniqueSessions(api);
-  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+  const sessions = uniqueSessions();
+  return runTaskList(list, sessions, { verbose: argv.verbose });
 }
 
-export function restart(api) {
+export function restart() {
   const list = nodemiral.taskList('Restart Docker Daemon');
 
   list.executeScript('Restart Docker', {
     script: resolvePath(__dirname, 'assets/docker-restart.sh')
   });
 
-  const sessions = uniqueSessions(api);
+  const sessions = uniqueSessions();
 
-  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+  return runTaskList(list, sessions, { verbose: argv.verbose });
 }
 
-export function ps(api) {
-  let args = api.getArgs();
+export function ps() {
+  let args = getArgs();
   args.shift();
-  each(uniqueSessions(api), (session, cb) => {
+  each(uniqueSessions(), (session, cb) => {
     session.execute(`sudo docker ${args.join(' ')} 2>&1`, (err, code, logs) => {
       console.log(chalk.magenta(`[${session._host}]`) + chalk.blue(` docker ${args.join(' ')}`));
       console.log(logs.stdout);

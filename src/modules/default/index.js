@@ -6,14 +6,15 @@ import debug from 'debug';
 import { resolvePath } from '../utils';
 import sh from 'shelljs';
 import fs from 'fs';
+import { getConfig } from '../../mup-api';
 
 const log = debug('mup:module:default');
 
 sh.config.silent = true;
 
-export function deploy(api) {
+export function deploy() {
   log('exec => mup deploy');
-  return meteor.deploy(api);
+  return meteor.deploy();
 }
 
 export function help() {
@@ -58,22 +59,22 @@ export function init() {
   }
 }
 
-export function logs(api) {
+export function logs() {
   log('exec => mup logs');
-  return meteor.logs(api);
+  return meteor.logs();
 }
 
-export function reconfig(api) {
+export function reconfig() {
   log('exec => mup reconfig');
-  return meteor.envconfig(api).then(() => meteor.start(api));
+  return meteor.envconfig().then(() => meteor.start());
 }
 
-export function restart(api) {
+export function restart() {
   log('exec => mup restart');
-  return meteor.stop(api).then(() => meteor.start(api));
+  return meteor.stop().then(() => meteor.start());
 }
 
-export function setup(api) {
+export function setup() {
   function displayNextSteps() {
     console.log('');
     console.log('Next, you should run:');
@@ -81,29 +82,29 @@ export function setup(api) {
   }
 
   log('exec => mup setup');
-  const config = api.getConfig();
+  const config = getConfig();
   return docker
-    .setup(api)
-    .then(meteor.setup.bind(null, api))
+    .setup()
+    .then(meteor.setup)
     .then(() => {
       if (config.mongo) {
-        return mongo.setup(api);
+        return mongo.setup();
       }
     })
     .then(() => {
       if (config.mongo) {
-        return mongo.start(api);
+        return mongo.start();
       }
     })
     .then(displayNextSteps);
 }
 
-export function start(api) {
+export function start() {
   log('exec => mup start');
-  return meteor.start(api);
+  return meteor.start();
 }
 
-export function stop(api) {
+export function stop() {
   log('exec => mup stop');
-  return meteor.stop(api);
+  return meteor.stop();
 }
