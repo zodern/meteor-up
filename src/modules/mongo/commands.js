@@ -1,9 +1,21 @@
-import * as commandFunctions from './';
-export let description = 'Commands to manage MongoDB';
-export function commands(parser) {
-  return parser
-    .command('setup', 'Installs and starts MongoDB', {}, commandFunctions.setup)
-    .command('logs', 'View MongoDB logs', {}, commandFunctions.logs)
-    .command('start', 'Start MongoDB', {}, commandFunctions.start)
-    .command('stop', 'Stop MongoDB', {}, commandFunctions.stop);
-}
+import * as commandFunctions from './tasks';
+
+export let setup = {
+  description: 'Installs and starts MongoDB',
+  handler: commandFunctions.setup
+};
+
+export let logs = {
+  description: 'View MongoDB logs',
+  handler: commandFunctions.logs
+};
+
+export let start = {
+  description: 'Start MongoDB',
+  handler: commandFunctions.start
+};
+
+export let stop = {
+  description: 'Stop MongoDB',
+  handler: commandFunctions.stop
+};

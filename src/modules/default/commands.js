@@ -1,40 +1,61 @@
-import * as commandFunctions from './index';
-export function commands(parser) {
-  return parser
-    .command('init', 'Setup files for new mup project', {}, commandFunctions.init)
-    .command(
-      'deploy',
-      'Deploy app to servers',
-      yargs => {
-        return yargs.option('cached-build', {
-          description: 'Use build from previous deploy',
-          boolean: true
-        });
-      },
-      commandFunctions.deploy
-    )
-    .command(
-      'logs',
-      "Show app's logs. Supports options from docker logs",
-      yargs => {
-        return yargs
-          .strict(false)
-          .option('tail', {
-            description: 'Number of lines to show from the end of the logs',
-            number: true,
-            default: 'all'
-          })
-          .option('follow', {
-            description: 'Follow log output',
-            alias: 'f',
-            boolean: true
-          });
-      },
-      commandFunctions.logs
-    )
-    .command('reconfig', 'Updates server env and start script to match config', {}, commandFunctions.reconfig)
-    .command('restart', 'Restart apps', {}, commandFunctions.restart)
-    .command('setup', 'Install depedencies on server, setups custom certificates and mongodb to match config', {}, commandFunctions.setup)
-    .command('start', 'Start app', {}, commandFunctions.start)
-    .command('stop', 'Stop app', {}, commandFunctions.stop);
-}
+import * as commandFunctions from './tasks';
+
+export let init = {
+  description: 'Setup files for new mup project',
+  handler: commandFunctions.init
+};
+
+export let deploy = {
+  description: 'Deploy app to server',
+  builder(yargs) {
+    return yargs.option('cached-build', {
+      description: 'Use build from previous deploy',
+      boolean: true
+    });
+  },
+  handler: commandFunctions.deploy
+};
+
+export let logs = {
+  description: "Show app\'s logs. Supports options from docker logs",
+  builder(yargs) {
+    return yargs
+      .strict(false)
+      .option('tail', {
+        description: 'Number of lines to show form the end of the logs',
+        nubmer: true,
+        default: 'all'
+      })
+      .option('follow', {
+        description: 'Follow log output',
+        alias: 'f',
+        boolean: true
+      });
+  },
+  handler: commandFunctions.logs
+};
+
+export let reconfig = {
+  description: 'Updates server env and start script to match config',
+  handler: commandFunctions.reconfig
+};
+
+export let restart = {
+  description: 'Restart app',
+  handler: commandFunctions.restart
+};
+
+export let setup = {
+  description: 'Install dependencies, custom certificates, and MongoDB on server',
+  handler: commandFunctions.setup
+};
+
+export let start = {
+  description: 'Start app',
+  handler: commandFunctions.start
+};
+
+export let stop = {
+  description: 'Stop app',
+  handler: commandFunctions.stop
+};

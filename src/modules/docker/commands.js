@@ -1,17 +1,16 @@
-import * as commandFunctions from './index';
-export let description = "Setup docker, and access it's commands";
+import * as commandFunctions from './tasks';
 
-export function commands(builder) {
-  return builder
-    .command('setup', 'Install and start docker', {}, commandFunctions.setup)
-    .command('restart', 'Restart docker daemon', {}, commandFunctions.restart)
-    .command(
-      'ps',
-      'View running containers. Accepts same options as docker ps',
-      (subBuilder) => {
-        return subBuilder.strict(false);
-      },
-      commandFunctions.ps
-    )
-    .strict(false);
-}
+export let setup = {
+  description: 'Install and start docker',
+  handler: commandFunctions.setup
+};
+
+export let restart = {
+  description: 'Restart docker daemon',
+  handler: commandFunctions.restart
+};
+
+export let ps = {
+  description: 'View running containers. Accepts same options as docker ps',
+  handler: commandFunctions.ps
+};

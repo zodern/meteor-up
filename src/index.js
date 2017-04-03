@@ -37,6 +37,10 @@ addModuleCommands(program);
 
 program = program.argv;
 
+if (program._.length === 0) {
+  yargs.showHelp();
+}
+
 // .action(argAction)
 // .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
 // .option('--config <filePath>', 'mup.js config file', setConfigPath)

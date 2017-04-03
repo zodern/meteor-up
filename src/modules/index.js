@@ -17,28 +17,48 @@ function isMupModule(name) {
   return fs.statSync(moduleDir).isDirectory();
 }
 
-export function addModuleCommands(parser) {
-  Object.keys(modules).forEach(moduleName => {
-    let description;
-    let commands;
-    try {
-      description = require(`./${moduleName}/commands.js`).description;
-      commands = require(`./${moduleName}/commands.js`).commands;
-    } catch (e) {
-      if (e.code !== 'MODULE_NOT_FOUND') {
-        console.log(e);
-      }
-      return;
-    }
-    if (moduleName !== 'default') {
-      parser.command(moduleName, description, commands);
-    } else {
-      commands(parser);
-    }
-  });
-}
-
 function loadModule(name) {
   const moduleDir = path.join(__dirname, name);
   modules[name] = require(moduleDir); // eslint-disable-line global-require
+}
+
+function addCommands(_yargs, module, moduleName) {
+  let yargs = _yargs;
+  Object.keys(module.commands).forEach((commandName) => {
+    let command = module.commands[commandName];
+    command.builder = command.builder || {};
+    yargs = yargs.command(
+        commandName,
+        command.description,
+        command.builder,
+        command.handler
+    );
+  });
+  if (moduleName !== 'default') {
+    yargs.command(
+    '*',
+    false,
+    {},
+    () => {
+      console.log(`Run "mup ${moduleName} help" for list of commands`);
+    }
+  );
+  }
+  return yargs;
+}
+
+export function addModuleCommands(yargs) {
+  Object.keys(modules).forEach(moduleName => {
+    if (moduleName !== 'default' && modules[moduleName].commands) {
+      yargs.command(
+        moduleName,
+        modules[moduleName].description,
+        (subYargs) => {
+          return addCommands(subYargs, modules[moduleName], moduleName);
+        }
+      );
+    } else if (moduleName === 'default') {
+      addCommands(yargs, modules[moduleName], moduleName);
+    }
+  });
 }
