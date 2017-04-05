@@ -239,6 +239,7 @@ rules:
   quotes:
   - 2
   - single
+  - avoidEscape: true
   radix: 2
   require-yield: 2
   semi:

@@ -2,28 +2,25 @@ import chalk from 'chalk';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
-import path from 'path';
 import { resolvePath } from './modules/utils';
-import validateConfig from './validate/index';
+import configValidator from './validate/index';
+import path from 'path';
 
 export default class MupAPI {
-  constructor(base, args, configPath, settingsPath, verbose) {
+  constructor(base, filteredArgs, program) {
     this.base = base;
-    this.args = args;
+    this.args = filteredArgs;
     this.config = null;
     this.settings = null;
     this.sessions = null;
-    this.configPath = configPath;
-    this.settingsPath = settingsPath;
-    this.verbose = verbose;
+    this.configPath = program['config'];
+    this.settingsPath = program['settings'];
+    this.verbose = program.verbose;
+    this.program = program;
   }
 
   getArgs() {
     return this.args;
-  }
-
-  optionEnabled(long) {
-    return this.args.indexOf(`--${long}`) > -1;
   }
 
   getBasePath() {
@@ -35,11 +32,11 @@ export default class MupAPI {
   }
 
   validateConfig(configPath) {
-    let problems = validateConfig(this.config);
+    let problems = configValidator(this.config);
 
     if (problems.length > 0) {
       let red = chalk.red;
-      let plural = problems.length > 1 ? 's' : 's';
+      let plural = problems.length > 1 ? 's' : '';
 
       console.log(`loaded mup.js from ${configPath}`);
       console.log('');
@@ -71,7 +68,9 @@ export default class MupAPI {
         this.config = require(filePath); // eslint-disable-line global-require
       } catch (e) {
         if (e.code === 'MODULE_NOT_FOUND') {
-          console.error('"mup.js" file not found. Run "mup init" first.');
+          console.error('"mup.js" file not found at');
+          console.error(`  ${filePath}`);
+          console.error('Run "mup init" to create it.');
         } else {
           console.error(e);
         }
