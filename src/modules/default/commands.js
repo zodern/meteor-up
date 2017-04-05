@@ -23,8 +23,7 @@ export let logs = {
       .strict(false)
       .option('tail', {
         description: 'Number of lines to show form the end of the logs',
-        nubmer: true,
-        default: 'all'
+        number: true
       })
       .option('follow', {
         description: 'Follow log output',

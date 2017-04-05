@@ -1,5 +1,4 @@
 import { getDockerLogs, resolvePath, runTaskList } from '../utils';
-import { getArgs, getSessions, getConfig } from '../../mup-api';
 import { argv } from 'yargs';
 
 import debug from 'debug';
@@ -15,19 +14,19 @@ export function help() {
   log('exec => mup mongo help');
 }
 
-export function logs() {
+export function logs(api) {
   log('exec => mup mongo logs');
 
-  const args = getArgs();
-  const sessions = getSessions(['mongo']);
+  const args = api.getArgs();
+  const sessions = api.getSessions(['mongo']);
   args.shift(); // remove mongo from args sent to docker
   return getDockerLogs('mongodb', sessions, args);
 }
 
-export function setup() {
+export function setup(api) {
   log('exec => mup mongo setup');
 
-  if (!getConfig().mongo) {
+  if (!api.getConfig().mongo) {
     // could happen when running "mup mongo setup"
     console.log(
       'Not setting up built-in mongodb since there is no mongo config'
@@ -35,8 +34,8 @@ export function setup() {
     return;
   }
 
-  const mongoSessions = getSessions(['mongo']);
-  const meteorSessions = getSessions(['meteor']);
+  const mongoSessions = api.getSessions(['mongo']);
+  const meteorSessions = api.getSessions(['meteor']);
 
   if (meteorSessions.length !== 1) {
     console.log(
@@ -61,17 +60,17 @@ export function setup() {
     dest: '/opt/mongodb/mongodb.conf'
   });
 
-  const sessions = getSessions(['mongo']);
+  const sessions = api.getSessions(['mongo']);
 
   return runTaskList(list, sessions, { verbose: argv.verbose });
 }
 
-export function start() {
+export function start(api) {
   log('exec => mup mongo start');
 
-  const mongoSessions = getSessions(['mongo']);
-  const meteorSessions = getSessions(['meteor']);
-  const config = getConfig().mongo;
+  const mongoSessions = api.getSessions(['mongo']);
+  const meteorSessions = api.getSessions(['meteor']);
+  const config = api.getConfig().mongo;
 
   if (
     meteorSessions.length !== 1 ||
@@ -90,11 +89,11 @@ export function start() {
     }
   });
 
-  const sessions = getSessions(['mongo']);
+  const sessions = api.getSessions(['mongo']);
   return runTaskList(list, sessions, { verbose: argv.verbose });
 }
 
-export function stop() {
+export function stop(api) {
   log('exec => mup mongo stop');
   const list = nodemiral.taskList('Stop Mongo');
 
@@ -102,6 +101,6 @@ export function stop() {
     script: resolvePath(__dirname, 'assets/mongo-stop.sh')
   });
 
-  const sessions = getSessions(['mongo']);
+  const sessions = api.getSessions(['mongo']);
   return runTaskList(list, sessions, { verbose: argv.verbose });
 }

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-
+import commandWrapper from './command-wrapper';
 const modules = {};
 export default modules;
 
@@ -31,7 +31,7 @@ function addCommands(_yargs, module, moduleName) {
         commandName,
         command.description,
         command.builder,
-        command.handler
+        commandWrapper(command.handler)
     );
   });
   if (moduleName !== 'default') {

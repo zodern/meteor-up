@@ -4,13 +4,12 @@ import { resolvePath } from '../utils';
 import { runTaskList } from '../utils';
 import { each } from 'async';
 import chalk from 'chalk';
-import { getSessions, getArgs } from '../../mup-api';
 import { argv } from 'yargs';
 
 const log = debug('mup:module:docker');
 
-function uniqueSessions() {
-  const sessions = getSessions(['meteor', 'mongo', 'proxy']);
+function uniqueSessions(api) {
+  const sessions = api.getSessions(['meteor', 'mongo', 'proxy']);
   return sessions.reduce(
     (prev, curr) => {
       if (prev.map(session => session._host).indexOf(curr._host) === -1) {
@@ -22,7 +21,7 @@ function uniqueSessions() {
   );
 }
 
-export function setup() {
+export function setup(api) {
   log('exec => mup docker setup');
   const list = nodemiral.taskList('Setup Docker');
 
@@ -30,26 +29,26 @@ export function setup() {
     script: resolvePath(__dirname, 'assets/docker-setup.sh')
   });
 
-  const sessions = uniqueSessions();
+  const sessions = uniqueSessions(api);
   return runTaskList(list, sessions, { verbose: argv.verbose });
 }
 
-export function restart() {
+export function restart(api) {
   const list = nodemiral.taskList('Restart Docker Daemon');
 
   list.executeScript('Restart Docker', {
     script: resolvePath(__dirname, 'assets/docker-restart.sh')
   });
 
-  const sessions = uniqueSessions();
+  const sessions = uniqueSessions(api);
 
   return runTaskList(list, sessions, { verbose: argv.verbose });
 }
 
-export function ps() {
-  let args = getArgs();
+export function ps(api) {
+  let args = api.getArgs();
   args.shift();
-  each(uniqueSessions(), (session, cb) => {
+  each(uniqueSessions(api), (session, cb) => {
     session.execute(`sudo docker ${args.join(' ')} 2>&1`, (err, code, logs) => {
       console.log(chalk.magenta(`[${session._host}]`) + chalk.blue(` docker ${args.join(' ')}`));
       console.log(logs.stdout);

@@ -6,15 +6,14 @@ import debug from 'debug';
 import { resolvePath } from '../utils';
 import sh from 'shelljs';
 import fs from 'fs';
-import { getConfig } from '../../mup-api';
 
 const log = debug('mup:module:default');
 
 sh.config.silent = true;
 
-export function deploy() {
+export function deploy(api) {
   log('exec => mup deploy');
-  return meteor.deploy();
+  return meteor.deploy(api);
 }
 
 export function help() {
@@ -59,22 +58,22 @@ export function init() {
   }
 }
 
-export function logs() {
+export function logs(api) {
   log('exec => mup logs');
-  return meteor.logs();
+  return meteor.logs(api);
 }
 
-export function reconfig() {
+export function reconfig(api) {
   log('exec => mup reconfig');
-  return meteor.envconfig().then(() => meteor.start());
+  return meteor.envconfig(api).then(() => meteor.start(api));
 }
 
-export function restart() {
+export function restart(api) {
   log('exec => mup restart');
-  return meteor.stop().then(() => meteor.start());
+  return meteor.stop(api).then(() => meteor.start(api));
 }
 
-export function setup() {
+export function setup(api) {
   function displayNextSteps() {
     console.log('');
     console.log('Next, you should run:');
@@ -82,29 +81,29 @@ export function setup() {
   }
 
   log('exec => mup setup');
-  const config = getConfig();
+  const config = api.getConfig();
   return docker
-    .setup()
-    .then(meteor.setup)
+    .setup(api)
+    .then(() => meteor.setup(api))
     .then(() => {
       if (config.mongo) {
-        return mongo.setup();
+        return mongo.setup(api);
       }
     })
     .then(() => {
       if (config.mongo) {
-        return mongo.start();
+        return mongo.start(api);
       }
     })
     .then(displayNextSteps);
 }
 
-export function start() {
+export function start(api) {
   log('exec => mup start');
-  return meteor.start();
+  return meteor.start(api);
 }
 
-export function stop() {
+export function stop(api) {
   log('exec => mup stop');
-  return meteor.stop();
+  return meteor.stop(api);
 }

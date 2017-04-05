@@ -1,8 +1,6 @@
 import * as _ from 'underscore';
 
 import { getDockerLogs, resolvePath, runTaskList } from '../utils';
-import { getConfig, getSessions, getSettings, getArgs, getBasePath } from '../../mup-api';
-import { argv } from 'yargs';
 
 import buildApp from './build.js';
 import debug from 'debug';
@@ -31,22 +29,25 @@ export function help() {
   console.log('mup meteor', Object.keys(this));
 }
 
-export function logs() {
+export function logs(api) {
   log('exec => mup meteor logs');
-  const config = getConfig().meteor;
+  const config = api.getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
-  const args = getArgs();
-  const sessions = getSessions(['meteor']);
+  const args = api.getArgs();
+  if (args[0] === 'meteor') {
+    args.shift();
+  }
+  const sessions = api.getSessions(['meteor']);
   return getDockerLogs(config.name, sessions, args);
 }
 
-export function setup() {
+export function setup(api) {
   log('exec => mup meteor setup');
-  const config = getConfig().meteor;
+  const config = api.getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -62,7 +63,7 @@ export function setup() {
   });
 
   if (config.ssl && typeof config.ssl.autogenerate !== 'object') {
-    const basePath = getBasePath();
+    const basePath = api.getBasePath();
 
     if (config.ssl.upload !== false) {
       list.executeScript('Cleaning up SSL Certificates', {
@@ -90,27 +91,27 @@ export function setup() {
     });
   }
 
-  const sessions = getSessions(['meteor']);
+  const sessions = api.getSessions(['meteor']);
 
-  return runTaskList(list, sessions, { verbose: argv.verbose });
+  return runTaskList(list, sessions, { verbose: api.verbose });
 }
 
-export async function push() {
+export async function push(api) {
   log('exec => mup meteor push');
-  const config = getConfig().meteor;
+  const config = api.getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
-  const appPath = resolvePath(getBasePath(), config.path);
+  const appPath = resolvePath(api.getBasePath(), config.path);
 
   let buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation ||
     tmpBuildPath(appPath);
 
   var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
-  if (!argv['cached-build']) {
+  if (!api.program['cached-build']) {
     // Check if using force-ssl package and ssl is not setup.
     // This is a common problem people encounter when deploying
     try {
@@ -132,7 +133,7 @@ export async function push() {
     }
 
     console.log('Building App Bundle Locally');
-    await buildApp(appPath, buildOptions, argv.verbose);
+    await buildApp(appPath, buildOptions, api.verbose);
   } else {
     const buildCached = fs.existsSync(bundlePath);
     if (!buildCached) {
@@ -152,17 +153,17 @@ export async function push() {
     progressBar: config.enableUploadProgressBar
   });
 
-  const sessions = getSessions(['meteor']);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
-    verbose: argv.verbose
+    verbose: api.verbose
   });
 }
 
-export function envconfig() {
+export function envconfig(api) {
   log('exec => mup meteor envconfig');
 
-  const config = getConfig().meteor;
+  const config = api.getConfig().meteor;
   let bindAddress = '0.0.0.0';
 
   if (!config) {
@@ -216,7 +217,7 @@ export function envconfig() {
     dest: '/opt/' + config.name + '/config/start.sh',
     vars: {
       appName: config.name,
-      useLocalMongo: getConfig().mongo ? 1 : 0,
+      useLocalMongo: api.getConfig().mongo ? 1 : 0,
       port: config.env.PORT || 80,
       bind: bindAddress,
       sslConfig: config.ssl,
@@ -228,7 +229,7 @@ export function envconfig() {
   });
 
   var env = _.clone(config.env);
-  env.METEOR_SETTINGS = JSON.stringify(getSettings());
+  env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
   // sending PORT to the docker container is useless.
   // It'll run on PORT 80 and we can't override it
   // Changing the port is done via the start.sh script
@@ -243,16 +244,16 @@ export function envconfig() {
     }
   });
 
-  const sessions = getSessions(['meteor']);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
-    verbose: argv.verbose
+    verbose: api.verbose
   });
 }
 
-export function start() {
+export function start(api) {
   log('exec => mup meteor start');
-  const config = getConfig().meteor;
+  const config = api.getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -276,30 +277,30 @@ export function start() {
     }
   });
 
-  const sessions = getSessions(['meteor']);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
-    verbose: argv.verbose
+    verbose: api.verbose
   });
 }
 
-export function deploy() {
+export function deploy(api) {
   log('exec => mup meteor deploy');
 
   // validate settings and config before starting
-  getSettings();
-  const config = getConfig().meteor;
+  api.getSettings();
+  const config = api.getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
-  return push().then(() => envconfig()).then(() => start());
+  return push(api).then(() => envconfig(api)).then(() => start(api));
 }
 
-export function stop() {
+export function stop(api) {
   log('exec => mup meteor stop');
-  const config = getConfig().meteor;
+  const config = api.getConfig().meteor;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -314,6 +315,6 @@ export function stop() {
     }
   });
 
-  const sessions = getSessions(['meteor']);
-  return runTaskList(list, sessions, { verbose: argv.verbose });
+  const sessions = api.getSessions(['meteor']);
+  return runTaskList(list, sessions, { verbose: api.verbose });
 }
