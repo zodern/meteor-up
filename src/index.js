@@ -1,5 +1,5 @@
 import checkUpdates from './updates';
-import modules from './modules/';
+import modules, { loadPlugins } from './modules/';
 import pkg from '../package.json';
 // import program from 'commander';
 import yargs from 'yargs';
@@ -66,6 +66,12 @@ function commandWrapper(handler) {
       console.error(e);
     });
   };
+}
+
+// Load plugins
+let config = new MupAPI(process.cwd(), process.argv, yargs.argv).getConfig();
+if (config.plugins) {
+  loadPlugins(config.plugins);
 }
 
 let program = yargs
