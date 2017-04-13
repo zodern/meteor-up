@@ -36,10 +36,36 @@ docker network disconnect bridge -f $APPNAME-nginx-proxy
 echo "Removed $APPNAME-nginx-proxy"
 
 # We don't need to fail the deployment because of a docker hub downtime
+<% if (docker.image === 'cache-build') { %>
+rm -rf $APP_PATH/tmp/build
+mkdir $APP_PATH/tmp/build
+tar xzf $BUNDLE_PATH/bundle.tar.gz -C $APP_PATH/tmp/build
+cd $APP_PATH/tmp/build
+
+cat <<EOF > ./Dockerfile
+ FROM abernix/meteord:base
+#  RUN mkdir -p /bundle/programs/server
+#  WORKDIR /bundle/programs/server
+ #ADD bundle/programs/server/package.json ./package.json
+ #ADD bundle/programs/server/npm-shrinkwrap.json ./npm-shrinkwrap.json
+ #ADD bundle/programs/server/npm-rebuild.js ./npm-rebuild.js
+ #ADD bundle/programs/server/npm-rebuild-args.js ./npm-rebuild-args.js
+#  ADD bundle/programs/server ./
+ WORKDIR /bundle
+ COPY . /bundle
+ WORKDIR /bundle/bundle/programs/server
+ RUN npm install --unsafe-perm
+ WORKDIR /bundle/bundle
+ ENTRYPOINT node main.js
+EOF
+docker build -t $APPNAME .
+<% } else { %>
 set +e
 docker pull <%= docker.image %>
 set -e
 echo "Pulled <%= docker.image %>"
+
+<% } %>
 
 docker run \
   -d \
@@ -63,7 +89,7 @@ docker run \
     -e "LETSENCRYPT_EMAIL=<%= sslConfig.autogenerate.email %>" \
   <% } %> \
   --name=$APPNAME \
-  <%= docker.image %>
+  <%= docker.image === 'cache-build' ? '$APPNAME' : docker.image %>
 echo "Ran <%= docker.image %>"
 sleep 15s
 
