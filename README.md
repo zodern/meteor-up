@@ -158,6 +158,7 @@ module.exports = {
   },
 
   mongo: { // (optional)
+    bind: '127.0.0.1',
     port: 27017,
     version: '3.4.1', // (optional), default is 3.4.1
     servers: {

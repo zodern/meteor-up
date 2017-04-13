@@ -1,6 +1,8 @@
 #!/bin/bash
 
 MONGO_VERSION=<%= mongoVersion %>
+MONGO_BIND_IP=<%= mongoBindIp %>
+MONGO_PORT=<%= mongoPort %>
 
 set -e
 # we use this data directory for the backward compatibility
@@ -20,7 +22,7 @@ echo "Running mongo:<%= mongoVersion %>"
 sudo docker run \
   -d \
   --restart=always \
-  --publish=127.0.0.1:27017:27017 \
+  --publish=$MONGO_BIND_IP:$MONGO_PORT:$MONGO_PORT \
   --volume=/var/lib/mongodb:/data/db \
   --volume=/opt/mongodb/mongodb.conf:/mongodb.conf \
   --name=mongodb \
