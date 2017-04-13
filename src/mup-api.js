@@ -2,25 +2,28 @@ import chalk from 'chalk';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
-import { resolvePath } from './modules/utils';
-import configValidator from './validate/index';
 import path from 'path';
+import { resolvePath } from './modules/utils';
+import validateConfig from './validate/index';
 
 export default class MupAPI {
-  constructor(base, filteredArgs, program) {
+  constructor(base, args, configPath, settingsPath, verbose) {
     this.base = base;
-    this.args = filteredArgs;
+    this.args = args;
     this.config = null;
     this.settings = null;
     this.sessions = null;
-    this.configPath = program['config'];
-    this.settingsPath = program['settings'];
-    this.verbose = program.verbose;
-    this.program = program;
+    this.configPath = configPath;
+    this.settingsPath = settingsPath;
+    this.verbose = verbose;
   }
 
   getArgs() {
     return this.args;
+  }
+
+  optionEnabled(long) {
+    return this.args.indexOf(`--${long}`) > -1;
   }
 
   getBasePath() {
@@ -32,11 +35,11 @@ export default class MupAPI {
   }
 
   validateConfig(configPath) {
-    let problems = configValidator(this.config);
+    let problems = validateConfig(this.config);
 
     if (problems.length > 0) {
       let red = chalk.red;
-      let plural = problems.length > 1 ? 's' : '';
+      let plural = problems.length > 1 ? 's' : 's';
 
       console.log(`loaded mup.js from ${configPath}`);
       console.log('');
@@ -68,9 +71,7 @@ export default class MupAPI {
         this.config = require(filePath); // eslint-disable-line global-require
       } catch (e) {
         if (e.code === 'MODULE_NOT_FOUND') {
-          console.error('"mup.js" file not found at');
-          console.error(`  ${filePath}`);
-          console.error('Run "mup init" to create it.');
+          console.error('"mup.js" file not found. Run "mup init" first.');
         } else {
           console.error(e);
         }

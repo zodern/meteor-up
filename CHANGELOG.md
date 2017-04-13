@@ -1,13 +1,5 @@
-## Next
-- All commands have a description and are listed in help
-- All options are shown in help
-- Remove `mup proxy` and `mup docker dump` commands which were placeholders.
-- Remove  `mup meteor push`. `mup meteor deploy` should be used instead.
-- Remove `mup meteor envconfig`. `mup reconfig` should be used instead
-
 ## 1.2.6 - Match 29, 20 
 - Fix `force-ssl` warning appearing when ssl is setup correctly
-
 
 ## 1.2.5 - March 22, 2017
 - Support changing docker exposed port @abernix
