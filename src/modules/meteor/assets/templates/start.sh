@@ -7,6 +7,8 @@ BUNDLE_PATH=$APP_PATH/current
 ENV_FILE=$APP_PATH/config/env.list
 PORT=<%= port %>
 BIND=<%= bind %>
+NGINX_PROXY_VERSION=latest
+LETS_ENCRYPT_VERSION=v1.4
 
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
@@ -79,8 +81,8 @@ EOT
 
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
-    docker pull jrcs/letsencrypt-nginx-proxy-companion:latest
-    docker pull jwilder/nginx-proxy
+    docker pull jrcs/letsencrypt-nginx-proxy-companion:$LETS_ENCRYPT_VERSION
+    docker pull jwilder/nginx-proxy:$NGINX_PROXY_VERSION
     set -e
 
     echo "Pulled autogenerate images"
@@ -88,12 +90,13 @@ EOT
       --name $APPNAME-nginx-proxy \
       --restart=always \
       -e "HTTPS_METHOD=noredirect" \
+      -e "DEFAULT_HOST=<%= sslConfig.autogenerate.domains.split(',')[0] %>" \
       -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
       -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
       -v /var/run/docker.sock:/tmp/docker.sock:ro \
-      jwilder/nginx-proxy
+      jwilder/nginx-proxy:$NGINX_PROXY_VERSION
       echo "Ran nginx-proxy"
     sleep 15s
 
@@ -103,7 +106,7 @@ EOT
       --volumes-from $APPNAME-nginx-proxy \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:rw \
       -v /var/run/docker.sock:/var/run/docker.sock:ro \
-      jrcs/letsencrypt-nginx-proxy-companion
+      jrcs/letsencrypt-nginx-proxy-companion:$LETS_ENCRYPT_VERSION
     echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
   <% } else { %>
     # We don't need to fail the deployment because of a docker hub downtime
