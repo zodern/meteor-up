@@ -474,6 +474,9 @@ Make sure that the docker image you are using supports your app's meteor version
 #### Check Logs
 If you suddenly can't deploy your app anymore, first use the `mup logs -f` command to check the logs for error messages.
 
+### Increase RAM
+Many problems are caused by the server running out of ram.
+
 #### Verbose Output
 If you need to see the output of `mup` (to see more precisely where it's failing or hanging, for example), run it like so:
 
@@ -500,9 +503,9 @@ If it silently fails for a different reason, please create an issue.
 
 This usually happens when meteor is not installed.
 
-> Seems like random errors during build or deploy
+> Redirects to https
 
-Make sure both the machines you are deploying from and to have enough ram.
+Make sure `force-ssl` is not in `.meteor/versions`.
 
 ### Migrating from Meteor Up 0.x
 
