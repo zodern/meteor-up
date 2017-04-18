@@ -150,7 +150,7 @@ module.exports = {
       }
     },
     deployCheckWaitTime: 60, // default 10
-    deployCheckPort: 80 // lets you define which port to check after the deploy process, if it differs from the meteor port you are serving (like meteor behind a proxy/firewall) (optional)
+    deployCheckPort: 80, // lets you define which port to check after the deploy process, if it differs from the meteor port you are serving (like meteor behind a proxy/firewall) (optional)
 
     // Shows progress bar while uploading bundle to server (optional)
     // You might need to disable it on CI servers
