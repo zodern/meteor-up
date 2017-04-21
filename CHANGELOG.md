@@ -1,4 +1,11 @@
-## 1.2.6 - Match 29, 20 
+## Next
+- Deployment verifier will fail the deployment if it receives a 503 or 502 error
+- Add default host to nginx-proxy to redirect unknown hosts to the app when accessed over http
+- Remove `force-ssl` warning and add a note about redirects to the Troubleshooting guide in the readme
+- Fix example config in readme @meteorplus
+- Fix setting `HTTPS_METHOD` for nginx-proxy. It will no longer redirect http to https.
+
+## 1.2.6 - March 29, 20
 - Fix `force-ssl` warning appearing when ssl is setup correctly
 
 ## 1.2.5 - March 22, 2017
@@ -22,10 +29,10 @@
 - Startup script is updated during `mup reconfig`
 - Default build path is consistent between deploys for each app
 - Add `--cached-build` flag to `mup deploy` which uses the build from the previous deploy
-- Configure additional docker networks, ip binding, and verification port @giordanocardillo 
+- Configure additional docker networks, ip binding, and verification port @giordanocardillo
 - Add `--verbose` flag to show output from `meteor build`
 - Handles promise rejections
-- Fix docker not always disconnecting containers from networks @joaolboing 
+- Fix docker not always disconnecting containers from networks @joaolboing
 - Fix stderr sometimes in wrong place in logs
 - Fix some lines in logs would be missing the host name
 - Fix validating buildLocation
