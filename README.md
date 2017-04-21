@@ -75,6 +75,7 @@ This will create two files in your Meteor Up project directory:
   * `settings.json` - Settings for Meteor's [settings API](http://docs.meteor.com/#meteor_settings)
 
 ### Example Config
+<!-- eslint comma-dangle: 0 -->
 
 ```js
 module.exports = {
@@ -86,7 +87,7 @@ module.exports = {
       // password: 'password',
       // or leave blank to authenticate using ssh-agent
       opts: {
-          port: 22,
+        port: 22,
       },
     }
   },
@@ -94,42 +95,59 @@ module.exports = {
   meteor: {
     name: 'app',
     path: '../app',
-    volumes: { // lets you add docker volumes (optional)
-      "/host/path": "/container/path", // passed as '-v /host/path:/container/path' to the docker run command
-      "/second/host/path": "/second/container/path"
+    // lets you add docker volumes (optional)
+    volumes: {
+      // passed as '-v /host/path:/container/path' to the docker run command
+      '/host/path': '/container/path',
+      '/second/host/path': '/second/container/path'
     },
     docker: {
-      image: 'kadirahq/meteord', // (optional)
+      // Change the image to 'kadirahq/meteord' if you
+      // are using Meteor 1.3 or older
+      image: 'abernix/meteord:base' , // (optional)
       imagePort: 80, // (optional, default: 80)
-      // image: 'abernix/meteord:base', // use this image if using Meteor 1.4+
-      args: [ // lets you add/overwrite any parameter on the docker run command (optional)
-        "--link=myCustomMongoDB:myCustomMongoDB", // linking example
-        "--memory-reservation 200M" // memory reservation example
+
+      // lets you add/overwrite any parameter on
+      // the docker run command (optional)
+      args: [
+        '--link=myCustomMongoDB:myCustomMongoDB', // linking example
+        '--memory-reservation 200M' // memory reservation example
       ],
-      // (optional) Only used if using your own ssl certificates. Default is "meteorhacks/mup-frontend-server"
+      // (optional) Only used if using your own ssl certificates.
+      // Default is "meteorhacks/mup-frontend-server"
       imageFrontendServer: 'meteorhacks/mup-frontend-server',
-      bind: '127.0.0.1', //lets you bind the docker container to a specific network interface (optional)
-      networks: [ //lets you add network connections to perform after run (runs docker network connect <net name> for each network listed here)
+      // lets you bind the docker container to a
+      // specific network interface (optional)
+      bind: '127.0.0.1',
+      // lets you add network connections to perform after run
+      // (runs docker network connect <net name> for each network listed here)
+      networks: [
         'net1'
       ]
     },
+
+     // list of servers to deploy, from the 'servers' list
     servers: {
-      one: {}, two: {}, three: {} // list of servers to deploy, from the 'servers' list
+      one: {}, two: {}, three: {}
     },
+
     buildOptions: {
-      serverOnly: true, // skip building mobile apps, but still build the web.cordova architecture
+      // skip building mobile apps, but still build the web.cordova architecture
+      serverOnly: true,
       debug: true,
       cleanAfterBuild: true, // default
       buildLocation: '/my/build/folder', // defaults to /tmp/<uuid>
 
-      //set serverOnly: false if want to build mobile apps when deploying
+      // set serverOnly: false if want to build mobile apps when deploying
 
-      // Remove this property for mobileSettings to use your settings.json. (optional)
+      // Remove this property for mobileSettings to use your settings.json
+      // (optional)
       mobileSettings: {
-        yourMobileSetting: "setting value"
+        yourMobileSetting: 'setting value'
       },
       server: 'http://app.com', // your app url for mobile app access (optional)
-      allowIncompatibleUpdates: true, //adds --allow-incompatible-updates arg to build command (optional)
+       // adds --allow-incompatible-updates arg to build command (optional)
+      allowIncompatibleUpdates: true,
     },
     env: {
       // PORT: 8000, // useful when deploying multiple instances (optional)
@@ -139,7 +157,7 @@ module.exports = {
     log: { // (optional)
       driver: 'syslog',
       opts: {
-        "syslog-address":'udp://syslogserverurl.com:1234'
+        'syslog-address': 'udp://syslogserverurl.com:1234'
       }
     },
     ssl: {
@@ -150,7 +168,10 @@ module.exports = {
       }
     },
     deployCheckWaitTime: 60, // default 10
-    deployCheckPort: 80, // lets you define which port to check after the deploy process, if it differs from the meteor port you are serving (like meteor behind a proxy/firewall) (optional)
+    // lets you define which port to check after the deploy process, if it
+    // differs from the meteor port you are serving
+    // (like meteor behind a proxy/firewall) (optional)
+    deployCheckPort: 80,
 
     // Shows progress bar while uploading bundle to server (optional)
     // You might need to disable it on CI servers
@@ -198,7 +219,7 @@ The `--cached-build` option will use the build from the last time you deployed t
 
 You can define Meteor build options in `mup.js` like this:
 
-~~~js
+```ts
 ...
 meteor: {
   buildOptions: {
@@ -216,7 +237,7 @@ meteor: {
   }
 }
 ...
-~~~
+```
 
 ### Additional Setup/Deploy Information
 
@@ -230,7 +251,7 @@ Most docker images used with mup run `npm install` before starting the app. Espe
 
 If you are deploying under a proxy/firewall and need a different port to be checked after deploy, add a variable called `deployCheckPort` with the value of the port you are publishing your application to.
 
-```js
+```ts
 meteor: {
  ...
   deployCheckPort: 80
@@ -308,7 +329,7 @@ In the staging `mup.js`, add a field called `appName` with the value `staging`. 
 
 You also have to tell meteor to use this custom port like this:
 
-```js
+```ts
 meteor: {
   ...
   env: {
@@ -326,7 +347,7 @@ Now set up both projects and deploy as you need.
 
 If you want Docker to listen only on a specific network interface, such as `127.0.0.1`, add a variable called `bind` with the value of the IP address you want to listen to.
 
-```js
+```ts
 meteor: {
  ...
  docker: {
@@ -341,7 +362,7 @@ meteor: {
 
 If you need to connect your docker container to one or more networks add a variable called `networks` inside the docker configuration. This is an array containing all network names to which it has to connect.
 
-```js
+```ts
 meteor: {
  ...
   docker: {
@@ -372,7 +393,7 @@ Meteor UP can enable SSL support for your app. It can either autogenerate the ce
 
 Meteor Up can use Let's Encrypt to generate certificates for you. Add the following to your `mup.js` file:
 
-```js
+```ts
 meteor: {
   ...
   ssl: {
@@ -391,7 +412,7 @@ Then run `mup deploy`. It will automatically create certificates and set up SSL,
 
 To upload certificates instead of having the server generate them for you, just add the following configuration to your `mup.js` file.
 
-```js
+```ts
 meteor: {
   ...
   ssl: {
@@ -415,7 +436,7 @@ If you would like to increase the client upload limits, you can change it by add
 
 ***This Only Works if you are using the Let's Encrypt Autogenerated SSL's as it uses a different nginx container***
 
-```js
+```ts
 
 meteor: {
    ...
@@ -441,7 +462,7 @@ You can't access the MongoDB from outside the server. To access the MongoDB shel
 
 If you have not deployed to the server, you can change the mongo version by adding:
 
-```js
+```ts
 
 mongo: {
   ...

@@ -2,6 +2,7 @@
 parser: babel-eslint
 plugins:
 - babel
+- markdown
 env:
   es6: true
   node: true
