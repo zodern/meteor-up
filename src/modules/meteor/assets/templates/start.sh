@@ -8,7 +8,7 @@ ENV_FILE=$APP_PATH/config/env.list
 PORT=<%= port %>
 BIND=<%= bind %>
 NGINX_PROXY_VERSION=latest
-LETS_ENCRYPT_VERSION=v1.4
+LETS_ENCRYPT_VERSION=latest
 
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
@@ -61,6 +61,7 @@ docker run \
     -e "VIRTUAL_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_EMAIL=<%= sslConfig.autogenerate.email %>" \
+    -e "HTTPS_METHOD=noredirect" \
   <% } %> \
   --name=$APPNAME \
   <%= docker.image %>
@@ -89,7 +90,6 @@ EOT
     docker run -d -p 80:80 -p 443:443 \
       --name $APPNAME-nginx-proxy \
       --restart=always \
-      -e "HTTPS_METHOD=noredirect" \
       -e "DEFAULT_HOST=<%= sslConfig.autogenerate.domains.split(',')[0] %>" \
       -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
