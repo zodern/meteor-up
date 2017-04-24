@@ -18,6 +18,7 @@ const schema = joi.object().keys({
   dockerImage: joi.string(),
   docker: joi.object().keys({
     image: joi.string().trim(),
+    imagePort: joi.number(),
     imageFrontendServer: joi.string(),
     args: joi.array().items(joi.string().label('docker.args array items')),
     bind: joi.string().trim(),
