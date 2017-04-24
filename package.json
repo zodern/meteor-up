@@ -1,6 +1,6 @@
 {
   "name": "mup",
-  "version": "1.2.6",
+  "version": "1.2.7-beta.0",
   "description": "Production Quality Meteor Deployments",
   "main": "lib/index.js",
   "bin": {
@@ -62,6 +62,7 @@
     "shelljs": "0.5.x",
     "silent-npm-registry-client": "2.x.x",
     "ssh2": "0.4.x",
+    "time-require": "^0.1.2",
     "underscore": "1.x.x",
     "uuid": "2.x.x"
   }
