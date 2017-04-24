@@ -19,7 +19,7 @@ export default function() {
         return;
       }
 
-      const npmVersion = '1.2.7' || res.latest;
+      const npmVersion = res.latest;
       const local = pkg.version.split('.').slice(0, 3).map(n => Number(n.split('-')[0]));
       const remote = npmVersion.split('.').map(n => Number(n.split('-')[0]));
 
