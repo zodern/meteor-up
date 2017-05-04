@@ -495,13 +495,13 @@ Make sure that the docker image you are using supports your app's meteor version
 #### Check Logs
 If you suddenly can't deploy your app anymore, first use the `mup logs -f` command to check the logs for error messages.
 
-### Increase RAM
+#### Increase RAM
 Many problems are caused by the server running out of ram.
 
 #### Verbose Output
 If you need to see the output of `mup` (to see more precisely where it's failing or hanging, for example), run it like so:
 
-    DEBUG=* mup <command> --verbose
+    DEBUG=mup* mup <command> --verbose
 
 where `<command>` is one of the `mup` commands such as `setup`, `deploy`, etc.
 

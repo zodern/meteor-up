@@ -5,7 +5,7 @@ var _ = require('underscore');
 import { resolvePath } from '../utils';
 import debug from 'debug';
 
-const log = debug('mup:module:meteor:build');
+const log = debug('mup:module:meteor');
 
 function buildApp(appPath, buildOptions, verbose) {
   // Check if the folder exists
