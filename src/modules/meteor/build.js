@@ -1,9 +1,11 @@
 var spawn = require('child_process').spawn;
 var archiver = require('archiver');
 var fs = require('fs');
-
-import { resolvePath } from '../utils';
 var _ = require('underscore');
+import { resolvePath } from '../utils';
+import debug from 'debug';
+
+const log = debug('mup:module:meteor:build');
 
 function buildApp(appPath, buildOptions, verbose) {
   // Check if the folder exists
@@ -94,6 +96,9 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
     },
     stdio: verbose ? 'inherit' : 'pipe'
   };
+
+  log(`Build Path: ${appPath}`);
+  log(`Build Command:  ${executable} ${args.join(' ')}`);
 
   var meteor = spawn(executable, args, options);
 
