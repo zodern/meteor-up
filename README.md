@@ -25,6 +25,7 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
     - [Server Setup Details](#server-setup-details)
     - [Deploy Wait Time](#deploy-wait-time)
     - [Multiple Deployment Targets](#multiple-deployment-targets)
+    - [Correct Setup of Secrets](#correct-setup-of-secrets)
 - [Multiple Deployments](#multiple-deployments)
 - [SSL Support](#ssl-support)
 - [Nginx Upload Size](#nginx-upload)
@@ -316,6 +317,16 @@ Meteor Up uses Docker to run and manage your app. It uses [MeteorD](https://gith
 You can use an array to deploy to multiple servers at once.
 
 To deploy to *different* environments (e.g. staging, production, etc.), use separate Meteor Up configurations in separate directories, with each directory containing separate `mup.js` and `settings.json` files, and the `mup.js` files' `app` field pointing back to your app's local directory.
+
+#### Correct Setup of Secrets
+
+Running `mup init` also creates a `settings.json` file alongwith the `mup.js` file with the configuration settings.
+
+Instead of storing secrets like usernames and passwords in `mup.js`, you have the following options:
+
+- Storing in environment variables. You can then use process.env.VARIABLE_NAME to access it.
+- Store it in the `settings.json` file. Then at the top of your mup.js file, add `var secret = require('./settings.json')`, and access it with secret.propertyName.
+    - make sure not to check the `settings.json` file into version control, if you're using git, add it to .gitignore so that it gets excluded.
 
 ### Multiple Deployments
 
