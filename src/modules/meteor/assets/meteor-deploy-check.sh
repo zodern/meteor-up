@@ -26,10 +26,11 @@ elaspsed=0
 while [[ true ]]; do
   sleep 1
   elaspsed=$((elaspsed+1))
-  curl --fail localhost:$DEPLOY_CHECK_PORT && exit 0
+  curl --fail -L localhost:$DEPLOY_CHECK_PORT && exit 0
 
   if [ "$elaspsed" == "$DEPLOY_CHECK_WAIT_TIME" ]; then
     revert_app
     exit 1
   fi
 done
+ 
