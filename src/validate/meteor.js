@@ -88,7 +88,11 @@ export default function(config) {
       message: '"name" has a space'
     });
   }
-  if ('autogenerate' in config.meteor.ssl && 'PORT' in config.meteor.env) {
+  if (
+    typeof config.meteor.ssl === 'object' &&
+    'autogenerate' in config.meteor.ssl &&
+    'PORT' in config.meteor.env
+  ) {
     details.push({
       message: 'PORT can not be set when using ssl.autogenerate',
       path: 'env'
