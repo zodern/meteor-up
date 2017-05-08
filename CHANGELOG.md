@@ -5,7 +5,6 @@
 - Remove  `mup meteor push`. `mup meteor deploy` should be used instead.
 - Remove `mup meteor envconfig`. `mup reconfig` should be used instead
 
-## 1.2.6 - Match 29, 20 
 ## 1.2.7 - May 5, 2017
 - Fix verifying deployment when using ssl autogenerate
 - Add default host to nginx-proxy to redirect unknown hosts to the app when accessed over http
