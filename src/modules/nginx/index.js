@@ -4,19 +4,12 @@
 
 import * as _ from 'underscore';
 
-import {
-  getDockerLogs,
-  resolvePath,
-  runTaskList,
-} from '../utils';
+import { getDockerLogs, resolvePath, runTaskList } from '../utils';
 
 import debug from 'debug';
 import nodemiral from 'nodemiral';
-import path from 'path';
-import uuid from 'uuid';
 
 const log = debug('mup:module:nginx');
-
 
 export function help(/* api */) {
   log('exec => mup nginx help');
@@ -37,36 +30,36 @@ export function logs(api) {
 }
 
 export function setup(api) {
-	log('exec => mup nginx setup');
-	const config = api.getConfig().nginx;
-	if (!config) {
-		console.error('error: no configs found for nginx');
-		process.exit(1);
-	}
-	
-	const list = nodemiral.taskList('Setup nginx');
-	
-	list.executeScript('Setup Environment', {
-		script: resolvePath(__dirname, 'assets/nginx-setup.sh'),
-		vars: {
-			name: config.name,
-		},
-	});
-	
-	list.copy('Pushing the Startup Script', {
-		src: resolvePath(__dirname, 'assets/templates/start.sh'),
-		dest: '/opt/' + config.name + '/config/start.sh',
-		vars: {
-			appName: config.name,
-			httpPort: config.httpPort || 80,
-			httpsPort: config.httpsPort,
-			clientUploadLimit: config.clientUploadLimit
-		}
-	});
-	
-	const sessions = api.getSessions(['nginx']);
-	
-	return runTaskList(list, sessions, { series: true });
+  log('exec => mup nginx setup');
+  const config = api.getConfig().nginx;
+  if (!config) {
+    console.error('error: no configs found for nginx');
+    process.exit(1);
+  }
+
+  const list = nodemiral.taskList('Setup nginx');
+
+  list.executeScript('Setup Environment', {
+    script: resolvePath(__dirname, 'assets/nginx-setup.sh'),
+    vars: {
+      name: config.name
+    }
+  });
+
+  list.copy('Pushing the Startup Script', {
+    src: resolvePath(__dirname, 'assets/templates/start.sh'),
+    dest: '/opt/' + config.name + '/config/start.sh',
+    vars: {
+      appName: config.name,
+      httpPort: config.httpPort || 80,
+      httpsPort: config.httpsPort,
+      clientUploadLimit: config.clientUploadLimit
+    }
+  });
+
+  const sessions = api.getSessions(['nginx']);
+
+  return runTaskList(list, sessions, { series: true });
 }
 
 export function envconfig(api) {
@@ -85,7 +78,7 @@ export function envconfig(api) {
     src: resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + config.name + '/config/env.list',
     vars: {
-      env: env || {},
+      env: env || {}
     }
   });
   var envLetsencrypt = _.clone(config.envLetsencrypt);
@@ -94,7 +87,7 @@ export function envconfig(api) {
     src: resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + config.name + '/config/env_letsencrypt.list',
     vars: {
-      env: envLetsencrypt || {},
+      env: envLetsencrypt || {}
     }
   });
   const sessions = api.getSessions(['nginx']);
@@ -106,6 +99,11 @@ export function start(api) {
   const config = api.getConfig().nginx;
   if (!config) {
     console.error('error: no configs found for nginx');
+    process.exit(1);
+  }
+
+  if (typeof config.name !== 'string' || config.name.length < 1) {
+    console.error('error: nginx.name needs to be a string');
     process.exit(1);
   }
 
