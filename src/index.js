@@ -117,7 +117,12 @@ function argAction(arg, subarg) {
       settingsPath,
       program.verbose
     );
-    let potentialPromise = module[command](api);
+    let potentialPromise;
+    try {
+      potentialPromise = module[command](api);
+    } catch (e) {
+      console.dir(e);
+    }
     if (potentialPromise && typeof potentialPromise.then === 'function') {
       potentialPromise.catch(e => {
         if (e.nodemiralHistory instanceof Array) {
@@ -125,8 +130,8 @@ function argAction(arg, subarg) {
           // Nodemiral already displayed the error to the user
           return;
         }
-
-        console.log(e);
+        console.log('error ======================');
+        console.error(e);
       });
     }
   });
