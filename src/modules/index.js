@@ -1,16 +1,18 @@
 import fs from 'fs';
 import path from 'path';
-
+import commandWrapper from './command-wrapper';
 const modules = {};
 export default modules;
 
 // Load all subdirectories as MUP modules.
 // The directory name is the module name.
-fs.readdirSync(__dirname)
-  .filter(isMupModule)
-  .forEach(loadModule);
+fs.readdirSync(__dirname).filter(isDirectoryMupModule).forEach(loadModule);
 
-function isMupModule(name) {
+export function loadPlugins(plugins) {
+  console.dir(plugins);
+}
+
+function isDirectoryMupModule(name) {
   if (name === '__tests__') {
     return false;
   }
