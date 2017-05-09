@@ -70,14 +70,11 @@ docker run \
 echo "Ran <%= docker.image %>"
 sleep 15s
 
-<% if(typeof sslConfig === "object" && !(typeof nginxConfig === "object"  && nginxConfig.domains))  { %>
-  <% if(typeof sslConfig.autogenerate === "object")  { %>
-    <% if(typeof nginxConfig === "object"  && nginxConfig.domains)  { %>
-      echo "Using shared nginx - not running own copy"
-    <% } else { %>
-      echo "Running autogenerate"
-      # Get the nginx template for nginx-gen
-      wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl -O /opt/$APPNAME/config/nginx.tmpl
+<% if(typeof sslConfig === "object") { %>
+   <% if(typeof sslConfig.autogenerate === "object")  { %>
+    echo "Running autogenerate"
+    # Get the nginx template for nginx-gen
+    wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl -O /opt/$APPNAME/config/nginx.tmpl
 
     # Update nginx config based on user input or default passed by js
 sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
@@ -113,7 +110,7 @@ EOT
       -v /var/run/docker.sock:/var/run/docker.sock:ro \
       jrcs/letsencrypt-nginx-proxy-companion:$LETS_ENCRYPT_VERSION
     echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
-  <% } else { %>
+    <% } else { %>
       # Using shared nginx so just copy the cert files to the right place.
     <% if(typeof nginxConfig === "object"  && nginxConfig.domains)  { %>
       <% var domainsArr=nginxConfig.domains.split(','); for(var i=0; i<domainsArr.length; i++) { %>
@@ -135,6 +132,7 @@ EOT
       --name=$APPNAME-frontend \
       <%= docker.imageFrontendServer %> /start.sh
   <% } %>
+<% } %>
 <% } %>
 
 <% for(var network in docker.networks) { %>

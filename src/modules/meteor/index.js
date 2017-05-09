@@ -202,6 +202,7 @@ export function envconfig(api) {
       logConfig: config.log,
       volumes: config.volumes,
       docker: config.docker,
+      nginxConfig: config.nginx,
       nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
     }
   });
@@ -251,7 +252,8 @@ export function start(api) {
     vars: {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
-      deployCheckPort: config.deployCheckPort || config.env.PORT || 80
+      deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
+      host: config.nginx && config.nginx.domains ? config.nginx.domains.split(',')[0] : null
     }
   });
 

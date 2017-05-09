@@ -3,6 +3,7 @@ APP_PATH=/opt/$APPNAME
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
 DEPLOY_CHECK_PORT=<%= deployCheckPort %>
+HOST=<%= host %>
 
 cd $APP_PATH
 
@@ -26,7 +27,12 @@ elaspsed=0
 while [[ true ]]; do
   sleep 1
   elaspsed=$((elaspsed+1))
-  curl --fail -L localhost:$DEPLOY_CHECK_PORT && exit 0
+  curl \
+    --fail \
+    -L \
+    localhost:$DEPLOY_CHECK_PORT \
+    <% if (host) { %> --header "HOST:$HOST" <% } %>  \
+    && exit 0
 
   if [ "$elaspsed" == "$DEPLOY_CHECK_WAIT_TIME" ]; then
     revert_app
