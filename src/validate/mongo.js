@@ -11,7 +11,6 @@ const schema = joi.object().keys({
   oplog: joi.bool(),
   port: joi.number(),
   version: joi.string(),
-  dbDir: joi.string(),
   servers: joi.object().keys()
 });
 

@@ -85,7 +85,7 @@ export function start(api) {
     script: resolvePath(__dirname, 'assets/mongo-start.sh'),
     vars: {
       mongoVersion: config.version || '3.4.1',
-      mongoDbDir: config.dbDir || '/var/lib/mongodb'
+      mongoDbDir: '/var/lib/mongodb'
     }
   });
 
