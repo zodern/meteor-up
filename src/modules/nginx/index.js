@@ -59,7 +59,7 @@ export function setup(api) {
 
   const sessions = api.getSessions(['nginx']);
 
-  return runTaskList(list, sessions, { series: true });
+  runTaskList(list, sessions, { series: true }).then(() => envconfig(api));
 }
 
 export function envconfig(api) {
@@ -91,7 +91,7 @@ export function envconfig(api) {
     }
   });
   const sessions = api.getSessions(['nginx']);
-  return runTaskList(list, sessions, { series: true });
+  return runTaskList(list, sessions, { series: true }).then(() => start(api));
 }
 
 export function start(api) {
