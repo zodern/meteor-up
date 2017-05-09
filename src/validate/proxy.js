@@ -1,7 +1,3 @@
-/**
- * @author Shai Amir
- */
-
 import { addLocation, combineErrorDetails, serversExist } from './utils';
 
 import joi from 'joi';
@@ -20,9 +16,7 @@ const schema = joi.object().keys({
   env: joi
     .object()
     .keys({
-      ACME_CA_URI: joi
-        .string()
-        .regex(new RegExp('^(http|https)://', 'i')),
+      ACME_CA_URI: joi.string().regex(new RegExp('^(http|https)://', 'i')),
       DEBUG: joi.boolean(),
       NGINX_PROXY_CONTAINER: joi.string()
     })
@@ -32,10 +26,12 @@ const schema = joi.object().keys({
 
 export default function(config) {
   let details = [];
-  details = combineErrorDetails(details, joi.validate(config.nginx, schema));
-  details = combineErrorDetails(
-    details,
-    serversExist(config.servers, config.nginx.servers)
-  );
-  return addLocation(details, 'nginx');
+  details = combineErrorDetails(details, joi.validate(config.proxy, schema));
+  if (config.proxy.servers) {
+    details = combineErrorDetails(
+      details,
+      serversExist(config.servers, config.proxy.servers)
+    );
+  }
+  return addLocation(details, 'proxy');
 }

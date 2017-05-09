@@ -1,7 +1,3 @@
-/**
- * @author Shai Amir
- */
-
 import * as _ from 'underscore';
 
 import { getDockerLogs, resolvePath, runTaskList } from '../utils';
@@ -9,40 +5,40 @@ import { getDockerLogs, resolvePath, runTaskList } from '../utils';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
 
-const log = debug('mup:module:nginx');
+const log = debug('mup:module:proxy');
 
 const PROXY_CONTAINER_NAME = 'mup_reverse_proxy';
 
 export function help(/* api */) {
-  log('exec => mup nginx help');
-  console.log('mup nginx', Object.keys(this));
+  log('exec => mup proxy help');
+  console.log('mup proxy', Object.keys(this));
 }
 
 export function logs(api) {
-  log('exec => mup nginx logs');
-  const config = api.getConfig().nginx;
+  log('exec => mup proxy logs');
+  const config = api.getConfig().proxy;
   if (!config) {
-    console.error('error: no configs found for nginx');
+    console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
   const args = api.getArgs();
-  const sessions = api.getSessions(['nginx']);
+  const sessions = api.getSessions(['proxy']);
   return getDockerLogs(config.name, sessions, args);
 }
 
 export function setup(api) {
-  log('exec => mup nginx setup');
-  const config = api.getConfig().nginx;
+  log('exec => mup proxy setup');
+  const config = api.getConfig().proxy;
   if (!config) {
-    console.error('error: no configs found for nginx');
+    console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
-  const list = nodemiral.taskList('Setup nginx');
+  const list = nodemiral.taskList('Setup proxy');
 
   list.executeScript('Setup Environment', {
-    script: resolvePath(__dirname, 'assets/nginx-setup.sh'),
+    script: resolvePath(__dirname, 'assets/proxy-setup.sh'),
     vars: {
       name: config.name
     }
@@ -59,24 +55,24 @@ export function setup(api) {
     }
   });
 
-  const sessions = api.getSessions(['nginx']);
+  const sessions = api.getSessions(['proxy']);
 
   runTaskList(list, sessions, { series: true }).then(() => envconfig(api));
 }
 
 export function envconfig(api) {
-  log('exec => mup nginx envconfig');
-  const config = api.getConfig().nginx;
+  log('exec => mup proxy envconfig');
+  const config = api.getConfig().proxy;
   if (!config) {
-    console.error('error: no configs found for nginx');
+    console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
-  const list = nodemiral.taskList('Configuring nginx Environment Variables');
+  const list = nodemiral.taskList('Configuring proxy Environment Variables');
 
   var env = _.clone(config.env);
 
-  list.copy('Sending nginx Environment Variables', {
+  list.copy('Sending proxy Environment Variables', {
     src: resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + config.name + '/config/env.list',
     vars: {
@@ -92,53 +88,53 @@ export function envconfig(api) {
       env: envLetsencrypt || {}
     }
   });
-  const sessions = api.getSessions(['nginx']);
+  const sessions = api.getSessions(['proxy']);
   return runTaskList(list, sessions, { series: true }).then(() => start(api));
 }
 
 export function start(api) {
-  log('exec => mup nginx start');
-  const config = api.getConfig().nginx;
+  log('exec => mup proxy start');
+  const config = api.getConfig().proxy;
   if (!config) {
-    console.error('error: no configs found for nginx');
+    console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
   if (typeof config.name !== 'string' || config.name.length < 1) {
-    console.error('error: nginx.name needs to be a string');
+    console.error('error: proxy.name needs to be a string');
     process.exit(1);
   }
 
-  const list = nodemiral.taskList('Start nginx');
+  const list = nodemiral.taskList('Start proxy');
 
-  list.executeScript('Start nginx', {
-    script: resolvePath(__dirname, 'assets/nginx-start.sh'),
+  list.executeScript('Start proxy', {
+    script: resolvePath(__dirname, 'assets/proxy-start.sh'),
     vars: {
       appName: config.name
     }
   });
 
-  const sessions = api.getSessions(['nginx']);
+  const sessions = api.getSessions(['proxy']);
   return runTaskList(list, sessions, { series: true });
 }
 
 export function stop(api) {
-  log('exec => mup nginx stop');
-  const config = api.getConfig().nginx;
+  log('exec => mup proxy stop');
+  const config = api.getConfig().proxy;
   if (!config) {
-    console.error('error: no configs found for nginx');
+    console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
-  const list = nodemiral.taskList('Stop nginx');
+  const list = nodemiral.taskList('Stop proxy');
 
-  list.executeScript('Stop nginx', {
-    script: resolvePath(__dirname, 'assets/nginx-stop.sh'),
+  list.executeScript('Stop proxy', {
+    script: resolvePath(__dirname, 'assets/proxy-stop.sh'),
     vars: {
       appName: config.name
     }
   });
 
-  const sessions = api.getSessions(['nginx']);
+  const sessions = api.getSessions(['proxy']);
   return runTaskList(list, sessions);
 }
