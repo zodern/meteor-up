@@ -57,7 +57,7 @@ export function setup(api) {
 
   const sessions = api.getSessions(['proxy']);
 
-  runTaskList(list, sessions, { series: true }).then(() => envconfig(api));
+  return runTaskList(list, sessions, { series: true }).then(() => envconfig(api));
 }
 
 export function envconfig(api) {
