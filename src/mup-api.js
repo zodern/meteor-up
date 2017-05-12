@@ -55,7 +55,7 @@ export default class MupAPI {
     }
   }
 
-  getConfig() {
+  getConfig(validate = true) {
     if (!this.config) {
       let filePath;
       if (this.configPath) {
@@ -76,7 +76,9 @@ export default class MupAPI {
         }
         process.exit(1);
       }
-      this.validateConfig(filePath);
+      if (validate) {
+        this.validateConfig(filePath);
+      }
     }
 
     return this.config;

@@ -1,10 +1,10 @@
 export const tasks = {};
 
 export default function registerTask(moduleName, name, handler) {
-  tasks[`${module}.${name}`] = handler;
+  tasks[`${moduleName}.${name}`] = handler;
 }
 
-export function registerOverrides(moduleName, overrides) {
+export function registerTaskOverrides(moduleName, overrides) {
   Object.keys(overrides).forEach((override) => {
     let handler;
 

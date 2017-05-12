@@ -1,7 +1,6 @@
 import checkUpdates from './updates';
 import modules, { loadPlugins } from './modules/';
 import pkg from '../package.json';
-// import program from 'commander';
 import yargs from 'yargs';
 import chalk from 'chalk';
 import MupAPI from './mup-api';
@@ -69,9 +68,14 @@ function commandWrapper(handler) {
 }
 
 // Load plugins
-let config = new MupAPI(process.cwd(), process.argv, yargs.argv).getConfig();
+let config = new MupAPI(process.cwd(), process.argv, yargs.argv).getConfig(false);
 if (config.plugins) {
-  loadPlugins(config.plugins);
+  loadPlugins(config.plugins.map((plugin) => {
+    return {
+      name: plugin,
+      path: plugin
+    };
+  }));
 }
 
 let program = yargs
