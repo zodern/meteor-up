@@ -137,6 +137,18 @@ export default class MupAPI {
     }
   };
   _runPostHooks = async function(task) {
+    const hookName = `post.${task}`;
+    let that = this;
+    if (hookName in hooks) {
+      let hookList = hooks[hookName];
+      hookList.forEach(async function(hookHandler) {
+        if (typeof hookHandler === 'string') {
+          that._runHookScript(hookHandler);
+        } else {
+          await hookHandler(that);
+        }
+      });
+    }
     return;
   };
   runTask = async function(name) {
@@ -144,14 +156,13 @@ export default class MupAPI {
       console.error('Task name is required');
       return false;
     }
-    await this._runPostHooks(name);
 
     if (!(name in tasks)) {
       console.error(`Unkown task name: ${name}`);
       return false;
     }
     await this._runPreHooks(name);
-    return tasks[name](this);
+    return tasks[name](this).then(() => this._runPostHooks(name));
   };
 
   getSessions(modules = []) {
