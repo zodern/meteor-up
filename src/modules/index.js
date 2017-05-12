@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import commandWrapper from './command-wrapper';
-import registerTask from '../tasks';
+import registerTask, { registerHook } from '../tasks';
 const modules = {};
 export default modules;
 
@@ -33,6 +33,11 @@ export function loadPlugins(plugins) {
       if (plugin.module.tasks) {
         Object.keys(plugin.module.tasks).forEach(key => {
           registerTask(plugin.name, key, plugin.module.tasks[key]);
+        });
+      }
+      if (plugin.module.hooks) {
+        Object.keys(plugin.module.hooks).forEach((key) => {
+          registerHook(key, plugin.module.hooks[key]);
         });
       }
     });
