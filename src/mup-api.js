@@ -5,7 +5,8 @@ import parseJson from 'parse-json';
 import { resolvePath } from './modules/utils';
 import configValidator from './validate/index';
 import path from 'path';
-import { tasks } from './tasks';
+import { tasks, hooks } from './tasks';
+import childProcess from 'child_process';
 
 export default class MupAPI {
   constructor(base, filteredArgs, program) {
@@ -114,19 +115,44 @@ export default class MupAPI {
 
     return this.settings;
   }
+  _runHookScript(script) {
+    childProcess.execSync(script, {
+      cwd: this.getBasePath(),
+      stdio: 'inherit'
+    });
+  }
+  _runPreHooks = async function(task) {
+    let hookName = `pre.${task}`;
+    let that = this;
 
-  runTask(name) {
+    if (hookName in hooks) {
+      let hookList = hooks[hookName];
+      hookList.forEach(async function(hookHandler) {
+        if (typeof hookHandler === 'string') {
+          that._runHookScript(hookHandler);
+        } else {
+          await hookHandler(that);
+        }
+      });
+    }
+  };
+  _runPostHooks = async function(task) {
+    return;
+  };
+  runTask = async function(name) {
     if (!name) {
       console.error('Task name is required');
       return false;
     }
+    await this._runPostHooks(name);
 
     if (!(name in tasks)) {
       console.error(`Unkown task name: ${name}`);
       return false;
     }
+    await this._runPreHooks(name);
     return tasks[name](this);
-  }
+  };
 
   getSessions(modules = []) {
     const sessions = this._pickSessions(modules);

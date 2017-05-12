@@ -1,4 +1,5 @@
 export const tasks = {};
+export const hooks = {};
 
 export default function registerTask(moduleName, name, handler) {
   tasks[`${moduleName}.${name}`] = handler;
@@ -18,4 +19,12 @@ export function registerTaskOverrides(moduleName, overrides) {
     }
     tasks[override] = handler;
   });
+}
+
+export function registerHook(hookName, handler) {
+  if (hookName in hooks) {
+    hooks[hookName].push(handler);
+  } else {
+    hooks[hookName] = [handler];
+  }
 }

@@ -86,7 +86,7 @@ export function setup(api) {
     .then(() => api.runTask('meteor.setup'))
     .then(() => {
       if (config.mongo) {
-        api.runTask('mongo.setup');
+        return api.runTask('mongo.setup');
       }
     })
     .then(() => {
