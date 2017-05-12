@@ -2,7 +2,7 @@ import * as commandFunctions from './tasks';
 
 export let init = {
   description: 'Setup files for new mup project',
-  handler: commandFunctions.init
+  handler: 'default.init'
 };
 
 export let deploy = {
@@ -13,7 +13,7 @@ export let deploy = {
       boolean: true
     });
   },
-  handler: commandFunctions.deploy
+  handler: 'default.deploy'
 };
 
 export let logs = {
@@ -31,30 +31,30 @@ export let logs = {
         boolean: true
       });
   },
-  handler: commandFunctions.logs
+  handler: 'default.logs'
 };
 
 export let reconfig = {
   description: 'Updates server env and start script to match config',
-  handler: commandFunctions.reconfig
+  handler: 'default.reconfig'
 };
 
 export let restart = {
   description: 'Restart app',
-  handler: commandFunctions.restart
+  handler: 'default.restart'
 };
 
 export let setup = {
   description: 'Install dependencies, custom certificates, and MongoDB on server',
-  handler: commandFunctions.setup
+  handler: 'default.setup'
 };
 
 export let start = {
   description: 'Start app',
-  handler: commandFunctions.start
+  handler: 'default.start'
 };
 
 export let stop = {
   description: 'Stop app',
-  handler: commandFunctions.stop
+  handler: 'default.stop'
 };

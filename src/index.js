@@ -45,8 +45,13 @@ function commandWrapper(handler) {
     checkUpdates()
       .then(() => {
         const api = new MupAPI(process.cwd(), filterArgv(), yargs.argv);
+        let potentialPromise;
 
-        let potentialPromise = handler(api);
+        if (typeof handler === 'string') {
+          potentialPromise = api.runTask(handler);
+        } else {
+          potentialPromise = handler(api);
+        }
 
         if (potentialPromise && typeof potentialPromise.then === 'function') {
           potentialPromise.catch(e => {
