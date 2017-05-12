@@ -5,6 +5,7 @@ import parseJson from 'parse-json';
 import { resolvePath } from './modules/utils';
 import configValidator from './validate/index';
 import path from 'path';
+import { tasks } from './tasks';
 
 export default class MupAPI {
   constructor(base, filteredArgs, program) {
@@ -114,6 +115,19 @@ export default class MupAPI {
     return this.settings;
   }
 
+  runTask(name) {
+    if (!name) {
+      console.error('Task name is required');
+      return false;
+    }
+
+    if (!(name in tasks)) {
+      console.error(`Unkown task name: ${name}`);
+      return false;
+    }
+    return tasks[name](this);
+  }
+
   getSessions(modules = []) {
     const sessions = this._pickSessions(modules);
     return Object.keys(sessions).map(name => sessions[name]);
@@ -194,7 +208,7 @@ export default class MupAPI {
         opts.ssh.agent = sshAgent;
       } else {
         console.error(
-          'error: server %s doesn\'t have password, ssh-agent or pem',
+          "error: server %s doesn't have password, ssh-agent or pem",
           name
         );
         process.exit(1);

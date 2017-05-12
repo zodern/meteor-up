@@ -295,7 +295,7 @@ export function deploy(api) {
     process.exit(1);
   }
 
-  return push(api).then(() => envconfig(api)).then(() => start(api));
+  return api.runTask('meteor.push').then(() => api.runTask('meteor.envconfig')).then(() => api.runTask('meteor.start'));
 }
 
 export function stop(api) {
