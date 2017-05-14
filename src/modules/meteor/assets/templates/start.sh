@@ -44,7 +44,7 @@ echo "Pulled <%= docker.image %>"
 docker run \
   -d \
   --restart=always \
-  <% if((sslConfig && typeof sslConfig.autogenerate === "object") || (typeof nginxConfig === "object" && nginxConfig.domains))  { %> \
+  <% if((sslConfig && typeof sslConfig.autogenerate === "object") || (typeof proxyConfig === "object" && proxyConfig.domains))  { %> \
   --expose=80 \
   <% } else { %> \
   --publish=$BIND:$PORT:<%= docker.imagePort %> \
@@ -62,8 +62,8 @@ docker run \
     -e "LETSENCRYPT_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_EMAIL=<%= sslConfig.autogenerate.email %>" \
     -e "HTTPS_METHOD=noredirect" \
-  <% } else if(typeof nginxConfig === "object" && nginxConfig.domains) { %> \
-    -e "VIRTUAL_HOST=<%= nginxConfig.domains %>" \
+  <% } else if(typeof proxyConfig === "object" && proxyConfig.domains) { %> \
+    -e "VIRTUAL_HOST=<%= proxyConfig.domains %>" \
   <% } %> \
   --name=$APPNAME \
   <%= docker.image %>
@@ -112,10 +112,10 @@ EOT
     echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
     <% } else { %>
       # Using shared nginx so just copy the cert files to the right place.
-    <% if(typeof nginxConfig === "object"  && nginxConfig.domains)  { %>
-      <% var domainsArr=nginxConfig.domains.split(','); for(var i=0; i<domainsArr.length; i++) { %>
-        cp /opt/$APPNAME/config/bundle.crt /opt/<%= nginxConfig.name %>/certs/<%= domainsArr[i] %>.crt
-        cp /opt/$APPNAME/config/private.key /opt/<%= nginxConfig.name %>/certs/<%= domainsArr[i] %>.key
+    <% if(typeof proxyConfig === "object"  && proxyConfig.domains)  { %>
+      <% var domainsArr=proxyConfig.domains.split(','); for(var i=0; i<domainsArr.length; i++) { %>
+        cp /opt/$APPNAME/config/bundle.crt /opt/<%= proxyName %>/certs/<%= domainsArr[i] %>.crt
+        cp /opt/$APPNAME/config/private.key /opt/<%= proxyName %>/certs/<%= domainsArr[i] %>.key
       <% } %>
     <% } else { %>
     # We don't need to fail the deployment because of a docker hub downtime

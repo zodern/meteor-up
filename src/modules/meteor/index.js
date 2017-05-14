@@ -9,6 +9,7 @@ import nodemiral from 'nodemiral';
 import random from 'random-seed';
 import uuid from 'uuid';
 import os from 'os';
+import { PROXY_CONTAINER_NAME } from '../proxy/index.js';
 
 const log = debug('mup:module:meteor');
 
@@ -174,6 +175,7 @@ export function envconfig(api) {
       };
     }
   }
+  
   if (config.dockerImageFrontendServer) {
     config.docker.imageFrontendServer = config.dockerImageFrontendServer;
   }
@@ -202,7 +204,8 @@ export function envconfig(api) {
       logConfig: config.log,
       volumes: config.volumes,
       docker: config.docker,
-      nginxConfig: config.nginx,
+      proxyConfig: api.getConfig().proxy,
+      proxyName: PROXY_CONTAINER_NAME,
       nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
     }
   });
@@ -253,7 +256,7 @@ export function start(api) {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
       deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
-      host: config.nginx && config.nginx.domains ? config.nginx.domains.split(',')[0] : null
+      host: api.getConfig().proxy ? api.getConfig().proxy.domains.split(',')[0] : null
     }
   });
 
