@@ -7,11 +7,18 @@ import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:proxy');
 
-const PROXY_CONTAINER_NAME = 'mup-reverse-proxy';
+export const PROXY_CONTAINER_NAME = 'mup-reverse-proxy';
 
 export function help(/* api */) {
   log('exec => mup proxy help');
-  console.log('mup proxy', Object.keys(this));
+  let commands = Object.keys(this).reduce((result, key) => {
+    if (typeof this[key] !== 'function') {
+      return result;
+    }
+    return result + (result.length === 0 ? '' : ', ') + key;
+  }, '');
+
+  console.log('mup proxy', `[${commands}]`);
 }
 
 export function logs(api) {
@@ -35,6 +42,10 @@ export function setup(api) {
     process.exit(1);
   }
 
+  config.shared = config.shared || {};
+
+  config.ssl = config.ssl || {};
+
   const list = nodemiral.taskList('Setup proxy');
 
   list.executeScript('Setup Environment', {
@@ -49,20 +60,24 @@ export function setup(api) {
     dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/start.sh',
     vars: {
       appName: PROXY_CONTAINER_NAME,
-      httpPort: config.httpPort || 80,
-      httpsPort: config.httpsPort,
+      httpPort: config.shared.httpPort || 80,
+      httpsPort: config.shared.httpsPort || 443,
+      letsEncryptEmail: config.ssl.letsEncryptEmail,
       clientUploadLimit: config.clientUploadLimit
     }
   });
 
   const sessions = api.getSessions(['proxy']);
 
-  return runTaskList(list, sessions, { series: true }).then(() => envconfig(api));
+  return runTaskList(list, sessions, { series: true }).then(() =>
+    envconfig(api)
+  );
 }
 
 export function envconfig(api) {
   log('exec => mup proxy envconfig');
   const config = api.getConfig().proxy;
+
   if (!config) {
     console.error('error: no configs found for proxy');
     process.exit(1);
@@ -70,7 +85,10 @@ export function envconfig(api) {
 
   const list = nodemiral.taskList('Configuring proxy Environment Variables');
 
-  var env = _.clone(config.env);
+  if (!config.shared) {
+    config.shared = {};
+  }
+  var env = _.clone(config.shared.env);
 
   list.copy('Sending proxy Environment Variables', {
     src: resolvePath(__dirname, 'assets/templates/env.list'),
@@ -79,13 +97,13 @@ export function envconfig(api) {
       env: env || {}
     }
   });
-  var envLetsencrypt = _.clone(config.envLetsencrypt);
+  var envLetsEncrypt = _.clone(config.shared.envLetsEncrypt);
 
   list.copy('Sending Letsencrypt Environment Variables', {
     src: resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/env_letsencrypt.list',
     vars: {
-      env: envLetsencrypt || {}
+      env: envLetsEncrypt || {}
     }
   });
   const sessions = api.getSessions(['proxy']);

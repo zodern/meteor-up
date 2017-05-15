@@ -47,7 +47,7 @@ docker run -d -p $HTTP_PORT:80 \
 echo "Ran nginx-proxy as $APPNAME"
 sleep 15s
 
-<% if(httpsPort) { %> \
+<% if(letsEncryptEmail) { %> \
   docker run -d \
     --name $APPNAME-letsencrypt \
     --env-file=$ENV_FILE_LETSENCRYPT \
