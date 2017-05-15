@@ -1,6 +1,7 @@
 ## Next
 - Implement shared nginx proxy (@shaiamir)
-    - To switch to using this, remove `meteor.ssl` and `meteor.nginx` from your config and add a new section named `proxy`. View the docs for details.
+    - Is configured with a `proxy` object instead of using `meteor.ssl` and `meteor.nginx`
+    - If multiple apps are deployed to a server, routes requests to the correct container
     - Adds `mup proxy` command. For a list of subcommands, run `mup proxy help`
     - Supports using custom certificates. This should be used instead of `meteor.ssl` since the previous image used for custom certificates has security problems.
     - Supports configuring the env variables for the nginx and let's encrypt containers.
