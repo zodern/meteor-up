@@ -1,3 +1,14 @@
+## Next
+- Implement shared nginx proxy (@shaiamir)
+    - To switch to using this, remove `meteor.ssl` and `meteor.nginx` from your config and add a new section named `proxy`. View the docs for details.
+    - Adds `mup proxy` command. For a list of subcommands, run `mup proxy help`
+    - Supports using custom certificates. This should be used instead of `meteor.ssl` since the previous image used for custom certificates has security problems.
+    - Supports configuring the env variables for the nginx and let's encrypt containers.
+    - Saves between 15 - 30 seconds during deployment compared to using `meteor.ssl`.
+
+- `mup stop` also stops nginx proxy and let's encrypt containers
+- App's container PORT env variable is set to `docker.imagePort`
+
 ## 1.2.7 - May 5, 2017
 - Fix verifying deployment when using ssl autogenerate
 - Add default host to nginx-proxy to redirect unknown hosts to the app when accessed over http
