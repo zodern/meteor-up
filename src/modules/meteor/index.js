@@ -251,6 +251,7 @@ export function start(api) {
     vars: {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
+      appUrl: config.env.ROOT_URL || 'localhost',
       deployCheckPort: config.deployCheckPort || config.env.PORT || 80
     }
   });
