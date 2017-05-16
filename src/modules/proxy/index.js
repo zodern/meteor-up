@@ -67,6 +67,38 @@ export function setup(api) {
     }
   });
 
+  if (
+    config.ssl &&
+    !config.ssl.letsEncryptEmail &&
+    config.ssl.upload !== false
+  ) {
+    const appName = api.getConfig().meteor.name;
+
+    list.executeScript('Cleaning Up SSL Certificates', {
+      script: resolvePath(__dirname, 'assets/ssl-cleanup.sh'),
+      vars: {
+        name: appName,
+        proxyName: PROXY_CONTAINER_NAME
+      }
+    });
+    list.copy('Copying SSL Certificate Bundle', {
+      src: resolvePath(api.getBasePath(), config.ssl.crt),
+      dest: `/opt/${appName}/config/bundle.crt`
+    });
+    list.copy('Copying SSL Private Key', {
+      src: resolvePath(api.getBasePath(), config.ssl.key),
+      dest: `/opt/${appName}/config/private.key`
+    });
+    list.executeScript('Setup SSL Certificates for Domains', {
+      script: resolvePath(__dirname, 'assets/ssl-setup.sh'),
+      vars: {
+        appName,
+        proxyName: PROXY_CONTAINER_NAME,
+        domains: config.domains.split(',')
+      }
+    });
+  }
+
   const sessions = api.getSessions(['proxy']);
 
   return runTaskList(list, sessions, {

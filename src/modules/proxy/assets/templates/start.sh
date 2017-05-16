@@ -38,7 +38,7 @@ docker run -d -p $HTTP_PORT:80 \
   --name $APPNAME \
   --env-file=$ENV_FILE \
   --restart=always\
-  -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
+  -v /opt/$APPNAME/mounted-certs:/etc/nginx/certs:ro \
   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
   <% if(typeof clientUploadLimit === 'number') { %> \
@@ -47,15 +47,15 @@ docker run -d -p $HTTP_PORT:80 \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
   jwilder/nginx-proxy
 echo "Ran nginx-proxy as $APPNAME"
-sleep 15s
 
 <% if(letsEncryptEmail) { %> \
+  sleep 15s
   docker run -d \
     --name $APPNAME-letsencrypt \
     --env-file=$ENV_FILE_LETSENCRYPT \
     --restart=always\
     --volumes-from $APPNAME \
-    -v /opt/$APPNAME/certs:/etc/nginx/certs:rw \
+    -v /opt/$APPNAME/mounted-certs:/etc/nginx/certs:rw \
     -v /var/run/docker.sock:/var/run/docker.sock:ro \
     jrcs/letsencrypt-nginx-proxy-companion
   echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
