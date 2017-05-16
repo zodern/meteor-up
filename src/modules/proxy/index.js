@@ -29,7 +29,7 @@ export function logs(api) {
     process.exit(1);
   }
 
-  const args = api.getArgs();
+  const args = api.getArgs().slice(1);
   const sessions = api.getSessions(['proxy']);
   return getDockerLogs(PROXY_CONTAINER_NAME, sessions, args);
 }
