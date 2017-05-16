@@ -69,9 +69,10 @@ export function setup(api) {
 
   const sessions = api.getSessions(['proxy']);
 
-  return runTaskList(list, sessions, { series: true }).then(() =>
-    envconfig(api)
-  );
+  return runTaskList(list, sessions, {
+    series: true,
+    verbose: api.getVerbose()
+  }).then(() => envconfig(api));
 }
 
 export function envconfig(api) {
@@ -107,7 +108,10 @@ export function envconfig(api) {
     }
   });
   const sessions = api.getSessions(['proxy']);
-  return runTaskList(list, sessions, { series: true }).then(() => start(api));
+  return runTaskList(list, sessions, {
+    series: true,
+    verbose: api.getVerbose()
+  }).then(() => start(api));
 }
 
 export function start(api) {
@@ -133,7 +137,10 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['proxy']);
-  return runTaskList(list, sessions, { series: true });
+  return runTaskList(list, sessions, {
+    series: true,
+    verbose: api.getVerbose()
+  });
 }
 
 export function stop(api) {
@@ -154,5 +161,5 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['proxy']);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
