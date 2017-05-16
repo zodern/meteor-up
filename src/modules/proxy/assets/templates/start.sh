@@ -8,10 +8,12 @@ HTTP_PORT=<%= httpPort %>
 
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
+docker network disconnect bridge -f $APPNAME
 echo "Removed $APPNAME"
 
 # Remove let's encrypt containers if exists
 docker rm -f $APPNAME-letsencrypt
+docker network disconnect bridge -f $APPNAME-nginx-proxy
 echo "Removed $APPNAME-letsencrypt"
 
 # We don't need to fail the deployment because of a docker hub downtime
