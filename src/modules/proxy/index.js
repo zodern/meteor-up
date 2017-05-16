@@ -7,7 +7,7 @@ import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:proxy');
 
-export const PROXY_CONTAINER_NAME = 'mup-reverse-proxy';
+export const PROXY_CONTAINER_NAME = 'mup-nginx-proxy';
 
 export function help(/* api */) {
   log('exec => mup proxy help');
