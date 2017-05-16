@@ -2,13 +2,17 @@ import Npm from 'silent-npm-registry-client';
 import boxen from 'boxen';
 import chalk from 'chalk';
 import pkg from '../package.json';
+import debug from 'debug';
+
+let log = debug('mup:updates');
 
 export default function() {
+  log('checking for updates');
   return new Promise(function(resolve) {
     const params = {
       timeout: 1000,
       package: pkg.name,
-      auth: {}
+      auth: {} 
     };
 
     const npm = new Npm();
@@ -20,12 +24,18 @@ export default function() {
       }
 
       const npmVersion = res.latest;
-      const local = pkg.version.split('.').map(n => Number(n));
-      const remote = npmVersion.split('.').map(n => Number(n));
+      const local = pkg.version.split('.').slice(0, 3).map(n => Number(n.split('-')[0]));
+      const remote = npmVersion.split('.').map(n => Number(n.split('-')[0]));
 
-      const available = remote[0] > local[0] ||
+      const beta = pkg.version.split('.')[2].split('-').length > 1;
+
+      let available = remote[0] > local[0] ||
         remote[0] === local[0] && remote[1] > local[1] ||
         remote[1] === local[1] && remote[2] > local[2];
+
+      if (beta && !available) {
+        available = remote[0] === local[0] && remote[1] === local[1] && remote[2] === local[2];
+      }
 
       if (available) {
         let text = `update available ${pkg.version} => ${npmVersion}`;

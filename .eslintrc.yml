@@ -2,10 +2,12 @@
 parser: babel-eslint
 plugins:
 - babel
+- markdown
 env:
   es6: true
   node: true
   mocha: true
+ecmaVersion: 2017
 ecmaFeatures:
   accessor-pairs: 2
   arrowFunctions: true
@@ -58,7 +60,7 @@ rules:
   computed-property-spacing:
   - 2
   - never
-  consistent-return: 2
+  consistent-return: 0
   consistent-this: 0
   curly:
   - 2

@@ -27,7 +27,9 @@ export function setup(api) {
 
   if (!api.getConfig().mongo) {
     // could happen when running "mup mongo setup"
-    console.log('Not setting up built-in mongodb since there is no mongo config');
+    console.log(
+      'Not setting up built-in mongodb since there is no mongo config'
+    );
     return;
   }
 
@@ -48,18 +50,18 @@ export function setup(api) {
 
   const list = nodemiral.taskList('Setup Mongo');
 
-  list.executeScript('setup environment', {
+  list.executeScript('Setup Environment', {
     script: resolvePath(__dirname, 'assets/mongo-setup.sh')
   });
 
-  list.copy('copying mongodb.conf', {
+  list.copy('Copying mongodb.conf', {
     src: resolvePath(__dirname, 'assets/mongodb.conf'),
     dest: '/opt/mongodb/mongodb.conf'
   });
 
   const sessions = api.getSessions(['mongo']);
 
-  return runTaskList(list, sessions); // eslint-disable-line consistent-return
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
 
 export function start(api) {
@@ -71,7 +73,7 @@ export function start(api) {
 
   if (
     meteorSessions.length !== 1 ||
-      mongoSessions[0]._host !== meteorSessions[0]._host
+    mongoSessions[0]._host !== meteorSessions[0]._host
   ) {
     log('Skipping mongodb start. Incompatible config');
     return;
@@ -79,7 +81,7 @@ export function start(api) {
 
   const list = nodemiral.taskList('Start Mongo');
 
-  list.executeScript('start mongo', {
+  list.executeScript('Start Mongo', {
     script: resolvePath(__dirname, 'assets/mongo-start.sh'),
     vars: {
       mongoVersion: config.version || '3.4.1'
@@ -87,7 +89,7 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions); // eslint-disable-line consistent-return
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
 
 export function stop(api) {
@@ -99,5 +101,5 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions);
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }

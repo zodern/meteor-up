@@ -136,13 +136,13 @@ describe('module - default', function() {
       const out = sh.exec('mup setup');
 
       expect(out.code).to.be.equal(0);
-      expect(countOccurences('setup docker: SUCCESS', out.output)).to.be.equal(
+      expect(countOccurences('Setup Docker: SUCCESS', out.output)).to.be.equal(
         1
       );
       expect(
-        countOccurences('setup environment: SUCCESS', out.output)
-      ).to.be.equal(1);
-      expect(countOccurences('start mongo: SUCCESS', out.output)).to.be.equal(
+        countOccurences('Setup Environment: SUCCESS', out.output)
+      ).to.be.equal(2);
+      expect(countOccurences('Start Mongo: SUCCESS', out.output)).to.be.equal(
         1
       );
       expect(

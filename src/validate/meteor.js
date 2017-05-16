@@ -13,18 +13,19 @@ const schema = joi.object().keys({
   dockerImage: joi.string(),
   docker: joi.object().keys({
     image: joi.string().trim(),
+    imagePort: joi.number(),
     imageFrontendServer: joi.string(),
     args: joi.array().items(joi.string().label('docker.args array items')),
     bind: joi.string().trim(),
-    networks: joi.array().items(
-      joi.string().label('docker.networks array items')
-    )
+    networks: joi
+      .array()
+      .items(joi.string().label('docker.networks array items'))
   }),
   buildOptions: joi.object().keys({
     serverOnly: joi.bool(),
     debug: joi.bool(),
     cleanAfterBuild: joi.bool(),
-    buildLocation: joi.bool(),
+    buildLocation: joi.string(),
     mobileSettings: joi.object(),
     server: joi.string().uri(),
     allowIncompatibleUpdates: joi.boolean(),
@@ -35,7 +36,10 @@ const schema = joi.object().keys({
     .keys({
       ROOT_URL: joi
         .string()
-        .regex(new RegExp('^(http|https)://', 'i'))
+        .regex(
+          new RegExp('^(http|https)://', 'i'),
+          'valid url with "http://" or "https://"'
+        )
         .required(),
       MONGO_URL: joi.string()
     })
@@ -60,12 +64,12 @@ const schema = joi.object().keys({
         .label('autogenerate'),
       crt: joi.string().trim(),
       key: joi.string().trim(),
-      port: joi.number()
+      port: joi.number(),
+      upload: joi.boolean()
     })
     .and('crt', 'key')
     .without('autogenerate', ['crt', 'key'])
     .or('crt', 'autogenerate')
-    .label('ssl')
 });
 
 export default function(config) {
@@ -77,6 +81,16 @@ export default function(config) {
   if (config.meteor.name.indexOf(' ') > -1) {
     details.push({
       message: '"name" has a space'
+    });
+  }
+  if (
+    typeof config.meteor.ssl === 'object' &&
+    'autogenerate' in config.meteor.ssl &&
+    'PORT' in config.meteor.env
+  ) {
+    details.push({
+      message: 'PORT can not be set when using ssl.autogenerate',
+      path: 'env'
     });
   }
   details = combineErrorDetails(

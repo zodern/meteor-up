@@ -1,0 +1,150 @@
+body {
+    background-color: #141B2B;
+}
+
+.home-intro {
+    background-image: url(/meteor-up/imgs/space-bg-shadowcodex.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 400px;
+    height: 100vh;
+    width: 100%;
+    display: inline-block;
+    display: flex;
+    align-items: center;
+}
+
+.home-banner {
+    /* margin-top: 135px; */
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.home-topper {
+    font-weight: 100;
+    font-size: 20pt;
+    margin-bottom:5px;
+}
+
+.home-middle {
+    font-weight: 700;
+    font-size: 36pt;
+    margin-top:5px;
+}
+
+.home-botter{
+    font-weight: 100;
+    font-size: 15pt;    
+}
+
+.install-command {
+    margin-left: auto;
+    margin-right: auto;
+    display: inline-block;
+    padding: 20px;
+    background-color: #141B2B;
+    width: 50%;
+    min-width: 300px;
+}
+
+.features h3{
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feature-list {
+    padding-left: 9%;
+}
+
+#terminal-deploy {
+    background-color: black;
+    padding: 20px;
+    font-family: monospace;
+}
+
+.terminal-blue {
+    color: #1966d9;
+}
+
+.terminal-purple {
+    color: #6d22e1;
+}
+
+.terminal-green {
+    color: #3cd53c;
+}
+
+.section-title {
+    text-align: center;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #49a170;
+}
+
+.section-spacer {
+    height: 100px;
+    width: 100%;
+    display: block;
+}
+
+.blurb-img {
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:25px;
+    display:block;
+}
+
+.blurb-text {
+    text-align:center;
+    margin-top:10px;
+}
+
+.stat-num {
+    text-align: center;
+    font-weight: 100;
+    font-size: 72pt;
+}
+
+.stat-text {
+    text-align: center;
+    font-weight: 700;
+}
+
+.footer-btn {
+    margin-left: 5px;
+}
+
+.btn-primary {
+    background-color: #49a170;
+}
+
+.features i {
+    padding-right: 11px;
+}
+header {
+    background: transparent;
+    position:absolute;
+    width: 100%;
+}
+nav {
+    font-size: 18px;
+    display: inline-block;
+    padding: 15px;
+    box-shadow: -5px 2px 6px 0px rgba(255, 255, 255, 0.52);
+}
+nav .brand {
+    display: inline-block;
+}
+nav .nav-links {
+    list-style: none;
+    display: inline;
+}
+
+.nav-links li {
+    display: inline-block;
+    padding: 0 10px;
+}

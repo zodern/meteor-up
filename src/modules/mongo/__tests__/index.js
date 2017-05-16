@@ -44,10 +44,10 @@ describe('module - mongo', function() {
       expect(out.code).to.be.equal(0);
 
       expect(
-        countOccurences('setup environment: SUCCESS', out.output)
+        countOccurences('Setup Environment: SUCCESS', out.output)
       ).to.be.equal(1);
       expect(
-        countOccurences('copying mongodb.conf: SUCCESS', out.output)
+        countOccurences('Copying mongodb.conf: SUCCESS', out.output)
       ).to.be.equal(1);
 
       const sshOut = await runSSHCommand(serverInfo, 'tree -pufi /opt');
@@ -66,7 +66,7 @@ describe('module - mongo', function() {
       const out = sh.exec('mup mongo start');
       expect(out.code).to.be.equal(0);
 
-      expect(countOccurences('start mongo: SUCCESS', out.output)).to.be.equal(
+      expect(countOccurences('Start Mongo: SUCCESS', out.output)).to.be.equal(
         1
       );
       expect(

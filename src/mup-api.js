@@ -3,13 +3,11 @@ import fs from 'fs';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
-import {
-  resolvePath
-} from './modules/utils';
+import { resolvePath } from './modules/utils';
 import validateConfig from './validate/index';
 
 export default class MupAPI {
-  constructor(base, args, configPath, settingsPath) {
+  constructor(base, args, configPath, settingsPath, verbose) {
     this.base = base;
     this.args = args;
     this.config = null;
@@ -17,14 +15,23 @@ export default class MupAPI {
     this.sessions = null;
     this.configPath = configPath;
     this.settingsPath = settingsPath;
+    this.verbose = verbose;
   }
 
   getArgs() {
     return this.args;
   }
 
+  optionEnabled(long) {
+    return this.args.indexOf(`--${long}`) > -1;
+  }
+
   getBasePath() {
     return this.base;
+  }
+
+  getVerbose() {
+    return this.verbose;
   }
 
   validateConfig(configPath) {
@@ -38,7 +45,7 @@ export default class MupAPI {
       console.log('');
       console.log(red(`${problems.length} Validation Error${plural}`));
 
-      problems.forEach((problem) => {
+      problems.forEach(problem => {
         console.log(red(`  - ${problem}`));
       });
 

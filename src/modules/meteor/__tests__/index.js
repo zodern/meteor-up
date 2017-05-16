@@ -70,12 +70,6 @@ describe('module - meteor', function() {
         'ls -al /opt/myapp/tmp/bundle.tar.gz'
       );
       assert.equal(sshOut.code, 0);
-
-      const sshOut2 = await runSSHCommand(
-        serverInfo,
-        'ls -al /opt/myapp/config/start.sh'
-      );
-      assert.equal(sshOut2.code, 0);
     });
   });
 
@@ -100,6 +94,13 @@ describe('module - meteor', function() {
         'ls -al /opt/myapp/config/env.list'
       );
       assert.equal(sshOut.code, 0);
+
+      const sshOut2 = await runSSHCommand(
+        serverInfo,
+        'ls -al /opt/myapp/config/start.sh'
+      );
+
+      assert.equal(sshOut2.code, 0);
     });
   });
 
