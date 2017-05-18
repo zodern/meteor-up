@@ -9,6 +9,7 @@ import nodemiral from 'nodemiral';
 import random from 'random-seed';
 import uuid from 'uuid';
 import os from 'os';
+import * as mongo from '../mongo/';
 
 const log = debug('mup:module:meteor');
 
@@ -273,7 +274,13 @@ export function deploy(api) {
     process.exit(1);
   }
 
-  return push(api).then(() => envconfig(api)).then(() => start(api));
+  return push(api).then(
+      () => envconfig(api)
+    ).then(
+      () => start(api)
+    ).then(
+      () => mongo.whitelist(api)
+    );
 }
 
 export function stop(api) {
