@@ -1,11 +1,12 @@
-## Next
-- Deployment verifier will fail the deployment if it receives a 503 or 502 error
+## 1.2.7 - May 5, 2017
+- Fix verifying deployment when using ssl autogenerate
 - Add default host to nginx-proxy to redirect unknown hosts to the app when accessed over http
 - Remove `force-ssl` warning and add a note about redirects to the Troubleshooting guide in the readme
 - Fix example config in readme @meteorplus
-- Fix setting `HTTPS_METHOD` for nginx-proxy. It will no longer redirect http to https.
+- Fix setting `HTTPS_METHOD` for nginx-proxy. It will no longer redirect http to https
+- Validator warns when using ssl autogenerate and setting `env.PORT`.
 
-## 1.2.6 - March 29, 20
+## 1.2.6 - March 29, 2017
 - Fix `force-ssl` warning appearing when ssl is setup correctly
 
 ## 1.2.5 - March 22, 2017

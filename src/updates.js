@@ -2,13 +2,17 @@ import Npm from 'silent-npm-registry-client';
 import boxen from 'boxen';
 import chalk from 'chalk';
 import pkg from '../package.json';
+import debug from 'debug';
+
+let log = debug('mup:updates');
 
 export default function() {
+  log('checking for updates');
   return new Promise(function(resolve) {
     const params = {
       timeout: 1000,
       package: pkg.name,
-      auth: {}
+      auth: {} 
     };
 
     const npm = new Npm();
