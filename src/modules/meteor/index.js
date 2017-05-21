@@ -6,9 +6,9 @@ import buildApp from './build.js';
 import debug from 'debug';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
+import os from 'os';
 import random from 'random-seed';
 import uuid from 'uuid';
-import os from 'os';
 
 const log = debug('mup:module:meteor');
 
@@ -108,19 +108,22 @@ export async function push(api) {
     tmpBuildPath(appPath);
 
   var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+  var rebuild = true;
 
-  if (!api.optionEnabled('cached-build')) {
-    console.log('Building App Bundle Locally');
-    await buildApp(appPath, buildOptions, api.getVerbose());
-  } else {
+  if (api.optionEnabled('cached-build')) {
     const buildCached = fs.existsSync(bundlePath);
     if (!buildCached) {
       console.log('Unable to use previous build. It doesn\'t exist.');
-      console.log('Remove the "--cached-build" option and try again.');
-      process.exit(1);
+    } else {
+      rebuild = false;
+      console.log('Not rebuilding app. Using build from previous deploy at');
+      console.log(`${buildOptions.buildLocation}`);
     }
-    console.log('Skipping build. Using previous build at');
-    console.log(`${buildOptions.buildLocation}`);
+  }
+
+  if (rebuild) {
+    console.log('Building App Bundle Locally');
+    await buildApp(appPath, buildOptions, api.getVerbose());
   }
 
   const list = nodemiral.taskList('Pushing Meteor App');

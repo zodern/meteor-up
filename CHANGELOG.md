@@ -1,3 +1,6 @@
+## Next
+- Will build app if cached build is not found and `--cached-build` flag is set
+
 ## 1.2.7 - May 5, 2017
 - Fix verifying deployment when using ssl autogenerate
 - Add default host to nginx-proxy to redirect unknown hosts to the app when accessed over http
