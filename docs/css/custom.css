@@ -24,6 +24,16 @@ body {
     z-index: 2;
 }
 
+.home-banner .btn-default {
+    padding: 14px;
+    background-color: transparent;
+    text-decoration: underline;
+}
+
+.home-banner .btn-default:hover {
+    background-color: transparent;
+}
+
 .home-topper {
     font-weight: 100;
     font-size: 20pt;
@@ -118,6 +128,19 @@ body {
     margin-left: 5px;
 }
 
+footer {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-image: url(/meteor-up/imgs/space-bg-shadowcodex.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100px;
+    padding: 0 10%;
+}
+
 .btn-primary {
     background-color: #49a170;
 }
@@ -192,4 +215,8 @@ pre {
 code {
     background-color: #353b49;
     color: #c9f5ff;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+    background-color: #3f8b61 !important;
 }
