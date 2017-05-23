@@ -40,8 +40,12 @@ WWW_IP=$(/usr/bin/docker inspect --format='{{.NetworkSettings.IPAddress}}' <%- n
 #while [ -z "$WWW_IP" ]; do echo "Waiting for www-nginx IP..."; WWW_IP=$($WWW_IP_CMD); done
 
 # Insert web server container filter rules
-iptables -I PRE_DOCKER -i eth0 -p tcp -d $WWW_IP --dport 80  -j ACCEPT
-iptables -I PRE_DOCKER -i eth0 -p tcp -d $WWW_IP --dport 443 -j ACCEPT
+<% for(var key in localServers) { %>
+  WWW_IP=$(/usr/bin/docker inspect --format='{{.NetworkSettings.IPAddress}}' <%- localServers[key] %>)
+  iptables -I PRE_DOCKER -i eth0 -p tcp -d $WWW_IP --dport 80  -j ACCEPT
+  iptables -I PRE_DOCKER -i eth0 -p tcp -d $WWW_IP --dport 443 -j ACCEPT
+<% } %>
+
 
 # Finally insert the PRE_DOCKER table before the DOCKER table in the FORWARD chain.
 iptables -I FORWARD -o docker0 -j PRE_DOCKER

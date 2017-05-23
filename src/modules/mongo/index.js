@@ -128,6 +128,15 @@ export function whitelist(api){
     process.exit(1);
   }
   let ipwhitelist = !config.ipwhitelist ? '' : config.ipwhitelist;
+  let localServers = [];
+  if(!configMeteor.ssl){
+    localServers.push(configMeteor.name);
+  }else if(configMeteor.ssl.autogenerate){
+    localServers.push(configMeteor.name+"-nginx-letsencrypt");
+    localServers.push(configMeteor.name+"-nginx-proxy");
+  }else{
+    localServers.push(configMeteor.name+"-frontend");
+  }
 
   const list = nodemiral.taskList('Whitelist Mongo');
 
@@ -135,7 +144,8 @@ export function whitelist(api){
     script: resolvePath(__dirname, 'assets/iptables.sh'),
     vars: {
       ips: config.ipwhitelist,
-      name: configMeteor.name
+      name: configMeteor.name,
+      localServers: localServers
     }
   });
 
