@@ -1,17 +1,12 @@
 ---
 layout: docs
 title: 'Meteor Up - Getting Started'
+header: 'Getting Started'
 ---
-# Getting started
 
-## Prequisites
+## Install
 
-You need to have the following installed:
-
-- Meteor
-- Node.js (4.0 or newer) and npm
-
-Install Meteor Up with `npm install --global mup`.
+Install Meteor Up with `npm install --global mup`. It requires node 4 or newer.
 
 You need at least one server to deploy to. You can get one for $5/month or less from Digital Ocean, Vultr, or OVH.
 
@@ -24,7 +19,7 @@ mkdir .deploy
 cd .deploy && mup init
 ```
 
-> It is a common practice to store your production settings and mup config in a `.deploy` folder.
+> It is a common practice to store your production settings.json and mup config in a `.deploy` folder.
 
 ## Step 2: Customize your config
 

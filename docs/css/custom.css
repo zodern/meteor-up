@@ -139,6 +139,11 @@ nav {
 nav .brand {
     display: inline-block;
 }
+
+nav .brand a {
+    color: white;
+}
+
 nav .nav-links {
     list-style: none;
     display: inline;
@@ -147,4 +152,44 @@ nav .nav-links {
 .nav-links li {
     display: inline-block;
     padding: 0 10px;
+}
+
+.nav-links li a {
+    color: white;
+}
+
+.nav-links li.selected, .nav-links li:hover {
+    color: #6cace5;
+}
+
+a {
+    color: #6cace5;
+}
+
+#docs-head {
+    background-image: url(/meteor-up/imgs/space-bg-shadowcodex.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    background-color: black;
+    height: 200px;
+    align-items: center;
+    justify-content: center;
+}
+
+.docs-nav {
+    list-style: none;
+    padding-top: 20px;
+}
+
+pre {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: white;
+    border: none;
+}
+
+code {
+    background-color: #353b49;
+    color: #c9f5ff;
 }
