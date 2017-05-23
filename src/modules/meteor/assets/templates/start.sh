@@ -52,11 +52,11 @@ docker run \
   --volume=$BUNDLE_PATH:/bundle \
   --hostname="$HOSTNAME-$APPNAME" \
   --env-file=$ENV_FILE \
-  <% if(useLocalMongo)  { %>--link=mongodb:mongodb --env=MONGO_URL=mongodb://mongodb:27017/$APPNAME <% } %>\
-  <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %>\
-  <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %>\
-  <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %>\
-  <% for(var args in docker.args) { %> <%- docker.args[args] %> <% } %>\
+  <% if(useLocalMongo)  { %>--link=mongodb:mongodb --env=MONGO_URL=mongodb://mongodb:27017/$APPNAME <% } %> \
+  <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %> \
+  <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %> \
+  <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %> \
+  <% for(var args in docker.args) { %> <%- docker.args[args] %> <% } %> \
   <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
     -e "VIRTUAL_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_HOST=<%= sslConfig.autogenerate.domains %>" \
@@ -64,6 +64,11 @@ docker run \
     -e "HTTPS_METHOD=noredirect" \
   <% } else if(typeof proxyConfig === "object" && proxyConfig.domains) { %> \
     -e "VIRTUAL_HOST=<%= proxyConfig.domains %>" \
+    -e "HTTPS_METHOD=noredirect" \
+    <% if (proxyConfig.ssl && proxyConfig.ssl.letsEncryptEmail){ %> \
+    -e "LETSENCRYPT_HOST=<%= proxyConfig.domains %>" \
+    -e "LETSENCRYPT_EMAIL=<%= proxyConfig.ssl.letsEncryptEmail %>" \
+    <% } %> \
   <% } %> \
   --name=$APPNAME \
   <%= docker.image %>

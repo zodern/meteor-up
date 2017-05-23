@@ -1,15 +1,18 @@
-import {
-  VALIDATE_OPTIONS,
-  addLocation,
-  combineErrorDetails,
-  serversExist
-} from './utils';
+import { VALIDATE_OPTIONS, addLocation, combineErrorDetails } from './utils';
 
 import joi from 'joi';
 
 const schema = joi.object().keys({
-  servers: joi.object().required(),
-  ssl: joi.object(),
+  ssl: joi
+    .object()
+    .keys({
+      letsEncryptEmail: joi.string().trim(),
+      crt: joi.string().trim(),
+      key: joi.string().trim()
+    })
+    .and('crt', 'key')
+    .without('letsEncryptEmail', ['crt', 'key'])
+    .or('letsEncryptEmail', 'crt'),
   domains: joi.string().required(),
   clientUploadLimit: joi.number(),
   shared: joi.object().keys({
@@ -35,11 +38,5 @@ export default function(config) {
     details,
     joi.validate(config.proxy, schema, VALIDATE_OPTIONS)
   );
-  if (config.proxy.servers) {
-    details = combineErrorDetails(
-      details,
-      serversExist(config.servers, config.proxy.servers)
-    );
-  }
   return addLocation(details, 'proxy');
 }

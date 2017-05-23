@@ -30,21 +30,21 @@ export function logs(api) {
   }
 
   const args = api.getArgs().slice(1);
-  const sessions = api.getSessions(['proxy']);
+  const sessions = api.getSessions(['meteor']);
   return getDockerLogs(PROXY_CONTAINER_NAME, sessions, args);
 }
 
 export function setup(api) {
   log('exec => mup proxy setup');
   const config = api.getConfig().proxy;
+  const appName = api.getConfig().meteor.name;
+
   if (!config) {
     console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
   config.shared = config.shared || {};
-
-  config.ssl = config.ssl || {};
 
   const list = nodemiral.taskList('Setup proxy');
 
@@ -62,8 +62,17 @@ export function setup(api) {
       appName: PROXY_CONTAINER_NAME,
       httpPort: config.shared.httpPort || 80,
       httpsPort: config.shared.httpsPort || 443,
-      letsEncryptEmail: config.ssl.letsEncryptEmail,
+      letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null,
       clientUploadLimit: config.clientUploadLimit
+    }
+  });
+
+
+  list.executeScript('Cleaning Up SSL Certificates', {
+    script: resolvePath(__dirname, 'assets/ssl-cleanup.sh'),
+    vars: {
+      name: appName,
+      proxyName: PROXY_CONTAINER_NAME
     }
   });
 
@@ -72,15 +81,6 @@ export function setup(api) {
     !config.ssl.letsEncryptEmail &&
     config.ssl.upload !== false
   ) {
-    const appName = api.getConfig().meteor.name;
-
-    list.executeScript('Cleaning Up SSL Certificates', {
-      script: resolvePath(__dirname, 'assets/ssl-cleanup.sh'),
-      vars: {
-        name: appName,
-        proxyName: PROXY_CONTAINER_NAME
-      }
-    });
     list.copy('Copying SSL Certificate Bundle', {
       src: resolvePath(api.getBasePath(), config.ssl.crt),
       dest: `/opt/${appName}/config/bundle.crt`
@@ -99,7 +99,7 @@ export function setup(api) {
     });
   }
 
-  const sessions = api.getSessions(['proxy']);
+  const sessions = api.getSessions(['meteor']);
 
   return runTaskList(list, sessions, {
     series: true,
@@ -139,7 +139,7 @@ export function envconfig(api) {
       env: envLetsEncrypt || {}
     }
   });
-  const sessions = api.getSessions(['proxy']);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
     verbose: api.getVerbose()
@@ -168,7 +168,7 @@ export function start(api) {
     }
   });
 
-  const sessions = api.getSessions(['proxy']);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
     verbose: api.getVerbose()
@@ -192,6 +192,6 @@ export function stop(api) {
     }
   });
 
-  const sessions = api.getSessions(['proxy']);
+  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
