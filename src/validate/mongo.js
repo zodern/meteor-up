@@ -11,7 +11,8 @@ const schema = joi.object().keys({
   oplog: joi.bool(),
   port: joi.number(),
   version: joi.string(),
-  servers: joi.object().keys()
+  servers: joi.object().keys(),
+  ipwhitelist: joi.array()
 });
 
 export default function(config) {

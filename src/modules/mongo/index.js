@@ -11,6 +11,7 @@ export function dump() {
 
 export function help() {
   log('exec => mup mongo help');
+  console.log('mup mongo', Object.keys(this));
 }
 
 export function logs(api) {
@@ -64,12 +65,13 @@ export function setup(api) {
   return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
 
-export function start(api) {
+export function realStart(api){
   log('exec => mup mongo start');
 
   const mongoSessions = api.getSessions(['mongo']);
   const meteorSessions = api.getSessions(['meteor']);
   const config = api.getConfig().mongo;
+  let ipwhitelist = !config.ipwhitelist ? '' : config.ipwhitelist;
 
   if (
     meteorSessions.length !== 1 ||
@@ -84,12 +86,25 @@ export function start(api) {
   list.executeScript('Start Mongo', {
     script: resolvePath(__dirname, 'assets/mongo-start.sh'),
     vars: {
-      mongoVersion: config.version || '3.4.1'
+      mongoVersion: config.version || '3.4.1',
+      ipwhitelist:ipwhitelist
     }
   });
 
   const sessions = api.getSessions(['mongo']);
   return runTaskList(list, sessions, { verbose: api.getVerbose() });
+}
+
+export function start(api) {
+  log('exec => mup mongo (dummy) start');
+  
+  const config = api.getConfig().mongo;
+
+  if(config.ipwhitelist){
+    return realStart(api).then(() => whitelist(api));
+  }else{
+    return realStart(api)
+  }
 }
 
 export function stop(api) {
@@ -98,6 +113,40 @@ export function stop(api) {
 
   list.executeScript('stop mongo', {
     script: resolvePath(__dirname, 'assets/mongo-stop.sh')
+  });
+
+  const sessions = api.getSessions(['mongo']);
+  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+}
+
+export function whitelist(api){
+  log('exec => mup whitelist blkmkt');
+  const config = api.getConfig().mongo;
+  const configMeteor = api.getConfig().meteor;
+  if (!config) {
+    console.error('error: no configs found for meteor');
+    process.exit(1);
+  }
+  let ipwhitelist = !config.ipwhitelist ? '' : config.ipwhitelist;
+  let localServers = [];
+  if(!configMeteor.ssl){
+    localServers.push(configMeteor.name);
+  }else if(configMeteor.ssl.autogenerate){
+    localServers.push(configMeteor.name+"-nginx-letsencrypt");
+    localServers.push(configMeteor.name+"-nginx-proxy");
+  }else{
+    localServers.push(configMeteor.name+"-frontend");
+  }
+
+  const list = nodemiral.taskList('Whitelist Mongo');
+
+  list.executeScript('Whitelist Mongo', {
+    script: resolvePath(__dirname, 'assets/iptables.sh'),
+    vars: {
+      ips: config.ipwhitelist,
+      name: configMeteor.name,
+      localServers: localServers
+    }
   });
 
   const sessions = api.getSessions(['mongo']);
