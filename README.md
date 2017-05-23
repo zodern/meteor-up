@@ -29,6 +29,8 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
 - [Multiple Deployments with single reverse proxy](#multiple-deployments-with-single-reverse-proxy)
 - [SSL Support](#ssl-support)
 - [Nginx Upload Size](#nginx-upload)
+- [Reverse Proxy (experimental)](#reverse-proxy)
+  - [SSL](#ssl)
 - [MongoDB](#mongodb)
     - [Accessing the Database](#accessing-the-database)
     - [Change MongoDB Version](#change-mongodb-version)
@@ -168,11 +170,6 @@ module.exports = {
         domains: 'website.com,www.website.com' // comma seperated list of domains
       }
     },
-    // Set this to signal that there is a shared nginx i.e. don't start one for this app and use the shared
-    nginx: { // (optional) shared nginx frontend
-      domains: 'website.com,www.website.com', // comma seperated list of domains - same as ssl.autogenerate.domains - sets value of VIRTUAL_HOST
-      name: 'nginx-shared' // Name of the shared nginx container - defines the dir (e.g. /opt/nginx-shared) to place uploaded certificates.
-    },
     deployCheckWaitTime: 60, // default 10
     // lets you define which port to check after the deploy process, if it
     // differs from the meteor port you are serving
@@ -189,39 +186,6 @@ module.exports = {
     version: '3.4.1', // (optional), default is 3.4.1
     servers: {
       one: {},
-    },
-  },
-  nginx: { // (optional) shared nginx.
-    name: 'nginx-shared', // Create /opt/nginx-shared dir
-    httpPort: 80, // (optional) The port number to listen to for http connections. Default 80.
-    // (optional) The port to listen for htts connections. If set then SSL is
-    // enabled on the shared nginx.
-    // App can control how https and http are handled by adding HTTPS_METHOD
-    // env variable to the app container with value:
-    // HTTPS_METHOD=redirect - this is the default and it will redirect http to https
-    // HTTPS_METHOD=noredirect - allow serving the app from http and https
-    // HTTPS_METHOD=nohttp - disable the non-SSL site entirely
-    // HTTPS_METHOD=nohttps - disable the https site
-    httpsPort: 443,
-    // (optional) Set proxy wide upload limit. Setting 0 will disable the limit.
-    clientUploadLimit: 0,
-    env: { // (optional)
-      DEFAULT_HOST: 'foo.bar.com'
-    },
-    envLetsencrypt: { // (optional) env for the jrcs/letsencrypt-nginx-proxy-companion container
-      // Directory URI for the CA ACME API endpoint (default: https://acme-v01.api.letsencrypt.org/directory).
-      // If you set it's value to https://acme-staging.api.letsencrypt.org/directory letsencrypt will use test
-      // servers that don't have the 5 certs/week/domain limits.
-      ACME_CA_URI:  'https://acme-v01.api.letsencrypt.org/directory',
-      // Set it to true to enable debugging of the entrypoint script and generation of LetsEncrypt certificates,
-      // which could help you pin point any configuration issues.
-      DEBUG: true,
-      // If for some reason you can't use the docker --volumes-from option, you can specify the name or id of
-      // the nginx-proxy container with this variable
-      NGINX_PROXY_CONTAINER: 'id or name'
-    },
-    servers: {
-      one: {}
     }
   }
 };
@@ -358,7 +322,7 @@ To deploy to *different* environments (e.g. staging, production, etc.), use sepa
 
 ### Multiple Deployments
 
-Meteor Up supports multiple deployments to a single server. Meteor Up only does the deployment; if you need to configure subdomains, you need to manually set up a reverse proxy yourself.
+Meteor Up supports multiple deployments to a single server. To route requests to the correct app, use the [reverse proxy](#reverse-proxy)
 
 Let's assume we need to deploy production and staging versions of the app to the same server. The production app runs on port 80 and the staging app runs on port 8000.
 
@@ -415,21 +379,18 @@ meteor: {
 }
 ```
 
-### Reverse Proxy and SSL setup
+### Reverse Proxy
 
-Meteor Up can create a single nginx proxy that will handle ssl and, if you are running multiple apps on the server, it will route requests to the correct app.
+Meteor Up can create a nginx reverse proxy that will handle ssl and, if you are running multiple apps on the server, it will route requests to the correct app. The proxy is shared between all apps on the servers.
 
-This currently is an experimental feature, as the configuration might have breaking changes between releases until it is finalized. This will eventually replace the former nginx setup, configured using `meteor.ssl` and `meteor.nginx`.
+This currently is an experimental feature. This means that the configuration might have breaking changes between releases until it is finalized. This will eventually replace the former nginx setup, configured using `meteor.ssl` and `meteor.nginx`.
+
+Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` section:
 
 ```js
 {
   ...
   proxy: { 
-    // All of the servers to setup the proxy on.
-    // This should be the same servers as you deploy your app to
-    servers: {
-      one: {}
-    },
     ssl: {
       letsEncryptEmail: 'address@gmail.com'
     },
@@ -437,17 +398,65 @@ This currently is an experimental feature, as the configuration might have break
     // will be accessed at.
     // You will need to configure your dns for each one.
     domains: 'website.com,www.website.com'
+}
+```
 
+You need to stop each app deployed to the servers:
+```bash
+mup stop
+```
+
+Then, run
+```bash
+mup setup
+mup reconfig
+```
+
+#### SSL
+Add an `ssl` object to your `proxy` config:
+```js
+{
+  ...
+  proxy: {
+    ...
+    ssl: {
+      // For using let's encrypt
+      letsEncryptEmail: 'email@domain.com'
+
+      // Use custom certificates
+      crt: './bundle.crt',
+      key: './private.pem'
+    }
+  }
+}
+```
+If you are using custom certificates instead, it would look like:
+```js
+proxy: {
+  ssl: {
+    crt: './bundle.crt',
+    key: './private.pem'
+  }
+}
+```
+
+#### Advance configuration
+
+```js
+{
+  proxy: {
     // Settings here will be applied to every app deployed on the servers.
-    // This only needs to be set in one app that is on the server.
     // Everything is optional. These won't need to be changed for most apps.
+    //
+    // This only needs to be set in one app that is on the server. 
+    // If multiple apps have `proxy.shared`, they will override each other when `mup setup` is run for an app.
     shared: {
       // The port number to listen to for http connections. Default 80.
       httpPort: 80, 
       // The port to listen for htts connections. Default is 443.
       httpsPort: 443,
       // Set proxy wide upload limit. Setting 0 will disable the limit.
-      clientUploadLimit: 0,
+      clientUploadLimit: '10M',
       // Environtment variables for nginx proxy
       env: {
         DEFAULT_HOST: 'foo.bar.com'
@@ -463,20 +472,9 @@ This currently is an experimental feature, as the configuration might have break
       DEBUG: true
     },
   }
- ...
 }
 ```
 
-
-You need to stop each app deployed to the servers:
-```bash
-mup stop
-```
-
-Then, run
-```bash
-mup setup
-```
 
 ### Changing `appName`
 

@@ -33,7 +33,7 @@ while [[ true ]]; do
   #
   # --fail Before the app is started, nginx returns an error page. Without this, it would take that as meaning the app was running
   # --L Follow redirects. Needed to still work when using --fail and redirected to https version
-  # --insecure Without this, it would fail if there was a problem with the certificates
+  # --insecure Without this, it would sometimes fail when ssl is set up
   curl \
     --fail \
     -L \
