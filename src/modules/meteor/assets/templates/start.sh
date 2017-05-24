@@ -11,6 +11,7 @@ NGINX_PROXY_VERSION=latest
 LETS_ENCRYPT_VERSION=latest
 
 # Remove previous version of the app, if exists
+docker network disconnect -f bridge $APPNAME
 docker rm -f $APPNAME
 
 # Remove container network if still exists
@@ -21,6 +22,7 @@ docker network disconnect <%=  docker.networks[network] %> -f $APPNAME
 <% } %>
 
 # Remove frontend container if exists
+docker network disconnect -f bridge $APPNAME-frontend
 docker rm -f $APPNAME-frontend
 docker network disconnect bridge -f $APPNAME-frontend
 echo "Removed $APPNAME-frontend"
