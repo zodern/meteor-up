@@ -10,6 +10,7 @@
     "prepublish": "npm run build -s",
     "build": "babel src --out-dir lib --sourceRoot=./ --copy-files --presets=es2015,es2016,es2017,stage-3",
     "build:watch": "npm run build -s -- -w",
+    "pretest": "npm run lint",
     "test": "bash ./tests/run.sh",
     "test:watch": "bash ./tests/run-watch.sh",
     "test:custom-server": "mocha --compilers js:babel-register --require babel-polyfill lib/**/__tests__/**/*.js",

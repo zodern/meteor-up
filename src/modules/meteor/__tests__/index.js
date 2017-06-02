@@ -111,7 +111,7 @@ describe('module - meteor', function() {
     it('should start meteor on "meteor" vm', async () => {
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
 
-      sh.exec('mup setup --verbose && mup meteor push --cached-build && mup meteor envconfig');
+      sh.exec('mup setup && mup meteor push --cached-build && mup meteor envconfig');
       const out = sh.exec('mup meteor start');
       assert.equal(out.code, 0);
 

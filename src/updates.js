@@ -1,8 +1,8 @@
 import Npm from 'silent-npm-registry-client';
 import boxen from 'boxen';
 import chalk from 'chalk';
-import pkg from '../package.json';
 import debug from 'debug';
+import pkg from '../package.json';
 
 let log = debug('mup:updates');
 
@@ -12,7 +12,7 @@ export default function() {
     const params = {
       timeout: 1000,
       package: pkg.name,
-      auth: {} 
+      auth: {}
     };
 
     const npm = new Npm();
@@ -34,7 +34,9 @@ export default function() {
         remote[1] === local[1] && remote[2] > local[2];
 
       if (beta && !available) {
-        available = remote[0] === local[0] && remote[1] === local[1] && remote[2] === local[2];
+        available = remote[0] === local[0] &&
+         remote[1] === local[1] &&
+         remote[2] === local[2];
       }
 
       if (available) {
