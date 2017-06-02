@@ -387,7 +387,7 @@ This currently is an experimental feature. This means that the configuration mig
 
 Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` section:
 
-```js
+```ts
 {
   ...
   proxy: { 
@@ -414,7 +414,7 @@ mup reconfig
 
 #### SSL
 Add an `ssl` object to your `proxy` config:
-```js
+```ts
 {
   ...
   proxy: {
@@ -431,7 +431,7 @@ Add an `ssl` object to your `proxy` config:
 }
 ```
 If you are using custom certificates instead, it would look like:
-```js
+```ts
 proxy: {
   ssl: {
     crt: './bundle.crt',
@@ -442,7 +442,7 @@ proxy: {
 
 #### Advance configuration
 
-```js
+```ts
 {
   proxy: {
     // Settings in "proxy.shared" will be applied to every app deployed on the servers.

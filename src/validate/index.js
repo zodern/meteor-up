@@ -10,7 +10,7 @@ const schema = joi.object().keys({
   servers: joi.object().required(),
   meteor: joi.object(),
   mongo: joi.object(),
-  proxy: joi.object(),
+  proxy: joi.object()
 });
 
 function validateAll(config) {

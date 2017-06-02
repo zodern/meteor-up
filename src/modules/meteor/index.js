@@ -178,7 +178,7 @@ export function envconfig(api) {
       };
     }
   }
-  
+
   if (config.dockerImageFrontendServer) {
     config.docker.imageFrontendServer = config.dockerImageFrontendServer;
   }
@@ -221,8 +221,8 @@ export function envconfig(api) {
   // port.
 
   // docker.imagePort is used for the port exposed from the container.
-  // In case the docker.imagePort is different than the container's default port,
-  // we set the env PORT to docker.imagePort.
+  // In case the docker.imagePort is different than the container's
+  // default port, we set the env PORT to docker.imagePort.
   env.PORT = config.docker.imagePort;
 
   list.copy('Sending Environment Variables', {

@@ -34,7 +34,8 @@ module.exports = {
     //   // Enables let's encrypt (optional)
     //   autogenerate: {
     //     email: 'email.address@domain.com',
-    //     domains: 'website.com,www.website.com' // comma seperated list of domains
+    //     // comma seperated list of domains
+    //     domains: 'website.com,www.website.com'
     //   }
     // },
 
