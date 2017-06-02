@@ -1,9 +1,4 @@
-import {
-  VALIDATE_OPTIONS,
-  addLocation,
-  combineErrorDetails,
-  serversExist
-} from './utils';
+import { VALIDATE_OPTIONS, addLocation, combineErrorDetails, serversExist } from './utils';
 
 import joi from 'joi';
 
