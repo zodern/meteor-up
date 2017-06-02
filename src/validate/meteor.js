@@ -55,7 +55,9 @@ const schema = joi.object().keys({
   }),
   volumes: joi.object(),
   nginx: joi.object().keys({
-    clientUploadLimit: joi.string().trim()
+    clientUploadLimit: joi.string().trim(),
+    domains: joi.string().trim(),
+    name: joi.string().trim().min(1)
   }),
   ssl: joi
     .object()

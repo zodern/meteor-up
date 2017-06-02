@@ -1,4 +1,14 @@
 ## Next
+- Implement shared nginx proxy (@shaiamir)
+    - Is configured with a `proxy` object instead of using `meteor.ssl` and `meteor.nginx`
+    - If multiple apps are deployed to a server, routes requests to the correct container
+    - Adds `mup proxy` command. For a list of subcommands, run `mup proxy help`
+    - Supports using custom certificates. This should be used instead of `meteor.ssl` since the previous image used for custom certificates has security problems.
+    - Supports configuring the env variables for the nginx and let's encrypt containers.
+    - Saves between 15 - 30 seconds during deployment compared to using `meteor.ssl`.
+
+- `mup stop` also stops nginx proxy and let's encrypt containers
+- App's container PORT env variable is set to `docker.imagePort`
 - Will build app if cached build is not found and `--cached-build` flag is set
 
 ## 1.2.7 - May 5, 2017

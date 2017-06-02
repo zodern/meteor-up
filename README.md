@@ -28,6 +28,8 @@ This version of Meteor Up is powered by [Docker](http://www.docker.com/), making
 - [Multiple Deployments](#multiple-deployments)
 - [SSL Support](#ssl-support)
 - [Nginx Upload Size](#nginx-upload)
+- [Reverse Proxy (experimental)](#reverse-proxy)
+  - [SSL](#ssl)
 - [MongoDB](#mongodb)
     - [Accessing the Database](#accessing-the-database)
     - [Change MongoDB Version](#change-mongodb-version)
@@ -183,8 +185,8 @@ module.exports = {
     version: '3.4.1', // (optional), default is 3.4.1
     servers: {
       one: {},
-    },
-  },
+    }
+  }
 };
 ```
 
@@ -243,7 +245,9 @@ meteor: {
 
 #### Deploy Wait Time
 
-Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`.
+Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`. 
+
+The app's client should have the http status code 200 or redirect on the server to a page that does. If your app does neither, adding the package `zodern:mup-helpers` should allow the deploy check to work.
 
 Most docker images used with mup run `npm install` before starting the app. Especially for small servers, this can take awhile. If deployments fail with `Verifying Deployment: FAILED`, and it looks like npm didn't finish installing dependencies, try increasing the value in `meteor.deployCheckWaitTime`
 
@@ -319,27 +323,26 @@ To deploy to *different* environments (e.g. staging, production, etc.), use sepa
 
 ### Multiple Deployments
 
-Meteor Up supports multiple deployments to a single server. Meteor Up only does the deployment; if you need to configure subdomains, you need to manually set up a reverse proxy yourself.
+Meteor Up supports multiple deployments to a single server. To route requests to the correct app, use the [reverse proxy](#reverse-proxy)
 
-Let's assume we need to deploy production and staging versions of the app to the same server. The production app runs on port 80 and the staging app runs on port 8000.
+Let's assume we need to deploy production and staging versions of the app to the same server. The production is at myapp.com, and staging is at staging.myapp.com.
 
 We need to have two separate Meteor Up projects. For that, create two directories and initialize Meteor Up and add the necessary configurations.
 
-In the staging `mup.js`, add a field called `appName` with the value `staging`. You can add any name you prefer instead of `staging`. Since we are running our staging app on port 8000, add an environment variable called `PORT` with the value 8000.
+In the staging `mup.js`, add a field called `appName` with the value `staging`. You can add any name you prefer instead of `staging`.
 
-You also have to tell meteor to use this custom port like this:
+Next, add the proxy object to both configs. For your production app, it would be:
 
 ```ts
-meteor: {
+{
   ...
-  env: {
-    ...
-    PORT: 8000
-    ...
+  proxy: {
+    domains: 'staging.myapp.com'
   }
-  ...
 }
 ```
+
+For the staging app, `proxy.domains` would be `staging.myapp.com`.
 
 Now set up both projects and deploy as you need.
 
@@ -376,6 +379,103 @@ meteor: {
 }
 ```
 
+### Reverse Proxy
+
+Meteor Up can create a nginx reverse proxy that will handle ssl, and, if you are running multiple apps on the server, it will route requests to the correct app. The proxy is shared between all apps on the servers.
+
+This currently is an experimental feature. This means that the configuration might have breaking changes between releases until it is finalized. This will eventually replace the former nginx setup, configured using `meteor.ssl` and `meteor.nginx`.
+
+Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` section:
+
+```js
+{
+  ...
+  proxy: { 
+    ssl: {
+      letsEncryptEmail: 'address@gmail.com'
+    },
+    // comma seperated list of domains your website
+    // will be accessed at.
+    // You will need to configure your dns for each one.
+    domains: 'website.com,www.website.com'
+}
+```
+
+You need to stop each app deployed to the servers:
+```bash
+mup stop
+```
+
+Then, run
+```bash
+mup setup
+mup reconfig
+```
+
+#### SSL
+Add an `ssl` object to your `proxy` config:
+```js
+{
+  ...
+  proxy: {
+    ...
+    ssl: {
+      // For using let's encrypt
+      letsEncryptEmail: 'email@domain.com'
+
+      // Use custom certificates
+      crt: './bundle.crt',
+      key: './private.pem'
+    }
+  }
+}
+```
+If you are using custom certificates instead, it would look like:
+```js
+proxy: {
+  ssl: {
+    crt: './bundle.crt',
+    key: './private.pem'
+  }
+}
+```
+
+#### Advance configuration
+
+```js
+{
+  proxy: {
+    // Settings in "proxy.shared" will be applied to every app deployed on the servers.
+    // Everything is optional. These won't need to be changed for most apps.
+    //
+    // This only needs to be set in one app that is on the server. 
+    // If multiple apps have `proxy.shared`, they will override each other when `mup setup` is run for an app.
+    shared: {
+      // The port number to listen to for http connections. Default 80.
+      httpPort: 80, 
+      // The port to listen for htts connections. Default is 443.
+      httpsPort: 443,
+      // Set proxy wide upload limit. Setting 0 will disable the limit.
+      clientUploadLimit: '10M',
+      // Environtment variables for nginx proxy
+      env: {
+        DEFAULT_HOST: 'foo.bar.com'
+      },
+      // env for the jrcs/letsencrypt-nginx-proxy-companion container
+      envLetsencrypt: {
+      // Directory URI for the CA ACME API endpoint (default: https://acme-v01.api.letsencrypt.org/directory).
+      // If you set it's value to https://acme-staging.api.letsencrypt.org/directory letsencrypt will use test
+      // servers that don't have the 5 certs/week/domain limits.
+      ACME_CA_URI:  'https://acme-v01.api.letsencrypt.org/directory',
+      // Set it to true to enable debugging of the entrypoint script and generation of LetsEncrypt certificates,
+      // which could help you pin point any configuration issues.
+      DEBUG: true
+    },
+  }
+}
+```
+
+
 ### Changing `appName`
 
 It's pretty okay to change the `appName`. But before you do so, you need to stop the project with older `appName`.
@@ -388,6 +488,8 @@ You can keep multiple configuration and settings files in the same directory and
 
 ### SSL Support
 Meteor UP can enable SSL support for your app. It can either autogenerate the certificates, or upload them from your dev computer.
+
+**If you are using the reverse proxy, follow [these instructions](#ssl) instead.**
 
 ### Autogenerate certificates
 
@@ -434,7 +536,9 @@ To learn more about SSL setup when using your own certificates, refer to the [`m
 
 If you would like to increase the client upload limits, you can change it by adding:
 
-***This Only Works if you are using the Let's Encrypt Autogenerated SSL's as it uses a different nginx container***
+***This Only Works if you are using the Let's Encrypt Autogenerated SSL's***
+
+**If you are using the reverse proxy, follow [these instructions](#advance-configuration) instead.**
 
 ```ts
 
@@ -513,7 +617,11 @@ The `--verbose` flag shows output from commands and scripts run on the server.
 
 > Verifying Deployment: FAILED
 
-If you do not see `=> Starting meteor app on port:80` in the logs, it might not have had enough time to finish running `npm install`. If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not.
+If you do not see `=> Starting meteor app on port:80` in the logs, it might not have had enough time to finish running `npm install`. 
+
+If you do see it in your logs:
+1) Make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not.
+2) If your app's home page has a http status code other than 200, and does not redirect to a page that does, add the meteor package `zodern:mup-helpers`.
 
 > Mup silently fails, mup.js file opens instead, or you get a Windows script error
 

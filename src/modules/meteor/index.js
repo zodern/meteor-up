@@ -9,6 +9,7 @@ import nodemiral from 'nodemiral';
 import os from 'os';
 import random from 'random-seed';
 import uuid from 'uuid';
+import { PROXY_CONTAINER_NAME } from '../proxy/index.js';
 
 const log = debug('mup:module:meteor');
 
@@ -177,6 +178,7 @@ export function envconfig(api) {
       };
     }
   }
+  
   if (config.dockerImageFrontendServer) {
     config.docker.imageFrontendServer = config.dockerImageFrontendServer;
   }
@@ -205,6 +207,8 @@ export function envconfig(api) {
       logConfig: config.log,
       volumes: config.volumes,
       docker: config.docker,
+      proxyConfig: api.getConfig().proxy,
+      proxyName: PROXY_CONTAINER_NAME,
       nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
     }
   });
@@ -212,9 +216,14 @@ export function envconfig(api) {
   var env = _.clone(config.env);
   env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
   // sending PORT to the docker container is useless.
-  // It'll run on PORT 80 and we can't override it
-  // Changing the port is done via the start.sh script
-  delete env.PORT;
+
+  // setting PORT in the config is used for the publicly accessible
+  // port.
+
+  // docker.imagePort is used for the port exposed from the container.
+  // In case the docker.imagePort is different than the container's default port,
+  // we set the env PORT to docker.imagePort.
+  env.PORT = config.docker.imagePort;
 
   list.copy('Sending Environment Variables', {
     src: resolvePath(__dirname, 'assets/templates/env.list'),
@@ -240,6 +249,8 @@ export function start(api) {
     process.exit(1);
   }
 
+  let route = api.hasMeteorPackage('zodern:mup-helpers') ? '/___mup_verify' : '';
+
   const list = nodemiral.taskList('Start Meteor');
 
   list.executeScript('Start Meteor', {
@@ -254,7 +265,9 @@ export function start(api) {
     vars: {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
-      deployCheckPort: config.deployCheckPort || config.env.PORT || 80
+      deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
+      deployCheckPath: route,
+      host: api.getConfig().proxy ? api.getConfig().proxy.domains.split(',')[0] : null
     }
   });
 

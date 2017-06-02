@@ -29,6 +29,19 @@ module.exports = {
       ROOT_URL: 'http://app.com',
       MONGO_URL: 'mongodb://localhost/meteor',
     },
+    
+    //ssl: { // (optional)
+    //  // Enables let's encrypt (optional)
+    //  autogenerate: {
+    //    email: 'email.address@domain.com',
+    //    domains: 'website.com,www.website.com' // comma seperated list of domains
+    //  }
+    //},
+    // Set this to signal that there is a shared nginx i.e. don't start one for this app and use the shared
+    //nginx: { // (optional) shared nginx frontend
+    //	domains: 'website.com,www.website.com', // comma seperated list of domains - same as ssl.autogenerate.domains - sets value of VIRTUAL_HOST
+    //	name: 'nginx-shared' // Name of the shared nginx container - defines the dir (e.g. /opt/nginx-shared) to place uploaded certifications.
+    //},
 
     docker: {
       // change to 'kadirahq/meteord' if your app is not using Meteor 1.4
@@ -51,7 +64,196 @@ module.exports = {
     port: 27017,
     version: '3.4.1',
     servers: {
-      one: {}
-    }
-  }
+      one: {},
+    },
+  },
+  
+  //nginx: { // (optional) shared nginx.
+  //	name: 'nginx-shared', // Is this needed?
+  //	httpPort: 80, // (optional) The port number to listen to for http connections. Default will be 80.
+  //	// (optional) The port to listen for htts connections. If set then SSL is
+  //	// enabled and all traffic will be redirected to HTTPS.
+  //	// App can control how https and http are handled by adding HTTPS_METHOD
+  //	// env variable to the app container with value:
+  //	// HTTPS_METHOD=redirect - this is the default and it will redirect http to https
+  //	// HTTPS_METHOD=noredirect - allow serving the app from http and https
+  //	// HTTPS_METHOD=nohttp - disable the non-SSL site entirely
+  //	// HTTPS_METHOD=nohttps - disable the https site 
+  //	httpsPort: 443,
+  //	env: {
+  //		DEFAULT_HOST: 'foo.bar.com'
+  //	},
+  //	envLetsencrypt: {
+  //		// Directory URI for the CA ACME API endpoint (default: https://acme-v01.api.letsencrypt.org/directory).
+  //		// If you set it's value to https://acme-staging.api.letsencrypt.org/directory letsencrypt will use test
+  //		// servers that don't have the 5 certs/week/domain limits.
+  //		ACME_CA_URI:  'https://acme-v01.api.letsencrypt.org/directory',
+  //		// Set it to true to enable debugging of the entrypoint script and generation of LetsEncrypt certificates,
+  //		// which could help you pin point any configuration issues.
+  //		DEBUG: true,
+  //		// If for some reason you can't use the docker --volumes-from option, you can specify the name or id of
+  //		// the nginx-proxy container with this variable
+  //		NGINX_PROXY_CONTAINER: 'id or name'
+  //	},
+  //	servers: {
+  //		one: {}
+  //	}
+  //}
+};
+
+  meteor: {
+    name: 'app',
+    path: '../app',
+    servers: {
+      one: {},
+    },
+    buildOptions: {
+      serverOnly: true,
+    },
+    env: {
+      ROOT_URL: 'app.com',
+      MONGO_URL: 'mongodb://localhost/meteor',
+    },
+    
+    //ssl: { // (optional)
+    //  // Enables let's encrypt (optional)
+    //  autogenerate: {
+    //    email: 'email.address@domain.com',
+    //    domains: 'website.com,www.website.com' // comma seperated list of domains
+    //  }
+    //},
+    // Set this to signal that there is a shared nginx i.e. don't start one for this app and use the shared
+    //nginx: { // (optional) shared nginx frontend
+    //	domains: 'website.com,www.website.com', // comma seperated list of domains - same as ssl.autogenerate.domains - sets value of VIRTUAL_HOST
+    //	name: 'nginx-shared' // Name of the shared nginx container - defines the dir (e.g. /opt/nginx-shared) to place uploaded certifications.
+    //},
+
+    // change to 'kadirahq/meteord' if your app is not using Meteor 1.4
+    dockerImage: 'abernix/meteord:base',
+    deployCheckWaitTime: 60,
+    
+    // Show progress bar while uploading bundle to server
+    // You might need to disable it on CI servers
+    enableUploadProgressBar: false
+  },
+
+  mongo: {
+    oplog: true,
+    port: 27017,
+    version: '3.4.1',
+    servers: {
+      one: {},
+    },
+  },
+  
+  //nginx: { // (optional) shared nginx.
+  //	name: 'nginx-shared', // Is this needed?
+  //	httpPort: 80, // (optional) The port number to listen to for http connections. Default will be 80.
+  //	// (optional) The port to listen for htts connections. If set then SSL is
+  //	// enabled and all traffic will be redirected to HTTPS.
+  //	// App can control how https and http are handled by adding HTTPS_METHOD
+  //	// env variable to the app container with value:
+  //	// HTTPS_METHOD=redirect - this is the default and it will redirect http to https
+  //	// HTTPS_METHOD=noredirect - allow serving the app from http and https
+  //	// HTTPS_METHOD=nohttp - disable the non-SSL site entirely
+  //	// HTTPS_METHOD=nohttps - disable the https site 
+  //	httpsPort: 443,
+  //	env: {
+  //		DEFAULT_HOST: 'foo.bar.com'
+  //	},
+  //	envLetsencrypt: {
+  //		// Directory URI for the CA ACME API endpoint (default: https://acme-v01.api.letsencrypt.org/directory).
+  //		// If you set it's value to https://acme-staging.api.letsencrypt.org/directory letsencrypt will use test
+  //		// servers that don't have the 5 certs/week/domain limits.
+  //		ACME_CA_URI:  'https://acme-v01.api.letsencrypt.org/directory',
+  //		// Set it to true to enable debugging of the entrypoint script and generation of LetsEncrypt certificates,
+  //		// which could help you pin point any configuration issues.
+  //		DEBUG: true,
+  //		// If for some reason you can't use the docker --volumes-from option, you can specify the name or id of
+  //		// the nginx-proxy container with this variable
+  //		NGINX_PROXY_CONTAINER: 'id or name'
+  //	},
+  //	servers: {
+  //		one: {}
+  //	}
+  //}
+};
+
+  meteor: {
+    name: 'app',
+    path: '../app',
+    servers: {
+      one: {},
+    },
+    buildOptions: {
+      serverOnly: true,
+    },
+    env: {
+      ROOT_URL: 'app.com',
+      MONGO_URL: 'mongodb://localhost/meteor',
+    },
+    
+    //ssl: { // (optional)
+    //  // Enables let's encrypt (optional)
+    //  autogenerate: {
+    //    email: 'email.address@domain.com',
+    //    domains: 'website.com,www.website.com' // comma seperated list of domains
+    //  }
+    //},
+    // Set this to signal that there is a shared nginx i.e. don't start one for this app and use the shared
+    //nginx: { // (optional) shared nginx frontend
+    //	domains: 'website.com,www.website.com', // comma seperated list of domains - same as ssl.autogenerate.domains - sets value of VIRTUAL_HOST
+    //	name: 'nginx-shared' // Name of the shared nginx container - defines the dir (e.g. /opt/nginx-shared) to place uploaded certifications.
+    //},
+
+    // change to 'kadirahq/meteord' if your app is not using Meteor 1.4
+    dockerImage: 'abernix/meteord:base',
+    deployCheckWaitTime: 60,
+    
+    // Show progress bar while uploading bundle to server
+    // You might need to disable it on CI servers
+    enableUploadProgressBar: false
+  },
+
+  mongo: {
+    oplog: true,
+    port: 27017,
+    version: '3.4.1',
+    dbDir: '/var/lib/mongodb', // (optional) default is '/var/lib/mongodb'
+    servers: {
+      one: {},
+    },
+  },
+  
+  //nginx: { // (optional) shared nginx.
+  //	name: 'nginx-shared', // Is this needed?
+  //	httpPort: 80, // (optional) The port number to listen to for http connections. Default will be 80.
+  //	// (optional) The port to listen for htts connections. If set then SSL is
+  //	// enabled and all traffic will be redirected to HTTPS.
+  //	// App can control how https and http are handled by adding HTTPS_METHOD
+  //	// env variable to the app container with value:
+  //	// HTTPS_METHOD=redirect - this is the default and it will redirect http to https
+  //	// HTTPS_METHOD=noredirect - allow serving the app from http and https
+  //	// HTTPS_METHOD=nohttp - disable the non-SSL site entirely
+  //	// HTTPS_METHOD=nohttps - disable the https site 
+  //	httpsPort: 443,
+  //	env: {
+  //		DEFAULT_HOST: 'foo.bar.com'
+  //	},
+  //	envLetsencrypt: {
+  //		// Directory URI for the CA ACME API endpoint (default: https://acme-v01.api.letsencrypt.org/directory).
+  //		// If you set it's value to https://acme-staging.api.letsencrypt.org/directory letsencrypt will use test
+  //		// servers that don't have the 5 certs/week/domain limits.
+  //		ACME_CA_URI:  'https://acme-v01.api.letsencrypt.org/directory',
+  //		// Set it to true to enable debugging of the entrypoint script and generation of LetsEncrypt certificates,
+  //		// which could help you pin point any configuration issues.
+  //		DEBUG: true,
+  //		// If for some reason you can't use the docker --volumes-from option, you can specify the name or id of
+  //		// the nginx-proxy container with this variable
+  //		NGINX_PROXY_CONTAINER: 'id or name'
+  //	},
+  //	servers: {
+  //		one: {}
+  //	}
+  //}
 };

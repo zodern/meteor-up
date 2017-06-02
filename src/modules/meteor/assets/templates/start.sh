@@ -44,7 +44,7 @@ echo "Pulled <%= docker.image %>"
 docker run \
   -d \
   --restart=always \
-  <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
+  <% if((sslConfig && typeof sslConfig.autogenerate === "object") || (typeof proxyConfig === "object" && proxyConfig.domains))  { %> \
   --expose=80 \
   <% } else { %> \
   --publish=$BIND:$PORT:<%= docker.imagePort %> \
@@ -52,24 +52,31 @@ docker run \
   --volume=$BUNDLE_PATH:/bundle \
   --hostname="$HOSTNAME-$APPNAME" \
   --env-file=$ENV_FILE \
-  <% if(useLocalMongo)  { %>--link=mongodb:mongodb --env=MONGO_URL=mongodb://mongodb:27017/$APPNAME <% } %>\
-  <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %>\
-  <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %>\
-  <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %>\
-  <% for(var args in docker.args) { %> <%- docker.args[args] %> <% } %>\
+  <% if(useLocalMongo)  { %>--link=mongodb:mongodb --env=MONGO_URL=mongodb://mongodb:27017/$APPNAME <% } %> \
+  <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %> \
+  <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %> \
+  <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %> \
+  <% for(var args in docker.args) { %> <%- docker.args[args] %> <% } %> \
   <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
     -e "VIRTUAL_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_EMAIL=<%= sslConfig.autogenerate.email %>" \
     -e "HTTPS_METHOD=noredirect" \
+  <% } else if(typeof proxyConfig === "object" && proxyConfig.domains) { %> \
+    -e "VIRTUAL_HOST=<%= proxyConfig.domains %>" \
+    -e "HTTPS_METHOD=noredirect" \
+    <% if (proxyConfig.ssl && proxyConfig.ssl.letsEncryptEmail){ %> \
+    -e "LETSENCRYPT_HOST=<%= proxyConfig.domains %>" \
+    -e "LETSENCRYPT_EMAIL=<%= proxyConfig.ssl.letsEncryptEmail %>" \
+    <% } %> \
   <% } %> \
   --name=$APPNAME \
   <%= docker.image %>
 echo "Ran <%= docker.image %>"
 sleep 15s
 
-<% if(typeof sslConfig === "object")  { %>
-  <% if(typeof sslConfig.autogenerate === "object")  { %>
+<% if(typeof sslConfig === "object") { %>
+   <% if(typeof sslConfig.autogenerate === "object")  { %>
     echo "Running autogenerate"
     # Get the nginx template for nginx-gen
     wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl -O /opt/$APPNAME/config/nginx.tmpl
@@ -108,7 +115,14 @@ EOT
       -v /var/run/docker.sock:/var/run/docker.sock:ro \
       jrcs/letsencrypt-nginx-proxy-companion:$LETS_ENCRYPT_VERSION
     echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
-  <% } else { %>
+    <% } else { %>
+      # Using shared nginx so just copy the cert files to the right place.
+    <% if(typeof proxyConfig === "object"  && proxyConfig.domains)  { %>
+      <% var domainsArr=proxyConfig.domains.split(','); for(var i=0; i<domainsArr.length; i++) { %>
+        cp /opt/$APPNAME/config/bundle.crt /opt/<%= proxyName %>/certs/<%= domainsArr[i] %>.crt
+        cp /opt/$APPNAME/config/private.key /opt/<%= proxyName %>/certs/<%= domainsArr[i] %>.key
+      <% } %>
+    <% } else { %>
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
     docker pull <%= docker.imageFrontendServer %>
@@ -123,6 +137,7 @@ EOT
       --name=$APPNAME-frontend \
       <%= docker.imageFrontendServer %> /start.sh
   <% } %>
+<% } %>
 <% } %>
 
 <% for(var network in docker.networks) { %>

@@ -1,6 +1,7 @@
 import * as docker from '../docker/';
 import * as meteor from '../meteor/';
 import * as mongo from '../mongo/';
+import * as proxy from '../proxy/';
 
 import debug from 'debug';
 import { resolvePath } from '../utils';
@@ -93,6 +94,11 @@ export function setup(api) {
     .then(() => {
       if (config.mongo) {
         return mongo.start(api);
+      }
+    })
+    .then(() => {
+      if (config.proxy) {
+        return proxy.setup(api);
       }
     })
     .then(displayNextSteps);
