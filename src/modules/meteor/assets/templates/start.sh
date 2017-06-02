@@ -10,6 +10,9 @@ BIND=<%= bind %>
 NGINX_PROXY_VERSION=latest
 LETS_ENCRYPT_VERSION=latest
 
+# We want this message with the errors in stderr when shown to the user.
+>&2 echo "Removing docker containers. Errors about nonexistent endpoints and containers are normal.";
+
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
 
@@ -23,17 +26,15 @@ docker network disconnect <%=  docker.networks[network] %> -f $APPNAME
 # Remove frontend container if exists
 docker rm -f $APPNAME-frontend
 docker network disconnect bridge -f $APPNAME-frontend
-echo "Removed $APPNAME-frontend"
-
 
 # Remove let's encrypt containers if exists
 docker rm -f $APPNAME-nginx-letsencrypt
 docker network disconnect bridge -f $APPNAME-nginx-letsencrypt
-echo "Removed $APPNAME-nginx-letsencrypt"
 
 docker rm -f $APPNAME-nginx-proxy
 docker network disconnect bridge -f $APPNAME-nginx-proxy
-echo "Removed $APPNAME-nginx-proxy"
+
+>&2 echo "Finished removing docker containers"
 
 # We don't need to fail the deployment because of a docker hub downtime
 set +e
@@ -131,9 +132,7 @@ EOT
       <%= docker.imageFrontendServer %> /start.sh
   <% } %>
 <% } %>
-<% } %>
 
 <% for(var network in docker.networks) { %>
-docker network connect <%=  docker.networks[network] %> $APPNAME
-
+  docker network connect <%=  docker.networks[network] %> $APPNAME
 <% } %>
