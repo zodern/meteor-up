@@ -2,8 +2,10 @@ APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
-DEPLOY_CHECK_PORT=<%= deployCheckPort %>
+DEPLOY_CHECK_URL=<%= `localhost:${deployCheckPort}${deployCheckPath}` %>
 HOST=<%= host %>
+
+echo $DEPLOY_CHECK_URL
 
 cd $APP_PATH
 
@@ -38,7 +40,7 @@ while [[ true ]]; do
     --fail \
     -L \
     --insecure \
-    localhost:$DEPLOY_CHECK_PORT \
+    $DEPLOY_CHECK_URL \
     <% if (host) { %> --header "HOST:$HOST" <% } %>  \
     && exit 0
 

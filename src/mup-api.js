@@ -34,6 +34,23 @@ export default class MupAPI {
     return this.verbose;
   }
 
+  hasMeteorPackage(name) {
+    // Check if app is using the package
+    try {
+      var contents = fs
+        .readFileSync(resolvePath(this.getBasePath(), this.getConfig().meteor.path, '.meteor/versions'))
+        .toString();
+      // Looks for "package-name@" in the begining of a
+      // line or at the start of the file
+      let regex = new RegExp(`(^|\\s)${name}@`, 'm');
+      return regex.test(contents);
+
+    } catch (e) {
+      console.log(`Unable to load file ${resolvePath(this.getBasePath(), '.meteor/versions')}`);
+      return false;
+    }
+  }
+
   validateConfig(configPath) {
     let problems = validateConfig(this.config);
 
@@ -193,7 +210,7 @@ export default class MupAPI {
         opts.ssh.agent = sshAgent;
       } else {
         console.error(
-          'error: server %s doesn\'t have password, ssh-agent or pem',
+          "error: server %s doesn't have password, ssh-agent or pem",
           name
         );
         process.exit(1);

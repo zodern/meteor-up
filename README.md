@@ -613,7 +613,11 @@ The `--verbose` flag shows output from commands and scripts run on the server.
 
 > Verifying Deployment: FAILED
 
-If you do not see `=> Starting meteor app on port:80` in the logs, it might not have had enough time to finish running `npm install`. If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not.
+If you do not see `=> Starting meteor app on port:80` in the logs, it might not have had enough time to finish running `npm install`. 
+
+If you do see it in your logs:
+1) Make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not.
+2) If your app's home page has a http status code other than 200, and does not redirect to a page that does, add the meteor package `zodern:mup-helpers`.
 
 > Mup silently fails, mup.js file opens instead, or you get a Windows script error
 
