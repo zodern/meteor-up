@@ -246,7 +246,9 @@ meteor: {
 
 #### Deploy Wait Time
 
-Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`.
+Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`. 
+
+The app's client should have the http status code 200 or redirect on the server to a page that does. If your app does neither, adding the package `zodern:mup-helpers` should allow the deploy check to work.
 
 Most docker images used with mup run `npm install` before starting the app. Especially for small servers, this can take awhile. If deployments fail with `Verifying Deployment: FAILED`, and it looks like npm didn't finish installing dependencies, try increasing the value in `meteor.deployCheckWaitTime`
 
