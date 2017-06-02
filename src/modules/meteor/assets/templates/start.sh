@@ -116,13 +116,6 @@ EOT
       jrcs/letsencrypt-nginx-proxy-companion:$LETS_ENCRYPT_VERSION
     echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
     <% } else { %>
-      # Using shared nginx so just copy the cert files to the right place.
-    <% if(typeof proxyConfig === "object"  && proxyConfig.domains)  { %>
-      <% var domainsArr=proxyConfig.domains.split(','); for(var i=0; i<domainsArr.length; i++) { %>
-        cp /opt/$APPNAME/config/bundle.crt /opt/<%= proxyName %>/certs/<%= domainsArr[i] %>.crt
-        cp /opt/$APPNAME/config/private.key /opt/<%= proxyName %>/certs/<%= domainsArr[i] %>.key
-      <% } %>
-    <% } else { %>
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
     docker pull <%= docker.imageFrontendServer %>
