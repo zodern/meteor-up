@@ -6,9 +6,10 @@ node_js:
   - "6"
 
 env:
-  - TESTS_REG_EXP="default.*"
-  - TESTS_REQ_EXP="meteor.*"
-  - TESTS_REQ_EXP="mongo.*"
+  - TEST_MODULE='modules/default'
+  - TEST_MODULE='modules/meteor'
+  - TEST_MODULE='modules/mongo'
+  - TEST_MODULE='modules/docker'
 
 services:
   - docker
@@ -16,4 +17,4 @@ services:
 before_script:
   - echo 'DOCKER_OPTS="--storage-driver=devicemapper"' | sudo tee --append /etc/default/docker >/dev/null && sudo service docker restart
 
-script: npm run test -- $TESTS_REG_EXP
+script: npm run test -- "$TEST_MODULE"

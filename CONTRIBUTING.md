@@ -3,7 +3,7 @@
 We are excited that you are interested in contributing to Meteor Up. Bug Fixes and feature implementations can be submitted as pull request on the master branch. Make sure your modifications does not break any of the current tests.
 
 ## Running Tests
-Our test suit is written using [mocha](https://mochajs.org/) + [shelljs](https://github.com/shelljs/shelljs) and parallelized using [GNU parallel](http://www.gnu.org/software/parallel/) + docker. Parallel testing is currently tested on Ubuntu 14.04 and 16.10, as well as Bash on Ubuntu on Windows.
+Our test suit is written using [mocha](https://mochajs.org/) + [shelljs](https://github.com/shelljs/shelljs) and parallelled using [GNU parallel](http://www.gnu.org/software/parallel/) + docker. Parallel testing is currently supported for Ubuntu 14.04 and 16.10, as well as Bash on Ubuntu on Windows.
 
 Before running the tests, make sure the server's user account running the tests is in the sudoers list. The test suit depends on node, docker, meteor and gnu parallel. If any of them are not available, the test suit will automatically install them.
 
@@ -39,7 +39,7 @@ npm test
 
 ### Running Tests Serially Without Docker
 
-Another option is to run the tests serially, and deploy to a remote server instead of a docker image. This will not use docker. Instead, it will deploy meteor app on the given server using meteor up. Either use `ssh-agent` or modify `<meteor-up dir>/tests/project-1/mup.js` file to setup authentication to test box.
+Another option is to run the tests serially, and deploy to a remote server instead of a docker image. This will not use docker. Instead, it will deploy meteor app on the given server using meteor up. Either use `ssh-agent` or modify `<meteor-up dir>/tests/project-1/mup.js` file to setup authentication to the test box.
 ```
 export PROD_SERVER=<server ip> #localhost for local testing
 export PROD_SERVER_USER=<server user>

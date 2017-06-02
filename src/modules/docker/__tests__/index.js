@@ -10,10 +10,6 @@ const servers = require('../../../../tests/servers');
 
 describe('module - docker', function() {
   this.timeout(6000000);
-  beforeEach(() => {
-    // seperator between tests
-    sh.exec('echo "--------"');
-  });
   it('TODO write tests');
 
   describe('help', function() {
@@ -35,7 +31,7 @@ describe('module - docker', function() {
         const out = sh.exec('mup docker setup');
         assert.equal(out.code, 0);
 
-        const num = countOccurences('setup docker: SUCCESS', out.output);
+        const num = countOccurences('Setup Docker: SUCCESS', out.output);
         assert.equal(num, 1);
 
         const sshOut = await runSSHCommand(serverInfo, 'which docker');
