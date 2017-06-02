@@ -27,10 +27,5 @@ module.exports = {
     servers: {
       mymongo: {}
     }
-  },
-  proxy: {
-    servers: {
-      myproxy: {}
-    }
   }
 };

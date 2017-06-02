@@ -75,7 +75,7 @@ describe('module - default', function() {
   describe('logs', function() {
     it('should pull the logs from meteor app', () => {
       sh.cd(path.resolve('/tmp/', 'tests/project-1'));
-      const out = sh.exec('mup logs');
+      const out = sh.exec('mup logs --tail 2');
       expect(out.code).to.be.equal(0);
     });
   });
@@ -84,7 +84,7 @@ describe('module - default', function() {
     it('should reconfig meteor app on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
-      sh.exec('mup setup && mup deploy');
+      sh.exec('mup setup  && mup deploy  --cached-build');
 
       const out = sh.exec('mup reconfig');
 
@@ -108,7 +108,7 @@ describe('module - default', function() {
     it('should restart meteor app on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
-      sh.exec('mup setup && mup deploy');
+      sh.exec('mup setup  && mup deploy --cached-build');
 
       const out = sh.exec('mup restart');
 
@@ -155,7 +155,7 @@ describe('module - default', function() {
     it('should start meteor app on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
-      sh.exec('mup setup && mup meteor push && mup meteor envconfig');
+      sh.exec('mup setup  && mup meteor push --cached-build && mup meteor envconfig');
 
       const out = sh.exec('mup start');
 
@@ -176,7 +176,7 @@ describe('module - default', function() {
     it('should stop meteor app on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];
       sh.cd(path.resolve('/tmp', 'tests/project-1'));
-      sh.exec('mup setup && mup deploy');
+      sh.exec('mup setup  && mup deploy --cached-build');
 
       const out = sh.exec('mup stop');
 
@@ -196,7 +196,7 @@ describe('module - default', function() {
     it('should write meteor logst to syslog on "meteor" vm', async () => {
       sh.cd(path.resolve('/tmp', 'tests/project-2'));
 
-      sh.exec('mup setup && mup deploy');
+      sh.exec('mup setup && mup deploy --cached-build');
       const out = await runSSHCommand(
         serverInfo,
         'sudo tail -n 100 /var/log/syslog'

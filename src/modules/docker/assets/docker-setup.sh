@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# TODO server must be Ubuntu 14.04.x LTS version
 # TODO make sure we can run docker in this server
 
 # Is docker already installed?
@@ -23,7 +22,8 @@ if [ ! "$hasDocker" ]; then
   # Install docker
   wget -qO- https://get.docker.com/ | sudo sh
   sudo usermod -a -G docker ${USER}
-  sudo service docker start || sudo service docker restart
 fi
+
+sudo service docker start || sudo service docker restart
 
 # TODO make sure docker works as expected

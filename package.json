@@ -11,9 +11,11 @@
     "build": "babel src --out-dir lib --sourceRoot=./ --copy-files --presets=es2015,es2016,es2017,stage-3",
     "build:watch": "npm run build -s -- -w",
     "test": "bash ./tests/run.sh",
-    "test:custom-server": "nofat test",
+    "test:watch": "bash ./tests/run-watch.sh",
+    "test:custom-server": "mocha --compilers js:babel-register --require babel-polyfill lib/**/__tests__/**/*.js",
+    "test:module": "mocha --compilers js:babel-register --require babel-polyfill ",
     "test:parallel": "bash ./tests/run-parallel.sh",
-    "lint": "npm run lint:code -s && npm run lint:defaultConfig -s && npm run lint:readme",
+    "lint": "npm run lint:code && npm run lint:defaultConfig && npm run lint:readme",
     "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" .",
     "lint:code": "eslint .",
     "lint:readme": "eslint --ext md ."
@@ -38,12 +40,13 @@
     "babel-preset-es2016": "^6.22.0",
     "babel-preset-es2017": "^6.22.0",
     "babel-preset-stage-3": "^6.22.0",
+    "babel-register": "^6.24.1",
+    "chai": "^3.5.0",
     "eslint": "^3.19.0",
     "eslint-plugin-babel": "^4.1.0",
     "eslint-plugin-markdown": "^1.0.0-beta.4",
     "mocha": "^3.2.0",
-    "nofat": "1.0.x",
-    "chai": "^3.5.0"
+    "nofat": "1.0.x"
   },
   "dependencies": {
     "archiver": "1.x.x",

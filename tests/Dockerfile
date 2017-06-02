@@ -9,7 +9,7 @@ CMD ["/sbin/my_init"]
 
 #Install wget
 RUN apt-get update
-RUN apt-get -y install wget tree sudo curl netcat
+RUN apt-get -y install tree sudo netcat
 
 #Enable ssh
 RUN rm -f /etc/service/sshd/down
