@@ -1,3 +1,4 @@
+<<<<<<< HEAD:src/modules/meteor/tasks.js
 import * as _ from 'underscore';
 
 import { getDockerLogs, resolvePath, runTaskList } from '../utils';
@@ -312,3 +313,12 @@ export function stop(api) {
   const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
+=======
+import * as _commands from './commands';
+import * as _tasks from './tasks';
+
+export const description = 'Deploy and manage meteor apps';
+
+export let commands = _commands;
+export let tasks = _tasks;
+>>>>>>> plugins:src/modules/meteor/index.js

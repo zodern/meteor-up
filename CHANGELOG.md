@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## 1.2.9 - June 3, 2017
 - Add shared nginx proxy
     - Is configured with a `proxy` object instead of using `meteor.ssl` and `meteor.nginx`
@@ -14,6 +15,14 @@ Big thanks to @shaiamir for his work on the shared proxy.
 - Will build app if cached build is not found and `--cached-build` flag is set
 - Fix some bugs with verifying deployment
 - Add support for `zodern:mup-helpers` package. Since version 1.2.7, verifying deployment fails if the app's `/` route's http code is other than 200, or if it does not redirect on the server to a page that does have that http code. Adding `zodern:mup-helpers` allows meteor up to sucessfully validate the deployment.
+=======
+## Next
+- All commands have a description and are listed in help
+- All options are shown in help
+- Remove `mup proxy` and `mup docker dump` commands which were placeholders.
+- Remove  `mup meteor push`. `mup meteor deploy` should be used instead.
+- Remove `mup meteor envconfig`. `mup reconfig` should be used instead
+>>>>>>> plugins
 
 ## 1.2.7 - May 5, 2017
 - Fix verifying deployment when using ssl autogenerate
@@ -26,6 +35,10 @@ Big thanks to @shaiamir for his work on the shared proxy.
 ## 1.2.6 - March 29, 2017
 - Fix `force-ssl` warning appearing when ssl is setup correctly
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> plugins
 ## 1.2.5 - March 22, 2017
 - Support changing docker exposed port @abernix
 - New `mup docker restart` command

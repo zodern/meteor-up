@@ -1,7 +1,6 @@
-import * as docker from '../docker/';
-import * as meteor from '../meteor/';
-import * as mongo from '../mongo/';
-import * as proxy from '../proxy/';
+import * as docker from '../docker/tasks';
+import * as meteor from '../meteor/tasks';
+import * as mongo from '../mongo/tasks';
 
 import debug from 'debug';
 import { resolvePath } from '../utils';
@@ -14,7 +13,7 @@ sh.config.silent = true;
 
 export function deploy(api) {
   log('exec => mup deploy');
-  return meteor.deploy(api);
+  api.runTask('meteor.deploy');
 }
 
 export function help() {
@@ -61,17 +60,17 @@ export function init() {
 
 export function logs(api) {
   log('exec => mup logs');
-  return meteor.logs(api);
+  return api.runTask('meteor.logs');
 }
 
 export function reconfig(api) {
   log('exec => mup reconfig');
-  return meteor.envconfig(api).then(() => meteor.start(api));
+  return api.runTask('meteor.envconfig').then(() => api.runTask('meteor.start'));
 }
 
 export function restart(api) {
   log('exec => mup restart');
-  return meteor.stop(api).then(() => meteor.start(api));
+  return api.runTask('meteor.stop').then(() => api.runTask('meteor.start'));
 }
 
 export function setup(api) {
@@ -83,22 +82,16 @@ export function setup(api) {
 
   log('exec => mup setup');
   const config = api.getConfig();
-  return docker
-    .setup(api)
-    .then(meteor.setup.bind(null, api))
+  return api.runTask('docker.setup')
+    .then(() => api.runTask('meteor.setup'))
     .then(() => {
       if (config.mongo) {
-        return mongo.setup(api);
+        return api.runTask('mongo.setup');
       }
     })
     .then(() => {
       if (config.mongo) {
-        return mongo.start(api);
-      }
-    })
-    .then(() => {
-      if (config.proxy) {
-        return proxy.setup(api);
+        return api.runTask('mongo.start');
       }
     })
     .then(displayNextSteps);
@@ -106,10 +99,10 @@ export function setup(api) {
 
 export function start(api) {
   log('exec => mup start');
-  return meteor.start(api);
+  return api.runTask('meteor.start');
 }
 
 export function stop(api) {
   log('exec => mup stop');
-  return meteor.stop(api);
+  return api.runTask('meteor.stop');
 }
