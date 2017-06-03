@@ -509,6 +509,10 @@ meteor: {
 
 ```
 
+You also need to:
+1. Make sure `meteor.env.ROOT_URL` starts with `https://`
+2. Setup DNS for each of the domains in `meteor.ssl.autogenerate.domains`
+
 Then run `mup deploy`. It will automatically create certificates and set up SSL, which can take up to a few minutes. The certificates will be automatically renewed when they expire within 30 days.
 
 ### Upload certificates
@@ -632,6 +636,16 @@ If it silently fails for a different reason, please create an issue.
 #### Error: spawn meteor ENOENT
 
 This usually happens when meteor is not installed.
+
+#### Let's Encrypt is not working
+
+Make sure your `meteor.env.ROOT_URL` starts with `https://`. Also, check that the dns for all of the domains in `ssl.autogenerate.domains` is correctly configured to point to the server. Port 80 needs to be open in the server so it can verify that you control the domain. 
+
+You can view the Let's Encrypt logs by running this command on the server:
+```
+docker logs <AppName>-nginx-letsencrypt
+```
+Replace `<AppName>` with the name of the app.
 
 #### Unwanted redirects to https
 
