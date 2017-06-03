@@ -1,15 +1,19 @@
 ## Next
-- Implement shared nginx proxy (@shaiamir)
+- Add shared nginx proxy
     - Is configured with a `proxy` object instead of using `meteor.ssl` and `meteor.nginx`
     - If multiple apps are deployed to a server, routes requests to the correct container
     - Adds `mup proxy` command. For a list of subcommands, run `mup proxy help`
-    - Supports using custom certificates. This should be used instead of `meteor.ssl` since the previous image used for custom certificates has security problems.
+    - Supports using custom certificates. This should be used instead of `meteor.ssl` since the previous image used for custom certificates had a security vulnerability.
+    - Also can set up Let's Encrypt
     - Supports configuring the env variables for the nginx and let's encrypt containers.
-    - Saves between 15 - 30 seconds during deployment compared to using `meteor.ssl`.
+
+Big thanks to @shaiamir for his work on the shared proxy.
 
 - `mup stop` also stops nginx proxy and let's encrypt containers
-- App's container PORT env variable is set to `docker.imagePort`
+- App inside container's port is set to `docker.imagePort`. The app is still accessible on `env.PORT`.
 - Will build app if cached build is not found and `--cached-build` flag is set
+- Fix some bugs with verifying deployment
+- Add support for `zodern:mup-helpers` package. Since version 1.2.7, verifying deployment fails if the app's `/` route's http code is other than 200, or if it does not redirect on the server to a page that does have that http code. Adding `zodern:mup-helpers` allows meteor up to sucessfully validate the deployment.
 
 ## 1.2.7 - May 5, 2017
 - Fix verifying deployment when using ssl autogenerate
