@@ -1,4 +1,4 @@
-## Next
+## 1.2.9 - June 3, 2017
 - Add shared nginx proxy
     - Is configured with a `proxy` object instead of using `meteor.ssl` and `meteor.nginx`
     - If multiple apps are deployed to a server, routes requests to the correct container
