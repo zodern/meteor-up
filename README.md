@@ -10,6 +10,7 @@ You can install and use Meteor Up on Linux, Mac and Windows.
 
 This version of Meteor Up is powered by [Docker](http://www.docker.com/), making deployment easy to manage and reducing a lot of server specific errors.
 
+Read the [getting started tutorial](http://zodern.github.io/meteor-up/getting-started.html).  
 
 **Table of Contents**
 

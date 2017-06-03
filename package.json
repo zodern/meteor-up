@@ -19,7 +19,8 @@
     "lint": "npm run lint:code && npm run lint:defaultConfig && npm run lint:readme",
     "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" .",
     "lint:code": "eslint .",
-    "lint:readme": "eslint --ext md ."
+    "lint:readme": "eslint --ext md .",
+    "docs": "cd docs && bundle exec jekyll serve"
   },
   "repository": {
     "type": "git",

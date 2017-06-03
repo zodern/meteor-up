@@ -6,17 +6,29 @@ header: 'Getting Started'
 
 ## Install
 
-Install Meteor Up with `npm install --global mup`. It requires node 4 or newer.
+Install Meteor Up with one command:
+
+```
+npm install --global mup
+``` 
+
+Mup requires node 4 or newer.
 
 You need at least one server to deploy to. You can get one for $5/month or less from Digital Ocean, Vultr, or OVH.
+
+The server should:
+- Have at least 512MB of ram. 1GB is recommended.
+- Be running Ubuntu 14 or 16.
+
+You do not need to install anything on your servers; mup will set them up for you.
 
 ## Step 1: Initialize your project
 
 In the terminal, run: 
 ```
 cd path/to/app
-mkdir .deploy
-cd .deploy && mup init
+mkdir .deploy && cd .deploy
+mup init
 ```
 
 > It is a common practice to store your production settings.json and mup config in a `.deploy` folder.
@@ -30,41 +42,42 @@ For each server:
 - __server authentication__ - You can use a `password` or set `pem` to the path to a private key. If neither are set, it uses `ssh-agent`
 
 In the `meteor` section:
-- __name__ - A unique name, with no spaces
-- __path__ - Path to the meteor app, relative to the config
-- __env.ROOT_URL__ - The url your app is accessible at. If you are using ssl, it should start with `https://`; otherwise, it should be `http://`
+- __name__ - A unique name, with no spaces.
+- __path__ - Path to the meteor app, relative to the config. If your config is in `app/.deploy`, the path would be `../`.
+- __env.ROOT_URL__ - The url your app is accessible at. If you are using ssl, it should start with `https://`; otherwise, it should be `http://`.
 
 ## Step 3: Setup Server
 **When running the Meteor Up commands in Command Prompt, you should use `mup.cmd` instead of `mup`.**
 
-Run:
+Run one command, and mup will install all of it's dependencies on the server and prepare it for your first deploy:
 ```
 mup setup
 ```
 
 If you want to see what the tasks are doing, you can add the `--verbose` flag.
 
-You should run `mup setup` after changing your config. It is safe to run multiple times.
+You should run `mup setup` anytime after changing your config. It is safe to run the command as many times as you need.
  
 ## Step 4: Deploy
 
-Run:
+The deploy process:
+
+1. Builds your app, using `meteor build`
+2. Uploads the app bundle, the start script, and the environment variables to your servers
+3. Runs the start script
+4. Verifies that the app sucessfully started
+
+Run
 ```bash
 mup deploy
 ```
 
-The deploy process:
-1) Builds your app, using `meteor build`
-2) Uploads the app bundle, the start script, andm the environment variables
-3) Runs the start script
-4) Verifies that the app sucessfully started
+If it failed due to a network error while uploading the bundle, you can run `mup deploy --cached-build`. It will then skip step 1 of the deploy process and use the bundle from the last time it was built.
+
+Congratulations! Your app is now running on the server, accessible to your potential users!
 
 ## Next Steps
 
-[View logs]()
-
-[Setup SSL]()
-
-[Deploy from CI]()
-
-[Production Checklist]()
+- [View logs]()
+- [Setup SSL]()
+- [Deploy from CI]()
