@@ -614,28 +614,28 @@ The environment variable `DEBUB=*` gives more information on what the `mup` cli 
 
 The `--verbose` flag shows output from commands and scripts run on the server.
 
-#### Common Problems
+### Common Problems
 
-> Verifying Deployment: FAILED
+#### Verifying Deployment: FAILED
 
-If you do not see `=> Starting meteor app on port:80` in the logs, it might not have had enough time to finish running `npm install`. 
+If you do not see `=> Starting meteor app on port` in the logs, it did not have had enough time to finish running `npm install`, or there was an error while installing the dependencies. Try increase `meteor.deployCheckWaitTime` until it has enough time to finish `npm install`.
 
 If you do see it in your logs:
 1) Make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not.
 2) If your app's home page has a http status code other than 200, and does not redirect to a page that does, add the meteor package `zodern:mup-helpers`.
 
-> Mup silently fails, mup.js file opens instead, or you get a Windows script error
+#### Mup silently fails, mup.js file opens instead, or you get a Windows script error
 
 If you are using windows, make sure you run commands with `mup.cmd <command>` instead of `mup <command>`.
 If it silently fails for a different reason, please create an issue.
 
-> Error: spawn meteor ENOENT
+#### Error: spawn meteor ENOENT
 
 This usually happens when meteor is not installed.
 
-> Redirects to https
+#### Unwanted redirects to https
 
-Make sure `force-ssl` is not in `.meteor/versions`.
+Make sure `force-ssl` is not in `.meteor/versions`. If it is, either your app, or a package it uses has `force-ssl` as a dependency.
 
 ### Migrating from Meteor Up 0.x
 
