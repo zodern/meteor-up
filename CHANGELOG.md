@@ -1,3 +1,6 @@
+## 1.2.9 - June 4, 2017
+- Deployment verifier no longer requires the http code to be 200.
+
 ## 1.2.9 - June 3, 2017
 - Add shared nginx proxy
     - Is configured with a `proxy` object instead of using `meteor.ssl` and `meteor.nginx`

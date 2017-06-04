@@ -249,8 +249,6 @@ export function start(api) {
     process.exit(1);
   }
 
-  let route = api.hasMeteorPackage('zodern:mup-helpers') ? '/___mup_verify' : '';
-
   const list = nodemiral.taskList('Start Meteor');
 
   list.executeScript('Start Meteor', {
@@ -266,7 +264,7 @@ export function start(api) {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
       deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
-      deployCheckPath: route,
+      deployCheckPath: '',
       host: api.getConfig().proxy ? api.getConfig().proxy.domains.split(',')[0] : null
     }
   });
