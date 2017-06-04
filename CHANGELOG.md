@@ -1,5 +1,5 @@
 ## 1.2.10 - June 4, 2017
-- Deployment verifier no longer requires the http code to be 200.
+- Deployment verifier no longer requires the http status code to be 200.
 
 ## 1.2.9 - June 3, 2017
 - Add shared nginx proxy
