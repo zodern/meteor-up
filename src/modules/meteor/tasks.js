@@ -1,4 +1,3 @@
-<<<<<<< HEAD:src/modules/meteor/tasks.js
 import * as _ from 'underscore';
 
 import { getDockerLogs, resolvePath, runTaskList } from '../utils';
@@ -7,10 +6,10 @@ import buildApp from './build.js';
 import debug from 'debug';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
-import os from 'os';
 import random from 'random-seed';
 import uuid from 'uuid';
-import { PROXY_CONTAINER_NAME } from '../proxy/index.js';
+import os from 'os';
+import { PROXY_CONTAINER_NAME } from '../proxy/tasks';
 
 const log = debug('mup:module:meteor');
 
@@ -40,6 +39,9 @@ export function logs(api) {
   }
 
   const args = api.getArgs();
+  if (args[0] === 'meteor') {
+    args.shift();
+  }
   const sessions = api.getSessions(['meteor']);
   return getDockerLogs(config.name, sessions, args);
 }
@@ -92,7 +94,7 @@ export function setup(api) {
 
   const sessions = api.getSessions(['meteor']);
 
-  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+  return runTaskList(list, sessions, { verbose: api.verbose });
 }
 
 export async function push(api) {
@@ -139,7 +141,7 @@ export async function push(api) {
   const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
-    verbose: api.getVerbose()
+    verbose: api.verbose
   });
 }
 
@@ -179,7 +181,6 @@ export function envconfig(api) {
       };
     }
   }
-
   if (config.dockerImageFrontendServer) {
     config.docker.imageFrontendServer = config.dockerImageFrontendServer;
   }
@@ -238,7 +239,7 @@ export function envconfig(api) {
   const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
-    verbose: api.getVerbose()
+    verbose: api.verbose
   });
 }
 
@@ -275,7 +276,7 @@ export function start(api) {
   const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
     series: true,
-    verbose: api.getVerbose()
+    verbose: api.verbose
   });
 }
 
@@ -290,7 +291,7 @@ export function deploy(api) {
     process.exit(1);
   }
 
-  return push(api).then(() => envconfig(api)).then(() => start(api));
+  return api.runTask('meteor.push').then(() => api.runTask('meteor.envconfig')).then(() => api.runTask('meteor.start'));
 }
 
 export function stop(api) {
@@ -311,14 +312,5 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['meteor']);
-  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+  return runTaskList(list, sessions, { verbose: api.verbose });
 }
-=======
-import * as _commands from './commands';
-import * as _tasks from './tasks';
-
-export const description = 'Deploy and manage meteor apps';
-
-export let commands = _commands;
-export let tasks = _tasks;
->>>>>>> plugins:src/modules/meteor/index.js

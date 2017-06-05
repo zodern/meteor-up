@@ -1,7 +1,6 @@
-import * as _commands from './commands';
-import * as _tasks from './tasks';
+import { getDockerLogs, resolvePath, runTaskList } from '../utils';
+import { argv } from 'yargs';
 
-<<<<<<< HEAD:src/modules/mongo/tasks.js
 import debug from 'debug';
 import nodemiral from 'nodemiral';
 
@@ -63,7 +62,7 @@ export function setup(api) {
 
   const sessions = api.getSessions(['mongo']);
 
-  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+  return runTaskList(list, sessions, { verbose: argv.verbose });
 }
 
 export function start(api) {
@@ -92,7 +91,7 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+  return runTaskList(list, sessions, { verbose: argv.verbose });
 }
 
 export function stop(api) {
@@ -104,10 +103,5 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions, { verbose: api.getVerbose() });
+  return runTaskList(list, sessions, { verbose: argv.verbose });
 }
-=======
-export const description = 'Commands to manage MongoDB';
-export let commands = _commands;
-export let tasks = _tasks;
->>>>>>> plugins:src/modules/mongo/index.js

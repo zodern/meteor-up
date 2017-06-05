@@ -1,7 +1,3 @@
-import * as docker from '../docker/tasks';
-import * as meteor from '../meteor/tasks';
-import * as mongo from '../mongo/tasks';
-
 import debug from 'debug';
 import { resolvePath } from '../utils';
 import sh from 'shelljs';
@@ -92,6 +88,11 @@ export function setup(api) {
     .then(() => {
       if (config.mongo) {
         return api.runTask('mongo.start');
+      }
+    })
+    .then(() => {
+      if (config.proxy) {
+        return api.runTask('proxy.setup');
       }
     })
     .then(displayNextSteps);
