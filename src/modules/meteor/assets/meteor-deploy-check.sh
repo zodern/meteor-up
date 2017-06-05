@@ -33,12 +33,8 @@ while [[ true ]]; do
   # Since this failing causes the app to rollback, it should only
   # fail because of a problem with the app, not from problems with the config.
   #
-  # --fail Before the app is started, nginx returns an error page. Without this, it would take that as meaning the app was running
-  # --L Follow redirects. Needed to still work when using --fail and redirected to https version
   # --insecure Without this, it would sometimes fail when ssl is set up
   curl \
-    --fail \
-    -L \
     --insecure \
     $DEPLOY_CHECK_URL \
     <% if (host) { %> --header "HOST:$HOST" <% } %>  \

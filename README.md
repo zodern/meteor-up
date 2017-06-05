@@ -248,8 +248,6 @@ meteor: {
 
 Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`. 
 
-The app's client should have the http status code 200 or redirect on the server to a page that does. If your app does neither, adding the package `zodern:mup-helpers` should allow the deploy check to work.
-
 Most docker images used with mup run `npm install` before starting the app. Especially for small servers, this can take awhile. If deployments fail with `Verifying Deployment: FAILED`, and it looks like npm didn't finish installing dependencies, try increasing the value in `meteor.deployCheckWaitTime`
 
 ##### Deploy check port
@@ -624,9 +622,7 @@ The `--verbose` flag shows output from commands and scripts run on the server.
 
 If you do not see `=> Starting meteor app on port` in the logs, it did not have had enough time to finish running `npm install`, or there was an error while installing the dependencies. Try increase `meteor.deployCheckWaitTime` until it has enough time to finish `npm install`.
 
-If you do see it in your logs:
-1) Make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not.
-2) If your app's home page has a http status code other than 200, and does not redirect to a page that does, add the meteor package `zodern:mup-helpers`.
+If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not. If that did not fix it, create a new issue with your config and output from `mup deploy --verbose`.
 
 #### Mup silently fails, mup.js file opens instead, or you get a Windows script error
 
