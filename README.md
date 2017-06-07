@@ -181,7 +181,7 @@ module.exports = {
     enableUploadProgressBar: true // default false.
   },
 
-  mongo: { // (optional)
+  mongo: { // (optional but remove it if you want to use a remote mongodb!)
     port: 27017,
     version: '3.4.1', // (optional), default is 3.4.1
     servers: {
