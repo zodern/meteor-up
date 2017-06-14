@@ -1,3 +1,7 @@
+## 1.2.11 - June 14, 2017
+- Deployment verifier shows last 100 lines of the app's log when it fails (it previously was 50 lines)
+- Fix `mup setup` restarting docker
+
 ## 1.2.10 - June 4, 2017
 - Deployment verifier no longer requires the http status code to be 200.
 
