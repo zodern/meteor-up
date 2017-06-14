@@ -26,7 +26,7 @@ if [ ! "$hasDocker" ]; then
   sudo service docker start || sudo service docker restart
 fi
 
-# Start docker if it was stopped
-sudo service docker start
+# Start docker if it was stopped. If docker is already running, the exit code is 1
+sudo service docker start || true
 
 # TODO make sure docker works as expected
