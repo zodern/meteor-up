@@ -5,12 +5,10 @@ DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
 DEPLOY_CHECK_URL=<%= `localhost:${deployCheckPort}${deployCheckPath}` %>
 HOST=<%= host %>
 
-echo $DEPLOY_CHECK_URL
-
 cd $APP_PATH
 
 revert_app (){
-  docker logs --tail=50 $APPNAME 1>&2
+  docker logs --tail=100 $APPNAME 1>&2
   if [ -d last ]; then
     sudo mv last current
     sudo bash $START_SCRIPT > /dev/null 2>&1
@@ -21,7 +19,7 @@ revert_app (){
   fi
   
   echo 
-  echo "To see more logs type 'mup logs --tail=50'"
+  echo "To see more logs type 'mup logs --tail=100'"
   echo ""
 }
 
@@ -38,7 +36,7 @@ while [[ true ]]; do
     --insecure \
     $DEPLOY_CHECK_URL \
     <% if (host) { %> --header "HOST:$HOST" <% } %>  \
-    && exit 0
+    && exit 0 
 
   if [ "$elaspsed" == "$DEPLOY_CHECK_WAIT_TIME" ]; then
     revert_app

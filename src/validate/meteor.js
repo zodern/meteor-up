@@ -85,7 +85,8 @@ export default function(config) {
   );
   if (config.meteor.name.indexOf(' ') > -1) {
     details.push({
-      message: '"name" has a space'
+      message: 'has a space',
+      path: 'name'
     });
   }
   if (

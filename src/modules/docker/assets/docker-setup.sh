@@ -22,8 +22,11 @@ if [ ! "$hasDocker" ]; then
   # Install docker
   wget -qO- https://get.docker.com/ | sudo sh
   sudo usermod -a -G docker ${USER}
+
+  sudo service docker start || sudo service docker restart
 fi
 
-sudo service docker start || sudo service docker restart
+# Start docker if it was stopped. If docker is already running, the exit code is 1
+sudo service docker start || true
 
 # TODO make sure docker works as expected
