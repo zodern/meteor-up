@@ -6,12 +6,24 @@
         <div id="docs-head">
           <h1>{{page.header}}</h1>
         </div>
-        <div class="container">
-            <div class="col-sm-8 col-sm-push-3">
+        <div class="js-toc"></div>
+        <div class="container-fluid">
+            <div class="col-sm-8 col-sm-push-3 docs-content">
                 {{ content }}
             </div>
             {% include docs_nav.html %}
         </div>
-        {% include footer.html %}
+        <script src="{{ site.baseurl }}/scripts/tocbot.min.js"></script>
+        <script>
+            tocbot.init({
+                    // Where to render the table of contents.
+                    tocSelector: '.docs-nav',
+                    // Where to grab the headings to build the table of contents.
+                    contentSelector: '.docs-content',
+                    // Which headings to grab inside of the contentSelector element.
+                    headingSelector: 'h1, h2, h3',
+                    positionFixedSelector: '.docs-nav'
+                });
+        </script>
     </body>
 </html>

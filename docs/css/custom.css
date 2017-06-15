@@ -220,3 +220,29 @@ code {
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
     background-color: #3f8b61 !important;
 }
+
+/* toc */
+.is-position-fixed {
+    left: 15px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.toc-list {
+    list-style: none;
+    border-left: 2px solid #eff;
+}
+.toc-link::before {
+    display: none;
+}
+.toc-link.is-active-link {
+    color: #74d2ed;
+}
+
+.docs-content h2 {
+    font-size: 28px;
+}
+
+.docs-content h3 {
+    font-size: 24px;
+}
