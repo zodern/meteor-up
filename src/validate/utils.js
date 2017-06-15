@@ -45,14 +45,15 @@ export function combineErrorDetails(details, results) {
   return details.concat(additionalDetails);
 }
 
-export function serversExist(serversConfig, serversUsed) {
+export function serversExist(serversConfig = {}, serversUsed) {
   let messages = [];
   let servers = Object.keys(serversConfig);
   let using = Object.keys(serversUsed);
   using.forEach(key => {
     if (servers.indexOf(key) === -1) {
       messages.push({
-        message: `Server "${key}" doesn't exist`
+        message: `Server "${key}" doesn't exist`,
+        path: 'servers'
       });
     }
   });
