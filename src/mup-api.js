@@ -58,7 +58,7 @@ export default class MupAPI {
       let red = chalk.red;
       let plural = problems.length > 1 ? 's' : 's';
 
-      console.log(`loaded mup.js from ${configPath}`);
+      console.log(`loaded config from ${configPath}`);
       console.log('');
       console.log(red(`${problems.length} Validation Error${plural}`));
 
@@ -68,9 +68,9 @@ export default class MupAPI {
 
       console.log('');
       console.log(
-        'If you think there is a bug in the mup.js validator, please'
+        'Read the docs and view example configs at'
       );
-      console.log('create an issue at https://github.com/zodern/meteor-up');
+      console.log('create an issue at https://zodern.github.io/meteor-up/docs');
       console.log('');
     }
   }
