@@ -140,17 +140,19 @@ export default class MupAPI {
   }
   _runPreHooks = async function(task) {
     let hookName = `pre.${task}`;
-    let that = this;
-
     if (hookName in hooks) {
       let hookList = hooks[hookName];
-      hookList.forEach(async function(hookHandler) {
+      for (let hookHandler of hookList) {
         if (typeof hookHandler === 'string') {
-          that._runHookScript(hookHandler);
+          this._runHookScript(hookHandler);
         } else {
-          await hookHandler(that);
+          try {
+            await hookHandler(this);
+          } catch (e) {
+            this._taskErrorHandler(e);
+          }
         }
-      });
+        }
     }
   };
   _runPostHooks = async function(task) {
@@ -158,16 +160,29 @@ export default class MupAPI {
     let that = this;
     if (hookName in hooks) {
       let hookList = hooks[hookName];
-      hookList.forEach(async function(hookHandler) {
+      for (let hookHandler of hookList) {
         if (typeof hookHandler === 'string') {
           that._runHookScript(hookHandler);
         } else {
-          await hookHandler(that);
+          try {
+            await hookHandler(that);
+          } catch (e) {
+            this._taskErrorHandler(e);
+          }
         }
-      });
+      }
     }
     return;
   };
+  _taskErrorHandler(e) {
+    if (e.nodemiralHistory instanceof Array) {
+      // Error is from nodemiral when running a task list.
+      // Nodemiral should have already displayed the error
+      return;
+    }
+
+    console.log(e);
+  }
   runTask = async function(name) {
     if (!name) {
       console.error('Task name is required');
@@ -175,11 +190,22 @@ export default class MupAPI {
     }
 
     if (!(name in tasks)) {
-      console.error(`Unkown task name: ${name}`);
+      console.error(`Unknown task name: ${name}`);
       return false;
     }
     await this._runPreHooks(name);
-    return tasks[name](this).then(() => this._runPostHooks(name));
+    let potentialPromise;
+    try {
+      potentialPromise = tasks[name](this);
+    } catch (e) {
+      this._taskErrorHandler(e);
+      process.exit(1);
+    }
+
+    if (potentialPromise && typeof potentialPromise.then === 'function') {
+      return potentialPromise.then(() => this._runPostHooks(name));
+    }
+    return await this._runPostHooks(name);
   };
 
   getSessions(modules = []) {

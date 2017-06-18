@@ -47,21 +47,18 @@ function commandWrapper(handler) {
         const api = new MupAPI(process.cwd(), filterArgv(), yargs.argv);
         let potentialPromise;
 
-        if (typeof handler === 'string') {
-          potentialPromise = api.runTask(handler);
-        } else {
-          potentialPromise = handler(api);
+        try {
+          if (typeof handler === 'string') {
+            potentialPromise = api.runTask(handler);
+          } else {
+            potentialPromise = handler(api);
+          }
+        } catch (e) {
+          api._taskErrorHandler(e);
         }
 
         if (potentialPromise && typeof potentialPromise.then === 'function') {
-          potentialPromise.catch(e => {
-            if (e.nodemiralHistory instanceof Array) {
-              // Error is form nodemiral when running a task list.
-              // Nodemiral already displayed the error
-              return;
-            }
-            console.log(e);
-          });
+          potentialPromise.catch(api._taskErrorHandler);
         }
       })
       .catch(e => {
@@ -74,6 +71,7 @@ function commandWrapper(handler) {
 let config = new MupAPI(process.cwd(), process.argv, yargs.argv).getConfig(
   false
 );
+
 if (config.plugins) {
   loadPlugins(
     config.plugins.map(plugin => {
@@ -114,7 +112,7 @@ let program = yargs
   .strict(true)
   .alias('help', 'h')
   .epilogue(
-    'For more information, read the docs at https://github.com/zodern/meteor-up'
+  'For more information, read the docs at https://github.com/zodern/meteor-up'
   )
   .help('help');
 
