@@ -1,10 +1,11 @@
 import debug from 'debug';
 import nodemiral from 'nodemiral';
-import { resolvePath } from '../utils';
-import { runTaskList } from '../utils';
+
+// import { resolvePath } from '../utils';
+// import { runTaskList } from '../utils';
 import { each } from 'async';
 import chalk from 'chalk';
-import { argv } from 'yargs';
+// import { argv } from 'yargs';
 
 const log = debug('mup:module:docker');
 
@@ -26,23 +27,23 @@ export function setup(api) {
   const list = nodemiral.taskList('Setup Docker');
 
   list.executeScript('Setup Docker', {
-    script: resolvePath(__dirname, 'assets/docker-setup.sh')
+    script: api.resolvePath(__dirname, 'assets/docker-setup.sh')
   });
 
   const sessions = uniqueSessions(api);
-  return runTaskList(list, sessions, { verbose: argv.verbose });
+  return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
 export function restart(api) {
   const list = nodemiral.taskList('Restart Docker Daemon');
 
   list.executeScript('Restart Docker', {
-    script: resolvePath(__dirname, 'assets/docker-restart.sh')
+    script: api.resolvePath(__dirname, 'assets/docker-restart.sh')
   });
 
   const sessions = uniqueSessions(api);
 
-  return runTaskList(list, sessions, { verbose: argv.verbose });
+  return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
 export function ps(api) {

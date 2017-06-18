@@ -1,5 +1,4 @@
 import debug from 'debug';
-import { resolvePath } from '../utils';
 import sh from 'shelljs';
 import fs from 'fs';
 
@@ -7,21 +6,21 @@ const log = debug('mup:module:default');
 
 sh.config.silent = true;
 
-export function deploy(api) {
+export function deploy() {
   log('exec => mup deploy');
-  api.runTask('meteor.deploy');
+  // api.runTask('meteor.deploy');
 }
 
 export function help() {
   log('exec => mup help');
 }
-export function init() {
+export function init(api) {
   log('exec => mup init');
 
-  const mupJs = resolvePath(__dirname, 'template/mup.js.sample');
-  const settinsJson = resolvePath(__dirname, 'template/settings.json');
-  const mupJsDst = resolvePath(process.cwd(), 'mup.js');
-  const settingsJsonDst = resolvePath(process.cwd(), 'settings.json');
+  const mupJs = api.resolvePath(__dirname, 'template/mup.js.sample');
+  const settinsJson = api.resolvePath(__dirname, 'template/settings.json');
+  const mupJsDst = api.resolvePath(process.cwd(), 'mup.js');
+  const settingsJsonDst = api.resolvePath(process.cwd(), 'settings.json');
   const mupJsExists = fs.existsSync(mupJsDst);
   const settingsJsonExist = fs.existsSync(settingsJsonDst);
 
@@ -70,32 +69,20 @@ export function restart(api) {
 }
 
 export function setup(api) {
-  function displayNextSteps() {
+  process.on('exit', function displayNextSteps() {
     console.log('');
     console.log('Next, you should run:');
     console.log('    mup deploy');
-  }
+  });
 
   log('exec => mup setup');
   const config = api.getConfig();
   return api.runTask('docker.setup')
-    .then(() => api.runTask('meteor.setup'))
-    .then(() => {
-      if (config.mongo) {
-        return api.runTask('mongo.setup');
-      }
-    })
-    .then(() => {
-      if (config.mongo) {
-        return api.runTask('mongo.start');
-      }
-    })
     .then(() => {
       if (config.proxy) {
         return api.runTask('proxy.setup');
       }
-    })
-    .then(displayNextSteps);
+    });
 }
 
 export function start(api) {

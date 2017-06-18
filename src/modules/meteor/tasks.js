@@ -1,7 +1,5 @@
 import * as _ from 'underscore';
 
-import { getDockerLogs, resolvePath, runTaskList } from '../utils';
-
 import buildApp from './build.js';
 import debug from 'debug';
 import fs from 'fs';
@@ -13,13 +11,13 @@ import { PROXY_CONTAINER_NAME } from '../proxy/tasks';
 
 const log = debug('mup:module:meteor');
 
-function tmpBuildPath(appPath) {
+function tmpBuildPath(appPath, api) {
   let rand = random.create(appPath);
   let uuidNumbers = [];
   for (let i = 0; i < 16; i++) {
     uuidNumbers.push(rand(255));
   }
-  return resolvePath(
+  return api.resolvePath(
     os.tmpdir(),
     `mup-meteor-${uuid.v4({ random: uuidNumbers })}`
   );
@@ -42,8 +40,8 @@ export function logs(api) {
   if (args[0] === 'meteor') {
     args.shift();
   }
-  return getDockerLogs(config.name, sessions, args);
   const sessions = api.getSessions(['app']);
+  return api.getDockerLogs(config.name, sessions, args);
 }
 
 export function setup(api) {
@@ -57,7 +55,7 @@ export function setup(api) {
   const list = nodemiral.taskList('Setup Meteor');
 
   list.executeScript('Setup Environment', {
-    script: resolvePath(__dirname, 'assets/meteor-setup.sh'),
+    script: api.resolvePath(__dirname, 'assets/meteor-setup.sh'),
     vars: {
       name: config.name
     }
@@ -68,24 +66,24 @@ export function setup(api) {
 
     if (config.ssl.upload !== false) {
       list.executeScript('Cleaning up SSL Certificates', {
-        script: resolvePath(__dirname, 'assets/ssl-cleanup.sh'),
+        script: api.resolvePath(__dirname, 'assets/ssl-cleanup.sh'),
         vars: {
           name: config.name
         }
       });
       list.copy('Copying SSL Certificate Bundle', {
-        src: resolvePath(basePath, config.ssl.crt),
+        src: api.resolvePath(basePath, config.ssl.crt),
         dest: '/opt/' + config.name + '/config/bundle.crt'
       });
 
       list.copy('Copying SSL Private Key', {
-        src: resolvePath(basePath, config.ssl.key),
+        src: api.resolvePath(basePath, config.ssl.key),
         dest: '/opt/' + config.name + '/config/private.key'
       });
     }
 
     list.executeScript('Verifying SSL Configurations', {
-      script: resolvePath(__dirname, 'assets/verify-ssl-config.sh'),
+      script: api.resolvePath(__dirname, 'assets/verify-ssl-config.sh'),
       vars: {
         name: config.name
       }
@@ -94,7 +92,7 @@ export function setup(api) {
 
   const sessions = api.getSessions(['app']);
 
-  return runTaskList(list, sessions, { verbose: api.verbose });
+  return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
 export async function push(api) {
@@ -105,13 +103,13 @@ export async function push(api) {
     process.exit(1);
   }
 
-  const appPath = resolvePath(api.getBasePath(), config.path);
+  const appPath = api.resolvePath(api.getBasePath(), config.path);
 
   let buildOptions = config.buildOptions || {};
   buildOptions.buildLocation = buildOptions.buildLocation ||
-    tmpBuildPath(appPath);
+    tmpBuildPath(appPath, api);
 
-  var bundlePath = resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+  var bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
   var rebuild = true;
 
   if (api.optionEnabled('cached-build')) {
@@ -138,8 +136,8 @@ export async function push(api) {
     progressBar: config.enableUploadProgressBar
   });
 
-  return runTaskList(list, sessions, {
   const sessions = api.getSessions(['app']);
+  return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
   });
@@ -198,7 +196,7 @@ export function envconfig(api) {
 
   const list = nodemiral.taskList('Configuring App');
   list.copy('Pushing the Startup Script', {
-    src: resolvePath(__dirname, 'assets/templates/start.sh'),
+    src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
     dest: '/opt/' + config.name + '/config/start.sh',
     vars: {
       appName: config.name,
@@ -228,7 +226,7 @@ export function envconfig(api) {
   env.PORT = config.docker.imagePort;
 
   list.copy('Sending Environment Variables', {
-    src: resolvePath(__dirname, 'assets/templates/env.list'),
+    src: api.resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + config.name + '/config/env.list',
     vars: {
       env: env || {},
@@ -254,14 +252,14 @@ export function start(api) {
   const list = nodemiral.taskList('Start Meteor');
 
   list.executeScript('Start Meteor', {
-    script: resolvePath(__dirname, 'assets/meteor-start.sh'),
+    script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
     vars: {
       appName: config.name
     }
   });
 
   list.executeScript('Verifying Deployment', {
-    script: resolvePath(__dirname, 'assets/meteor-deploy-check.sh'),
+    script: api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh'),
     vars: {
       deployCheckWaitTime: config.deployCheckWaitTime || 60,
       appName: config.name,
@@ -271,8 +269,8 @@ export function start(api) {
     }
   });
 
-  return runTaskList(list, sessions, {
   const sessions = api.getSessions(['app']);
+  return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
   });
@@ -303,12 +301,12 @@ export function stop(api) {
   const list = nodemiral.taskList('Stop Meteor');
 
   list.executeScript('Stop Meteor', {
-    script: resolvePath(__dirname, 'assets/meteor-stop.sh'),
+    script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
     vars: {
       appName: config.name
     }
   });
 
-  return runTaskList(list, sessions, { verbose: api.verbose });
   const sessions = api.getSessions(['app']);
+  return api.runTaskList(list, sessions, { verbose: api.verbose });
 }

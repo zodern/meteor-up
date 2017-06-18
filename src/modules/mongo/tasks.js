@@ -1,6 +1,3 @@
-import { getDockerLogs, resolvePath, runTaskList } from '../utils';
-import { argv } from 'yargs';
-
 import debug from 'debug';
 import nodemiral from 'nodemiral';
 
@@ -20,7 +17,7 @@ export function logs(api) {
   const args = api.getArgs();
   const sessions = api.getSessions(['mongo']);
   args.shift(); // remove mongo from args sent to docker
-  return getDockerLogs('mongodb', sessions, args);
+  return api.getDockerLogs('mongodb', sessions, args);
 }
 
 export function setup(api) {
@@ -52,17 +49,17 @@ export function setup(api) {
   const list = nodemiral.taskList('Setup Mongo');
 
   list.executeScript('Setup Environment', {
-    script: resolvePath(__dirname, 'assets/mongo-setup.sh')
+    script: api.resolvePath(__dirname, 'assets/mongo-setup.sh')
   });
 
   list.copy('Copying mongodb.conf', {
-    src: resolvePath(__dirname, 'assets/mongodb.conf'),
+    src: api.resolvePath(__dirname, 'assets/mongodb.conf'),
     dest: '/opt/mongodb/mongodb.conf'
   });
 
   const sessions = api.getSessions(['mongo']);
 
-  return runTaskList(list, sessions, { verbose: argv.verbose });
+  return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
 export function start(api) {
@@ -83,7 +80,7 @@ export function start(api) {
   const list = nodemiral.taskList('Start Mongo');
 
   list.executeScript('Start Mongo', {
-    script: resolvePath(__dirname, 'assets/mongo-start.sh'),
+    script: api.resolvePath(__dirname, 'assets/mongo-start.sh'),
     vars: {
       mongoVersion: config.version || '3.4.1',
       mongoDbDir: '/var/lib/mongodb'
@@ -91,7 +88,7 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions, { verbose: argv.verbose });
+  return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
 export function stop(api) {
@@ -99,9 +96,9 @@ export function stop(api) {
   const list = nodemiral.taskList('Stop Mongo');
 
   list.executeScript('stop mongo', {
-    script: resolvePath(__dirname, 'assets/mongo-stop.sh')
+    script: api.resolvePath(__dirname, 'assets/mongo-stop.sh')
   });
 
   const sessions = api.getSessions(['mongo']);
-  return runTaskList(list, sessions, { verbose: argv.verbose });
+  return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
