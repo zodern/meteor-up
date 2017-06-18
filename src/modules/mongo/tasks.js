@@ -35,7 +35,7 @@ export function setup(api) {
   }
 
   const mongoSessions = api.getSessions(['mongo']);
-  const meteorSessions = api.getSessions(['meteor']);
+  const meteorSessions = api.getSessions(['app']);
 
   if (meteorSessions.length !== 1) {
     console.log(
@@ -69,7 +69,7 @@ export function start(api) {
   log('exec => mup mongo start');
 
   const mongoSessions = api.getSessions(['mongo']);
-  const meteorSessions = api.getSessions(['meteor']);
+  const meteorSessions = api.getSessions(['app']);
   const config = api.getConfig().mongo;
 
   if (

@@ -32,7 +32,7 @@ export function help() {
 
 export function logs(api) {
   log('exec => mup meteor logs');
-  const config = api.getConfig().meteor;
+  const config = api.getConfig().app;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -42,13 +42,13 @@ export function logs(api) {
   if (args[0] === 'meteor') {
     args.shift();
   }
-  const sessions = api.getSessions(['meteor']);
   return getDockerLogs(config.name, sessions, args);
+  const sessions = api.getSessions(['app']);
 }
 
 export function setup(api) {
   log('exec => mup meteor setup');
-  const config = api.getConfig().meteor;
+  const config = api.getConfig().app;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -92,14 +92,14 @@ export function setup(api) {
     });
   }
 
-  const sessions = api.getSessions(['meteor']);
+  const sessions = api.getSessions(['app']);
 
   return runTaskList(list, sessions, { verbose: api.verbose });
 }
 
 export async function push(api) {
   log('exec => mup meteor push');
-  const config = api.getConfig().meteor;
+  const config = api.getConfig().app;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -138,8 +138,8 @@ export async function push(api) {
     progressBar: config.enableUploadProgressBar
   });
 
-  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
+  const sessions = api.getSessions(['app']);
     series: true,
     verbose: api.verbose
   });
@@ -148,7 +148,7 @@ export async function push(api) {
 export function envconfig(api) {
   log('exec => mup meteor envconfig');
 
-  const config = api.getConfig().meteor;
+  const config = api.getConfig().app;
   let bindAddress = '0.0.0.0';
 
   if (!config) {
@@ -236,8 +236,8 @@ export function envconfig(api) {
     }
   });
 
-  const sessions = api.getSessions(['meteor']);
-  return runTaskList(list, sessions, {
+  const sessions = api.getSessions(['app']);
+  return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
   });
@@ -245,7 +245,7 @@ export function envconfig(api) {
 
 export function start(api) {
   log('exec => mup meteor start');
-  const config = api.getConfig().meteor;
+  const config = api.getConfig().app;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -271,8 +271,8 @@ export function start(api) {
     }
   });
 
-  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, {
+  const sessions = api.getSessions(['app']);
     series: true,
     verbose: api.verbose
   });
@@ -283,7 +283,7 @@ export function deploy(api) {
 
   // validate settings and config before starting
   api.getSettings();
-  const config = api.getConfig().meteor;
+  const config = api.getConfig().app;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -294,7 +294,7 @@ export function deploy(api) {
 
 export function stop(api) {
   log('exec => mup meteor stop');
-  const config = api.getConfig().meteor;
+  const config = api.getConfig().app;
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -309,6 +309,6 @@ export function stop(api) {
     }
   });
 
-  const sessions = api.getSessions(['meteor']);
   return runTaskList(list, sessions, { verbose: api.verbose });
+  const sessions = api.getSessions(['app']);
 }

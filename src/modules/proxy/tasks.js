@@ -30,14 +30,14 @@ export function logs(api) {
   }
 
   const args = api.getArgs().slice(1);
-  const sessions = api.getSessions(['meteor']);
+  const sessions = api.getSessions(['app']);
   return getDockerLogs(PROXY_CONTAINER_NAME, sessions, args);
 }
 
 export function setup(api) {
   log('exec => mup proxy setup');
   const config = api.getConfig().proxy;
-  const appName = api.getConfig().meteor.name;
+  const appName = api.getConfig().app.name;
 
   if (!config) {
     console.error('error: no configs found for proxy');
@@ -99,7 +99,7 @@ export function setup(api) {
     });
   }
 
-  const sessions = api.getSessions(['meteor']);
+  const sessions = api.getSessions(['app']);
 
   return runTaskList(list, sessions, {
     series: true,
@@ -139,7 +139,7 @@ export function envconfig(api) {
       env: envLetsEncrypt || {}
     }
   });
-  const sessions = api.getSessions(['meteor']);
+  const sessions = api.getSessions(['app']);
   return runTaskList(list, sessions, {
     series: true,
     verbose: api.getVerbose()
@@ -168,7 +168,7 @@ export function start(api) {
     }
   });
 
-  const sessions = api.getSessions(['meteor']);
+  const sessions = api.getSessions(['app']);
   return runTaskList(list, sessions, {
     series: true,
     verbose: api.getVerbose()
@@ -192,6 +192,6 @@ export function stop(api) {
     }
   });
 
-  const sessions = api.getSessions(['meteor']);
+  const sessions = api.getSessions(['app']);
   return runTaskList(list, sessions, { verbose: api.getVerbose() });
 }

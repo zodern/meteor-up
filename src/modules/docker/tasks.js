@@ -9,7 +9,7 @@ import { argv } from 'yargs';
 const log = debug('mup:module:docker');
 
 function uniqueSessions(api) {
-  const sessions = api.getSessions(['meteor', 'mongo', 'proxy']);
+  const sessions = api.getSessions(['app', 'mongo', 'proxy']);
   return sessions.reduce(
     (prev, curr) => {
       if (prev.map(session => session._host).indexOf(curr._host) === -1) {

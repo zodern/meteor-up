@@ -10,10 +10,11 @@ module.exports = {
     }
   },
 
-  meteor: {
+  app: {
     // TODO: change app name and path
     name: 'app',
     path: '../app',
+    type: 'meteor',
 
     servers: {
       one: {},

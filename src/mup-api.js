@@ -7,6 +7,7 @@ import configValidator from './validate/index';
 import path from 'path';
 import { tasks, hooks } from './tasks';
 import childProcess from 'child_process';
+import * as utils from './modules/utils';
 
 export default class MupAPI {
   constructor(base, filteredArgs, program) {
@@ -19,6 +20,11 @@ export default class MupAPI {
     this.settingsPath = program['settings'];
     this.verbose = program.verbose;
     this.program = program;
+
+    this.resolvePath = utils.resolvePath;
+    this.runTaskList = utils.runTaskList;
+    this.getDockerLogs = utils.getDockerLogs;
+    this.runSSHCommand = utils.runSSHCommand;
   }
 
   getArgs() {
@@ -69,11 +75,20 @@ export default class MupAPI {
       console.log(
         'Read the docs and view example configs at'
       );
-      console.log('create an issue at https://zodern.github.io/meteor-up/docs');
+      console.log('    https://zodern.github.io/meteor-up/docs');
       console.log('');
     }
   }
-
+  _normalizeConfig(config) {
+    if (typeof config !== 'object') {
+      return config;
+    }
+    if (config.meteor && typeof config.app !== 'object') {
+      config.app = config.meteor;
+      config.app.type = 'meteor';
+    }
+    return config;
+  }
   getConfig(validate = true) {
     if (!this.config) {
       let filePath;
@@ -86,6 +101,9 @@ export default class MupAPI {
       try {
         this.config = require(filePath); // eslint-disable-line global-require
       } catch (e) {
+        if (!validate) {
+          return {};
+        }
         if (e.code === 'MODULE_NOT_FOUND') {
           console.error('"mup.js" file not found at');
           console.error(`  ${filePath}`);
@@ -98,6 +116,7 @@ export default class MupAPI {
       if (validate) {
         this.validateConfig(filePath);
       }
+      this.config = this._normalizeConfig(this.config);
     }
 
     return this.config;
@@ -152,7 +171,7 @@ export default class MupAPI {
             this._taskErrorHandler(e);
           }
         }
-        }
+      }
     }
   };
   _runPostHooks = async function(task) {
