@@ -70,7 +70,7 @@ export default class MupAPI {
       console.log(
         'Read the docs and view example configs at'
       );
-      console.log('create an issue at https://zodern.github.io/meteor-up/docs');
+      console.log('  https://zodern.github.io/meteor-up/docs');
       console.log('');
     }
   }
