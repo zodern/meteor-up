@@ -1,3 +1,9 @@
+## Next
+- Show link to docs when there are validation errors
+- Improve some of the validation messages
+- Show validation error when `server.pem` is a path to a public key
+- Removed unnecessary stack traces when the app's path is incorrect or `meteor build` failed
+
 ## 1.2.11 - June 14, 2017
 - Deployment verifier shows last 100 lines of the app's log when it fails (it previously was 50 lines)
 - Fix `mup setup` restarting docker
