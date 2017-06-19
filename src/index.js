@@ -109,6 +109,10 @@ let program = yargs
     description: 'Print output from build and server scripts',
     boolean: true
   })
+  .option('show-hook-names', {
+    description: 'Prints names of the available hooks as the command runs',
+    boolean: true
+  })
   .strict(true)
   .alias('help', 'h')
   .epilogue(

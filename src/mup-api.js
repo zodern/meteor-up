@@ -159,6 +159,11 @@ export default class MupAPI {
   }
   _runPreHooks = async function(task) {
     let hookName = `pre.${task}`;
+
+    if (this.program['show-hook-names']) {
+      console.log(chalk.yellow(`Hook: ${hookName}`));
+    }
+
     if (hookName in hooks) {
       let hookList = hooks[hookName];
       for (let hookHandler of hookList) {
@@ -176,6 +181,11 @@ export default class MupAPI {
   };
   _runPostHooks = async function(task) {
     const hookName = `post.${task}`;
+
+    if (this.program['show-hook-names']) {
+      console.log(chalk.yellow(`Hook: ${hookName}`));
+    }
+
     let that = this;
     if (hookName in hooks) {
       let hookList = hooks[hookName];
