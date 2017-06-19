@@ -69,7 +69,11 @@ export function restart(api) {
 }
 
 export function setup(api) {
-  process.on('exit', function displayNextSteps() {
+  process.on('exit', function displayNextSteps(code) {
+    if (code > 0) {
+      return;
+    }
+
     console.log('');
     console.log('Next, you should run:');
     console.log('    mup deploy');

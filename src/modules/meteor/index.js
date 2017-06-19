@@ -14,9 +14,9 @@ export let hooks = {
     }
   },
   'post.default.deploy'(api) {
-    const config = api.getconfig();
+    const config = api.getConfig();
     if (config.app && config.app.type === 'meteor') {
-      return api.runTask('meteor.setup');
+      return api.runTask('meteor.deploy');
     }
   }
 };
