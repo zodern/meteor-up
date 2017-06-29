@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import commandWrapper from './command-wrapper';
 import registerTask, { registerHook } from '../tasks';
+import { addPluginValidator } from '../validate';
 const modules = {};
 export default modules;
 
@@ -39,6 +40,11 @@ export function loadPlugins(plugins) {
         Object.keys(plugin.module.hooks).forEach((key) => {
           registerHook(key, plugin.module.hooks[key]);
         });
+      }
+      if (plugin.module.validate) {
+        for (var [property, validator] of Object.entries(plugin.module.validate)) {
+          addPluginValidator(property, validator);
+        }
       }
     });
 }

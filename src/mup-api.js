@@ -78,13 +78,15 @@ export default class MupAPI {
       console.log('    https://zodern.github.io/meteor-up/docs');
       console.log('');
     }
+
+    return problems;
   }
   _normalizeConfig(config) {
     if (typeof config !== 'object') {
       return config;
     }
     if (config.meteor && typeof config.app !== 'object') {
-      config.app = config.meteor;
+      config.app = Object.assign({}, config.meteor);
       config.app.type = 'meteor';
     }
     return config;

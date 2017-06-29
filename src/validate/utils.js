@@ -45,7 +45,7 @@ export function combineErrorDetails(details, results) {
   return details.concat(additionalDetails);
 }
 
-export function serversExist(serversConfig = {}, serversUsed) {
+export function serversExist(serversConfig = {}, serversUsed = {}) {
   let messages = [];
   let servers = Object.keys(serversConfig);
   let using = Object.keys(serversUsed);

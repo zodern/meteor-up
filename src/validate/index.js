@@ -1,4 +1,4 @@
-import { VALIDATE_OPTIONS, combineErrorDetails, improveErrors } from './utils';
+import * as utils from './utils';
 
 import joi from 'joi';
 import validateMeteor from './meteor';
@@ -6,19 +6,33 @@ import validateMongo from './mongo';
 import validateServer from './servers';
 import validateProxy from './proxy';
 
-const schema = joi.object().keys({
-  servers: joi.object().required(),
-  meteor: joi.object(),
-  mongo: joi.object(),
-  proxy: joi.object(),
-  pugins: joi.array()
-});
+const { combineErrorDetails, VALIDATE_OPTIONS, improveErrors } = utils;
+
+export const _pluginValidators = {};
+
+export function addPluginValidator(rootPath, handler) {
+  _pluginValidators[rootPath] = handler;
+}
+
+function generateSchema() {
+  const topLevelKeys = {
+    servers: joi.object().required(),
+    app: joi.object(),
+    plugins: joi.array()
+  };
+
+  Object.keys(_pluginValidators).forEach((key) => {
+    topLevelKeys[key] = joi.any();
+  });
+
+  return joi.object().keys(topLevelKeys);
+}
 
 function validateAll(config) {
   let details = [];
   let results;
 
-  results = joi.validate(config, schema, VALIDATE_OPTIONS);
+  results = joi.validate(config, generateSchema(), VALIDATE_OPTIONS);
   details = combineErrorDetails(details, results);
 
   if (config.servers) {
@@ -26,20 +40,32 @@ function validateAll(config) {
     details = combineErrorDetails(details, results);
   }
 
-  if (config.mongo) {
-    results = validateMongo(config);
-    details = combineErrorDetails(details, results);
+  for (const [property, validator] of Object.entries(_pluginValidators)) {
+    if (config[property] !== undefined) {
+      results = validator(config, utils);
+      details = combineErrorDetails(details, results);
+    }
   }
 
-  if (config.meteor) {
-    results = validateMeteor(config);
-    details = combineErrorDetails(details, results);
-  }
+  // Object.values(_pluginValidators).forEach(validator => {
+  //   results = validator(config, utils);
+  //   details = combineErrorDetails(details, results);
+  // });
 
-  if (config.proxy) {
-    results = validateProxy(config);
-    details = combineErrorDetails(details, results);
-  }
+  // if (config.mongo) {
+  //   results = validateMongo(config);
+  //   details = combineErrorDetails(details, results);
+  // }
+
+  // if (config.meteor) {
+  //   results = validateMeteor(config);
+  //   details = combineErrorDetails(details, results);
+  // }
+
+  // if (config.proxy) {
+  //   results = validateProxy(config);
+  //   details = combineErrorDetails(details, results);
+  // }
 
   return details.map(improveErrors);
 }
