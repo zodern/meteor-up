@@ -1,7 +1,6 @@
 ---
 layout: docs
-title: 'Meteor Up - Getting Started'
-header: 'Getting Started'
+title: 'Getting Started'
 ---
 
 ## Install

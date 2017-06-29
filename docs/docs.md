@@ -1,6 +1,6 @@
 ---
 layout: 'docs'
-title: 'Meteor Up Documentation'
+title: 'Documentation'
 ---
 
 ## Server Configuration

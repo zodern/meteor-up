@@ -12,10 +12,16 @@ function buildApp(appPath, buildOptions, verbose) {
   try {
     fs.statSync(resolvePath(appPath));
   } catch (e) {
-    console.log(e);
-    console.log(`${resolvePath(appPath)} does not exist`);
+
+    if (e.code === 'ENOENT') {
+      console.log(`${resolvePath(appPath)} does not exist`);
+    } else {
+      console.log(e);
+    }
+
     process.exit(1);
   }
+
   // Make sure it is a Meteor app
   try {
     // checks for release file since there also is a
@@ -40,7 +46,7 @@ function buildApp(appPath, buildOptions, verbose) {
         return;
       }
       console.log('\n=> Build Error. Check the logs printed above.');
-      callback(new Error('build-error'));
+      process.exit(1);
     });
   });
 }
