@@ -204,6 +204,9 @@ a {
 .docs-nav {
     list-style: none;
     padding-top: 20px;
+    padding-left: 15px;
+    background-color: #1c2a44;
+    height: 100vh;
 }
 
 pre {
@@ -223,7 +226,7 @@ code {
 
 /* toc */
 .is-position-fixed {
-    left: 15px;
+    left: 0;
     height: 100vh;
     overflow-y: auto;
 }
@@ -237,6 +240,10 @@ code {
 }
 .toc-link.is-active-link {
     color: #74d2ed;
+}
+
+.docs-content {
+    padding-right: 30px;
 }
 
 .docs-content h2 {
