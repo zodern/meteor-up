@@ -1,10 +1,10 @@
 import checkUpdates from './updates';
 import modules, { loadPlugins } from './load-plugins';
-import { registerHook } from './api/tasks';
+import { registerHook } from './hooks';
 import pkg from '../package.json';
 import yargs from 'yargs';
 import chalk from 'chalk';
-import MupAPI from './api/plugin-api';
+import MupAPI from './plugin-api';
 
 function addModuleCommands(builder, module, moduleName) {
   Object.keys(module.commands).forEach(commandName => {

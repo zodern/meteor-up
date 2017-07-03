@@ -1,4 +1,4 @@
-import { countOccurences, runSSHCommand } from '../../../api/utils';
+import { countOccurences, runSSHCommand } from '../../../utils';
 import { describe, it } from 'mocha';
 
 /* eslint-disable max-len, no-unused-expressions */

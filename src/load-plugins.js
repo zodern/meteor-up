@@ -1,8 +1,8 @@
 import fs from 'fs';
 import { resolve, join } from 'path';
-import registerCommand from './api/commands';
-import { registerHook } from './api/hooks';
-import { addPluginValidator } from './api/validate';
+import registerCommand from './commands';
+import { registerHook } from './hooks';
+import { addPluginValidator } from './validate';
 const modules = {};
 export default modules;
 
