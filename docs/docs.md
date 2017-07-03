@@ -32,7 +32,7 @@ This will create two files in your Meteor Up project directory:
 
 ## Example Configs
 <!-- eslint comma-dangle: 0 -->
-### Simple Config
+### Minimal Config
 
 Just the required and most common options.
 
@@ -67,9 +67,9 @@ module.exports = {
     version: '3.4.1',
     servers: {
       one: {}
-    }  
+    }
   }
-}
+};
 ```
 
 ### Everything Configured
@@ -84,8 +84,8 @@ module.exports = {
       // password: 'password',
       // or leave blank to authenticate using ssh-agent
       opts: {
-        port: 22,
-      },
+        port: 22
+      }
     }
   },
 
@@ -93,7 +93,8 @@ module.exports = {
     name: 'app',
     path: '../app',
 
-    // lets you add docker volumes (optional). Can be used to store files between app deploys and restarts.
+    // lets you add docker volumes (optional). Can be used to
+    // store files between app deploys and restarts.
     volumes: {
       // passed as '-v /host/path:/container/path' to the docker run command
       '/host/path': '/container/path',
@@ -103,7 +104,6 @@ module.exports = {
       // Change the image to 'kadirahq/meteord' if you
       // are using Meteor 1.3 or older
       image: 'abernix/meteord:base',
-      imagePort: 80, // (optional, default: 80)
 
       // lets you add/overwrite any parameter on
       // the docker run command (optional)
@@ -134,13 +134,14 @@ module.exports = {
 
     // All options are optional.
     buildOptions: {
-      // Set to true to skip building mobile apps, but still build the web.cordova architecture. (recommended)
+      // Set to true to skip building mobile apps
+      // but still build the web.cordova architecture. (recommended)
       serverOnly: true,
 
       debug: true,
 
       // defaults to a a folder in your tmp folder.
-      buildLocation: '/my/build/folder', 
+      buildLocation: '/my/build/folder',
 
       // Remove this property for mobileSettings to use your settings.json
       mobileSettings: {
@@ -148,7 +149,7 @@ module.exports = {
       },
 
       // your app url for mobile app access
-      server: 'http://app.com', 
+      server: 'http://app.com',
 
        // adds --allow-incompatible-updates arg to build command
       allowIncompatibleUpdates: true,
@@ -162,9 +163,9 @@ module.exports = {
       ROOT_URL: 'http://app.com',
 
       MONGO_URL: 'mongodb://localhost/meteor'
-    
+
       // The port you access the app on. (optional, default is 80)
-      // PORT: 8000 
+      // PORT: 8000
     },
 
     // Docker log options (optional)
@@ -179,7 +180,7 @@ module.exports = {
       autogenerate: {
         email: 'email.address@domain.com',
         // Comma seperated list of domains
-        domains: 'website.com,www.website.com' 
+        domains: 'website.com,www.website.com'
       }
     },
     deployCheckWaitTime: 60, // default 10
@@ -197,12 +198,12 @@ module.exports = {
   // (optional but remove it if you want to use a remote mongodb!)
   mongo: {
     port: 27017,
-    
+
     // (optional), default is 3.4.1
     version: '3.4.1',
 
     servers: {
-      one: {},
+      one: {}
     }
   }
 };
@@ -221,7 +222,7 @@ It is safe to run `mup setup` multiple times if needed. After making changes to 
 
     mup deploy
 
-This will bundle the Meteor project locally and deploy it to the remote server(s). The bundling process is exactly how `meteor deploy` does it.
+This will bundle the Meteor project locally and deploy it to the remote server(s). The bundling process is the same as what `meteor deploy` does.
 
     mup deploy --cached-build
 
@@ -229,11 +230,11 @@ The `--cached-build` option will use the build from the last time you deployed t
 
 ## Other Utility Commands
 
-* `mup reconfig` - reconfigures app with new environment variables, Meteor settings, and it updates the start script. This is run as part of `mup deploy`
+* `mup reconfig` - reconfigures app with new environment variables, Meteor settings, and it updates the start script. This is also the last step of `mup deploy`.
 * `mup stop` - stop the app
 * `mup start` - start the app
 * `mup restart` - restart the app
-* `mup logs [-f --tail=50]` - get logs. Supports all of the flags from `docker logs`.
+* `mup logs [-f --tail=50]` - view the app's logs. Supports all of the flags from `docker logs`.
 
 ## Build Options
 
@@ -398,6 +399,10 @@ meteor: {
  ...
 }
 ```
+
+### Image Port
+
+You can set `meteor.docker.port` to the port to expose from the container. This does not effect the port the app is accessed on, only the port the app runs on inside the docker container.
 
 ## Reverse Proxy
 

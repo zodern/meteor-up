@@ -43,7 +43,6 @@ module.exports = {
     docker: {
       // change to 'kadirahq/meteord' if your app is not using Meteor 1.4
       image: 'abernix/meteord:base',
-      // imagePort: 80, // (default: 80, some images EXPOSE different ports)
     },
 
     // This is the maximum time in seconds it will wait
