@@ -12,17 +12,6 @@ const servers = require('../../../../tests/servers');
 describe('module - meteor', function() {
   this.timeout(600000);
 
-  // async function cleanup(server) {
-  //   await runSSHCommand(
-  //     server,
-  //     'sudo apt-get -y purge docker-engine && sudo apt-get -y autoremove --purge docker-engine && sudo rm -rf /var/lib/docker && sudo rm -rf /opt/myapp || :'
-  //   );
-  // }
-
-  describe('help', function() {
-    it('TODO write tests');
-  });
-
   describe('setup', function() {
     it('should setup enviranment on "meteor" vm', async () => {
       const serverInfo = servers['mymeteor'];

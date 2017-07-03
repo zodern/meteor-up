@@ -56,10 +56,6 @@ describe('module - default', function() {
     });
   });
 
-  describe('help', function() {
-    it('TODO write tests');
-  });
-
   describe('init', function() {
     it('should create "mup.js" and "setting.json" in /tmp/project-tmp', () => {
       const dir = '/tmp/project-tmp';

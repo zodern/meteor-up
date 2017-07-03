@@ -10,11 +10,6 @@ const servers = require('../../../../tests/servers');
 
 describe('module - docker', function() {
   this.timeout(6000000);
-  it('TODO write tests');
-
-  describe('help', function() {
-    it('TODO write tests');
-  });
 
   describe('setup', function() {
     // reuse this function for 3 tests below

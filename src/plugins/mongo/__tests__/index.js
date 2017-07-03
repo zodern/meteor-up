@@ -11,14 +11,6 @@ const servers = require('../../../../tests/servers');
 describe('module - mongo', function() {
   this.timeout(600000);
 
-  describe('dump', function() {
-    it('TODO write tests');
-  });
-
-  describe('help', function() {
-    it('TODO write tests');
-  });
-
   describe('logs', function() {
     it('should pull logs from "meteor" vm', async () => {
       sh.cd('/tmp/tests/project-1');
