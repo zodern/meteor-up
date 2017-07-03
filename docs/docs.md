@@ -63,7 +63,6 @@ module.exports = {
     }
   },
   mongo: {
-    port: 27017,
     version: '3.4.1',
     servers: {
       one: {}
@@ -197,8 +196,6 @@ module.exports = {
 
   // (optional but remove it if you want to use a remote mongodb!)
   mongo: {
-    port: 27017,
-
     // (optional), default is 3.4.1
     version: '3.4.1',
 
