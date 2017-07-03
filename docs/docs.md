@@ -747,8 +747,7 @@ Replace `<AppName>` with the name of the app.
 
 Make sure `force-ssl` is not in `.meteor/versions`. If it is, either your app, or a package it uses has `force-ssl` as a dependency.
 
-## Migrating from Meteor Up 0.x
-
+## Migration Guide
 `mup` is not backward compatible with Meteor Up 0.x. or `mupx`.
 
 * Docker is now the runtime for Meteor Up
@@ -758,9 +757,9 @@ Make sure `force-ssl` is not in `.meteor/versions`. If it is, either your app, o
 * It uses Nginx and different SSL configurations
 * Now we don't re-build binaries. Instead we build for the `os.linux.x86_64` architecture. (This is the same thing what meteor-deploy does)
 
-## Migration Guide
+> Use a new server if you can. Then migrate DNS accordingly. That's the easiest and safest way.
 
-> Use a new server if possible as you can. Then migrate DNS accordingly. That's the easiest and safest way.
+### Migrating from Mupx
 
 Let's assume our appName is `meteor`
 
@@ -768,4 +767,6 @@ Remove old docker container with: `docker rm -f meteor`
 Remove old mongodb container with: `docker rm -f mongodb`
 If present remove nginx container with: `docker rm -f meteor-frontend`
 
+The new config format is different from mupx. 
+Run `mup init` to create a new config file.
 Then do `mup setup` and then `mup deploy`.
