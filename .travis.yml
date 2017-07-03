@@ -6,10 +6,10 @@ node_js:
   - "6"
 
 env:
-  - TEST_MODULE='modules/default'
-  - TEST_MODULE='modules/meteor'
-  - TEST_MODULE='modules/mongo'
-  - TEST_MODULE='modules/docker'
+  - TEST_MODULE='plugins/default'
+  - TEST_MODULE='plugins/meteor'
+  - TEST_MODULE='plugins/mongo'
+  - TEST_MODULE='plugins/docker'
 
 services:
   - docker
