@@ -1,12 +1,12 @@
 import checkUpdates from './updates';
-import modules, { loadPlugins } from './modules/';
-import { registerHook } from './tasks';
+import modules, { loadPlugins } from './load-plugins';
+import { registerHook } from './api/tasks';
 import pkg from '../package.json';
 import yargs from 'yargs';
 import chalk from 'chalk';
-import MupAPI from './mup-api';
+import MupAPI from './api/plugin-api';
 
-function addModuleCommands(builder, module) {
+function addModuleCommands(builder, module, moduleName) {
   Object.keys(module.commands).forEach(commandName => {
     let command = module.commands[commandName];
     command.builder = command.builder || {};
@@ -14,7 +14,7 @@ function addModuleCommands(builder, module) {
       commandName,
       command.description,
       command.builder,
-      commandWrapper(command.handler)
+      commandWrapper(moduleName, commandName)
     );
   });
 }
@@ -40,7 +40,7 @@ function filterArgv() {
   return result;
 }
 
-function commandWrapper(handler) {
+function commandWrapper(pluginName, commandName) {
   return function() {
     checkUpdates()
       .then(() => {
@@ -48,17 +48,13 @@ function commandWrapper(handler) {
         let potentialPromise;
 
         try {
-          if (typeof handler === 'string') {
-            potentialPromise = api.runTask(handler);
-          } else {
-            potentialPromise = handler(api);
-          }
+          potentialPromise = api.runCommand(`${pluginName}.${commandName}`);
         } catch (e) {
-          api._taskErrorHandler(e);
+          api._commandErrorHandler(e);
         }
 
         if (potentialPromise && typeof potentialPromise.then === 'function') {
-          potentialPromise.catch(api._taskErrorHandler);
+          potentialPromise.catch(api._commandErrorHandler);
         }
       })
       .catch(e => {
@@ -72,7 +68,7 @@ let config = new MupAPI(process.cwd(), process.argv, yargs.argv).getConfig(
   false
 );
 
-if (config.plugins) {
+if (config.plugins instanceof Array) {
   loadPlugins(
     config.plugins.map(plugin => {
       return {
