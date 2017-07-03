@@ -580,13 +580,81 @@ meteor: {
 
 ## MongoDB
 
+### External Database
+
+To use an external database:
+
+1. Remove the `mongo` object from your config
+2. Set `meteor.env.MONGO_URL` to point tothe external Mongo instance
+
+Two popular Mongo DbaaS's are [Compose](https://www.compose.com/mongodb) and [mLab](https://mlab.com/).
+
+### Built-in Database
+Meteor Up can start a MongoDB instance on the server and set `meteor.env.MONGO_URL` to connect to it.
+
+It is recommended to use an external database instead of the one built-in to mup for apps in production. The built-in database currently does not support oplog, is not easy to backup, and only works when the app is running on one server.
+
+Add the `mongo` object to your config:
+
+```ts
+{
+  ...
+  mongo: {
+    version: '3.4.1',
+    servers: {
+      one: {}
+    }
+  }
+}
+```
+
+Before your first setup, it is recommeneded to change `mongo.version` to the newest version of MongoDB your app or meteor supports. After Mongo is started, it is more complex to upgrade it.
+
+After you finished changing the config, run
+```bash
+mup setup
+```
+
+and 
+```bash
+mup deploy
+```
+
+### Multiple apps use same Database
+It is possible for two apps to use the same database from the built-in MongoDB instance.
+
+In the config for one of the apps, follow the instructions for [Built-in Database](#built-in-database).
+
+For the other apps:
+1. Make sure the `mongo` object is not in the config
+2. Change `env.MONGO_URL` to `mongodb://mongodb:27017/<app1 name>`
+3. Change `meteor.docker.args` to `[ '--link=mongodb:mongodb' ]`. `meteor.docker` will look similar to:
+
+```ts
+    docker: {
+      // change to 'kadirahq/meteord' if your app is using Meteor 1.3 or older
+      image: 'abernix/meteord:base',
+      args: [
+        '--link=mongodb:mongodb'
+      ]
+    }
+```
+
 ### Accessing the Database
 
 You can't access the MongoDB from outside the server. To access the MongoDB shell you need to log into your server via SSH first and then run the following command:
 
     docker exec -it mongodb mongo <appName>
 
-### Change Mongodb Version
+### View MongoDB Logs
+
+If you are experiencing problems with MongoDB (such as it frequently restarting), you can view the logs with
+
+```bash
+mup mongo logs
+```
+
+### Change MongoDB Version
 
 If you have not deployed to the server, you can change the mongo version by adding:
 
@@ -601,10 +669,10 @@ mongo: {
 
 If you have deployed to the server, it involves a couple more steps.
 
-1) Go to the [MongoDB manual](https://docs.mongodb.com/manual/) > Release Notes > Current version of Mongodb > Upgrade or Downgrade Standalone
-2) Follow the directions listed there. You can access the MongoDB console by running `docker exec -it mongodb mongo` on the server.
-3) During the steps for install or replace binaries or restarting mongodb, instead change the version in your `mup.js` and run `mup setup`.
-4) To verify that it worked, run `docker ps` to check if mongodb keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
+1. Go to the [MongoDB manual](https://docs.mongodb.com/manual/) > Release Notes > Current version of Mongodb > Upgrade or Downgrade Standalone
+2. Follow the directions listed there. You can access the MongoDB console by running `docker exec -it mongodb mongo` on the server.
+3. During the steps for install or replace binaries or restarting mongodb, instead change the version in your `mup.js` and run `mup setup`.
+4. To verify that it worked, run `docker ps` to check if mongodb keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
 
 
 ## Updating Mup
