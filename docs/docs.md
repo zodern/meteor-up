@@ -627,7 +627,15 @@ Make sure that the docker image you are using supports your app's meteor version
 Some problems are caused by old versions of docker.
 
 ### Increase RAM
- problems are caused by the server running out of ram.
+Some problems are caused by the server running out of ram.
+
+### Check if Docker Containers are Restarting
+You can view a list of Docker containers with
+```bash
+mup docker ps
+```
+
+and check the `STATUS` column. 
 
 ### Verbose Output
 If you need to see the output of `mup` (to see more precisely where it's failing or hanging, for example), run it like so:
