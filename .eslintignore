@@ -1,5 +1,5 @@
-tests/helloapp
+tests/fixtures
 lib
 docs/scripts
 docs/_site
- 
+coverage

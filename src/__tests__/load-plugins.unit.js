@@ -1,4 +1,4 @@
-import modules, {loadPlugins, isDirectoryMupModule} from '../load-plugins';
+import modules from '../load-plugins';
 import assert from 'assert';
 
 describe('load-plugins', function() {
