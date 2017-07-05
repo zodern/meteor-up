@@ -1,11 +1,13 @@
 ## Next
 
 **Hooks**
+
 It is now possible to add hooks that run before or after commands. Hooks can be a string with a command to run locally, or a function. The function is passed two arguments: the `api` object available to plugin commands, and an `nodemiral` object which can be used to create tasks and task lists to run on the remote servers.
 
 Some commands run other commands. The new `--show-hook-names` option shows all of the available hooks when running a cli command. 
 
 **Plugins**
+
 Mup supports plugins to add functionality. Plugins can add commands (commands can be run from the mup cli or by other plugins), hooks, and config validators. All of the included cli commands and task lists have been moved to plugins.
 
 **Config Changes**
