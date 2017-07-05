@@ -8,7 +8,7 @@ export MUP_DIR=$PWD
 {
 rm -rf /tmp/tests
 mkdir /tmp/tests
-cp -rf $MUP_DIR/tests /tmp
+cp -rf $MUP_DIR/tests/fixtures /tmp
 cd /tmp/tests/
 rm -rf new*
 eval `ssh-agent`
@@ -37,9 +37,9 @@ fi
 
 {
 cd $MUP_DIR
-rm -rf ./tests/ssh
-mkdir ./tests/ssh
-cd ./tests/ssh
+rm -rf ./tests/fixtures/ssh
+mkdir ./tests/fixtures/ssh
+cd ./tests/fixtures/ssh
 ssh-keygen -f new -t rsa -N ''
 chmod 600 new.pub
 sudo chown root:root new.pub

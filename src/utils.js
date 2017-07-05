@@ -13,11 +13,14 @@ const log = debug('mup:utils');
 
 export function addStdioHandlers(list) {
   list._taskQueue = list._taskQueue.map(task => {
+    task.options = task.options || {};
+
     task.options.onStdout = () => {
       return data => {
         process.stdout.write(data);
       };
     };
+
     task.options.onStderr = () => {
       return data => {
         process.stderr.write(data);
@@ -52,7 +55,7 @@ export function runTaskList(list, sessions, opts) {
   });
 }
 
-// Implments a simple readable stream to pass
+// Implements a simple readable stream to pass
 // the logs from nodemiral to readline which
 // then splits it into individual lines.
 class Callback2Stream extends stream.Readable {
