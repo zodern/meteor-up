@@ -7,7 +7,7 @@ import path from 'path';
 import sh from 'shelljs';
 
 sh.config.silent = false;
-const servers = require('../../../../tests/servers');
+const servers = require('../../../../tests/fixtures/servers');
 
 describe('module - meteor', function() {
   this.timeout(600000);

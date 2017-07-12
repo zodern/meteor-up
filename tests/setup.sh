@@ -8,7 +8,7 @@ export MUP_DIR=$PWD
 {
 rm -rf /tmp/tests
 mkdir /tmp/tests
-cp -rf $MUP_DIR/tests/fixtures /tmp
+cp -rf $MUP_DIR/tests/fixtures/* /tmp/tests
 cd /tmp/tests/
 rm -rf new*
 eval `ssh-agent`

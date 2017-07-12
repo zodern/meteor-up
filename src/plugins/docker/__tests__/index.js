@@ -6,7 +6,7 @@ import assert from 'assert';
 import sh from 'shelljs';
 
 sh.config.silent = false;
-const servers = require('../../../../tests/servers');
+const servers = require('../../../../tests/fixtures/servers');
 
 describe('module - docker', function() {
   this.timeout(6000000);
