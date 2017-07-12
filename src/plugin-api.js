@@ -103,7 +103,8 @@ export default class PluginAPI {
   getConfig(validate = true) {
     if (!this.config) {
       try {
-        this.config = require(this.configPath); // eslint-disable-line global-require
+        // eslint-disable-next-line global-require
+        this.config = require(this.configPath);
       } catch (e) {
         if (!validate) {
           return {};

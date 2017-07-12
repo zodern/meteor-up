@@ -9,7 +9,7 @@ describe('hooks', function() {
   });
 
   it('should create new hooks', function() {
-    function target() {}
+    const target = { localScript: 'test' };
 
     registerHook('pre.default.setup', target);
     assert(hooks['pre.default.setup'].length === 1);
@@ -17,7 +17,7 @@ describe('hooks', function() {
   });
 
   it('should add hooks when some already exist', function() {
-    function target() {}
+    const target = { localScript: 'test' };
 
     registerHook('pre.default.setup', target);
     registerHook('pre.default.setup', target);
@@ -26,10 +26,18 @@ describe('hooks', function() {
     assert(hooks['pre.default.setup'][1] === target);
   });
 
-  it('should add missing plugin name for hooks for default commands', function() {
-    function target() {}
+  it('should add missing plugin name to hooks for default commands', function() {
+    const target = { localScript: 'test' };
     registerHook('pre.setup', target);
 
     assert(hooks['pre.default.setup'][0] === target);
+  });
+  it('should move functions to the method property', function() {
+    const target = function() {};
+
+    registerHook('pre.setup', target);
+    console.dir(hooks);
+
+    assert(hooks['pre.default.setup'][0].method === target);
   });
 });

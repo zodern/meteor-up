@@ -16,7 +16,7 @@
     "test:integration": "mocha --compilers js:babel-register --require babel-polyfill lib/**/__tests__/**/*.js",
     "test:module": "mocha --compilers js:babel-register --require babel-polyfill ",
     "test:parallel": "bash ./tests/run-parallel.sh",
-    "test:unit": "nyc --all mocha --compilers js:babel-register --require babel-polyfill src/**/*.unit.js",
+    "test:unit": "cross-env NODE_ENV=test nyc --all mocha --compilers js:babel-register --require babel-polyfill src/**/*.unit.js",
     "lint": "npm run lint:code && npm run lint:defaultConfig && npm run lint:readme",
     "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" .",
     "lint:code": "eslint .",
@@ -47,6 +47,7 @@
     "babel-preset-stage-3": "^6.22.0",
     "babel-register": "^6.24.1",
     "chai": "^3.5.0",
+    "cross-env": "^5.0.1",
     "eslint": "^3.19.0",
     "eslint-plugin-babel": "^4.1.0",
     "eslint-plugin-markdown": "^1.0.0-beta.4",
@@ -79,10 +80,13 @@
   "nyc": {
     "sourceMap": false,
     "instrument": false,
-    "cache": true,
     "reporter": [
       "lcov",
       "text-summary"
+    ],
+    "exclude": [
+      "src/plugins/**",
+      "**/__tests__/**"
     ]
   }
 }
