@@ -5,3 +5,5 @@ node_modules
 *.log
 docs/_site
 coverage
+
+tests/ssh/
