@@ -7,3 +7,4 @@ docs/_site
 coverage
 
 tests/ssh/
+.nyc_output/

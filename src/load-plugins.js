@@ -5,6 +5,10 @@ import { resolve, join } from 'path';
 import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { addPluginValidator } from './validate';
+import path from 'path';
+import debug from 'debug';
+
+const log = debug('mup:plugin-loader');
 
 const modules = {};
 export default modules;
@@ -21,38 +25,39 @@ let bundledPlugins = fs
 loadPlugins(bundledPlugins);
 
 export function locatePluginDir(name, configPath, appPath) {
-  console.log(name, configPath, appPath);
+  log(`loading plugin ${name}`);
+
   if (name.indexOf('.') === 0 || name.indexOf('/') === 0 || name.indexOf('~') === 0) {
-    console.log('local');
+    log('plugin name is a path to the plugin');
     return name;
   }
 
   const configLocalPath = resolveFrom.silent(configPath, name);
   if (configLocalPath) {
-    console.log('config relative', configLocalPath);
+    log('plugin installed locally to config folder');
     return configLocalPath;
   }
   try {
     const mupLocal = require.resolve(name);
+    log('plugin installed locally with mup');
     return mupLocal;
   } catch (e) {
-    console.log(e);
     // Continues to next location to resolve from
   }
 
   const appLocalPath = resolveFrom.silent(appPath, name);
   if (appLocalPath) {
-    console.log('app relative');
+    log('plugin installed locall in app folder');
     return appLocalPath;
   }
 
-  const globalPath = resolveFrom.silent(globalModules, name);
-  console.log(globalPath, globalModules, name);
+  log(`global install path: ${globalModules}`);
+  const globalPath = resolveFrom.silent(path.resolve(globalModules, '..'), name);
   if (globalPath) {
-    console.log('global');
+    log('plugin installed globally');
     return globalPath;
   }
-
+  log('plugin not found');
   return name;
 }
 
