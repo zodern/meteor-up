@@ -261,7 +261,7 @@ meteor: {
 
 ### Deploy Wait Time
 
-Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`. 
+Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`.
 
 Most docker images used with mup run `npm install` before starting the app. Especially for small servers, this can take awhile. If deployments fail with `Verifying Deployment: FAILED`, and it looks like npm didn't finish installing dependencies, try increasing the value in `meteor.deployCheckWaitTime`
 
@@ -412,7 +412,7 @@ Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` sectio
 ```ts
 {
   ...
-  proxy: { 
+  proxy: {
     ssl: {
       letsEncryptEmail: 'address@gmail.com'
     },
@@ -470,11 +470,11 @@ proxy: {
     // Settings in "proxy.shared" will be applied to every app deployed on the servers.
     // Everything is optional. These won't need to be changed for most apps.
     //
-    // This only needs to be set in one app that is on the server. 
+    // This only needs to be set in one app that is on the server.
     // If multiple apps have `proxy.shared`, they will override each other when `mup setup` is run for an app.
     shared: {
       // The port number to listen to for http connections. Default 80.
-      httpPort: 80, 
+      httpPort: 80,
       // The port to listen for htts connections. Default is 443.
       httpsPort: 443,
       // Set proxy wide upload limit. Setting 0 will disable the limit.
@@ -615,7 +615,7 @@ After you finished changing the config, run
 mup setup
 ```
 
-and 
+and
 ```bash
 mup deploy
 ```
@@ -703,7 +703,7 @@ You can view a list of Docker containers with
 mup docker ps
 ```
 
-and check the `STATUS` column. 
+and check the `STATUS` column.
 
 ### Verbose Output
 If you need to see the output of `mup` (to see more precisely where it's failing or hanging, for example), run it like so:
@@ -724,6 +724,19 @@ If you do not see `=> Starting meteor app on port` in the logs, it did not have 
 
 If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not. If that did not fix it, create a new issue with your config and output from `mup deploy --verbose`.
 
+
+If you are using Meteor 1.3, you might see this error:
+```
+/bundle/bundle/programs/server/node_modules/fibers/future.js:280
+						throw(ex);
+						^
+
+ReferenceError: module is not defined
+    at app/mup.js:1:-27
+```
+
+This error happens when your config gets bundled with the app. Try moving it and your `settings.json` to a hidden folder (such as `app/.deploy`) or to a location outside of the app's folder.
+
 ### Mup silently fails, mup.js file opens instead, or you get a Windows script error
 
 If you are using windows, make sure you run commands with `mup.cmd <command>` instead of `mup <command>`.
@@ -735,7 +748,7 @@ This usually happens when meteor is not installed.
 
 ### Let's Encrypt is not working
 
-Make sure your `meteor.env.ROOT_URL` starts with `https://`. Also, check that the dns for all of the domains in `ssl.autogenerate.domains` is correctly configured to point to the server. Port 80 needs to be open in the server so it can verify that you control the domain. 
+Make sure your `meteor.env.ROOT_URL` starts with `https://`. Also, check that the dns for all of the domains in `ssl.autogenerate.domains` is correctly configured to point to the server. Port 80 needs to be open in the server so it can verify that you control the domain.
 
 You can view the Let's Encrypt logs by running this command on the server:
 ```
@@ -767,6 +780,6 @@ Remove old docker container with: `docker rm -f meteor`
 Remove old mongodb container with: `docker rm -f mongodb`
 If present remove nginx container with: `docker rm -f meteor-frontend`
 
-The new config format is different from mupx. 
+The new config format is different from mupx.
 Run `mup init` to create a new config file.
 Then do `mup setup` and then `mup deploy`.
