@@ -1,5 +1,5 @@
 import checkUpdates from './updates';
-import modules, { loadPlugins } from './load-plugins';
+import modules, { loadPlugins, locatePluginDir } from './load-plugins';
 import { registerHook } from './hooks';
 import pkg from '../package.json';
 import yargs from 'yargs';
@@ -63,17 +63,17 @@ function commandWrapper(pluginName, commandName) {
   };
 }
 
-// Load plugins
-let config = new MupAPI(process.cwd(), process.argv, yargs.argv).getConfig(
-  false
-);
+// Load config before creating commands
+const preAPI = new MupAPI(process.cwd(), process.argv, yargs.argv);
+const config = preAPI.getConfig(false);
 
+// Load plugins
 if (config.plugins instanceof Array) {
   loadPlugins(
     config.plugins.map(plugin => {
       return {
         name: plugin,
-        path: plugin
+        path: locatePluginDir(plugin, preAPI.configPath, preAPI.app ? preAPI.app.path : '')
       };
     })
   );

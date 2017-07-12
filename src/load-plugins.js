@@ -1,8 +1,11 @@
 import fs from 'fs';
+import resolveFrom from 'resolve-from';
+import globalModules from 'global-modules';
 import { resolve, join } from 'path';
 import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { addPluginValidator } from './validate';
+
 const modules = {};
 export default modules;
 
@@ -17,6 +20,42 @@ let bundledPlugins = fs
 
 loadPlugins(bundledPlugins);
 
+export function locatePluginDir(name, configPath, appPath) {
+  console.log(name, configPath, appPath);
+  if (name.indexOf('.') === 0 || name.indexOf('/') === 0 || name.indexOf('~') === 0) {
+    console.log('local');
+    return name;
+  }
+
+  const configLocalPath = resolveFrom.silent(configPath, name);
+  if (configLocalPath) {
+    console.log('config relative', configLocalPath);
+    return configLocalPath;
+  }
+  try {
+    const mupLocal = require.resolve(name);
+    return mupLocal;
+  } catch (e) {
+    console.log(e);
+    // Continues to next location to resolve from
+  }
+
+  const appLocalPath = resolveFrom.silent(appPath, name);
+  if (appLocalPath) {
+    console.log('app relative');
+    return appLocalPath;
+  }
+
+  const globalPath = resolveFrom.silent(globalModules, name);
+  console.log(globalPath, globalModules, name);
+  if (globalPath) {
+    console.log('global');
+    return globalPath;
+  }
+
+  return name;
+}
+
 export function loadPlugins(plugins) {
   plugins
     .map(plugin => {
@@ -27,7 +66,7 @@ export function loadPlugins(plugins) {
       } catch (e) {
         console.log(e);
         console.log(`Unable to load plugin ${plugin.name}`);
-        return {name: module.name || plugin.name, failed: true};
+        return { name: module.name || plugin.name, failed: true };
       }
     })
     .forEach(plugin => {

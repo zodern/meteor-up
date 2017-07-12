@@ -13,12 +13,12 @@ const { resolvePath } = utils;
 
 export default class PluginAPI {
   constructor(base, filteredArgs, program) {
-    this.base = base;
+    this.base = program['config'] ? path.dirname(this.configPath) : base;
     this.args = filteredArgs;
     this.config = null;
     this.settings = null;
     this.sessions = null;
-    this.configPath = program['config'];
+    this.configPath = program['config'] ? resolvePath(this.configPath) : path.join(this.base, 'mup.js');
     this.settingsPath = program['settings'];
     this.verbose = program.verbose;
     this.program = program;
@@ -101,22 +101,15 @@ export default class PluginAPI {
   }
   getConfig(validate = true) {
     if (!this.config) {
-      let filePath;
-      if (this.configPath) {
-        filePath = resolvePath(this.configPath);
-        this.base = path.dirname(this.configPath);
-      } else {
-        filePath = path.join(this.base, 'mup.js');
-      }
       try {
-        this.config = require(filePath); // eslint-disable-line global-require
+        this.config = require(this.configPath); // eslint-disable-line global-require
       } catch (e) {
         if (!validate) {
           return {};
         }
         if (e.code === 'MODULE_NOT_FOUND') {
           console.error('"mup.js" file not found at');
-          console.error(`  ${filePath}`);
+          console.error(`  ${this.configPath}`);
           console.error('Run "mup init" to create it.');
         } else {
           console.error(e);
@@ -124,7 +117,7 @@ export default class PluginAPI {
         process.exit(1);
       }
       if (validate) {
-        this.validateConfig(filePath);
+        this.validateConfig(this.configPath);
       }
       this.config = this._normalizeConfig(this.config);
     }
