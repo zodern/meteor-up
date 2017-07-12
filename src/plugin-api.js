@@ -1,13 +1,14 @@
+import * as utils from './utils';
+
 import chalk from 'chalk';
+import childProcess from 'child_process';
+import { commands } from './commands';
+import configValidator from './validate/index';
 import fs from 'fs';
+import { hooks } from './hooks';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
-import * as utils from './utils';
-import configValidator from './validate/index';
 import path from 'path';
-import { commands } from './commands';
-import { hooks } from './hooks';
-import childProcess from 'child_process';
 
 const { resolvePath } = utils;
 
@@ -170,11 +171,11 @@ export default class PluginAPI {
     if (hookName in hooks) {
       let hookList = hooks[hookName];
       for (let hookHandler of hookList) {
-        if (typeof hookHandler === 'string') {
-          this._runHookScript(hookHandler);
-        } else {
+        if (hookHandler.localCommand) {
+          this._runHookScript(hookHandler.localCommand);
+        } else if (typeof hookHandler.method === 'function') {
           try {
-            await hookHandler(this);
+            await hookHandler.method(this, nodemiral);
           } catch (e) {
             this._commandErrorHandler(e);
           }
@@ -193,11 +194,11 @@ export default class PluginAPI {
     if (hookName in hooks) {
       let hookList = hooks[hookName];
       for (let hookHandler of hookList) {
-        if (typeof hookHandler === 'string') {
-          that._runHookScript(hookHandler);
-        } else {
+        if (hookHandler.localCommand) {
+          that._runHookScript(hookHandler.localCommand);
+        } else if (typeof hookHandler.method === 'function') {
           try {
-            await hookHandler(that);
+            await hookHandler.method(that, nodemiral);
           } catch (e) {
             this._commandErrorHandler(e);
           }
