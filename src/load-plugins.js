@@ -98,11 +98,11 @@ export function loadPlugins(plugins) {
     });
 }
 
-function isDirectoryMupModule({ name, path }) {
+function isDirectoryMupModule({ name, path: modulePath }) {
   if (name === '__tests__') {
     return false;
   }
 
-  const moduleDir = join(__dirname, path);
+  const moduleDir = join(__dirname, modulePath);
   return fs.statSync(moduleDir).isDirectory();
 }

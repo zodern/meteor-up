@@ -1,9 +1,17 @@
-import modules from '../load-plugins';
-import assert from 'assert';
+import modules, { locatePluginDir } from '../load-plugins';
+import { expect } from 'chai';
 
 describe('load-plugins', function() {
   it('should load included plugins', function() {
-    assert(Object.keys(modules).length > 4);
-    assert(Object.keys(modules).indexOf('default') > -1);
+    expect(Object.keys(modules)).to.have.length.greaterThan(4);
+    expect(Object.keys(modules)).to.contain('default');
+  });
+
+  describe('locatePluginDir', () => {
+    it('should identify paths', () => {
+      expect(locatePluginDir('./test')).to.equal('./test');
+      expect(locatePluginDir('~/test')).to.equal('~/test');
+      expect(locatePluginDir('/test')).to.equal('/test');
+    });
   });
 });

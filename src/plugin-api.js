@@ -14,12 +14,12 @@ const { resolvePath } = utils;
 
 export default class PluginAPI {
   constructor(base, filteredArgs, program) {
-    this.base = program['config'] ? path.dirname(this.configPath) : base;
+    this.base = program['config'] ? path.dirname(program['config']) : base;
     this.args = filteredArgs;
     this.config = null;
     this.settings = null;
     this.sessions = null;
-    this.configPath = program['config'] ? resolvePath(this.configPath) : path.join(this.base, 'mup.js');
+    this.configPath = program['config'] ? resolvePath(program['config']) : path.join(this.base, 'mup.js');
     this.settingsPath = program['settings'];
     this.verbose = program.verbose;
     this.program = program;
@@ -64,7 +64,7 @@ export default class PluginAPI {
   }
 
   validateConfig(configPath) {
-    let problems = configValidator(this.config);
+    let problems = configValidator(this.getConfig());
 
     if (problems.length > 0) {
       let red = chalk.red;
@@ -156,6 +156,11 @@ export default class PluginAPI {
 
     return this.settings;
   }
+
+  setConfig(newConfig) {
+    this.config = newConfig;
+  }
+
   _runHookScript(script) {
     childProcess.execSync(script, {
       cwd: this.getBasePath(),
@@ -220,13 +225,11 @@ export default class PluginAPI {
   }
   runCommand = async function(name) {
     if (!name) {
-      console.error('Command name is required');
-      return false;
+      throw new Error('Command name is required');
     }
 
     if (!(name in commands)) {
-      console.error(`Unknown command name: ${name}`);
-      return false;
+      throw new Error(`Unknown command name: ${name}`);
     }
     await this._runPreHooks(name);
     let potentialPromise;
@@ -248,21 +251,15 @@ export default class PluginAPI {
     return Object.keys(sessions).map(name => sessions[name]);
   }
 
-  withSessions(modules = []) {
-    const api = Object.create(this);
-    api.sessions = this._pickSessions(modules);
-    return api;
-  }
-
-  _pickSessions(modules = []) {
+  _pickSessions(plugins = []) {
     if (!this.sessions) {
       this._loadSessions();
     }
 
     const sessions = {};
 
-    modules.forEach(moduleName => {
-      const moduleConfig = this.config[moduleName];
+    plugins.forEach(moduleName => {
+      const moduleConfig = this.getConfig()[moduleName];
       if (!moduleConfig) {
         return;
       }

@@ -1,4 +1,4 @@
-import assert from 'assert';
+import { expect } from 'chai';
 import validate, { _pluginValidators, addPluginValidator } from '../index';
 
 describe('validator', function() {
@@ -10,9 +10,9 @@ describe('validator', function() {
 
   describe('addPluginValidator', function() {
     it('should add validator', function() {
-      const handler = () => {};
+      const handler = () => { };
       addPluginValidator('metrics', handler);
-      assert(_pluginValidators['metrics'] === handler);
+      expect(_pluginValidators['metrics']).to.equal(handler);
     });
   });
 
@@ -25,9 +25,16 @@ describe('validator', function() {
           }
         }
       };
-      const errors = validate(config);
-      console.log(errors);
-      assert(errors instanceof Array);
+
+      let errors;
+
+      try {
+        errors = validate(config);
+      } catch (e) {
+        console.log(e);
+      }
+      // console.log(errors);
+      expect(errors).instanceOf(Array);
     });
   });
 });

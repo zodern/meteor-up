@@ -9,7 +9,7 @@ describe('validator utils', function() {
       const result = serversExist(serversConfig, usedServers);
       const expectedLength = 1;
 
-      assert(result === expectedLength);
+      assert(result.length === expectedLength);
     });
   });
 });

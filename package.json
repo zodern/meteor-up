@@ -52,7 +52,6 @@
     "eslint-plugin-babel": "^4.1.0",
     "eslint-plugin-markdown": "^1.0.0-beta.4",
     "mocha": "^3.2.0",
-    "nofat": "1.0.x",
     "nyc": "^11.0.3",
     "sinon": "^2.3.6"
   },
@@ -70,6 +69,7 @@
     "nodemiral": "~1.1.1",
     "parse-json": "~2.2.0",
     "random-seed": "~0.3.0",
+    "resolve-from": "^3.0.0",
     "shelljs": "~0.5.0",
     "silent-npm-registry-client": "2.x.x",
     "ssh2": "0.4.x",
@@ -80,6 +80,7 @@
   "nyc": {
     "sourceMap": false,
     "instrument": false,
+    "cache": true,
     "reporter": [
       "lcov",
       "text-summary"
