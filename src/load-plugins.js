@@ -69,7 +69,9 @@ export function loadPlugins(plugins) {
         let name = module.name || plugin.name;
         return { name, module };
       } catch (e) {
-        console.log(e);
+        if (e.code !== 'MODULE_NOT_FOUND') {
+          console.log(e);
+        }
         console.log(`Unable to load plugin ${plugin.name}`);
         return { name: module.name || plugin.name, failed: true };
       }
