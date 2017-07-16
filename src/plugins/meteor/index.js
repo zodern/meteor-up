@@ -1,11 +1,9 @@
 import * as _commands from './commands';
-import * as _tasks from './tasks';
 import _validator from './validate';
 
 export const description = 'Deploy and manage meteor apps';
 
 export let commands = _commands;
-export let tasks = _tasks;
 
 export const validate = {
   meteor: _validator,

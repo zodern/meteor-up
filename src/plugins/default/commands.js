@@ -1,4 +1,4 @@
-import * as commandHandlers from './tasks';
+import * as commandHandlers from './command-handlers';
 
 export let init = {
   description: 'Setup files for new mup project',

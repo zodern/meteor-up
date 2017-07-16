@@ -1,4 +1,4 @@
-import * as commandFunctions from './tasks';
+import * as commandFunctions from './command-handlers';
 
 export let setup = {
   description: 'Install and start docker',

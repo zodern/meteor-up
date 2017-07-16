@@ -1,4 +1,4 @@
-import * as commandHandlers from './tasks';
+import * as commandHandlers from './command-handlers';
 
 export let setup = {
   description: 'Prepare server to deploy meteor apps',

@@ -1,5 +1,5 @@
 import * as _commands from './commands';
-import * as _tasks from './tasks';
+import * as _tasks from './command-handlers';
 import _validator from './validate';
 
 export const description = 'Commands to manage MongoDB';
