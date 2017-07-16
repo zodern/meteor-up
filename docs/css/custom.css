@@ -205,8 +205,30 @@ a {
     list-style: none;
     padding-top: 20px;
     padding-left: 15px;
-    background-color: #1c2a44;
     height: 100vh;
+    background-color: #1c2a44;
+}
+
+.docs-nav-wrapper {
+    padding: 0;
+}
+
+.docs-nav-wrapper .close {
+    margin-right: 10px;
+    margin-top: 4px;
+    position: fixed;
+    z-index: 100;
+    right: 0;
+    top: 0;
+}
+
+.docs-content .show-menu {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background-color: grey;
+    padding: 10px;
+    cursor: pointer;
 }
 
 pre {
@@ -247,11 +269,26 @@ code {
 }
 
 .docs-content h2 {
-    font-size: 28px;
-    font-weight: 600;
+    font-size: 32px;
+    font-weight: normal;
+    margin: 35px 0 15px 0;
+    line-height: 1.2;
 }
 
 .docs-content h3 {
     font-size: 20px;
     font-weight: 600;
+}
+
+.highlight .c1 {
+    color: #9e9e9e;
+}
+
+@media (max-width: 600px) {
+  .docs-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 5;
+  }
 }
