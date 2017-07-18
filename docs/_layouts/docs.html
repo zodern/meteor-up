@@ -9,13 +9,13 @@
     </div>
     <div class="js-toc"></div>
     <div>
+        <div class="col-sm-9 col-sm-push-3 docs-content">
+              <div class="show-menu visible-xs-block">Docs Menu</div>
+            {{ content }}
+        </div>
         <div class="docs-nav-wrapper">
             <div class="close hidden-xs hidden-sm hidden-md hidden-lg">&times;</div>
             {% include docs_nav.html %}
-        </div>
-        <div class="col-sm-9 docs-content">
-              <div class="show-menu visible-xs-block">Docs Menu</div>
-            {{ content }}
         </div>
     </div>
     <script src="{{ site.baseurl }}/scripts/tocbot.min.js"></script>
