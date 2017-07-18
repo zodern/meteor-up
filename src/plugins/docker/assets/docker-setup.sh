@@ -2,13 +2,8 @@
 
 # TODO make sure we can run docker in this server
 
-# Is docker already installed?
-set +e
-hasDocker=$(docker version | grep "version")
-set -e
-
-if [ ! "$hasDocker" ]; then
-  # Remove the lock
+install_docker () {
+# Remove the lock
   set +e
   sudo rm /var/lib/dpkg/lock > /dev/null
   sudo rm /var/cache/apt/archives/lock > /dev/null
@@ -24,9 +19,36 @@ if [ ! "$hasDocker" ]; then
   sudo usermod -a -G docker ${USER}
 
   sudo service docker start || sudo service docker restart
-fi
+}
 
-# Start docker if it was stopped. If docker is already running, the exit code is 1
-sudo service docker start || true
+minimumMajor=1
+minimumMinor=12
+
+# Is docker already installed?
+set +e
+hasDocker=$(docker version | grep "version")
+serverVersion=$(docker version --format '{{.Server.Version}}')
+parsedVersion=( ${serverVersion//./ })
+majorVersion="${parsedVersion[0]}"
+minorVersion="${parsedVersion[1]}"
+echo $serverVersion
+echo "Major" $majorVersion
+echo "Minor" $minorVersion
+set -e
+
+if [ ! "$hasDocker" ]; then
+  install_docker
+
+elif [ "$minimumMajor" -gt "$majorVersion" ]; then
+  echo "major wrong"
+  install_docker
+
+elif [ "$minimumMajor" -eq "$majorVersion" ] && [ "$minimumMinor" -gt "$minorVersion" ]; then
+  echo "minor wrong"
+  install_docker
+else
+  # Start docker if it was stopped. If docker is already running, the exit code is 1
+  sudo service docker start || true
+fi
 
 # TODO make sure docker works as expected

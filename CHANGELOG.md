@@ -21,6 +21,7 @@ Mup supports plugins to add functionality. Plugins can add commands (commands ca
 - Improve mongo, migration, and troubleshooting docs
 
 **Other Changes**
+- `mup setup` updates Docker if it is older than 1.12
 - Remove `meteor.docker.imagePort` and `mongo.port` from default config
 - Renamed the `meteor` object in the config to `app` in the default config
 - Show link to docs when there are validation errors
