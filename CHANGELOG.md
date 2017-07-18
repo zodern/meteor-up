@@ -12,7 +12,6 @@ Mup supports plugins to add functionality. Plugins can add commands (commands ca
 
 **Config Changes**
 - The `meteor` object has been renamed to `app`. `meteor` will be supported until Mup 2.0
-- A reminder that if you want to change what port you access the app on, you should change `meteor.env.PORT` instead of `meteor.docker.imagePort`. `meteor.docker.imagePort` is only used in rare cases and can be safely removed from your config
 - You can remove `mongo.port` and `mongo.oplog` from your config since they have never been used
 
 **Docs**
@@ -21,7 +20,7 @@ Mup supports plugins to add functionality. Plugins can add commands (commands ca
 - Improve mongo, migration, and troubleshooting docs
 
 **Other Changes**
-- `mup setup` updates Docker if it is older than 1.12
+- `mup setup` updates Docker if it is older than 1.13
 - Remove `meteor.docker.imagePort` and `mongo.port` from default config
 - Renamed the `meteor` object in the config to `app` in the default config
 - Show link to docs when there are validation errors

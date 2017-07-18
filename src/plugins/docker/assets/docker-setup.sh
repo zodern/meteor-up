@@ -22,7 +22,7 @@ install_docker () {
 }
 
 minimumMajor=1
-minimumMinor=12
+minimumMinor=13
 
 # Is docker already installed?
 set +e
