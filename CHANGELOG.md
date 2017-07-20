@@ -2,13 +2,18 @@
 
 **Hooks**
 
-It is now possible to add hooks that run before or after commands. Hooks can be a string with a command to run locally, or a function. The function is passed two arguments: the `api` object available to plugin commands, and an `nodemiral` object which can be used to create tasks and task lists to run on the remote servers.
-
-Some commands run other commands. The new `--show-hook-names` option shows all of the available hooks when running a cli command. 
+It is now possible to add hooks that run before or after commands. The new `--show-hook-names` option shows all of the available hooks for a cli command while it is running. Hooks can be a command to run locally or on the servers, or a function.
 
 **Plugins**
 
 Mup supports plugins to add functionality. Plugins can add commands (commands can be run from the mup cli or by other plugins), hooks, and config validators. All of the included cli commands and task lists have been moved to plugins.
+
+**Changes to Deployment and Deployment validation**
+
+After the bundle is uploaded to each server, a new task is run called "Prepare bundle". It installs the Meteor npm dependencies, rebuilds native modules, and stores the result in a docker image. This has a few benefits:
+- The time in `meteor.deployCheckWaitTime` no longer needs to include the time to install npm dependencies
+- When installing dependencies fails, it does not continuously restart until `meteor.deployCheckWaitTime` expires, and it shows the full logs from `npm install`
+- Dependencies are only installed once during each deploy, instead of having to be installed every time the app was started
 
 **Config Changes**
 - The `meteor` object has been renamed to `app`. `meteor` will be supported until Mup 2.0
@@ -17,18 +22,19 @@ Mup supports plugins to add functionality. Plugins can add commands (commands ca
 **Docs**
 - Remove `meteor.docker.imagePort`, `mongo.port`, and `mongo.oplog` from example configs
 - Document `meteor.docker.imagePort`
+- Update documentation for `meteor.deployCheckWaitTime`
 - Improve mongo, migration, and troubleshooting docs
 
 **Other Changes**
 - `mup setup` updates Docker if it is older than 1.13
-- Remove `meteor.docker.imagePort` and `mongo.port` from default config
-- Renamed the `meteor` object in the config to `app` in the default config
+- Remove `meteor.deployCheckWaitTime`, `meteor.docker.imagePort`, and `mongo.port` from default config
+- Renamed the `meteor` object in the default config to `app`
 - Show link to docs when there are validation errors
 - Improve cli help output (commands have a description, command specific options are documented)
 - Show validation error when `server.pem` is a path to a public key
 - Improve some of the validation messages
 - Remove unnecessary stack traces when the app's path is incorrect or `meteor build` fails
-- Remove `mup proxy` and `mup docker dump` commands which were placeholders.
+- Remove `mup docker dump` command since it did nothing
 
 ## 1.2.11 - June 14, 2017
 - Deployment verifier shows last 100 lines of the app's log when it fails (it previously was 50 lines)

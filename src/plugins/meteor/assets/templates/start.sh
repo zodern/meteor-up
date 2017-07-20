@@ -9,6 +9,16 @@ PORT=<%= port %>
 BIND=<%= bind %>
 NGINX_PROXY_VERSION=latest
 LETS_ENCRYPT_VERSION=latest
+IMAGE=mup-<%= appName %>:latest
+VOLUME="--volume=$BUNDLE_PATH:/bundle"
+docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
+
+if [ $IMAGE == mup-<%= appName %>:latest  ]; then
+  VOLUME=""
+fi
+
+echo "Image" $IMAGE
+echo "Volume" $VOLUME
 
 # We want this message with the errors in stderr when shown to the user.
 >&2 echo "Removing docker containers. Errors about nonexistent endpoints and containers are normal.";
@@ -45,12 +55,12 @@ echo "Pulled <%= docker.image %>"
 docker run \
   -d \
   --restart=always \
+  $VOLUME \
   <% if((sslConfig && typeof sslConfig.autogenerate === "object") || (typeof proxyConfig === "object" && proxyConfig.domains))  { %> \
   --expose=80 \
   <% } else { %> \
   --publish=$BIND:$PORT:<%= docker.imagePort %> \
   <% } %> \
-  --volume=$BUNDLE_PATH:/bundle \
   --hostname="$HOSTNAME-$APPNAME" \
   --env-file=$ENV_FILE \
   <% if(useLocalMongo)  { %>--link=mongodb:mongodb --env=MONGO_URL=mongodb://mongodb:27017/$APPNAME <% } %> \
@@ -72,7 +82,7 @@ docker run \
     <% } %> \
   <% } %> \
   --name=$APPNAME \
-  <%= docker.image %>
+  $IMAGE
 echo "Ran <%= docker.image %>"
 sleep 15s
 

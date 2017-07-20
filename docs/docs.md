@@ -182,7 +182,8 @@ module.exports = {
         domains: 'website.com,www.website.com'
       }
     },
-    deployCheckWaitTime: 60, // default 10
+    // The maximum number of seconds it will wait for your app to successfully start
+    deployCheckWaitTime: 60, // default is 60 (optional)
 
     // lets you define which port to check after the deploy process, if it
     // differs from the meteor port you are serving
@@ -262,8 +263,6 @@ meteor: {
 ### Deploy Wait Time
 
 Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`.
-
-Most docker images used with mup run `npm install` before starting the app. Especially for small servers, this can take awhile. If deployments fail with `Verifying Deployment: FAILED`, and it looks like npm didn't finish installing dependencies, try increasing the value in `meteor.deployCheckWaitTime`
 
 #### Deploy check port
 
@@ -720,10 +719,9 @@ The `--verbose` flag shows output from commands and scripts run on the server.
 
 ### Verifying Deployment: FAILED
 
-If you do not see `=> Starting meteor app on port` in the logs, it did not have had enough time to finish running `npm install`, or there was an error while installing the dependencies. Try increase `meteor.deployCheckWaitTime` until it has enough time to finish `npm install`.
+If you do not see `=> Starting meteor app on port` in the logs, your app did not have enough time to start. Try increase `meteor.deployCheckWaitTime`.
 
 If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not. If that did not fix it, create a new issue with your config and output from `mup deploy --verbose`.
-
 
 If you are using Meteor 1.3, you might see this error:
 ```
@@ -744,7 +742,7 @@ If it silently fails for a different reason, please create an issue.
 
 ### Error: spawn meteor ENOENT
 
-This usually happens when meteor is not installed.
+Make sure meteor is installed on the computer you are deploying from.
 
 ### Let's Encrypt is not working
 

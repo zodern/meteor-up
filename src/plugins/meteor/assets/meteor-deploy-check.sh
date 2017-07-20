@@ -1,5 +1,6 @@
 APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
+IMAGE=mup-<%= appName %>
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
 DEPLOY_CHECK_URL=<%= `localhost:${deployCheckPort}${deployCheckPath}` %>
@@ -9,7 +10,16 @@ cd $APP_PATH
 
 revert_app (){
   docker logs --tail=100 $APPNAME 1>&2
-  if [ -d last ]; then
+
+  if docker image inspect $IMAGE:previous >/dev/null; then
+    docker tag $IMAGE:previous $IMAGE:latest 
+    sudo bash $START_SCRIPT > /dev/null 2>&1
+
+    echo " " 1>&2
+    echo "=> Redeploying previous version of the app" 1>&2
+    echo " " 1>&2
+
+  elif [ -d last ]; then
     sudo mv last current
     sudo bash $START_SCRIPT > /dev/null 2>&1
 

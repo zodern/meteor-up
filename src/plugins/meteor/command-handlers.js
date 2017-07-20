@@ -130,6 +130,14 @@ export async function push(api) {
     progressBar: config.enableUploadProgressBar
   });
 
+  list.executeScript('Prepare Bundle', {
+    script: api.resolvePath(__dirname, 'assets/prepare-bundle.sh'),
+    vars: {
+      appName: config.name,
+      dockerImage: config.docker.image
+    }
+  });
+
   const sessions = api.getSessions(['app']);
   return api.runTaskList(list, sessions, {
     series: true,
