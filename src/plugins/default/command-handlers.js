@@ -62,7 +62,7 @@ export function reconfig(api) {
 
 export function restart(api) {
   log('exec => mup restart');
-  return api.runCommand('meteor.stop').then(() => api.runCommand('meteor.start'));
+  return api.runCommand('meteor.restart');
 }
 
 export function setup(api) {

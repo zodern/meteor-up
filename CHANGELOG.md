@@ -6,7 +6,7 @@ It is now possible to add hooks that run before or after commands. The new `--sh
 
 **Plugins**
 
-Plugins can add commands (commands can be run from the mup cli or by other plugins), hooks, and config validators. All of the included cli commands and task lists have been moved to plugins.
+Plugins are npm packages that can add commands (commands can be run from the mup cli or by other plugins), hooks, and config validators. All of the included cli commands and task lists have been moved to plugins.
 
 **Changes to Deployment and Deployment validation**
 
@@ -14,6 +14,9 @@ After the bundle is uploaded to each server, a new task is run called "Prepare b
 - The time in `meteor.deployCheckWaitTime` no longer needs to include the time to install npm dependencies
 - When installing dependencies fails, it does not continuously restart until `meteor.deployCheckWaitTime` expires, and it shows the full logs from `npm install`
 - Dependencies are only installed once during each deploy, instead of having to be installed every time the app was started
+
+**Improved Support for Multiple Servers**
+- `mup restart` stops only one server at a time
 
 **Config Changes**
 - The `meteor` object has been renamed to `app`. `meteor` will be supported until Mup 2.0
@@ -34,6 +37,7 @@ After the bundle is uploaded to each server, a new task is run called "Prepare b
 - Show validation error when `server.pem` is a path to a public key
 - Improve some of the validation messages
 - Remove unnecessary stack traces when the app's path is incorrect or `meteor build` fails
+- Add `mup meteor restart` command
 - Remove `mup docker dump` command since it did nothing
 
 ## 1.2.11 - June 14, 2017

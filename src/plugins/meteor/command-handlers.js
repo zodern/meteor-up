@@ -312,3 +312,29 @@ export function stop(api) {
   const sessions = api.getSessions(['app']);
   return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
+
+export function restart(api) {
+  const list = nodemiral.taskList('Restart Meteor');
+  const sessions = api.getSessions(['meteor']);
+  const config = api.getConfig().app;
+
+  list.executeScript('Stop Meteor', {
+    script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
+    vars: {
+      appName: config.name
+    }
+  });
+
+  list.executeScript('Start Meteor', {
+    script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
+    vars: {
+      appName: config.name
+    }
+  });
+
+  return api.runTaskList(
+    list,
+    sessions,
+    { series: true, verbose: api.verbose }
+  );
+}
