@@ -19,6 +19,7 @@ export default class PluginAPI {
     this.config = null;
     this.settings = null;
     this.sessions = null;
+    this._enabledSessions = program.servers.split(',') || [];
     this.configPath = program['config'] ? resolvePath(program['config']) : path.join(this.base, 'mup.js');
     this.settingsPath = program['settings'];
     this.verbose = program.verbose;
@@ -294,6 +295,13 @@ export default class PluginAPI {
     // Use this information to create nodemiral sessions.
     for (var name in config.servers) {
       if (!config.servers.hasOwnProperty(name)) {
+        continue;
+      }
+
+      if (
+          this._enabledSessions.length > 0 &&
+          this._enabledSessions.indexOf(name) === -1
+        ) {
         continue;
       }
 

@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import MupAPI from './plugin-api';
 import { filterArgv } from './utils';
 
-const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help'];
+const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help', 'servers'];
 
 function addModuleCommands(builder, module, moduleName) {
   Object.keys(module.commands).forEach(commandName => {
@@ -82,6 +82,11 @@ let program = yargs
   })
   .option('config', {
     description: 'Path to mup.js config file',
+    requiresArg: true,
+    string: true
+  })
+  .option('servers', {
+    description: 'Comma separated list of servers to use',
     requiresArg: true,
     string: true
   })
