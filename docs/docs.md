@@ -182,7 +182,8 @@ module.exports = {
         domains: 'website.com,www.website.com'
       }
     },
-    // The maximum number of seconds it will wait for your app to successfully start
+    // The maximum number of seconds it will wait
+    // for your app to successfully start
     deployCheckWaitTime: 60, // default is 60 (optional)
 
     // lets you define which port to check after the deploy process, if it
@@ -680,7 +681,7 @@ Hooks allow you to run a command or function before or after a cli command is ru
 ```js
 module.exports = {
   hooks: {
-    'hookName': {
+    hookName: {
       localCommand: 'command to run on computer',
       remoteCommand: 'command to run on every server'
     },
@@ -690,12 +691,14 @@ module.exports = {
     'post.meteor.restart': {
       remoteCommand: 'docker logs --tail 50 app-name'
     },
-    'post.mongo.setup'(api) {
+    'post.docker.setup'(api) {
       // Same api as is given to plugin command handlers
       // If this runs asynchronous tasks, it needs to return a promise.
+      const config = api.getConfig();
+      return api.runSSHCommand(config.servers.one, 'docker --version');
     }
   }
-}
+};
 ```
 
 The hook name format is `{pre or post}.topLevelCommand.subCommand`. For example, if you want a command to run after `mup deploy`, the hook name would be `post.deploy`. Or if you want it to run after `mup mongo restart`, the hook name would be `post.mongo.restart`.
@@ -857,12 +860,12 @@ module.exports = {
     // Object of commands
   },
   hooks: {
-    // Object of hooks that 
+    // Object of hooks that
   },
   validators: {
     // Object of validators to validate the config
   }
-}
+};
 ```
 
 ### Commands
@@ -876,13 +879,14 @@ Commands can optionally be hidden from the cli help if they are intended to only
 
 The command config is:
 ```js
-modules.export {
+module.exports = {
   commands: {
     // key is name of command
     logs: {
       description: 'description of command, or set to false to hide it in the help',
 
-      // (optional) A yargs command builder. Can be used to add options, disable strict mode, etc.
+      // (optional) A yargs command builder.
+      // Can be used to add options, disable strict mode, etc.
       // For more help, view http://yargs.js.org/docs/#api-commandmodule
       builder(yargs) {
         return yargs.option('follow', {
@@ -897,12 +901,12 @@ modules.export {
       handler(api) {
         const args = api.getArgs();
         const sessions = api.getSessions(['meteor']);
-        
+
         return api.getDockerLogs('mongodb', sessions, args);
       }
     }
   }
-}
+};
 ```
 
 ### Hooks
@@ -927,7 +931,7 @@ module.exports = {
       api.runCommand('elixir.adjustMongoConfig');
     }
   }
-}
+};
 ```
 
 Hook functions are given the same arguments as command handlers. 
@@ -1008,16 +1012,16 @@ For example, if your plugin alerts the user when certain events happen, your use
 ```js
 module.exports = {
   alerts: {
-    email: 'email@domain.com'
+    email: 'email@domain.com',
     deployFailed: true,
     lowDisk: true
   }
   // ... rest of config
-}
+};
 ```
 
 In your plugin's exported object:
-```js
+```ts
 module.exports = {
   validate: {
     'alerts'(config, utils) {
@@ -1025,7 +1029,7 @@ module.exports = {
       // errors from validating the alerts object
     }
   }
-}
+};
 ```
 
 It is recommended to use [joi](https://github.com/hapijs/joi) to validate the config.
@@ -1035,7 +1039,7 @@ It is recommended to use [joi](https://github.com/hapijs/joi) to validate the co
 #### VALIDATE_OPTIONS
 
 Is an object of options that you can pass to `joi.validate`.
-```js
+```ts
 {
   abortEarly: false,
   convert: true
