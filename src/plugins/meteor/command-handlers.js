@@ -34,6 +34,7 @@ export function logs(api) {
   if (args[0] === 'meteor') {
     args.shift();
   }
+
   const sessions = api.getSessions(['app']);
   return api.getDockerLogs(config.name, sessions, args);
 }

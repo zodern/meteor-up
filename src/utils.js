@@ -177,3 +177,39 @@ export function resolvePath(...paths) {
   });
   return path.resolve(...expandedPaths);
 }
+
+export function filterArgv(argvArray, argv, unwanted) {
+  let result = argv._.slice();
+  Object.keys(argv).forEach(_key => {
+    let add = false;
+    let key = _key;
+    if (
+      unwanted.indexOf(key) === -1 &&
+      argv[key] !== false &&
+      argv[key] !== undefined
+    ) {
+      add = true;
+    }
+
+    if (key.length > 1) {
+      key = `--${key}`;
+    } else {
+      key = `-${key}`;
+    }
+
+    if (add) {
+      if (argvArray.indexOf(key) === -1) {
+        return;
+      }
+
+      result.push(key);
+
+      if (typeof argv[_key] !== 'boolean') {
+        result.push(argv[_key]);
+      }
+    }
+
+  });
+
+  return result;
+}

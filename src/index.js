@@ -5,6 +5,9 @@ import pkg from '../package.json';
 import yargs from 'yargs';
 import chalk from 'chalk';
 import MupAPI from './plugin-api';
+import { filterArgv } from './utils';
+
+const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help'];
 
 function addModuleCommands(builder, module, moduleName) {
   Object.keys(module.commands).forEach(commandName => {
@@ -19,32 +22,13 @@ function addModuleCommands(builder, module, moduleName) {
   });
 }
 
-function filterArgv() {
-  const unwanted = ['_', '$0', 'settings', 'config'];
-  let result = [...yargs.argv._];
-
-  Object.keys(yargs.argv).forEach(key => {
-    if (
-      unwanted.indexOf(key) === -1 &&
-      yargs.argv[key] !== false &&
-      yargs.argv[key] !== undefined
-    ) {
-      result.push(`--${key}`);
-
-      if (typeof yargs.argv[key] !== 'boolean') {
-        result.push(yargs.argv[key]);
-      }
-    }
-  });
-
-  return result;
-}
-
 function commandWrapper(pluginName, commandName) {
   return function() {
     checkUpdates()
       .then(() => {
-        const api = new MupAPI(process.cwd(), filterArgv(), yargs.argv);
+        const rawArgv = process.argv.slice(2);
+        const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
+        const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
         let potentialPromise;
 
         try {
