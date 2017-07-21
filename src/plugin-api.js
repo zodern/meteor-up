@@ -171,10 +171,11 @@ export default class PluginAPI {
       // do nothing
     }
   }
-  _runHooks = async function (handlers, hookName) {
+  _runHooks = async function(handlers, hookName) {
+    const messagePrefix = `> Running hook ${hookName}`;
     for (let hookHandler of handlers) {
       if (hookHandler.localCommand) {
-        console.log(`> Running hook ${hookName} "${hookHandler.localCommand}"`);
+        console.log(`${messagePrefix} "${hookHandler.localCommand}"`);
         this._runHookScript(hookHandler.localCommand);
       }
       if (typeof hookHandler.method === 'function') {
@@ -185,12 +186,17 @@ export default class PluginAPI {
         }
       }
       if (hookHandler.remoteCommand) {
-        console.log(`> Running hook ${hookName} remote command "${hookHandler.remoteCommand}"`)
-        await runRemoteHooks(this.getConfig().servers, hookHandler.remoteCommand, this.getVerbose());
+        console.log(
+          `${messagePrefix} remote command "${hookHandler.remoteCommand}"`
+        );
+        await runRemoteHooks(
+          this.getConfig().servers,
+          hookHandler.remoteCommand
+        );
       }
     }
   }
-  _runPreHooks = async function (name) {
+  _runPreHooks = async function(name) {
     let hookName = `pre.${name}`;
 
     if (this.program['show-hook-names']) {
@@ -202,7 +208,7 @@ export default class PluginAPI {
       await this._runHooks(hookList, name);
     }
   };
-  _runPostHooks = async function (commandName) {
+  _runPostHooks = async function(commandName) {
     const hookName = `post.${commandName}`;
 
     if (this.program['show-hook-names']) {
@@ -211,7 +217,7 @@ export default class PluginAPI {
 
     if (hookName in hooks) {
       let hookList = hooks[hookName];
-      await this._runHooks(hookList, name)
+      await this._runHooks(hookList, hookName);
     }
     return;
   };
@@ -225,7 +231,7 @@ export default class PluginAPI {
     console.error(e);
     process.exitCode = 1;
   }
-  runCommand = async function (name) {
+  runCommand = async function(name) {
     if (!name) {
       throw new Error('Command name is required');
     }
