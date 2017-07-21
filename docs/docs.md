@@ -673,6 +673,35 @@ If you have deployed to the server, it involves a couple more steps.
 3. During the steps for install or replace binaries or restarting mongodb, instead change the version in your `mup.js` and run `mup setup`.
 4. To verify that it worked, run `docker ps` to check if mongodb keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
 
+## Hooks
+
+Hooks allow you to run a command or function before or after a cli command is run. The config looks like:
+
+```js
+module.exports = {
+  hooks: {
+    'hookName': {
+      localCommand: 'command to run on computer',
+      remoteCommand: 'command to run on every server'
+    },
+    'pre.deploy': {
+      localCommand: 'npm prune --production'
+    },
+    'post.meteor.restart': {
+      remoteCommand: 'docker logs --tail 50 app-name'
+    },
+    'post.mongo.setup'(api) {
+      // Same api as is given to plugin command handlers
+      // If this runs asynchronous tasks, it needs to return a promise.
+    }
+  }
+}
+```
+
+The hook name format is `{pre or post}.topLevelCommand.subCommand`. For example, if you want a command to run after `mup deploy`, the hook name would be `post.deploy`. Or if you want it to run after `mup mongo restart`, the hook name would be `post.mongo.restart`.
+
+Some cli commands run other cli commands. For example, `mup setup` runs `mup docker setup` and `mup mongo setup`. To see all of the available hooks while a command runs, use the `--show-hook-names` option.
+
 
 ## Updating Mup
 

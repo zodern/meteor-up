@@ -1,4 +1,4 @@
-import { countOccurences } from './utils';
+import { countOccurences, runSSHCommand } from './utils';
 
 export const hooks = {};
 
@@ -22,4 +22,18 @@ export function registerHook(_hookName, _handler) {
   } else {
     hooks[hookName] = [handler];
   }
+}
+
+export async function runRemoteHooks(serversConfig, command) {
+  return Promise.all(Object.values(serversConfig).map(server => {
+    return runSSHCommand(server, command)
+      .then(({ output }) => {
+        console.log(`=> output from ${server.host}`);
+        console.log(output);
+      })
+      .catch(e => {
+        console.error(`Error running remote hook command: ${command}`);
+        console.error(e);
+      });
+  }));
 }

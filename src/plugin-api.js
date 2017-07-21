@@ -5,7 +5,7 @@ import childProcess from 'child_process';
 import { commands } from './commands';
 import configValidator from './validate/index';
 import fs from 'fs';
-import { hooks } from './hooks';
+import { hooks, runRemoteHooks } from './hooks';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
@@ -52,7 +52,7 @@ export default class PluginAPI {
       var contents = fs
         .readFileSync(resolvePath(this.getBasePath(), this.getConfig().meteor.path, '.meteor/versions'))
         .toString();
-      // Looks for "package-name@" in the begining of a
+      // Looks for "package-name@" in the beginning of a
       // line or at the start of the file
       let regex = new RegExp(`(^|\\s)${name}@`, 'm');
       return regex.test(contents);
@@ -162,12 +162,35 @@ export default class PluginAPI {
   }
 
   _runHookScript(script) {
-    childProcess.execSync(script, {
-      cwd: this.getBasePath(),
-      stdio: 'inherit'
-    });
+    try {
+      childProcess.execSync(script, {
+        cwd: this.getBasePath(),
+        stdio: 'inherit'
+      });
+    } catch (e) {
+      // do nothing
+    }
   }
-  _runPreHooks = async function(name) {
+  _runHooks = async function (handlers, hookName) {
+    for (let hookHandler of handlers) {
+      if (hookHandler.localCommand) {
+        console.log(`> Running hook ${hookName} "${hookHandler.localCommand}"`);
+        this._runHookScript(hookHandler.localCommand);
+      }
+      if (typeof hookHandler.method === 'function') {
+        try {
+          await hookHandler.method(this, nodemiral);
+        } catch (e) {
+          this._commandErrorHandler(e);
+        }
+      }
+      if (hookHandler.remoteCommand) {
+        console.log(`> Running hook ${hookName} remote command "${hookHandler.remoteCommand}"`)
+        await runRemoteHooks(this.getConfig().servers, hookHandler.remoteCommand, this.getVerbose());
+      }
+    }
+  }
+  _runPreHooks = async function (name) {
     let hookName = `pre.${name}`;
 
     if (this.program['show-hook-names']) {
@@ -176,40 +199,19 @@ export default class PluginAPI {
 
     if (hookName in hooks) {
       let hookList = hooks[hookName];
-      for (let hookHandler of hookList) {
-        if (hookHandler.localCommand) {
-          this._runHookScript(hookHandler.localCommand);
-        } else if (typeof hookHandler.method === 'function') {
-          try {
-            await hookHandler.method(this, nodemiral);
-          } catch (e) {
-            this._commandErrorHandler(e);
-          }
-        }
-      }
+      await this._runHooks(hookList, name);
     }
   };
-  _runPostHooks = async function(commandName) {
+  _runPostHooks = async function (commandName) {
     const hookName = `post.${commandName}`;
 
     if (this.program['show-hook-names']) {
       console.log(chalk.yellow(`Hook: ${hookName}`));
     }
 
-    let that = this;
     if (hookName in hooks) {
       let hookList = hooks[hookName];
-      for (let hookHandler of hookList) {
-        if (hookHandler.localCommand) {
-          that._runHookScript(hookHandler.localCommand);
-        } else if (typeof hookHandler.method === 'function') {
-          try {
-            await hookHandler.method(that, nodemiral);
-          } catch (e) {
-            this._commandErrorHandler(e);
-          }
-        }
-      }
+      await this._runHooks(hookList, name)
     }
     return;
   };
@@ -223,7 +225,7 @@ export default class PluginAPI {
     console.error(e);
     process.exitCode = 1;
   }
-  runCommand = async function(name) {
+  runCommand = async function (name) {
     if (!name) {
       throw new Error('Command name is required');
     }

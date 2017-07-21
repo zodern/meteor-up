@@ -6,7 +6,7 @@ It is now possible to add hooks that run before or after commands. The new `--sh
 
 **Plugins**
 
-Mup supports plugins to add functionality. Plugins can add commands (commands can be run from the mup cli or by other plugins), hooks, and config validators. All of the included cli commands and task lists have been moved to plugins.
+Plugins can add commands (commands can be run from the mup cli or by other plugins), hooks, and config validators. All of the included cli commands and task lists have been moved to plugins.
 
 **Changes to Deployment and Deployment validation**
 

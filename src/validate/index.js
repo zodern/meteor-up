@@ -15,7 +15,14 @@ function generateSchema() {
   const topLevelKeys = {
     servers: joi.object().required(),
     app: joi.object(),
-    plugins: joi.array()
+    plugins: joi.array(),
+    hooks: joi.object().pattern(/.*/, joi.alternatives(joi.object({
+      localCommand: joi.string(),
+      remoteCommand: joi.string(),
+      method: joi.func()
+    }),
+    joi.func()
+  ))
   };
 
   Object.keys(_pluginValidators).forEach((key) => {
