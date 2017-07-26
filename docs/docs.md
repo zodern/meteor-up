@@ -263,7 +263,7 @@ meteor: {
 
 ### Deploy Wait Time
 
-Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can sucessfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`.
+Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can successfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`.
 
 #### Deploy check port
 
@@ -416,7 +416,7 @@ Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` sectio
     ssl: {
       letsEncryptEmail: 'address@gmail.com'
     },
-    // comma seperated list of domains your website
+    // comma separated list of domains your website
     // will be accessed at.
     // You will need to configure your dns for each one.
     domains: 'website.com,www.website.com'
@@ -463,23 +463,22 @@ proxy: {
 ```
 
 ### Advance configuration
+The `proxy.shared` object has settings that most apps won't need to change, but if they are they apply to every app using the proxy. After you change `proxy.shared`, you need to run `mup proxy reconfig-shared` for it to take effect.
 
 ```ts
 {
   proxy: {
     // Settings in "proxy.shared" will be applied to every app deployed on the servers.
-    // Everything is optional. These won't need to be changed for most apps.
-    //
-    // This only needs to be set in one app that is on the server.
-    // If multiple apps have `proxy.shared`, they will override each other when `mup setup` is run for an app.
+    // Everything is optional.
+    // After changing this object, run `mup proxy reconfig-shared`
     shared: {
       // The port number to listen to for http connections. Default 80.
       httpPort: 80,
-      // The port to listen for htts connections. Default is 443.
+      // The port to listen for https connections. Default is 443.
       httpsPort: 443,
       // Set proxy wide upload limit. Setting 0 will disable the limit.
       clientUploadLimit: '10M',
-      // Environtment variables for nginx proxy
+      // Environment variables for nginx proxy
       env: {
         DEFAULT_HOST: 'foo.bar.com'
       },
@@ -585,7 +584,7 @@ meteor: {
 To use an external database:
 
 1. Remove the `mongo` object from your config
-2. Set `meteor.env.MONGO_URL` to point tothe external Mongo instance
+2. Set `meteor.env.MONGO_URL` to point to the external Mongo instance
 
 Two popular Mongo DbaaS's are [Compose](https://www.compose.com/mongodb) and [mLab](https://mlab.com/).
 
@@ -608,7 +607,7 @@ Add the `mongo` object to your config:
 }
 ```
 
-Before your first setup, it is recommeneded to change `mongo.version` to the newest version of MongoDB your app or meteor supports. After Mongo is started, it is more complex to upgrade it.
+Before your first setup, it is recommended to change `mongo.version` to the newest version of MongoDB your app or meteor supports. After Mongo is started, it is more complex to upgrade it.
 
 After you finished changing the config, run
 ```bash
@@ -743,7 +742,7 @@ If you need to see the output of `mup` (to see more precisely where it's failing
 
 where `<command>` is one of the `mup` commands such as `setup`, `deploy`, etc.
 
-The environment variable `DEBUB=mup*` gives more information on what the `mup` cli is doing.
+The environment variable `DEBUG=mup*` gives more information on what the `mup` cli is doing.
 
 The `--verbose` flag shows output from commands and scripts run on the server.
 
@@ -908,6 +907,8 @@ module.exports = {
   }
 };
 ```
+
+You can also set the property `name` for a command, useful when the name has characters not allowed in js variables.
 
 ### Hooks
 

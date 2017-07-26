@@ -11,10 +11,13 @@ NGINX_PROXY_VERSION=latest
 LETS_ENCRYPT_VERSION=latest
 IMAGE=mup-<%= appName %>:latest
 VOLUME="--volume=$BUNDLE_PATH:/bundle"
+LOCAL_IMAGE=false
+
 docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
 
 if [ $IMAGE == mup-<%= appName %>:latest  ]; then
   VOLUME=""
+  LOCAL_IMAGE=true
 fi
 
 echo "Image" $IMAGE
@@ -30,7 +33,6 @@ docker rm -f $APPNAME
 docker network disconnect bridge -f $APPNAME
 <% for(var network in docker.networks) { %>
 docker network disconnect <%=  docker.networks[network] %> -f $APPNAME
-
 <% } %>
 
 # Remove frontend container if exists
@@ -47,16 +49,18 @@ docker network disconnect bridge -f $APPNAME-nginx-proxy
 >&2 echo "Finished removing docker containers"
 
 # We don't need to fail the deployment because of a docker hub downtime
-set +e
-docker pull <%= docker.image %>
-set -e
-echo "Pulled <%= docker.image %>"
+if [ $LOCAL_IMAGE == "false" ]; then
+  set +e
+  docker pull <%= docker.image %>
+  set -e
+  echo "Pulled <%= docker.image %>"
+fi
 
 docker run \
   -d \
   --restart=always \
   $VOLUME \
-  <% if((sslConfig && typeof sslConfig.autogenerate === "object") || (typeof proxyConfig === "object" && proxyConfig.domains))  { %> \
+  <% if((sslConfig && typeof sslConfig.autogenerate === "object") || (typeof proxyConfig === "object"))  { %> \
   --expose=80 \
   <% } else { %> \
   --publish=$BIND:$PORT:<%= docker.imagePort %> \
@@ -73,13 +77,6 @@ docker run \
     -e "LETSENCRYPT_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_EMAIL=<%= sslConfig.autogenerate.email %>" \
     -e "HTTPS_METHOD=noredirect" \
-  <% } else if(typeof proxyConfig === "object" && proxyConfig.domains) { %> \
-    -e "VIRTUAL_HOST=<%= proxyConfig.domains %>" \
-    -e "HTTPS_METHOD=noredirect" \
-    <% if (proxyConfig.ssl && proxyConfig.ssl.letsEncryptEmail){ %> \
-    -e "LETSENCRYPT_HOST=<%= proxyConfig.domains %>" \
-    -e "LETSENCRYPT_EMAIL=<%= proxyConfig.ssl.letsEncryptEmail %>" \
-    <% } %> \
   <% } %> \
   --name=$APPNAME \
   $IMAGE

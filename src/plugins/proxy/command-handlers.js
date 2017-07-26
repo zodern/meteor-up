@@ -29,8 +29,6 @@ export function setup(api) {
     process.exit(1);
   }
 
-  config.shared = config.shared || {};
-
   const list = nodemiral.taskList('Setup proxy');
 
   list.executeScript('Setup Environment', {
@@ -45,10 +43,7 @@ export function setup(api) {
     dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/start.sh',
     vars: {
       appName: PROXY_CONTAINER_NAME,
-      httpPort: config.shared.httpPort || 80,
-      httpsPort: config.shared.httpsPort || 443,
-      letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null,
-      clientUploadLimit: config.clientUploadLimit
+      letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null
     }
   });
 
@@ -89,46 +84,61 @@ export function setup(api) {
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.getVerbose()
-  }).then(() => envconfig(api));
+  }).then(() => api.runCommand('proxy.start'));
 }
 
-export function envconfig(api) {
-  log('exec => mup proxy envconfig');
+export function reconfigShared(api) {
   const config = api.getConfig().proxy;
+  const shared = config.shared || {};
 
   if (!config) {
     console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
-  const list = nodemiral.taskList('Configuring proxy Environment Variables');
+  console.log('The shared settings affect all apps using this reverse proxy.');
 
-  if (!config.shared) {
-    config.shared = {};
+  if (Object.keys(shared).length === 0) {
+    console.log('No shared config properties are set. Resetting proxy to defaults.');
   }
-  var env = clone(config.shared.env);
 
-  list.copy('Sending proxy Environment Variables', {
+  const list = nodemiral.taskList('Configuring Proxy\'s Shared Settings');
+
+  list.copy('Sending shared variables', {
+    src: api.resolvePath(__dirname, 'assets/templates/shared-config.sh'),
+    dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/shared-config.sh',
+    vars: {
+      httpPort: shared.httpPort,
+      httpsPort: shared.httpsPort,
+      clientUploadLimit: shared.clientUploadLimit
+    }
+  });
+
+  const env = clone(shared.env);
+
+  list.copy('Sending proxy environment variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/env.list',
     vars: {
       env: env || {}
     }
   });
-  var envLetsEncrypt = clone(config.shared.envLetsEncrypt);
 
-  list.copy('Sending Letsencrypt Environment Variables', {
+  const envLetsEncrypt = clone(shared.envLetsEncrypt);
+
+  list.copy('Sending let\'s encrypt environment variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/env_letsencrypt.list',
     vars: {
       env: envLetsEncrypt || {}
     }
   });
+
   const sessions = api.getSessions(['app']);
   return api.runTaskList(list, sessions, {
     series: true,
-    verbose: api.getVerbose()
-  }).then(() => start(api));
+    verbose: api.verbose
+  }).then(() => api.runCommand('proxy.start'));
 }
 
 export function start(api) {

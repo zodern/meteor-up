@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e
 
 APP_DIR=/opt/<%= appName %>
@@ -10,6 +12,7 @@ build_failed() {
   exit 2
 }
 
+docker pull <%= dockerImage %>
 docker stop $APPNAME || true
 
 cd $APP_DIR/tmp

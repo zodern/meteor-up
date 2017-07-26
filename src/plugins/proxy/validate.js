@@ -40,5 +40,15 @@ export default function(config, {
     details,
     joi.validate(config.proxy, schema, VALIDATE_OPTIONS)
   );
+  if (
+    config.app && config.app.env &&
+    typeof config.app.env.PORT === 'number' &&
+    config.app.env.PORT !== 80
+  ) {
+    details.push({
+      message: 'app.env.PORT can not be set when using proxy',
+      path: ''
+    });
+  }
   return addLocation(details, 'proxy');
 }

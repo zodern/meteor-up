@@ -2,9 +2,15 @@
 
 APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
+
+# Shared settings
+source $APP_PATH/config/shared-config.sh
+: ${HTTP_PORT:=80}
+: ${HTTPS_PORT:=443}
+: ${CLIENT_UPLOAD_LIMIT="10M"}
+
 ENV_FILE=$APP_PATH/config/env.list
 ENV_FILE_LETSENCRYPT=$APP_PATH/config/env_letsencrypt.list
-HTTP_PORT=<%= httpPort %>
 
 # Remove previous version of the app, if exists
 docker rm -f $APPNAME
@@ -23,18 +29,18 @@ docker pull jwilder/nginx-proxy
 set -e
 echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
 
-<% if(typeof clientUploadLimit === 'number') { %>
+
 # This updates nginx for all vhosts
-sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
-client_max_body_size <%= clientUploadLimit %>;
-EOT
-<% } %>
+NGINX_CONFIG="client_max_body_size $CLIENT_UPLOAD_LIMIT"
+echo $NGINX_CONFIG > /opt/$APPNAME/config/nginx-default.conf
+# sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
+# client_max_body_size  clientUploadLimit ;
+# EOT
 
-
-docker run -d -p $HTTP_PORT:80 \
-  <% if(httpsPort) { %> \
- -p <%= httpsPort %>:443 \
-  <% } %> \
+docker run \
+  -d \
+  -p $HTTP_PORT:80 \
+  -p $HTTPS_PORT:443 \
   --name $APPNAME \
   --env-file=$ENV_FILE \
   --restart=always\

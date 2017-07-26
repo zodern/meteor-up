@@ -13,8 +13,9 @@ function addModuleCommands(builder, module, moduleName) {
   Object.keys(module.commands).forEach(commandName => {
     let command = module.commands[commandName];
     command.builder = command.builder || {};
+
     builder.command(
-      commandName,
+      command.name || commandName,
       command.description,
       command.builder,
       commandWrapper(moduleName, commandName)

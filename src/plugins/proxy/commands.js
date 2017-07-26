@@ -5,6 +5,12 @@ export const setup = {
   handler: handlers.setup
 };
 
+export const reconfigShared = {
+  name: 'reconfig-shared',
+  description: 'Reconfigure shared properties',
+  handler: handlers.reconfigShared
+};
+
 export const logs = {
   description: 'View logs for proxy',
   builder(yargs) {
