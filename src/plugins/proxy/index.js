@@ -9,29 +9,22 @@ export const validate = {
   proxy: validator
 };
 
-export const hooks = {
-  'pre.meteor.envconfig'(api) {
-    const config = api.getConfig();
-    const appConfig = config.app;
-    const proxyConfig = config.proxy;
 
-    if (!appConfig || !appConfig.env || !proxyConfig) {
-      return;
-    }
 
-    appConfig.env['VIRTUAL_HOST'] = proxyConfig.domains;
-    appConfig.env['HTTPS_METHOD'] = 'noredirect';
-    
-    if (proxyConfig.ssl && proxyConfig.ssl.letsEncryptEmail) {
-      appConfig.env['LETSENCRYPT_HOST'] = proxyConfig.domains;
-      appConfig.env['LETSENCRYPT_EMAIL'] = proxyConfig.ssl.letsEncryptEmail;
-    }
-
-    api.setConfig({
-      ...config,
-      app: {
-        ...appConfig
-      }
-    });
+export function prepareConfig(config) {
+  if (!config.app || !config.app.env || !config.proxy) {
+    return config;
   }
-};
+
+  config.app.env['VIRTUAL_HOST'] = config.proxy.domains;
+
+  config.app.env['VIRTUAL_HOST'] = config.proxy.domains;
+  config.app.env['HTTPS_METHOD'] = config.proxy.forceSSL ? 'redirect' : 'noredirect';
+
+  if (config.proxy.ssl && config.proxy.ssl.letsEncryptEmail) {
+    config.app.env['LETSENCRYPT_HOST'] = config.proxy.domains;
+    config.app.env['LETSENCRYPT_EMAIL'] = config.proxy.ssl.letsEncryptEmail;
+  }
+
+  return config;
+}

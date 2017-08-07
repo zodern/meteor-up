@@ -1,4 +1,4 @@
-import * as _ from 'underscore';
+import { cloneDeep } from 'lodash';
 
 import buildApp from './build.js';
 import debug from 'debug';
@@ -215,7 +215,7 @@ export function envconfig(api) {
     }
   });
 
-  var env = _.clone(config.env);
+  var env = cloneDeep(config.env);
   env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
   // sending PORT to the docker container is useless.
 

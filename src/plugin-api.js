@@ -6,6 +6,7 @@ import { commands } from './commands';
 import configValidator from './validate/index';
 import fs from 'fs';
 import { hooks, runRemoteHooks } from './hooks';
+import { runConfigPreps } from './prepare-config';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
@@ -99,7 +100,8 @@ export default class PluginAPI {
     } else if (typeof config.app === 'object' && !('type' in config.app)) {
       config.app.type = 'meteor';
     }
-    return config;
+
+    return runConfigPreps(config);
   }
   getConfig(validate = true) {
     if (!this.config) {

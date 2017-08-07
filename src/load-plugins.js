@@ -5,6 +5,7 @@ import { resolve, join } from 'path';
 import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { addPluginValidator } from './validate';
+import { registerPreparer } from './prepare-config';
 import path from 'path';
 import debug from 'debug';
 
@@ -96,6 +97,9 @@ export function loadPlugins(plugins) {
         for (const [property, validator] of validators) {
           addPluginValidator(property, validator);
         }
+      }
+      if (plugin.module.prepareConfig) {
+        registerPreparer(plugin.module.prepareConfig);
       }
     });
 }

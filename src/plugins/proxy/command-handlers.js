@@ -1,4 +1,4 @@
-import { clone } from 'underscore';
+import { clone } from 'lodash';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
 

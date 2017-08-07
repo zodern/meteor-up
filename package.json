@@ -66,6 +66,7 @@
     "expand-tilde": "~2.0.2",
     "global-modules": "^1.0.0",
     "joi": "~10.6.0",
+    "lodash": "^4.17.4",
     "nodemiral": "~1.1.1",
     "parse-json": "~2.2.0",
     "random-seed": "~0.3.0",
@@ -73,7 +74,6 @@
     "shelljs": "~0.5.0",
     "silent-npm-registry-client": "2.x.x",
     "ssh2": "0.4.x",
-    "underscore": "1.x.x",
     "uuid": "2.x.x",
     "yargs": "~8.0.2"
   },
@@ -89,5 +89,6 @@
       "src/plugins/**",
       "**/__tests__/**"
     ]
-  }
+  },
+  "false": {}
 }

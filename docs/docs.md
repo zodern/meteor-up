@@ -863,6 +863,11 @@ module.exports = {
   },
   validators: {
     // Object of validators to validate the config
+  },
+  // (optional) Called right after the config is loaded
+  prepareConfig: function(config) {
+    // Normalize config, add env variables, etc
+    return config;
   }
 };
 ```

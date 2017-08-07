@@ -1,5 +1,3 @@
-import * as _ from 'underscore';
-
 import { Client } from 'ssh2';
 import debug from 'debug';
 import expandTilde from 'expand-tilde';
@@ -88,7 +86,7 @@ export function getDockerLogs(name, sessions, args) {
 
   log(`getDockerLogs command: ${command}`);
 
-  let promises = _.map(sessions, session => {
+  let promises = sessions.map(session => {
     const input = new Callback2Stream();
     const host = '[' + session._host + ']';
     const lineSeperator = readline.createInterface({

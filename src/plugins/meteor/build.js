@@ -1,8 +1,8 @@
-var spawn = require('child_process').spawn;
-var archiver = require('archiver');
-var fs = require('fs');
-var _ = require('underscore');
+import { spawn } from 'child_process';
+import archiver from 'archiver';
+import fs from 'fs';
 import debug from 'debug';
+import { once } from 'lodash';
 
 const log = debug('mup:module:meteor');
 
@@ -121,7 +121,7 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
 }
 
 function archiveIt(buildLocation, api, cb) {
-  var callback = _.once(cb);
+  var callback = once(cb);
   var bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
   var sourceDir = api.resolvePath(buildLocation, 'bundle');
 
