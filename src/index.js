@@ -115,7 +115,7 @@ Object.keys(modules).forEach(moduleName => {
         addModuleCommands(subYargs, modules[moduleName], moduleName);
       },
       () => {
-        yargs.parse(`mup ${moduleName} help`);
+        yargs.showHelp('log');
       }
     );
   } else if (moduleName === 'default') {
