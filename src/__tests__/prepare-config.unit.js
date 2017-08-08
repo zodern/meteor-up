@@ -1,5 +1,6 @@
+import { _configPreps, registerPreparer, runConfigPreps } from '../prepare-config';
+
 import { expect } from 'chai';
-import { _configPreps, registerPreparer, runConfigPreps } from '../prepare-config'
 
 describe('prepare-config', () => {
   beforeEach(() => {

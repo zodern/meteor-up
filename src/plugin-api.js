@@ -7,11 +7,10 @@ import childProcess from 'child_process';
 import { commands } from './commands';
 import configValidator from './validate/index';
 import fs from 'fs';
-import { hooks, runRemoteHooks } from './hooks';
-import { runConfigPreps } from './prepare-config';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
+import { runConfigPreps } from './prepare-config';
 
 const { resolvePath } = utils;
 

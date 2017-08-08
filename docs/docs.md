@@ -865,7 +865,7 @@ module.exports = {
     // Object of validators to validate the config
   },
   // (optional) Called right after the config is loaded
-  prepareConfig: function(config) {
+  prepareConfig(config) {
     // Normalize config, add env variables, etc
     return config;
   }
@@ -940,7 +940,7 @@ module.exports = {
 };
 ```
 
-Hook functions are given the same arguments as command handlers. 
+Hook functions are given the same arguments as command handlers.
 
 You should never directly call a command handler function. Instead, you should use `api.runCommand` to allow for the command's hooks to run.
 
@@ -958,7 +958,7 @@ Returns boolean. True if verbose is enabled.
 #### **getOptions()**
 Returns object, with the key being the option given to mup, and the value being the option's value.
 
-#### **hasMeteorPackage(packageName)** 
+#### **hasMeteorPackage(packageName)**
 Returns true if the app is using the Meteor package. Returns false if it isn't or if it could not load `appPath/.meteor/versions`.
 
 #### **validateConfig(configPath)**
@@ -977,7 +977,7 @@ Returns the Meteor settings file, loading it if it hasn't been yet.
 Set a new config object. Plugins can use this to add env variables or make other changes to the config.
 
 #### **runCommand(commandName)**
-Runs the command, and it's pre and post hooks. 
+Runs the command, and it's pre and post hooks.
 
 `commandName` is in the format of `pluginName.commandName`. For example, `mongo.restart`, `docker.setup`, and `meteor.push` all all valid strings for `commandName`.
 
