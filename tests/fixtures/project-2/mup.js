@@ -20,7 +20,7 @@ module.exports = {
     log: {
       driver: 'syslog'
     },
-    deployCheckWaitTime: 120
+    deployCheckWaitTime: 300
   },
   mongo: {
     oplog: true,

@@ -5,34 +5,24 @@ We are excited that you are interested in contributing to Meteor Up. Bug Fixes a
 ## Running Tests
 Our test suit is written using [mocha](https://mochajs.org/) + [shelljs](https://github.com/shelljs/shelljs) and parallelled using [GNU parallel](http://www.gnu.org/software/parallel/) + docker. Parallel testing is currently supported for Ubuntu 14.04 and 16.10.
 
-Before running the tests, make sure the server's user account running the tests is in the sudoers list. The test suit depends on node, docker, meteor and gnu parallel. If any of them are not available, the test suit will automatically install them.
+## Running tests on linux
 
-If your internet and computer are fast enough, you can run the tests locally. Otherwise, you will want to run the tests on a server.
+Before running the tests, make sure the server's user account running the tests is in the sudoers list. The test suit depends on node, docker, meteor and gnu parallel. Before the tests start, it will try to automatically install missing dependencies.
+
+## Running tests on Mac/Windows
+
+The test suit depends on node, docker, and meteor. Please make sure they are installed before running the tests.
 
 ### Running Tests Parallelly
-Parallel testing works by creating docker instances per each test case given and actually deploying a meteor app inside that using meteor up. So the box running tests should have a higher CPU/RAM depending on your `MOCHA_PARALLEL` env setting.
+Parallel testing works by creating docker instances per each test case given and actually deploying a meteor app inside that using meteor up. So the box running tests should have a higher CPU/RAM depending on your `MOCHA_PARALLEL` env setting. This is only supported on linux.
 
 Start parallel tests with:
 ```
 npm run test:parallel
 ```
 
-#### How to run tests on a server
-
-* Get a Ubuntu (14.04) box (Our setup is 4vCPU/10GB ram VM for 6 parallel tests)
-* Clone your meteor up fork into `~/meteor-up`
-* Decide your parallelism setting (default is 2)
-```
-export MOCHA_PARALLEL=<number of cores * 1.5>
-```
-* Start testing
-```
-npm install
-npm run test:parallel
-```
-
 ## Running Tests Serially
-If the server or your local computer can not handle parallel tests, you can run tests serially. It will create one docker container that all of the tests will use.
+If the server or your local computer can not handle parallel tests, or you are running the tests on Windows or OSX, you can run tests serially. It will create one docker container that all of the tests will use.
 ```
 npm test
 ```

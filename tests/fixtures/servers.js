@@ -1,7 +1,7 @@
-const host = process.env.PROD_SERVER;
-const username = process.env.PROD_SERVER_USER;
-const pem = process.env.PROD_SERVER_PEM;
-const port = parseInt(process.env.PROD_SERVER_PORT, 10) || 22;
+const host = process.env.PROD_SERVER || '0.0.0.0';
+const username = process.env.PROD_SERVER_USER || 'root';
+const pem = process.env.PROD_SERVER_PEM || '../ssh/new';
+const port = parseInt(process.env.PROD_SERVER_PORT, 10) || 3500;
 
 module.exports = {
   mymeteor: {

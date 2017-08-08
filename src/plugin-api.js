@@ -1,5 +1,7 @@
 import * as utils from './utils';
 
+import { hooks, runRemoteHooks } from './hooks';
+
 import chalk from 'chalk';
 import childProcess from 'child_process';
 import { commands } from './commands';

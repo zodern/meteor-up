@@ -4,9 +4,9 @@ import buildApp from './build.js';
 import debug from 'debug';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
+import os from 'os';
 import random from 'random-seed';
 import uuid from 'uuid';
-import os from 'os';
 
 const log = debug('mup:module:meteor');
 
@@ -101,8 +101,8 @@ export async function push(api) {
   const appPath = api.resolvePath(api.getBasePath(), config.path);
 
   let buildOptions = config.buildOptions || {};
-  buildOptions.buildLocation = buildOptions.buildLocation ||
-    tmpBuildPath(appPath, api);
+  buildOptions.buildLocation =
+    buildOptions.buildLocation || tmpBuildPath(appPath, api);
 
   var bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
   var rebuild = true;
@@ -131,8 +131,31 @@ export async function push(api) {
     progressBar: config.enableUploadProgressBar
   });
 
+  if (!config.docker) {
+    if (config.dockerImage) {
+      config.docker = {
+        image: config.dockerImage
+      };
+      delete config.dockerImage;
+    } else {
+      config.docker = {
+        image: 'kadirahq/meteord'
+      };
+    }
+  }
+
+  const prepareSupported = config.docker.image === 'abernix/meteord';
+  const supportedScript = api.resolvePath(
+    __dirname,
+    'assets/prepare-bundle.sh'
+  );
+  const unsupportedScript = api.resolvePath(
+    __dirname,
+    'assets/prepare-bundle-unsupported.sh'
+  );
+
   list.executeScript('Prepare Bundle', {
-    script: api.resolvePath(__dirname, 'assets/prepare-bundle.sh'),
+    script: prepareSupported ? supportedScript : unsupportedScript,
     vars: {
       appName: config.name,
       dockerImage: config.docker.image
@@ -267,7 +290,9 @@ export function start(api) {
       appName: config.name,
       deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
       deployCheckPath: '',
-      host: api.getConfig().proxy ? api.getConfig().proxy.domains.split(',')[0] : null
+      host: api.getConfig().proxy ?
+        api.getConfig().proxy.domains.split(',')[0] :
+        null
     }
   });
 
@@ -289,7 +314,10 @@ export function deploy(api) {
     process.exit(1);
   }
 
-  return api.runCommand('meteor.push').then(() => api.runCommand('meteor.envconfig')).then(() => api.runCommand('meteor.start'));
+  return api
+    .runCommand('meteor.push')
+    .then(() => api.runCommand('meteor.envconfig'))
+    .then(() => api.runCommand('meteor.start'));
 }
 
 export function stop(api) {
@@ -332,9 +360,20 @@ export function restart(api) {
     }
   });
 
-  return api.runTaskList(
-    list,
-    sessions,
-    { series: true, verbose: api.verbose }
-  );
+  list.executeScript('Verifying Deployment', {
+    script: api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh'),
+    vars: {
+      deployCheckWaitTime: config.deployCheckWaitTime || 60,
+      appName: config.name,
+      deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
+      deployCheckPath: '',
+      host: api.getConfig().proxy ?
+        api.getConfig().proxy.domains.split(',')[0] : null
+    }
+  });
+
+  return api.runTaskList(list, sessions, {
+    series: true,
+    verbose: api.verbose
+  });
 }

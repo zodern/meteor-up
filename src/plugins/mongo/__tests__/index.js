@@ -3,6 +3,8 @@ import { describe, it } from 'mocha';
 
 /* eslint-disable max-len */
 import { expect } from 'chai';
+import os from 'os';
+import path from 'path';
 import sh from 'shelljs';
 
 sh.config.silent = false;
@@ -13,7 +15,7 @@ describe('module - mongo', function() {
 
   describe('logs', function() {
     it('should pull logs from "meteor" vm', async () => {
-      sh.cd('/tmp/tests/project-1');
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
 
       sh.exec('mup setup');
       const out = sh.exec('mup mongo logs');
@@ -30,7 +32,7 @@ describe('module - mongo', function() {
   describe('setup', function() {
     it('should setup mongodb on "mongo" vm', async () => {
       const serverInfo = servers['mymongo'];
-      sh.cd('/tmp/tests/project-1');
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
 
       const out = sh.exec('mup mongo setup');
       expect(out.code).to.be.equal(0);
@@ -52,7 +54,7 @@ describe('module - mongo', function() {
     it('should start mongodb on "mongo" vm', async () => {
       const serverInfo = servers['mymongo'];
 
-      sh.cd('/tmp/tests/project-1');
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
       sh.exec('mup docker setup && mup mongo setup');
 
       const out = sh.exec('mup mongo start');
@@ -71,7 +73,7 @@ describe('module - mongo', function() {
     it('should stop mongodb on "mongo" vm', async () => {
       const serverInfo = servers['mymongo'];
 
-      sh.cd('/tmp/tests/project-1');
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
       sh.exec('mup docker setup && mup mongo setup && mup mongo start');
 
       const out = sh.exec('mup mongo stop');

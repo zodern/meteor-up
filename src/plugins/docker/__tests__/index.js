@@ -3,6 +3,7 @@ import { countOccurences, resolvePath, runSSHCommand } from '../../../utils';
 import { describe, it } from 'mocha';
 
 import assert from 'assert';
+import os from 'os';
 import sh from 'shelljs';
 
 sh.config.silent = false;
@@ -22,7 +23,7 @@ describe('module - docker', function() {
       return async function() {
         this.timeout(60000);
 
-        sh.cd(resolvePath('/tmp', 'tests/project-1'));
+        sh.cd(resolvePath(os.tmpdir(), 'tests/project-1'));
         const out = sh.exec('mup docker setup');
         assert.equal(out.code, 0);
 

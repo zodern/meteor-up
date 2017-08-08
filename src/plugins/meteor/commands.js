@@ -48,7 +48,7 @@ export let stop = {
 export let restart = {
   description: 'Restart meteor app',
   handler: commandHandlers.restart
-}
+};
 
 // Hidden commands
 export const push = {

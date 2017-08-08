@@ -1,8 +1,7 @@
-import debug from 'debug';
-import nodemiral from 'nodemiral';
-
-import { each } from 'async';
 import chalk from 'chalk';
+import debug from 'debug';
+import { each } from 'async';
+import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:docker');
 
