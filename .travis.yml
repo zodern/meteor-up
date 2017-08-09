@@ -6,11 +6,11 @@ node_js:
   - "6"
 
 env:
-  - TEST_PLUGIN='plugins/default'
-  - TEST_PLUGIN='plugins/meteor'
-  - TEST_PLUGIN='plugins/mongo'
-  - TEST_PLUGIN='plugins/docker'
-  - TEST_PLUGIN='plugins/proxy'
+  - TEST_PLUGIN='default'
+  - TEST_PLUGIN='meteor'
+  - TEST_PLUGIN='mongo'
+  - TEST_PLUGIN='docker'
+  - TEST_PLUGIN='proxy'
 
 services:
   - docker

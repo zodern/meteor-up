@@ -13,7 +13,7 @@ chai.use(chaiString);
 
 sh.config.silent = false;
 
-describe.only('module - proxy', function() {
+describe('module - proxy', function() {
   this.timeout(60000000);
 
   describe('setup', function() {
