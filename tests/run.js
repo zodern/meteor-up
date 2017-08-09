@@ -12,9 +12,9 @@ sh.env['PROD_SERVER'] = '127.0.0.1';
 sh.env['PROD_SERVER_PORT'] = '3500';
 sh.env['PROD_SERVER_PEM'] = path.resolve(mupDir, 'tests/fixtures/ssh/new');
 
-const volume = `-v ${keyPath}:/root/.ssh/authorized_keys`;
-const publish = '-p 127.0.0.1:3500:22';
-const image = 'mup-tests-server-docker';
+var volume = `-v ${keyPath}:/root/.ssh/authorized_keys`;
+var publish = '-p 127.0.0.1:3500:22';
+var image = 'mup-tests-server-docker';
 
 var containerId = sh.exec(
   `docker run ${volume} ${publish} --privileged -d -t ${image} /sbin/my_init`
@@ -22,8 +22,11 @@ var containerId = sh.exec(
 
 sh.exec(`docker exec ${containerId} sudo service docker start`);
 
-const watch = argv.watch ? ' --watch' : '';
-const files = argv.path ? argv.path : ' src/**/__tests__/**/*.js';
+var watch = argv.watch ? ' --watch' : '';
+var files = argv.path ? argv.path : ' src/**/__tests__/**/*.js';
+if (argv.plugin) {
+  files = ' src/plugins/' + argv.plugin + '/__tests__/**/*.js';
+}
 
 var testCode = sh.exec('npm run test:module -s -- ' + files + watch)
   .code;

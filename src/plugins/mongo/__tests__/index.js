@@ -23,9 +23,6 @@ describe('module - mongo', function() {
       expect(out.code).to.be.equal(0);
       expect(countOccurences('MongoDB starting :', out.output)).to.be.equal(1);
       expect(countOccurences('db version', out.output)).to.be.equal(1);
-      expect(
-        countOccurences('waiting for connections on port 27017', out.output)
-      ).to.be.equal(1);
     });
   });
 
