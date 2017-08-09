@@ -1,5 +1,6 @@
 var sh = require('shelljs');
 var path = require('path');
+var argv = require('yargs').argv;
 
 require('./setup.js');
 
@@ -21,7 +22,10 @@ var containerId = sh.exec(
 
 sh.exec(`docker exec ${containerId} sudo service docker start`);
 
-var testCode = sh.exec('npm run test:module -s -- "src/**/__tests__/**/*.js"')
+const watch = argv.watch ? ' --watch' : '';
+const files = argv.path ? argv.path : ' src/**/__tests__/**/*.js';
+
+var testCode = sh.exec('npm run test:module -s -- ' + files + watch)
   .code;
 
 sh.exec(`docker rm -f ${containerId}`);

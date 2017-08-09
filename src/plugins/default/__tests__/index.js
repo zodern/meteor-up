@@ -25,7 +25,7 @@ describe('module - default', function() {
 
       const out = sh.exec('mup deploy --cached-build');
 
-      expect(out.code).to.be.equal(0);
+      expect(out.code).to.equal(0);
       expect(
         countOccurences('Building App Bundle Locally', out.output)
       ).to.be.equal(1);

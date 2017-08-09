@@ -149,11 +149,6 @@ export function start(api) {
     process.exit(1);
   }
 
-  // if (typeof config.name !== 'string' || config.name.length < 1) {
-  //   console.error('error: proxy.name needs to be a string');
-  //   process.exit(1);
-  // }
-
   const list = nodemiral.taskList('Start proxy');
 
   list.executeScript('Start proxy', {

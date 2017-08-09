@@ -1,25 +1,36 @@
-/* eslint-disable */
 var path = require('path');
+var servers = require('../servers')
 
 var meteorPath = path.resolve('..', 'helloapp');
-var serverFile = path.resolve('..', 'servers');
-var servers = require(serverFile);
+
 
 module.exports = {
   servers: servers,
-  meteor: {
+
+  app: {
     name: 'myapp',
-    path: meteorPath,
+    path: '../helloapp',
     servers: {
-      mymeteor: {}
+      mymeteor: {},
     },
+
     env: {
       ROOT_URL: 'http://' + servers.mymeteor.host + '.com',
-      MONGO_URL: 'mongodb://' + servers.mymongo.host + '/meteor'
+      MONGO_URL: 'mongodb://' + servers.mymongo.host + '/meteor',
     },
+
     deployCheckWaitTime: 300
   },
+
+  proxy: {
+    domains: 'website.com',
+    shared: {
+      clientUploadLimit: '10M'
+    }
+  },
+
   mongo: {
+    version: '3.4.1',
     servers: {
       mymongo: {}
     }

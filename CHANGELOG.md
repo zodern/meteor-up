@@ -32,6 +32,7 @@ After the bundle is uploaded to each server, a new task is run called "Prepare b
 **Other Changes**
 - `mup setup` updates Docker if it is older than 1.13
 - Add `mup proxy reconfig-shared` to update the server after changing `proxy.shared` in the config.
+- Fix validating `proxy.shared.clientUploadLimit`
 - Remove `meteor.deployCheckWaitTime`, `meteor.docker.imagePort`, and `mongo.port` from default config
 - Renamed the `meteor` object in the default config to `app`
 - Show link to docs when there are validation errors

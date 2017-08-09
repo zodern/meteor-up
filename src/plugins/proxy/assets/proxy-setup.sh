@@ -7,7 +7,7 @@ sudo mkdir -p /opt/<%= name %>/config
 sudo mkdir -p /opt/<%= name %>/config/vhost.d
 sudo mkdir -p /opt/<%= name %>/config/html
 
-touch /opt/<%= name %>/config/shared.sh
+touch /opt/<%= name %>/config/shared-config.sh
 touch /opt/<%= name %>/config/env.list
 touch /opt/<%= name %>/config/env_letsencrypt.list
 

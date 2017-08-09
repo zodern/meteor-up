@@ -1,6 +1,6 @@
 import debug from 'debug';
-import sh from 'shelljs';
 import fs from 'fs';
+import sh from 'shelljs';
 
 const log = debug('mup:module:default');
 
@@ -42,7 +42,7 @@ export function init(api) {
     console.log('  Available options can be found in the docs at');
     console.log('    https://github.com/zodern/meteor-up');
     console.log('');
-    console.log('  Then run the command:');
+    console.log('  Then, run the command:');
     console.log('    mup setup');
   } else {
     console.log('Skipping creation of mup.js');
