@@ -1,3 +1,4 @@
+import './node-version';
 import checkUpdates from './updates';
 import modules, { loadPlugins, locatePluginDir } from './load-plugins';
 import { registerHook } from './hooks';

@@ -38,6 +38,7 @@ After the bundle is uploaded to each server, a new task is run called "Prepare b
 - Show link to docs when there are validation errors
 - Improve cli help output (commands have a description, command specific options are documented)
 - Show validation error when `server.pem` is a path to a public key
+- Mup displays message and exits if the node version is older than v4
 - Improve some of the validation messages
 - Remove unnecessary stack traces when the app's path is incorrect or `meteor build` fails
 - Add `mup meteor restart` command
