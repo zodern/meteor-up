@@ -126,6 +126,7 @@ EOT
       --restart=always \
       --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
       --volume=/opt/$APPNAME/config/private.key:/private.key \
+      <% for(var volume in sslVolumes) { %>-v <%= volume %>:<%= sslVolumes[volume] %> <% } %>\
       --link=$APPNAME:backend \
       --publish=$BIND:<%= sslConfig.port %>:443 \
       --name=$APPNAME-frontend \
