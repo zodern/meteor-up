@@ -5,7 +5,15 @@ const schema = joi.object().keys({
   path: joi.string().min(1).required(),
   port: joi.number(),
   type: joi.string(),
-  servers: joi.object().required(),
+  servers: joi.object().required().pattern(
+    /[/s/S]*/,
+    joi.object().keys({
+      env: joi.object().pattern(
+        /[/s/S]*/,
+        [joi.string(), joi.number(), joi.bool()]
+      )
+    })
+  ),
   deployCheckWaitTime: joi.number(),
   deployCheckPort: joi.number(),
   enableUploadProgressBar: joi.bool(),
@@ -14,11 +22,11 @@ const schema = joi.object().keys({
     image: joi.string().trim(),
     imagePort: joi.number(),
     imageFrontendServer: joi.string(),
-    args: joi.array().items(joi.string().label('docker.args array items')),
+    args: joi.array().items(joi.string()),
     bind: joi.string().trim(),
     networks: joi
       .array()
-      .items(joi.string().label('docker.networks array items'))
+      .items(joi.string())
   }),
   buildOptions: joi.object().keys({
     serverOnly: joi.bool(),
@@ -42,7 +50,7 @@ const schema = joi.object().keys({
         .required(),
       MONGO_URL: joi.string()
     })
-    .pattern(/[\s\S]*/, [joi.string(), joi.number()]),
+    .pattern(/[\s\S]*/, [joi.string(), joi.number(), joi.bool()]),
   log: joi.object().keys({
     driver: joi.string(),
     opts: joi.object()
@@ -59,8 +67,7 @@ const schema = joi.object().keys({
         .keys({
           email: joi.string().email().required(),
           domains: joi.string().required()
-        })
-        .label('autogenerate'),
+        }),
       crt: joi.string().trim(),
       key: joi.string().trim(),
       port: joi.number(),
