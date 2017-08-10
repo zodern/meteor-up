@@ -7,7 +7,7 @@ IMAGE=mup-<%= appName %>
 
 # save the last known version
 cd $APP_DIR
-if docker image inspect $IMAGE:build >/dev/null; then
+if docker image inspect $IMAGE:latest >/dev/null; then
   echo "using image"
   sudo rm -rf current
 else
