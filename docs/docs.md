@@ -128,8 +128,8 @@ module.exports = {
 
      // list of servers to deploy to, from the 'servers' list
     servers: {
-      one: {}, 
-      two: {}, 
+      one: {},
+      two: {},
       three: {
         // Add or override env variables for specific servers (optional)
         env: {

@@ -10,25 +10,21 @@ Plugins are npm packages that can add commands (commands can be run from the mup
 
 **Changes to Deployment and Deployment validation**
 
+*This is currently only enabled for the `abernix/meteord` docker image.*
+
 After the bundle is uploaded to each server, a new task is run called "Prepare bundle". It installs the Meteor npm dependencies, rebuilds native modules, and stores the result in a docker image. This has a few benefits:
 - The time in `meteor.deployCheckWaitTime` no longer needs to include the time to install npm dependencies
 - When installing dependencies fails, it does not continuously restart until `meteor.deployCheckWaitTime` expires, and it shows the full logs from `npm install`
-- Dependencies are only installed once during each deploy, instead of having to be installed every time the app was started
+- Dependencies are only installed once during each deploy. This means that `mup start`, `mup restart`, and `mup reconfig` are all much faster.
 
 **Improved Support for Multiple Servers**
-- `mup restart` stops only one server at a time
-- Add `servers` option to list which servers to use
+- `mup restart` restarts only one server at a time
+- Add `--servers` option to list which servers to use
 - Add support for server specific env variables, which can be configured in `meteor.servers.<server name>.env`
 
 **Config Changes**
 - The `meteor` object has been renamed to `app`. `meteor` will be supported until Mup 2.0
-- You can remove `mongo.port` and `mongo.oplog` from your config since they have never been used
-
-**Docs**
-- Remove `meteor.docker.imagePort`, `mongo.port`, and `mongo.oplog` from example configs
-- Document `meteor.docker.imagePort`
-- Update documentation for `meteor.deployCheckWaitTime`
-- Improve mongo, migration, and troubleshooting docs
+- You can remove `mongo.port` and `mongo.oplog` from your config since they have never been used.
 
 **Other Changes**
 - `mup setup` updates Docker if it is older than 1.13
@@ -43,7 +39,7 @@ After the bundle is uploaded to each server, a new task is run called "Prepare b
 - Improve some of the validation messages
 - Remove unnecessary stack traces when the app's path is incorrect or `meteor build` fails
 - Add `mup meteor restart` command
-- Remove `mup docker dump` command since it did nothing
+- Remove `mup mongo dump` command since it did nothing
 
 ## 1.2.11 - June 14, 2017
 - Deployment verifier shows last 100 lines of the app's log when it fails (it previously was 50 lines)
