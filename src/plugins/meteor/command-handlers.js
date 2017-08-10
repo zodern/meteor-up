@@ -173,6 +173,7 @@ export function envconfig(api) {
   log('exec => mup meteor envconfig');
 
   const config = api.getConfig().app;
+  const servers = api.getConfig().servers;
   let bindAddress = '0.0.0.0';
 
   if (!config) {
@@ -250,9 +251,17 @@ export function envconfig(api) {
   // default port, we set the env PORT to docker.imagePort.
   env.PORT = config.docker.imagePort;
 
+  const hostVars = {};
+  Object.keys(config.servers).forEach(key => {
+    if (config.servers[key].env) {
+      hostVars[servers[key].host] = {env: config.servers[key].env};
+    }
+  });
+
   list.copy('Sending Environment Variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),
     dest: '/opt/' + config.name + '/config/env.list',
+    hostVars,
     vars: {
       env: env || {},
       appName: config.name

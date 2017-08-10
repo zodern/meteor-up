@@ -246,7 +246,7 @@ export default class PluginAPI {
     await this._runPreHooks(name);
     let potentialPromise;
     try {
-      potentialPromise = commands[name].handler(this);
+      potentialPromise = commands[name].handler(this, nodemiral);
     } catch (e) {
       this._commandErrorHandler(e);
       process.exit(1);

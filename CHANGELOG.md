@@ -18,6 +18,7 @@ After the bundle is uploaded to each server, a new task is run called "Prepare b
 **Improved Support for Multiple Servers**
 - `mup restart` stops only one server at a time
 - Add `servers` option to list which servers to use
+- Add support for server specific env variables, which can be configured in `meteor.servers.<server name>.env`
 
 **Config Changes**
 - The `meteor` object has been renamed to `app`. `meteor` will be supported until Mup 2.0

@@ -97,6 +97,20 @@ describe('module - meteor', function() {
 
       assert.equal(sshOut2.code, 0);
     });
+    it('should push server specific env variables', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-2'));
+      sh.exec('mup meteor setup');
+
+      const out = sh.exec('mup meteor envconfig');
+
+      expect(out.code).to.equal(0);
+
+      const sshOut = await runSSHCommand(
+        serverInfo,
+        'cat /opt/myapp/config/env.list'
+      );
+      expect(sshOut.output).to.have.entriesCount('TEST=true', 1);
+    });
   });
 
   describe('start', function() {

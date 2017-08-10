@@ -1,4 +1,5 @@
 import './node-version';
+import './nodemiral';
 import checkUpdates from './updates';
 import modules, { loadPlugins, locatePluginDir } from './load-plugins';
 import { registerHook } from './hooks';

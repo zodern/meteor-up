@@ -11,7 +11,11 @@ module.exports = {
     name: 'myapp',
     path: meteorPath,
     servers: {
-      mymeteor: {}
+      mymeteor: {
+        env: {
+          TEST: true
+        }
+      }
     },
     env: {
       ROOT_URL: 'http://' + servers.mymeteor.host + '.com',
@@ -23,7 +27,6 @@ module.exports = {
     deployCheckWaitTime: 300
   },
   mongo: {
-    oplog: true,
     servers: {
       mymongo: {}
     }
