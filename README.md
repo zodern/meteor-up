@@ -109,6 +109,9 @@ module.exports = {
       // are using Meteor 1.3 or older
       image: 'abernix/meteord:base' , // (optional)
       imagePort: 80, // (optional, default: 80)
+      // lets you bind the docker container for the application
+      // image to a specific network interface (optional)
+      bind: '127.0.0.1',
 
       // lets you add/overwrite any parameter on
       // the docker run command (optional)
@@ -119,9 +122,6 @@ module.exports = {
       // (optional) Only used if using your own ssl certificates.
       // Default is "meteorhacks/mup-frontend-server"
       imageFrontendServer: 'meteorhacks/mup-frontend-server',
-      // lets you bind the docker container to a
-      // specific network interface (optional)
-      bind: '127.0.0.1',
       // lets you add network connections to perform after run
       // (runs docker network connect <net name> for each network listed here)
       networks: [
