@@ -3,6 +3,21 @@
   "version": "1.2.11",
   "description": "Production Quality Meteor Deployments",
   "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zodern/meteor-up.git"
+  },
+  "keywords": [
+    "meteor",
+    "meteor-up",
+    "deploy"
+  ],
+  "author": "Kadira Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zodern/meteor-up/issues"
+  },
+  "homepage": "https://github.com/zodern/meteor-up#readme",
   "bin": {
     "mup": "./index.js"
   },
@@ -23,19 +38,6 @@
     "lint:readme": "eslint --ext md .",
     "docs": "cd docs && bundle exec jekyll serve"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kadirahq/meteor-up.git"
-  },
-  "keywords": [
-    "meteor"
-  ],
-  "author": "Kadira Inc.",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/kadirahq/meteor-up/issues"
-  },
-  "homepage": "https://github.com/kadirahq/meteor-up#readme",
   "devDependencies": {
     "babel-cli": "^6.23.0",
     "babel-eslint": "^7.1.1",
@@ -92,6 +94,5 @@
       "src/plugins/**",
       "**/__tests__/**"
     ]
-  },
-  "false": {}
+  }
 }
