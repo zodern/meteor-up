@@ -20,7 +20,7 @@ export function prepareConfig(config) {
   config.app.env['VIRTUAL_HOST'] = config.proxy.domains;
 
   config.app.env['VIRTUAL_HOST'] = config.proxy.domains;
-  config.app.env['HTTPS_METHOD'] = config.proxy.forceSSL ? 'redirect' : 'noredirect';
+  config.app.env['HTTPS_METHOD'] = config.proxy.ssl && config.proxy.ssl.forceSSL ? 'redirect' : 'noredirect';
 
   if (config.proxy.ssl && config.proxy.ssl.letsEncryptEmail) {
     config.app.env['LETSENCRYPT_HOST'] = config.proxy.domains;

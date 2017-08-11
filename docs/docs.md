@@ -420,9 +420,6 @@ Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` sectio
 {
   ...
   proxy: {
-    ssl: {
-      letsEncryptEmail: 'address@gmail.com'
-    },
     // comma separated list of domains your website
     // will be accessed at.
     // You will need to configure your dns for each one.
@@ -452,9 +449,8 @@ Add an `ssl` object to your `proxy` config:
       // For using let's encrypt
       letsEncryptEmail: 'email@domain.com'
 
-      // Use custom certificates
-      crt: './bundle.crt',
-      key: './private.pem'
+      // Redirects http to https. Uses HSTS.
+      forceSSL: false
     }
   }
 }
@@ -464,7 +460,10 @@ If you are using custom certificates instead, it would look like:
 proxy: {
   ssl: {
     crt: './bundle.crt',
-    key: './private.pem'
+    key: './private.pem',
+
+    // Redirects http to https. Uses HSTS.
+    forceSSL: false
   }
 }
 ```

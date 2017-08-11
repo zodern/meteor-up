@@ -26,7 +26,14 @@ After the bundle is uploaded to each server, a new task is run called "Prepare b
 - The `meteor` object has been renamed to `app`. `meteor` will be supported until Mup 2.0
 - You can remove `mongo.port` and `mongo.oplog` from your config since they have never been used.
 
+**Docs**
+- Remove `meteor.docker.imagePort`, `mongo.port`, and `mongo.oplog` from example configs
+- Document `meteor.docker.imagePort`
+- Update documentation for `meteor.deployCheckWaitTime`
+- Improve mongo, migration, and troubleshooting docs
+
 **Other Changes**
+- The reverse proxy can redirect `http` to `https`, configured in `proxy.ssl.forceSSL`
 - `mup setup` updates Docker if it is older than 1.13
 - Add `mup proxy reconfig-shared` to update the server after changing `proxy.shared` in the config.
 - Fix validating `proxy.shared.clientUploadLimit`

@@ -6,7 +6,8 @@ const schema = joi.object().keys({
     .keys({
       letsEncryptEmail: joi.string().trim(),
       crt: joi.string().trim(),
-      key: joi.string().trim()
+      key: joi.string().trim(),
+      forceSSL: joi.bool()
     })
     .and('crt', 'key')
     .without('letsEncryptEmail', ['crt', 'key'])
