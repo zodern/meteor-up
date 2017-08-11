@@ -123,11 +123,11 @@ EOT
     set -e
     docker run \
       -d \
+      -p 80:80 -p <%= sslConfig.port %>:443 \
       --restart=always \
       --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
       --volume=/opt/$APPNAME/config/private.key:/private.key \
       --link=$APPNAME:backend \
-      --publish=$BIND:<%= sslConfig.port %>:443 \
       --name=$APPNAME-frontend \
       <%= docker.imageFrontendServer %> /start.sh
   <% } %>
