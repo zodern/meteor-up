@@ -144,7 +144,7 @@ export async function push(api) {
     }
   }
 
-  const prepareSupported = config.docker.image === 'abernix/meteord';
+  const prepareSupported = config.docker.image.indexOf('abernix/meteord') === 0;
   const supportedScript = api.resolvePath(
     __dirname,
     'assets/prepare-bundle.sh'
