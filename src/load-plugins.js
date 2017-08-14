@@ -88,7 +88,7 @@ export function loadPlugins(plugins) {
         });
       }
       if (plugin.module.hooks) {
-        Object.keys(plugin.module.hooks).forEach((key) => {
+        Object.keys(plugin.module.hooks).forEach(key => {
           registerHook(key, plugin.module.hooks[key]);
         });
       }

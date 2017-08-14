@@ -217,31 +217,31 @@ describe('PluginAPI', () => {
       delete commands['test.logs'];
     });
 
-    it('should throw if name is not provided', (cb) => {
+    it('should throw if name is not provided', cb => {
       api.runCommand().catch(() => {
         cb();
       });
     });
 
-    it('should throw if unknown command', (cb) => {
+    it('should throw if unknown command', cb => {
       api.runCommand('nonexistent.command').catch(() => {
         cb();
       });
     });
 
-    it('should run command', (cb) => {
+    it('should run command', cb => {
       api.runCommand('test.logs').then(() => {
         expect(commandCalled).to.equal(true);
         cb();
       });
     });
 
-    it('should run hooks', (cb) => {
+    it('should run hooks', cb => {
       api.runCommand('test.logs').then(() => {
         expect(preHookCalled).to.equal(true);
         expect(postHookCalled).to.equal(true);
         cb();
-      }).catch((e) => {
+      }).catch(e => {
         console.log(e);
       });
     });

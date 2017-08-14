@@ -5,7 +5,7 @@ export default function registerCommand(moduleName, name, command) {
 }
 
 export function registerCommandOverrides(moduleName, overrides) {
-  Object.keys(overrides).forEach((override) => {
+  Object.keys(overrides).forEach(override => {
     let handler;
 
     if (commands[`${moduleName}.${overrides[override]}`]) {

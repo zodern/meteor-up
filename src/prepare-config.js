@@ -7,7 +7,7 @@ export function registerPreparer(preparer) {
 export function runConfigPreps(_config) {
   let config = _config;
 
-  _configPreps.forEach((preparer) => {
+  _configPreps.forEach(preparer => {
     config = preparer(config) || config;
   });
 

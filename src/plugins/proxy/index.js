@@ -10,8 +10,6 @@ export const validate = {
   proxy: validator
 };
 
-
-
 export function prepareConfig(config) {
   if (!config.app || !config.app.env || !config.proxy) {
     return config;

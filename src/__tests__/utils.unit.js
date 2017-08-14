@@ -15,7 +15,7 @@ describe('utils', function() {
   });
 
   describe('runTaskList', function() {
-    it('should resolve when list is sucessfull', (cb) => {
+    it('should resolve when list is sucessfull', cb => {
       const list = {
         run(sessions, opts, runCb) {
           runCb({});
@@ -24,7 +24,7 @@ describe('utils', function() {
       utils.runTaskList(list, {}, {}).then(() => {cb();});
     });
 
-    it('should add stdio handlers for verbose', (cb) => {
+    it('should add stdio handlers for verbose', cb => {
       const list = {
         _taskQueue: [],
         run(sessions, opts, runCb) {
@@ -37,7 +37,7 @@ describe('utils', function() {
       .then(() => { cb(); });
     });
 
-    it('should reject if a task failed', (cb) => {
+    it('should reject if a task failed', cb => {
       const list = {
         run(sessions, opts, runCb) {
           runCb({

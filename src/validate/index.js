@@ -25,7 +25,7 @@ function generateSchema() {
   ))
   };
 
-  Object.keys(_pluginValidators).forEach((key) => {
+  Object.keys(_pluginValidators).forEach(key => {
     topLevelKeys[key] = joi.any();
   });
 
@@ -56,7 +56,7 @@ function validateAll(config) {
 
 export default function validate(config) {
   let errors = validateAll(config);
-  return errors.map((error) => {
+  return errors.map(error => {
     return error.message;
   });
 }
