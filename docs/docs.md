@@ -625,7 +625,7 @@ and
 mup deploy
 ```
 
-### Multiple apps use same Database
+### Multiple apps use same database
 It is possible for two apps to use the same database from the built-in MongoDB instance.
 
 In the config for one of the apps, follow the instructions for [Built-in Database](#built-in-database).
@@ -833,10 +833,13 @@ Plugins are npm packages, and can be installed with the `npm` tool. You can inst
 
 ### List of plugins
 
-There currently are no plugins. If you have created one, create a github issue or pull request to let us know.
+- [mup-disk](https://www.npmjs.com/package/mup-disk) Shows disk usage, and cleans up old files and docker items
+- [mup-redis](https://www.npmjs.com/package/mup-redis) Setup and manage Redis
+
+If you have created a plugin, create a pull request to add it to this list.
 
 Meteor Up comes with some built-in plugins. These include:
-- `default` Handles all of the top-level commands, such as `mup setup`, `mup init`, and `mup deploy`
+- `default` Handles most of the top-level commands, such as `mup setup`, `mup init`, and `mup deploy`
 - `meteor` Adds the `meteor` top-level command, and adds meteor specific functionality to the `default` commands
 - `docker` Adds the `docker` top-level command, and sets-up docker
 - `mongo` Adds the `mongo` top-level command, and manages the MongoDB instance
