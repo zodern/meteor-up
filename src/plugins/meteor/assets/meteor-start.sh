@@ -18,6 +18,8 @@ else
   # setup the new version
   sudo mkdir current
   sudo cp tmp/bundle.tar.gz current/
+
+  docker rmi $IMAGE:previous || true
 fi
 
 if docker image inspect $IMAGE:previous >/dev/null; then
