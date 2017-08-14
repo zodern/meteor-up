@@ -3,6 +3,7 @@ node_modules
 .vscode
 .idea
 *.log
+package-lock.json
 docs/_site
 coverage
 
