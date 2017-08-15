@@ -446,27 +446,35 @@ Add an `ssl` object to your `proxy` config:
   proxy: {
     ...
     ssl: {
-      // For using let's encrypt
+      // Enable let's encrypt to create free certificates
       letsEncryptEmail: 'email@domain.com'
-
-      // Redirects http to https. Uses HSTS.
-      forceSSL: false
     }
   }
 }
 ```
+
 If you are using custom certificates instead, it would look like:
 ```ts
 proxy: {
   ssl: {
     crt: './bundle.crt',
     key: './private.pem',
-
-    // Redirects http to https. Uses HSTS.
-    forceSSL: false
   }
 }
 ```
+
+### Redirect http to https
+
+In your config, add:
+```ts
+proxy: {
+  ssl: {
+    forceSSL: true
+  }
+}
+```
+
+It uses HSTS. This means that if you set it to `false` after it's been true, the browser used by anyone that visited it while it was set to true will still be redirected to `https` for one year.
 
 ### Advance configuration
 The `proxy.shared` object has settings that most apps won't need to change, but if they are they apply to every app using the proxy. After you change `proxy.shared`, you need to run `mup proxy reconfig-shared` for it to take effect.

@@ -59,7 +59,8 @@ export function setup(api) {
   if (
     config.ssl &&
     !config.ssl.letsEncryptEmail &&
-    config.ssl.upload !== false
+    config.ssl.upload !== false &&
+    config.ssl.crt
   ) {
     list.copy('Copying SSL Certificate Bundle', {
       src: api.resolvePath(api.getBasePath(), config.ssl.crt),

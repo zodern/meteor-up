@@ -11,7 +11,7 @@ const schema = joi.object().keys({
     })
     .and('crt', 'key')
     .without('letsEncryptEmail', ['crt', 'key'])
-    .or('letsEncryptEmail', 'crt'),
+    .or('letsEncryptEmail', 'crt', 'forceSSL'),
   domains: joi.string().required(),
   shared: joi.object().keys({
     clientUploadLimit: joi.alternatives().try(joi.number(), joi.string()),
