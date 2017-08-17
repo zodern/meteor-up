@@ -58,3 +58,9 @@ export let stop = {
   description: 'Stop app',
   handler: commandHandlers.stop
 };
+
+export let ssh = {
+  name: 'ssh [server]',
+  description: 'SSH into server',
+  handler: commandHandlers.ssh
+};

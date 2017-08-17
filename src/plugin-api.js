@@ -31,6 +31,7 @@ export default class PluginAPI {
     this.runTaskList = utils.runTaskList;
     this.getDockerLogs = utils.getDockerLogs;
     this.runSSHCommand = utils.runSSHCommand;
+    this._createSSHOptions = utils.createSSHOptions;
   }
 
   getArgs() {
