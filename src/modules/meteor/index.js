@@ -213,6 +213,13 @@ export function envconfig(api) {
     }
   });
 
+  if (config.ssl.htpasswd) {
+    list.copy('Puhsing htpasswd file', {
+      src: resolvePath(api.getBasePath(), config.ssl.htpasswd),
+      dest: '/opt/' + config.name + '/config/htpasswd/' + config.ssl.autogenerate.domains
+    });
+  }
+
   var env = _.clone(config.env);
   env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
   // sending PORT to the docker container is useless.

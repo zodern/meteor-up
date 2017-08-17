@@ -70,7 +70,8 @@ const schema = joi.object().keys({
       crt: joi.string().trim(),
       key: joi.string().trim(),
       port: joi.number(),
-      upload: joi.boolean()
+      upload: joi.boolean(),
+      htpasswd: joi.string().trim()
     })
     .and('crt', 'key')
     .without('autogenerate', ['crt', 'key'])
