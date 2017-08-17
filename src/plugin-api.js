@@ -226,6 +226,8 @@ export default class PluginAPI {
     return;
   };
   _commandErrorHandler(e) {
+    process.exitCode = 1;
+
     if (e.nodemiralHistory instanceof Array) {
       // Error is from nodemiral when running a task list.
       // Nodemiral should have already displayed the error
@@ -233,7 +235,6 @@ export default class PluginAPI {
     }
 
     console.error(e);
-    process.exitCode = 1;
   }
   runCommand = async function(name) {
     if (!name) {
