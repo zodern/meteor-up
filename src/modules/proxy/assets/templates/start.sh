@@ -23,6 +23,12 @@ docker pull jwilder/nginx-proxy
 set -e
 echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
 
+sudo cat <<EOT > /opt/$APPNAME/config/vhost.d/default
+proxy_buffer_size          128k;
+proxy_buffers              4 256k;
+proxy_busy_buffers_size    256k;;
+EOT
+
 <% if(typeof clientUploadLimit === 'number') { %>
 # This updates nginx for all vhosts
 sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
@@ -57,4 +63,3 @@ docker run -d \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
   jrcs/letsencrypt-nginx-proxy-companion
 echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
-
