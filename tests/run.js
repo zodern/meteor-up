@@ -28,7 +28,10 @@ if (argv.plugin) {
   files = ' src/plugins/' + argv.plugin + '/__tests__/**/*.js';
 }
 
-var testCode = sh.exec('npm run test:module -s -- ' + files + watch)
+var g = argv.g ? ' -g ' + argv.g : '';
+var command = 'npm run test:module -- ' + files + watch + g;
+
+var testCode = sh.exec(command)
   .code;
 
 sh.exec(`docker rm -f ${containerId}`);

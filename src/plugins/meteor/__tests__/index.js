@@ -119,7 +119,9 @@ describe('module - meteor', function() {
     it('should start meteor on "meteor" vm', async () => {
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
 
-      sh.exec('mup setup && mup meteor push --cached-build && mup meteor envconfig');
+      sh.exec(
+        'mup setup && mup meteor push --cached-build && mup meteor envconfig'
+      );
       const out = sh.exec('mup meteor start');
       assert.equal(out.code, 0);
 
@@ -136,11 +138,8 @@ describe('module - meteor', function() {
 
   describe('deploy', function() {
     const serverInfo = servers['mymeteor'];
-    it('should deploy meteor app on "meteor" vm', async () => {
-      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
 
-      sh.exec('mup setup');
-      const out = sh.exec('mup meteor deploy --cached-build');
+    async function checkDeploy(out, appText) {
       assert.equal(out.code, 0);
 
       const num = countOccurences(
@@ -163,6 +162,25 @@ describe('module - meteor', function() {
         'curl localhost:80 && exit 0'
       );
       assert.equal(sshOut.code, 0);
+      expect(sshOut.output).to.have.entriesCount(appText, 1);
+    }
+
+    it('should deploy meteor app on "meteor" vm', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
+
+      sh.exec('mup setup');
+      const out = sh.exec('mup meteor deploy --cached-build');
+
+      checkDeploy(out, '<title>helloapp-new</title>');
+    });
+
+    it('should deploy app using Meteor 1.2', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
+
+      sh.exec('mup setup --config mup.old.js');
+      const out = sh.exec('mup meteor deploy --cached-build --config mup.old.js');
+
+      checkDeploy(out, '<title>helloapp</title>');
     });
   });
 
