@@ -18,6 +18,13 @@ if (process.platform !== 'win32') {
 
 var mupDir = process.cwd();
 var tmp = path.resolve(os.tmpdir(), 'tests');
+var helloapp = path.resolve(mupDir, 'tests/fixtures/helloapp');
+
+if (!fs.existsSync(path.resolve(helloapp, 'node_modules'))) {
+  sh.cd(path.resolve(mupDir, 'tests/fixtures/helloapp'));
+  sh.exec('npm install');
+}
+
 
 sh.rm('-fr', tmp);
 sh.mkdir(tmp);
