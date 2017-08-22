@@ -8,7 +8,7 @@ export MUP_DIR=$PWD
 {
 rm -rf /tmp/tests
 mkdir /tmp/tests
-cp -rf $MUP_DIR/tests /tmp
+cp -rf $MUP_DIR/tests/fixtures/* /tmp/tests
 cd /tmp/tests/
 rm -rf new*
 eval `ssh-agent`
@@ -31,15 +31,18 @@ if [[ -z $( docker images -aq mup-tests-server-docker) ]]; then
     docker exec mup-tests-server-docker-setup service docker start
     docker exec -t mup-tests-server-docker-setup docker pull mongo:3.4.1
     docker exec -t mup-tests-server-docker-setup docker pull kadirahq/meteord
+    docker exec -t mup-tests-server-docker-setup docker pull abernix/meteord:base
+    docker exec -t mup-tests-server-docker-setup docker pull jwilder/nginx-proxy
+    docker exec -t mup-tests-server-docker-setup docker pull jrcs/letsencrypt-nginx-proxy-companion:latest
     docker commit mup-tests-server-docker-setup mup-tests-server-docker
     docker rm -f mup-tests-server-docker-setup
 fi
 
 {
 cd $MUP_DIR
-rm -rf ./tests/ssh
-mkdir ./tests/ssh
-cd ./tests/ssh
+rm -rf ./tests/fixtures/ssh
+mkdir ./tests/fixtures/ssh
+cd ./tests/fixtures/ssh
 ssh-keygen -f new -t rsa -N ''
 chmod 600 new.pub
 sudo chown root:root new.pub

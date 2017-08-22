@@ -22,7 +22,7 @@ export default function validateServers(servers) {
   let result = joi.validate(servers, schema, VALIDATE_OPTIONS);
   details = combineErrorDetails(details, result);
 
-  Object.keys(servers).forEach((key) => {
+  Object.keys(servers).forEach(key => {
     const server = servers[key];
     if (server.pem && server.pem.indexOf('.pub') === server.pem.length - 4) {
       details.push({

@@ -1,162 +1,132 @@
-import MupAPI from './mup-api';
+import './node-version';
+import './nodemiral';
 import checkUpdates from './updates';
-import modules from './modules/';
+import modules, { loadPlugins, locatePluginDir } from './load-plugins';
+import { registerHook } from './hooks';
 import pkg from '../package.json';
-import program from 'commander';
+import yargs from 'yargs';
+import chalk from 'chalk';
+import MupAPI from './plugin-api';
+import { filterArgv } from './utils';
 
-let settingsPath;
-let configPath;
-const args = process.argv.slice(2);
+const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help', 'servers'];
 
-program
-  .arguments('<command> [subcommand]')
-  .version(pkg.version)
-  .action(argAction)
-  .option('--settings <filePath>', 'Meteor settings file', setSettingsPath)
-  .option('--config <filePath>', 'mup.js config file', setConfigPath)
-  .option(
-    '--verbose',
-    'Print more output while building and running tasks on server'
-  )
-  .on('--help', function() {
-    console.log('   Commands:');
+function addModuleCommands(builder, module, moduleName) {
+  Object.keys(module.commands).forEach(commandName => {
+    let command = module.commands[commandName];
+    command.builder = command.builder || {};
 
-    function listModuleCommands(commands) {
-      Object.keys(commands).forEach(command => {
-        if (command === 'default') {
-          listModuleCommands(commands['default']);
-          return;
-        }
-        console.log(`     ${command}`);
-      });
-    }
-
-    listModuleCommands(modules);
-
-    console.log('');
-    console.log('    For list of subcommands, run ');
-    console.log('      mup <command> help');
-  })
-  .parse(process.argv);
-
-if (program.args.length === 0) {
-  program.help();
-  process.exit(0);
-}
-
-function argAction(arg, subarg) {
-  let moduleArg = arg;
-  let command = subarg;
-
-  if (!command && !modules[moduleArg]) {
-    command = moduleArg;
-    moduleArg = 'default';
-  }
-
-  if (moduleArg === 'default' && command === 'help') {
-    program.help();
-    process.exit();
-  }
-
-  let module;
-
-  if (modules[moduleArg]) {
-    module = modules[moduleArg];
-  } else {
-    console.error(`No such module ${moduleArg}`);
-    program.help();
-    process.exit(1);
-  }
-
-  if (!command) {
-    if (moduleArg === 'default') {
-      program.help();
-    } else {
-      module.help(args);
-    }
-    process.exit(0);
-  }
-
-  if (!module[command]) {
-    console.error('error: unknown command %s', command);
-    if (moduleArg === 'default') {
-      program.help();
-      process.exit(1);
-    }
-
-    module.help(args);
-    process.exit(1);
-  }
-
-  if (program.settings) {
-    let settingsIndex = argIndex(args, '--settings');
-
-    if (args[settingsIndex].indexOf('--settings=') === 0) {
-      args.splice(settingsIndex, 1);
-    } else {
-      args.splice(settingsIndex, 2);
-    }
-  }
-
-  if (program.config) {
-    let configIndex = argIndex(args, '--config');
-
-    if (args[configIndex].indexOf('--config=') === 0) {
-      args.splice(configIndex, 1);
-    } else {
-      args.splice(configIndex, 2);
-    }
-  }
-
-  checkUpdates().then(() => {
-    const base = process.cwd();
-    const api = new MupAPI(
-      base,
-      args,
-      configPath,
-      settingsPath,
-      program.verbose
+    builder.command(
+      command.name || commandName,
+      command.description,
+      command.builder,
+      commandWrapper(moduleName, commandName)
     );
-    let potentialPromise;
-    try {
-      potentialPromise = module[command](api);
-    } catch (e) {
-      console.dir(e);
-    }
-    if (potentialPromise && typeof potentialPromise.then === 'function') {
-      potentialPromise.catch(e => {
-        if (e.nodemiralHistory instanceof Array) {
-          // Error is from nodemiral when running a task list
-          // Nodemiral already displayed the error to the user
-          return;
-        }
-        console.log('error ======================');
-        console.error(e);
-      });
-    }
   });
 }
 
-function argIndex(list, string) {
-  for (let i = 0; i < list.length; i++) {
-    if (list[i].indexOf(string) === 0) {
-      return i;
-    }
+function commandWrapper(pluginName, commandName) {
+  return function() {
+    checkUpdates()
+      .then(() => {
+        const rawArgv = process.argv.slice(2);
+        const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
+        const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
+        let potentialPromise;
+
+        try {
+          potentialPromise = api.runCommand(`${pluginName}.${commandName}`);
+        } catch (e) {
+          api._commandErrorHandler(e);
+        }
+
+        if (potentialPromise && typeof potentialPromise.then === 'function') {
+          potentialPromise.catch(api._commandErrorHandler);
+        }
+      })
+      .catch(e => {
+        console.error(e);
+      });
+  };
+}
+
+// Load config before creating commands
+const preAPI = new MupAPI(process.cwd(), process.argv, yargs.argv);
+const config = preAPI.getConfig(false);
+
+// Load plugins
+if (config.plugins instanceof Array) {
+  loadPlugins(
+    config.plugins.map(plugin => {
+      return {
+        name: plugin,
+        path: locatePluginDir(plugin, preAPI.configPath, preAPI.app ? preAPI.app.path : '')
+      };
+    })
+  );
+}
+
+// Load hooks
+if (config.hooks) {
+  Object.keys(config.hooks).forEach(key => {
+    registerHook(key, config.hooks[key]);
+  });
+}
+
+let program = yargs
+  .usage(`\nUsage: ${chalk.yellow('mup')} <command> [args]`)
+  .version(pkg.version)
+  .alias('version', 'V')
+  .global('version', false)
+  .option('settings', {
+    description: 'Path to Meteor settings file',
+    requiresArg: true,
+    string: true
+  })
+  .option('config', {
+    description: 'Path to mup.js config file',
+    requiresArg: true,
+    string: true
+  })
+  .option('servers', {
+    description: 'Comma separated list of servers to use',
+    requiresArg: true,
+    string: true
+  })
+  .option('verbose', {
+    description: 'Print output from build and server scripts',
+    boolean: true
+  })
+  .option('show-hook-names', {
+    description: 'Prints names of the available hooks as the command runs',
+    boolean: true
+  })
+  .strict(true)
+  .alias('help', 'h')
+  .epilogue(
+  'For more information, read the docs at https://github.com/zodern/meteor-up'
+  )
+  .help('help');
+
+Object.keys(modules).forEach(moduleName => {
+  if (moduleName !== 'default' && modules[moduleName].commands) {
+    yargs.command(
+      moduleName,
+      modules[moduleName].description,
+      subYargs => {
+        addModuleCommands(subYargs, modules[moduleName], moduleName);
+      },
+      () => {
+        yargs.showHelp('log');
+      }
+    );
+  } else if (moduleName === 'default') {
+    addModuleCommands(yargs, modules[moduleName], moduleName);
   }
-  return -1;
-}
+});
 
-function handleErrors(e) {
-  console.log(e.name, e.message);
-  process.exit(1);
-}
+program = program.argv;
 
-function setSettingsPath(settingsPathArg) {
-  settingsPath = settingsPathArg;
+if (program._.length === 0) {
+  yargs.showHelp();
 }
-
-function setConfigPath(configPathArg) {
-  configPath = configPathArg;
-}
-
-process.on('uncaughtException', handleErrors);

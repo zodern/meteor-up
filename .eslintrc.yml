@@ -35,7 +35,7 @@ ecmaFeatures:
   templateStrings: true
   unicodeCodePointEscapes: true
 rules:
-  babel/arrow-parens:
+  arrow-parens:
   - 2
   - as-needed
   array-bracket-spacing:
@@ -240,6 +240,7 @@ rules:
   quotes:
   - 2
   - single
+  - avoidEscape: true
   radix: 2
   require-yield: 2
   semi:
