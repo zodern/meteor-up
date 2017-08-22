@@ -104,7 +104,7 @@ let program = yargs
   .strict(true)
   .alias('help', 'h')
   .epilogue(
-  'For more information, read the docs at https://github.com/zodern/meteor-up'
+    'For more information, read the docs at http://zodern.github.io/meteor-up/docs.html'
   )
   .help('help');
 
