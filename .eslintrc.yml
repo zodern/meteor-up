@@ -7,33 +7,34 @@ env:
   es6: true
   node: true
   mocha: true
-ecmaVersion: 2017
-ecmaFeatures:
-  accessor-pairs: 2
-  arrowFunctions: true
-  binaryLiterals: true
-  blockBindings: true
-  classes: true
-  defaultParams: true
-  destructuring: true
-  experimentalObjectRestSpread: true
-  forOf: true
-  generators: true
-  globalReturn: true
-  jsx: true
-  modules: true
-  objectLiteralComputedProperties: true
-  objectLiteralDuplicateProperties: true
-  objectLiteralShorthandMethods: true
-  objectLiteralShorthandProperties: true
-  octalLiterals: true
-  regexUFlag: true
-  regexYFlag: true
-  restParams: true
-  spread: true
-  superInFunctions: true
-  templateStrings: true
-  unicodeCodePointEscapes: true
+parserOptions:
+  ecmaVersion: 2017
+  ecmaFeatures:
+    accessor-pairs: 2
+    arrowFunctions: true
+    binaryLiterals: true
+    blockBindings: true
+    classes: true
+    defaultParams: true
+    destructuring: true
+    experimentalObjectRestSpread: true
+    forOf: true
+    generators: true
+    globalReturn: true
+    jsx: true
+    modules: true
+    objectLiteralComputedProperties: true
+    objectLiteralDuplicateProperties: true
+    objectLiteralShorthandMethods: true
+    objectLiteralShorthandProperties: true
+    octalLiterals: true
+    regexUFlag: true
+    regexYFlag: true
+    restParams: true
+    spread: true
+    superInFunctions: true
+    templateStrings: true
+    unicodeCodePointEscapes: true
 rules:
   arrow-parens:
   - 2

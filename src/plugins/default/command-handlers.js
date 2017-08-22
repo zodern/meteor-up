@@ -99,7 +99,7 @@ export function stop(api) {
 
 export function ssh(api) {
   const servers = api.getConfig().servers;
-  const serverOption = api.getArgs()[1]
+  const serverOption = api.getArgs()[1];
 
   if (!(serverOption in servers)) {
     console.log('mup ssh <server>');

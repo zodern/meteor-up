@@ -304,9 +304,9 @@ export default class PluginAPI {
       }
 
       if (
-          this._enabledSessions.length > 0 &&
+        this._enabledSessions.length > 0 &&
           this._enabledSessions.indexOf(name) === -1
-        ) {
+      ) {
         continue;
       }
 
