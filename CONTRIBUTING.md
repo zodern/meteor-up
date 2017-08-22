@@ -34,3 +34,17 @@ Since we are using docker inside docker for parallel testing, `Aufs` storage dri
 ## Adding Tests
 Write tests for plugins in `<meteor-up dir>/src/plugins/<plugin name>/__tests__/index.js`.
 To run the test in parallel, add a matching regex to the `<meteor-up dir>/tests/tests.list` on a new line.
+
+## Test options
+`--watch`
+
+`-g <regex>`
+
+`--path <test files>` Defaults to `src/**/__tests__/**/*.js`
+
+`--plugin <plugin name>` Runs tests for plugin. Overrides `--path`
+
+For example:
+```
+npm test -- --watch
+```

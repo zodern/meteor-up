@@ -17,6 +17,9 @@ module.exports = {
       ROOT_URL: 'http://' + servers.mymeteor.host + '.com',
       MONGO_URL: 'mongodb://' + servers.mymongo.host + '/meteor'
     },
+    docker: {
+      image: 'abernix/meteord:base'
+    },
     deployCheckWaitTime: 300
   },
   mongo: {

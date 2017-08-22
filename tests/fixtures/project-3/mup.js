@@ -1,8 +1,7 @@
 var path = require('path');
-var servers = require('../servers')
+var servers = require('../servers');
 
 var meteorPath = path.resolve('..', 'helloapp');
-
 
 module.exports = {
   servers: servers,
@@ -11,12 +10,16 @@ module.exports = {
     name: 'myapp',
     path: '../helloapp',
     servers: {
-      mymeteor: {},
+      mymeteor: {}
     },
 
     env: {
       ROOT_URL: 'http://' + servers.mymeteor.host + '.com',
-      MONGO_URL: 'mongodb://' + servers.mymongo.host + '/meteor',
+      MONGO_URL: 'mongodb://' + servers.mymongo.host + '/meteor'
+    },
+
+    docker: {
+      image: 'abernix/meteord:base'
     },
 
     deployCheckWaitTime: 300

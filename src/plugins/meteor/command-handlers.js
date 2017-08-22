@@ -1,6 +1,5 @@
-import { cloneDeep } from 'lodash';
-
 import buildApp from './build.js';
+import { cloneDeep } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
@@ -113,8 +112,8 @@ export async function push(api) {
       console.log('Unable to use previous build. It doesn\'t exist.');
     } else {
       rebuild = false;
-      console.log('Not rebuilding app. Using build from previous deploy at');
-      console.log(`${buildOptions.buildLocation}`);
+      console.log('Not building app. Using build from previous deploy at');
+      console.log(buildOptions.buildLocation);
     }
   }
 
@@ -143,6 +142,8 @@ export async function push(api) {
       };
     }
   }
+
+  config.docker.image = config.docker.image || 'kadirahq/meteord';
 
   const prepareSupported = config.docker.image.indexOf('abernix/meteord') === 0;
   const supportedScript = api.resolvePath(

@@ -27,8 +27,6 @@
     "build:watch": "npm run build -s -- -w",
     "pretest": "npm run lint",
     "test": "node ./tests/run.js",
-    "test:watch": "bash ./tests/run-watch.sh",
-    "test:integration": "mocha --compilers js:babel-register --require babel-polyfill src/plugins/**/__tests__/**/*.js",
     "test:module": "mocha --compilers js:babel-register --require babel-polyfill ",
     "test:parallel": "bash ./tests/run-parallel.sh",
     "test:unit": "cross-env NODE_ENV=test nyc --all mocha --compilers js:babel-register --require babel-polyfill src/**/*.unit.js",

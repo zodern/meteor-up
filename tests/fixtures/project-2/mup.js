@@ -24,6 +24,9 @@ module.exports = {
     log: {
       driver: 'syslog'
     },
+    docker: {
+      image: 'abernix/meteord:base'
+    },
     deployCheckWaitTime: 300
   },
   mongo: {
