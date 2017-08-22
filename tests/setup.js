@@ -4,6 +4,7 @@ var path = require('path');
 var fs = require('fs');
 var keypair = require('keypair');
 var forge = require('node-forge');
+var argv = require('yargs').argv;
 
 if (process.platform !== 'win32') {
   var installCommands = [
@@ -52,7 +53,7 @@ if (images.output.length === 0) {
 }
 
 images = sh.exec('docker images -aq mup-tests-server-docker');
-if (images.output.length === 0) {
+if (images.output.length === 0 && !argv.skipPull) {
   console.log('building image');
   var commands = [
     'docker build -f ./Dockerfile_docker -t mup-tests-server-docker .',

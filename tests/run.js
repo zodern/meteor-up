@@ -14,7 +14,7 @@ sh.env['PROD_SERVER_PEM'] = path.resolve(mupDir, 'tests/fixtures/ssh/new');
 
 var volume = `-v ${keyPath}:/root/.ssh/authorized_keys`;
 var publish = '-p 127.0.0.1:3500:22';
-var image = 'mup-tests-server-docker';
+var image = argv.skipPull ? 'mup-tests-server' : 'mup-tests-server-docker';
 
 var containerId = sh.exec(
   `docker run ${volume} ${publish} --privileged -d -t ${image} /sbin/my_init`

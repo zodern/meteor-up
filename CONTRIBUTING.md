@@ -44,6 +44,8 @@ To run the test in parallel, add a matching regex to the `<meteor-up dir>/tests/
 
 `--plugin <plugin name>` Runs tests for plugin. Overrides `--path`
 
+`--skip-pull` To speedup running the tests, it creates a docker image before the first run that has docker installed and has pulled all of the images used during the tests. This option disables creating or using the image.
+
 For example:
 ```
 npm test -- --watch

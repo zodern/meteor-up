@@ -18,4 +18,4 @@ services:
 before_script:
   - echo 'DOCKER_OPTS="--storage-driver=devicemapper"' | sudo tee --append /etc/default/docker >/dev/null && sudo service docker restart
 
-script: npm run test -- --plugin="$TEST_PLUGIN"
+script: npm run test -- --plugin="$TEST_PLUGIN" --skip-pull
