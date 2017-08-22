@@ -26,7 +26,7 @@ echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
 sudo cat <<EOT > /opt/$APPNAME/config/vhost.d/default
 proxy_buffer_size          128k;
 proxy_buffers              4 256k;
-proxy_busy_buffers_size    256k;;
+proxy_busy_buffers_size    256k;
 EOT
 
 <% if(typeof clientUploadLimit === 'number') { %>
