@@ -12,10 +12,9 @@ export function improveErrors(error) {
     );
   } else if (error.type === 'object.without') {
     error.message = error.message.replace(
-        ' conflict with forbidden peer ',
-        ' and '
-      ) +
-      ' cannot both be defined';
+      ' conflict with forbidden peer ',
+      ' and '
+    ) + ' cannot both be defined';
   } else if (error.type === 'object.min') {
     error.message = error.message.replace('.value', '');
   }

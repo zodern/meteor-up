@@ -110,6 +110,24 @@ export function getDockerLogs(name, sessions, args) {
   return Promise.all(promises);
 }
 
+export function createSSHOptions(server) {
+  var sshAgent = process.env.SSH_AUTH_SOCK;
+  var ssh = {
+    host: server.host,
+    port: (server.opts && server.opts.port) || 22,
+    username: server.username
+  };
+
+  if (server.pem) {
+    ssh.privateKey = fs.readFileSync(resolvePath(server.pem), 'utf8');
+  } else if (server.password) {
+    ssh.password = server.password;
+  } else if (sshAgent && fs.existsSync(sshAgent)) {
+    ssh.agent = sshAgent;
+  }
+  return ssh;
+}
+
 // Maybe we should create a new npm package
 // for this one. Something like 'sshelljs'.
 export function runSSHCommand(info, command) {

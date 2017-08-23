@@ -168,11 +168,6 @@ export function start(api) {
 
 export function stop(api) {
   log('exec => mup proxy stop');
-  const config = api.getConfig().proxy;
-  if (!config) {
-    console.error('error: no configs found for proxy');
-    process.exit(1);
-  }
 
   const list = nodemiral.taskList('Stop proxy');
 

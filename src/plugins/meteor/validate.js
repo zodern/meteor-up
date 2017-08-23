@@ -24,6 +24,7 @@ const schema = joi.object().keys({
     imageFrontendServer: joi.string(),
     args: joi.array().items(joi.string()),
     bind: joi.string().trim(),
+    prepareBundle: joi.bool(),
     networks: joi
       .array()
       .items(joi.string())
@@ -44,8 +45,8 @@ const schema = joi.object().keys({
       ROOT_URL: joi
         .string()
         .regex(
-        new RegExp('^(http|https)://', 'i'),
-        'valid url with "http://" or "https://"'
+          new RegExp('^(http|https)://', 'i'),
+          'valid url with "http://" or "https://"'
         )
         .required(),
       MONGO_URL: joi.string()

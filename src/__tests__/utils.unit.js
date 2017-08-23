@@ -34,7 +34,7 @@ describe('utils', function() {
       };
 
       utils.runTaskList(list, {}, {verbose: true})
-      .then(() => { cb(); });
+        .then(() => { cb(); });
     });
 
     it('should reject if a task failed', cb => {

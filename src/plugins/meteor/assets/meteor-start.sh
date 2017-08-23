@@ -7,7 +7,7 @@ IMAGE=mup-<%= appName %>
 
 # save the last known version
 cd $APP_DIR
-if docker image inspect $IMAGE:latest >/dev/null; then
+if sudo docker image inspect $IMAGE:latest >/dev/null; then
   echo "using image"
   sudo rm -rf current
 else
@@ -19,10 +19,10 @@ else
   sudo mkdir current
   sudo cp tmp/bundle.tar.gz current/
 
-  docker rmi $IMAGE:previous || true
+  sudo docker rmi $IMAGE:previous || true
 fi
 
-if docker image inspect $IMAGE:previous >/dev/null; then
+if sudo docker image inspect $IMAGE:previous >/dev/null; then
   echo "removing last"
   sudo rm -rf last
 fi

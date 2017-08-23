@@ -11,14 +11,14 @@ const schema = joi.object().keys({
 });
 
 export default function(
-    config,
-    {
-      combineErrorDetails,
-      serversExist,
-      addLocation,
-      VALIDATE_OPTIONS
-   }
-  ) {
+  config,
+  {
+    combineErrorDetails,
+    serversExist,
+    addLocation,
+    VALIDATE_OPTIONS
+  }
+) {
   let details = [];
 
   let validationErrors = joi.validate(config.mongo, schema, VALIDATE_OPTIONS);

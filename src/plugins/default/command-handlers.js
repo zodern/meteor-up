@@ -1,6 +1,7 @@
 import debug from 'debug';
 import fs from 'fs';
 import sh from 'shelljs';
+import { Client } from 'ssh2';
 
 const log = debug('mup:module:default');
 
@@ -94,4 +95,41 @@ export function start(api) {
 export function stop(api) {
   log('exec => mup stop');
   return api.runCommand('meteor.stop');
+}
+
+export function ssh(api) {
+  const servers = api.getConfig().servers;
+  const serverOption = api.getArgs()[1];
+
+  if (!(serverOption in servers)) {
+    console.log('mup ssh <server>');
+    console.log('Available servers are:\n', Object.keys(servers).join('\n'));
+    process.exitCode = 1;
+    return;
+  }
+
+  const server = servers[serverOption];
+  const sshOptions = api._createSSHOptions(server);
+
+  var conn = new Client();
+  conn.on('ready', function() {
+    conn.shell(function(err, stream) {
+      if (err) { throw err; }
+      stream.on('close', function() {
+        conn.end();
+        process.exit();
+      });
+
+      process.stdin.setRawMode(true);
+      process.stdin.pipe(stream);
+
+      stream.pipe(process.stdout);
+      stream.stderr.pipe(process.stderr);
+      stream.setWindow(process.stdout.rows, process.stdout.columns);
+
+      process.stdout.on('resize', () => {
+        stream.setWindow(process.stdout.rows, process.stdout.columns);
+      });
+    });
+  }).connect(sshOptions);
 }

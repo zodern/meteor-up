@@ -6,7 +6,7 @@ import joi from 'joi';
 const schema = joi.object().keys().pattern(/.*/, {
   host: joi
     .alternatives(
-    joi.string().trim()
+      joi.string().trim()
     )
     .required(),
   username: joi.string().required(),
