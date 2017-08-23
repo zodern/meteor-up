@@ -13,19 +13,19 @@ ENV_FILE=$APP_PATH/config/env.list
 ENV_FILE_LETSENCRYPT=$APP_PATH/config/env_letsencrypt.list
 
 # Remove previous version of the app, if exists
-docker rm -f $APPNAME
-docker network disconnect bridge -f $APPNAME
+sudo docker rm -f $APPNAME
+sudo docker network disconnect bridge -f $APPNAME
 echo "Removed $APPNAME"
 
 # Remove let's encrypt containers if exists
-docker rm -f $APPNAME-letsencrypt
-docker network disconnect bridge -f $APPNAME-nginx-proxy
+sudo docker rm -f $APPNAME-letsencrypt
+sudo docker network disconnect bridge -f $APPNAME-nginx-proxy
 echo "Removed $APPNAME-letsencrypt"
 
 # We don't need to fail the deployment because of a docker hub downtime
 set +e
-docker pull jrcs/letsencrypt-nginx-proxy-companion:latest
-docker pull jwilder/nginx-proxy
+sudo docker pull jrcs/letsencrypt-nginx-proxy-companion:latest
+sudo docker pull jwilder/nginx-proxy
 set -e
 echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
 
@@ -37,7 +37,7 @@ echo $NGINX_CONFIG > /opt/$APPNAME/config/nginx-default.conf
 # client_max_body_size  clientUploadLimit ;
 # EOT
 
-docker run \
+sudo docker run \
   -d \
   -p $HTTP_PORT:80 \
   -p $HTTPS_PORT:443 \
@@ -55,7 +55,7 @@ docker run \
 echo "Ran nginx-proxy as $APPNAME"
 
 sleep 2s
-docker run -d \
+sudo docker run -d \
   --name $APPNAME-letsencrypt \
   --env-file=$ENV_FILE_LETSENCRYPT \
   --restart=always \
@@ -63,4 +63,3 @@ docker run -d \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
   jrcs/letsencrypt-nginx-proxy-companion
 echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
-
