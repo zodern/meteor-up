@@ -8,12 +8,15 @@ START_SCRIPT=$APP_DIR/config/start.sh
 IMAGE=mup-<%= appName %> 
 
 build_failed() {
-  docker start $APPNAME || true
+  sudo docker start $APPNAME || true
   exit 2
 }
 
-docker pull <%= dockerImage %>
-docker stop $APPNAME || true
+set +e
+sudo docker pull <%= dockerImage %>
+set -e
+
+sudo docker stop $APPNAME || true
 
 cd $APP_DIR/tmp
 
@@ -29,12 +32,12 @@ COPY ./ /built_app
 RUN cd /built_app/programs/server && npm install --unsafe-perm
 EOT
 
-docker build -t $IMAGE:build . || build_failed
+sudo docker build -t $IMAGE:build . || build_failed
 
 sudo rm -rf bundle
 
-docker start $APPNAME || true
+sudo docker start $APPNAME || true
 
-docker tag $IMAGE:latest $IMAGE:previous || true
-docker tag $IMAGE:build $IMAGE:latest
-docker image prune -f
+sudo docker tag $IMAGE:latest $IMAGE:previous || true
+sudo docker tag $IMAGE:build $IMAGE:latest
+sudo docker image prune -f

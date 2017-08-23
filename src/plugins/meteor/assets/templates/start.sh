@@ -13,7 +13,7 @@ IMAGE=mup-<%= appName %>:latest
 VOLUME="--volume=$BUNDLE_PATH:/bundle"
 LOCAL_IMAGE=false
 
-docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
+sudo docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
 
 if [ $IMAGE == mup-<%= appName %>:latest  ]; then
   VOLUME=""
@@ -27,36 +27,36 @@ echo "Volume" $VOLUME
 >&2 echo "Removing docker containers. Errors about nonexistent endpoints and containers are normal.";
 
 # Remove previous version of the app, if exists
-docker rm -f $APPNAME
+sudo docker rm -f $APPNAME
 
 # Remove container network if still exists
-docker network disconnect bridge -f $APPNAME
+sudo docker network disconnect bridge -f $APPNAME
 <% for(var network in docker.networks) { %>
-docker network disconnect <%=  docker.networks[network] %> -f $APPNAME
+sudo docker network disconnect <%=  docker.networks[network] %> -f $APPNAME
 <% } %>
 
 # Remove frontend container if exists
-docker rm -f $APPNAME-frontend
-docker network disconnect bridge -f $APPNAME-frontend
+sudo docker rm -f $APPNAME-frontend
+sudo docker network disconnect bridge -f $APPNAME-frontend
 
 # Remove let's encrypt containers if exists
-docker rm -f $APPNAME-nginx-letsencrypt
-docker network disconnect bridge -f $APPNAME-nginx-letsencrypt
+sudo docker rm -f $APPNAME-nginx-letsencrypt
+sudo docker network disconnect bridge -f $APPNAME-nginx-letsencrypt
 
-docker rm -f $APPNAME-nginx-proxy
-docker network disconnect bridge -f $APPNAME-nginx-proxy
+sudo docker rm -f $APPNAME-nginx-proxy
+sudo docker network disconnect bridge -f $APPNAME-nginx-proxy
 
 >&2 echo "Finished removing docker containers"
 
 # We don't need to fail the deployment because of a docker hub downtime
 if [ $LOCAL_IMAGE == "false" ]; then
   set +e
-  docker pull <%= docker.image %>
+  sudo docker pull <%= docker.image %>
   set -e
   echo "Pulled <%= docker.image %>"
 fi
 
-docker run \
+sudo docker run \
   -d \
   --restart=always \
   $VOLUME \
@@ -97,12 +97,12 @@ EOT
 
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
-    docker pull jrcs/letsencrypt-nginx-proxy-companion:$LETS_ENCRYPT_VERSION
-    docker pull jwilder/nginx-proxy:$NGINX_PROXY_VERSION
+    sudo docker pull jrcs/letsencrypt-nginx-proxy-companion:$LETS_ENCRYPT_VERSION
+    sudo docker pull jwilder/nginx-proxy:$NGINX_PROXY_VERSION
     set -e
 
     echo "Pulled autogenerate images"
-    docker run -d -p 80:80 -p 443:443 \
+    sudo docker run -d -p 80:80 -p 443:443 \
       --name $APPNAME-nginx-proxy \
       --restart=always \
       -e "DEFAULT_HOST=<%= sslConfig.autogenerate.domains.split(',')[0] %>" \
@@ -115,7 +115,7 @@ EOT
       echo "Ran nginx-proxy"
     sleep 15s
 
-    docker run -d \
+    sudo docker run -d \
       --name $APPNAME-nginx-letsencrypt \
       --restart=always\
       --volumes-from $APPNAME-nginx-proxy \
@@ -126,9 +126,9 @@ EOT
     <% } else { %>
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
-    docker pull <%= docker.imageFrontendServer %>
+    sudo docker pull <%= docker.imageFrontendServer %>
     set -e
-    docker run \
+    sudo docker run \
       -d \
       --restart=always \
       --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
@@ -141,5 +141,5 @@ EOT
 <% } %>
 
 <% for(var network in docker.networks) { %>
-  docker network connect <%=  docker.networks[network] %> $APPNAME
+  sudo docker network connect <%=  docker.networks[network] %> $APPNAME
 <% } %>

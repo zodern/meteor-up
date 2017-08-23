@@ -31,6 +31,7 @@ export default class PluginAPI {
     this.runTaskList = utils.runTaskList;
     this.getDockerLogs = utils.getDockerLogs;
     this.runSSHCommand = utils.runSSHCommand;
+    this._createSSHOptions = utils.createSSHOptions;
   }
 
   getArgs() {
@@ -226,6 +227,8 @@ export default class PluginAPI {
     return;
   };
   _commandErrorHandler(e) {
+    process.exitCode = 1;
+
     if (e.nodemiralHistory instanceof Array) {
       // Error is from nodemiral when running a task list.
       // Nodemiral should have already displayed the error
@@ -233,7 +236,6 @@ export default class PluginAPI {
     }
 
     console.error(e);
-    process.exitCode = 1;
   }
   runCommand = async function(name) {
     if (!name) {
@@ -302,9 +304,9 @@ export default class PluginAPI {
       }
 
       if (
-          this._enabledSessions.length > 0 &&
+        this._enabledSessions.length > 0 &&
           this._enabledSessions.indexOf(name) === -1
-        ) {
+      ) {
         continue;
       }
 

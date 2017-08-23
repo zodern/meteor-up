@@ -126,7 +126,7 @@ module.exports = {
       ]
     },
 
-     // list of servers to deploy to, from the 'servers' list
+    // list of servers to deploy to, from the 'servers' list
     servers: {
       one: {},
       two: {},
@@ -157,7 +157,7 @@ module.exports = {
       // your app url for mobile app access
       server: 'http://app.com',
 
-       // adds --allow-incompatible-updates arg to build command
+      // adds --allow-incompatible-updates arg to build command
       allowIncompatibleUpdates: true,
 
       // Executable used to build the meteor project
@@ -914,7 +914,7 @@ module.exports = {
           alias: 'f',
           description: 'Follow log output'
         })
-        .strict(false);
+          .strict(false);
       },
 
       // This is called when the command is run.

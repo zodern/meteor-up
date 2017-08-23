@@ -22,7 +22,7 @@ function generateSchema() {
       method: joi.func()
     }),
     joi.func()
-  ))
+    ))
   };
 
   Object.keys(_pluginValidators).forEach(key => {

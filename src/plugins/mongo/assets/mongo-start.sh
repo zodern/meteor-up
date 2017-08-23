@@ -5,13 +5,15 @@ MONGO_VERSION=<%= mongoVersion %>
 set -e
 
 sudo mkdir -p <%= mongoDbDir %>
-
 sudo docker pull mongo:$MONGO_VERSION
+
 set +e
-docker update --restart=no mongodb
-docker exec mongodb mongod --shutdown
+
+sudo docker update --restart=no mongodb
+sudo docker exec mongodb mongod --shutdown
 sleep 2
 sudo docker rm -f mongodb
+
 set -e
 
 echo "Running mongo:<%= mongoVersion %>"

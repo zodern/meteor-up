@@ -26,8 +26,8 @@ minimumMinor=13
 
 # Is docker already installed?
 set +e
-hasDocker=$(docker version | grep "version")
-serverVersion=$(docker version --format '{{.Server.Version}}')
+hasDocker=$(sudo docker version | grep "version")
+serverVersion=$(sudo docker version --format '{{.Server.Version}}')
 parsedVersion=( ${serverVersion//./ })
 majorVersion="${parsedVersion[0]}"
 minorVersion="${parsedVersion[1]}"
