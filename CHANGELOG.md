@@ -1,6 +1,7 @@
 ## Next
 - Add `mup ssh <server>` command
 - Exit code when task list fails is now 1 instead of 0
+- Fix running scripts when default server's shell is zsh @thsowers
 - All docker commands are run with `sudo`
 - `mup proxy stop` doesn't require the `proxy` object to be in the config
 - Add option `app.docker.prepareBundle` to enable or disable prepare bundle
