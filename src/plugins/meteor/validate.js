@@ -24,6 +24,7 @@ const schema = joi.object().keys({
     imageFrontendServer: joi.string(),
     args: joi.array().items(joi.string()),
     bind: joi.string().trim(),
+    prepareBundle: joi.bool(),
     networks: joi
       .array()
       .items(joi.string())
