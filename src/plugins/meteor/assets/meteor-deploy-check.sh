@@ -1,3 +1,5 @@
+#!/bin/bash
+
 APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
 IMAGE=mup-<%= appName %>
@@ -48,7 +50,7 @@ while [[ true ]]; do
     <% if (host) { %> --header "HOST:$HOST" <% } %>  \
     && exit 0 
 
-  if [ "$elaspsed" == "$DEPLOY_CHECK_WAIT_TIME" ]; then
+  if [ "$elaspsed" "==" "$DEPLOY_CHECK_WAIT_TIME" ]; then
     revert_app
     exit 1
   fi
