@@ -1,4 +1,4 @@
-## Next
+## 1.3.0 - August 22, 2017
 
 **Hooks**
 
@@ -14,7 +14,7 @@ Plugins are npm packages that can add commands (commands can be run from the mup
 
 After the bundle is uploaded to each server, a new task is run called "Prepare bundle". It installs the Meteor npm dependencies, rebuilds native modules, and stores the result in a docker image. This has a few benefits:
 - The time in `meteor.deployCheckWaitTime` no longer needs to include the time to install npm dependencies
-- When installing dependencies fails, it does not continuously restart until `meteor.deployCheckWaitTime` expires, and it shows the full logs from `npm install`
+- When installing dependencies fails, it does not continuously restart until `meteor.deployCheckWaitTime` expires, and running with `--verbose` shows the full logs from `npm install`
 - Dependencies are only installed once during each deploy. This means that `mup start`, `mup restart`, and `mup reconfig` are all much faster.
 
 **Improved Support for Multiple Servers**
@@ -23,17 +23,17 @@ After the bundle is uploaded to each server, a new task is run called "Prepare b
 - Add support for server specific env variables, which can be configured in `meteor.servers.<server name>.env`
 
 **Config Changes**
-- The `meteor` object has been renamed to `app`. `meteor` will be supported until Mup 2.0
-- You can remove `mongo.port` and `mongo.oplog` from your config since they have never been used.
+- The `meteor` object has been renamed to `app`. The `meteor` object will be supported until Mup 2.0
+- You can remove `mongo.port` and `mongo.oplog` from your config since they have never been used
 
 **Docs**
 - Remove `meteor.docker.imagePort`, `mongo.port`, and `mongo.oplog` from example configs
 - Document `meteor.docker.imagePort`
 - Update documentation for `meteor.deployCheckWaitTime`
-- Improve mongo, migration, and troubleshooting docs
+- Improve mongo, migration, proxy, and troubleshooting docs
 
 **Other Changes**
-- The reverse proxy can redirect `http` to `https`, configured in `proxy.ssl.forceSSL`
+- The reverse proxy can redirect `http` to `https`, configured with `proxy.ssl.forceSSL`
 - `mup setup` updates Docker if it is older than 1.13
 - Add `mup proxy reconfig-shared` to update the server after changing `proxy.shared` in the config.
 - Remove `meteor.deployCheckWaitTime`, `meteor.docker.imagePort`, and `mongo.port` from default config
@@ -42,9 +42,9 @@ After the bundle is uploaded to each server, a new task is run called "Prepare b
 - Show link to docs when there are validation errors
 - Show validation error when `server.pem` is a path to a public key
 - Show validation error when `app.name` has a period
+- Improve some of the validation messages
 - Fix validating `proxy.shared.clientUploadLimit`
 - Mup displays message and exits if the node version is older than v4
-- Improve some of the validation messages
 - Remove unnecessary stack traces when the app's path is incorrect or `meteor build` fails
 - Add `mup meteor restart` command
 - Remove `mup mongo dump` command since it did nothing
