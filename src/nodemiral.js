@@ -27,4 +27,41 @@ function copy(session, _options, callback) {
   doCopy();
 }
 
+function executeScript(session, _options, callback, varsMapper) {
+  const options = clone(_options);
+  if (typeof options.hostVars === 'object' && options.hostVars[session._host]) {
+    options.vars = merge(options.vars, options.hostVars[session._host]);
+  }
+
+  session.executeScript(options.script, options, createCallback(callback, varsMapper));
+}
+
+function createCallback(cb, varsMapper) {
+  return function (err, code, logs) {
+    logs.stderr = logs.stderr || '';
+    logs.stdout = logs.stdout || '';
+
+    if (err) {
+      return cb(err);
+    }
+    if (code > 0) {
+      let message = `
+      ------------------------------------STDERR------------------------------------
+      ${logs.stderr.substring(logs.stderr.length - 2000)}
+      ------------------------------------STDOUT------------------------------------
+      ${logs.stdout.substring(logs.stdout.length - 2000)}
+      ------------------------------------------------------------------------------      
+      `
+      return callback(new Error(message));
+    }
+
+    if (varsMapper) {
+      varsMapper(logs.stdout, logs.stderr);
+    }
+
+    cb();
+  }
+}
+
 nodemiral.registerTask('copy', copy);
+nodemiral.registerTask('executeScript', executeScript);
