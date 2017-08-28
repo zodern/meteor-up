@@ -9,7 +9,7 @@ IMAGE=mup-<%= appName %>
 cd $APP_DIR
 if sudo docker image inspect $IMAGE:latest >/dev/null; then
   echo "using image"
-  sudo rm -rf current
+  sudo rm -rf current || true
 else
   echo "using bundle"
   sudo rm -rf last
