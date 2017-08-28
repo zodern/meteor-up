@@ -1,3 +1,7 @@
+## Next
+- App's env varaibles are set before `npm install` during prepare bundle
+- Fix error sometimes encountered after updating Mup to 1.3
+
 ## 1.3.1 - August 23, 2017
 - Add `mup ssh <server>` command
 - Exit code when task list fails is now 1 instead of 0
