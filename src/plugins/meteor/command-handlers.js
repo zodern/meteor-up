@@ -163,7 +163,8 @@ export async function push(api) {
     script: prepareSupported ? supportedScript : unsupportedScript,
     vars: {
       appName: config.name,
-      dockerImage: config.docker.image
+      dockerImage: config.docker.image,
+      env: config.env
     }
   });
 

@@ -29,7 +29,9 @@ sudo cat <<EOT > Dockerfile
 FROM <%= dockerImage %>
 RUN mkdir /built_app
 COPY ./ /built_app
-RUN cd /built_app/programs/server && npm install --unsafe-perm
+RUN cd  /built_app/programs/server && \
+    <% for(var key in env) { %> <%- key %>=<%- env[key] %> <% } %> && \
+    npm install --unsafe-perm
 EOT
 
 sudo docker build -t $IMAGE:build . || build_failed
