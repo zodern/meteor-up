@@ -5,9 +5,18 @@
         <ul class="nav-links">
             <li><a href="{{site.baseurl}}{% link getting-started.md %}">Tutorial</a></div>
             <li><a href="{{site.baseurl}}{% link docs.md %}">Docs</a></div>
-            <li><a href="https://gitter.im/meteor-up/Lobby">Chat</a></li>
+<!-- Remove and replace with gitter sidecar            <li><a href="https://gitter.im/meteor-up/Lobby">Chat</a></li> -->
         </ul>
     </nav>
+
+    <!-- Added gitter Sidecar -->
+    <script>
+      ((window.gitter = {}).chat = {}).options = {
+        room: 'meteor-up/Lobby'
+      };
+    </script>
+    <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+    <!-- End Gitter Sidecar -->
 
     <a href="https://github.com/zodern/meteor-up" class="github-corner" aria-label="View source on Github">
         <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#151513; position: absolute; top: 0; border: 0; right: 0;"
