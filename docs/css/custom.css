@@ -2,6 +2,10 @@ body {
     background-color: #141B2B;
 }
 
+.fix-shadow {
+    box-shadow: none;
+}
+
 .home-intro {
     background-image: url(/meteor-up/imgs/space-bg-shadowcodex.jpg);
     background-size: cover;
