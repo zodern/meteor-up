@@ -2,6 +2,10 @@ body {
     background-color: #141B2B;
 }
 
+.fix-shadow {
+    box-shadow: none;
+}
+
 .home-intro {
     background-image: url(/meteor-up/imgs/space-bg-shadowcodex.jpg);
     background-size: cover;
@@ -126,6 +130,7 @@ body {
 
 .footer-btn {
     margin-left: 5px;
+    margin-bottom: 5px;
 }
 
 footer {
@@ -137,8 +142,8 @@ footer {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    height: 100px;
-    padding: 0 10%;
+    min-height: 100px;
+    padding: 20px 5em 45px 5em;
 }
 
 .btn-primary {
