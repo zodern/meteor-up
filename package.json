@@ -17,7 +17,7 @@
   "bugs": {
     "url": "https://github.com/zodern/meteor-up/issues"
   },
-  "homepage": "https://github.com/zodern/meteor-up#readme",
+  "homepage": "http://meteor-up.com/",
   "bin": {
     "mup": "./index.js"
   },

@@ -8,7 +8,7 @@ You can install and use Meteor Up on Linux, Mac and Windows. It can deploy to se
 
 This version of Meteor Up is powered by [Docker](http://www.docker.com/), making deployment easy to manage and reducing server specific errors.
 
-Read the [getting started tutorial](http://zodern.github.io/meteor-up/getting-started.html).  
+Read the [getting started tutorial](http://meteor-up.com/getting-started.html).  
 
 ### Features
 
@@ -41,12 +41,12 @@ npm install -g mup
 `mup` should be installed on the computer you are deploying from.
 
 ### Using Mup
-- [Getting Started](http://zodern.github.io/meteor-up/getting-started.html)
-- [Docs](http://zodern.github.io/meteor-up/docs.html)
+- [Getting Started](http://meteor-up.com/getting-started.html)
+- [Docs](http://meteor-up.com/docs.html)
 
 ### Support
 
-First, look at the [troubleshooting](http://zodern.github.io/meteor-up/docs.html#troubleshooting) and [common problems](http://zodern.github.io/meteor-up/docs.html#common-problems) sections of the docs. You can also search the [github issues](https://github.com/zodern/meteor-up/issues).
+First, look at the [troubleshooting](http://meteor-up.com/docs.html#troubleshooting) and [common problems](http://http://meteor-up.com/docs.html#common-problems) sections of the docs. You can also search the [github issues](https://github.com/zodern/meteor-up/issues).
 
 If that doesn't solve the problem, you can:
 - [Create a Github issue](https://github.com/zodern/meteor-up/issues/new)
