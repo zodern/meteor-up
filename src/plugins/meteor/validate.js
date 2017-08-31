@@ -88,13 +88,13 @@ export default function(
     details,
     joi.validate(config.app, schema, VALIDATE_OPTIONS)
   );
-  if (config.app.name.indexOf(' ') > -1) {
+  if (config.app.name && config.app.name.indexOf(' ') > -1) {
     details.push({
       message: 'has a space',
       path: 'name'
     });
   }
-  if (config.app.name.indexOf('.') > -1) {
+  if (config.app.name && config.app.name.indexOf('.') > -1) {
     details.push({
       message: 'has a period',
       path: 'name'
