@@ -17,7 +17,7 @@
   "bugs": {
     "url": "https://github.com/zodern/meteor-up/issues"
   },
-  "homepage": "https://github.com/zodern/meteor-up#readme",
+  "homepage": "http://meteor-up.com/",
   "bin": {
     "mup": "./index.js"
   },
@@ -34,7 +34,8 @@
     "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" .",
     "lint:code": "eslint .",
     "lint:readme": "eslint --ext md .",
-    "docs": "cd docs && bundle exec jekyll serve"
+    "docs": "cd docs && bundle exec jekyll serve",
+    "postinstall": "opencollective postinstall"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -71,6 +72,7 @@
     "joi": "~10.6.0",
     "lodash": "^4.17.4",
     "nodemiral": "~1.1.1",
+    "opencollective": "^1.0.3",
     "parse-json": "^3.0.0",
     "random-seed": "~0.3.0",
     "resolve-from": "^3.0.0",
@@ -92,5 +94,10 @@
       "src/plugins/**",
       "**/__tests__/**"
     ]
+  },
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/meteor-up",
+    "logo": "https://opencollective.com/opencollective/logo.txt"
   }
 }

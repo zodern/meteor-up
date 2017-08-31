@@ -86,7 +86,7 @@ export default class PluginAPI {
       console.log(
         'Read the docs and view example configs at'
       );
-      console.log('    https://zodern.github.io/meteor-up/docs');
+      console.log('    http://meteor-up.com/docs');
       console.log('');
     }
 
