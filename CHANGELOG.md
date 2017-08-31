@@ -1,5 +1,5 @@
 ## Next
-- App's env varaibles are set before `npm install` during prepare bundle
+- App's env variables are set before `npm install` during Prepare Bundle
 - Fix error sometimes encountered after updating Mup to 1.3
 
 ## 1.3.1 - August 23, 2017
