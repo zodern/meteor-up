@@ -1,4 +1,4 @@
-# Meteor Up [![Backers on Open Collective](https://opencollective.com/meteor-up/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/meteor-up/sponsors/badge.svg)](#sponsors) [![Travis branch](https://img.shields.io/travis/zodern/meteor-up/master.svg?style=flat-square)](https://travis-ci.org/zodern/meteor-up/) [![Code Climate](https://img.shields.io/codeclimate/github/zodern/meteor-up.svg?style=flat-square)](https://codeclimate.com/github/zodern/meteor-up) [![Gitter](https://img.shields.io/gitter/room/meteor-up/Lobby.svg?style=flat-square)](https://gitter.im/meteor-up/Lobby)
+# Meteor Up [![Travis branch](https://img.shields.io/travis/zodern/meteor-up/master.svg?style=flat-square)](https://travis-ci.org/zodern/meteor-up/) [![Code Climate](https://img.shields.io/codeclimate/github/zodern/meteor-up.svg?style=flat-square)](https://codeclimate.com/github/zodern/meteor-up) [![Gitter](https://img.shields.io/gitter/room/meteor-up/Lobby.svg?style=flat-square)](https://gitter.im/meteor-up/Lobby) [![Backers on Open Collective](https://opencollective.com/meteor-up/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/meteor-up/sponsors/badge.svg)](#sponsors)
 
 #### Production Quality Meteor Deployments
 
@@ -21,6 +21,8 @@ Read the [getting started tutorial](http://meteor-up.com/getting-started.html).
 * Access logs from the terminal (supports log tailing)
 * Support for custom docker images
 * Support for Let's Encrypt and custom SSL certificates
+
+[Roadmap](ROADMAP.md)
 
 ### Server Configuration
 
