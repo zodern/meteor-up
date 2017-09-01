@@ -1,6 +1,10 @@
 ## Next
 - App's env variables are set before `npm install` during Prepare Bundle
 - Fix error sometimes encountered after updating Mup to 1.3
+- Periods are removed from the database name when using built-in MongoDB
+- Removed validation error `"meteor.name" has a period`
+- Fix reverse proxy let's encrypt and force ssl not working when `app.env` is missing
+- Fix crash when `app.name` is missing
 
 ## 1.3.1 - August 23, 2017
 - Add `mup ssh <server>` command

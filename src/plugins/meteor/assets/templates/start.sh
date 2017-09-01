@@ -67,7 +67,6 @@ sudo docker run \
   <% } %> \
   --hostname="$HOSTNAME-$APPNAME" \
   --env-file=$ENV_FILE \
-  <% if(useLocalMongo)  { %>--link=mongodb:mongodb --env=MONGO_URL=mongodb://mongodb:27017/$APPNAME <% } %> \
   <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %> \
   <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %> \
   <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %> \

@@ -94,12 +94,6 @@ export default function(
       path: 'name'
     });
   }
-  if (config.app.name && config.app.name.indexOf('.') > -1) {
-    details.push({
-      message: 'has a period',
-      path: 'name'
-    });
-  }
   if (
     typeof config.app.ssl === 'object' &&
     'autogenerate' in config.app.ssl &&
