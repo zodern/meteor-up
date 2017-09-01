@@ -5,7 +5,7 @@ set -e
 APP_DIR=/opt/<%= appName %>
 APPNAME=<%= appName %>
 START_SCRIPT=$APP_DIR/config/start.sh
-IMAGE=mup-<%= appName %>
+IMAGE=mup-<%= appName.toLowerCase() %>
 
 build_failed() {
   sudo docker start $APPNAME || true

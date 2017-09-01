@@ -3,7 +3,7 @@
 set -e
 
 APP_DIR=/opt/<%=appName %>
-IMAGE=mup-<%= appName %>
+IMAGE=mup-<%= appName.toLowerCase() %>
 
 # save the last known version
 cd $APP_DIR
@@ -28,4 +28,4 @@ if sudo docker image inspect $IMAGE:previous >/dev/null; then
 fi
 
 # start app
-sudo bash config/start.sh 
+sudo bash config/start.sh
