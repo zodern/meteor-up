@@ -26,3 +26,10 @@ sudo docker run \
   --volume=/opt/mongodb/mongodb.conf:/mongodb.conf \
   --name=mongodb \
   mongo:$MONGO_VERSION mongod -f /mongodb.conf
+
+sleep 3
+
+echo "Creating replica set"
+
+sudo docker exec mongodb mongo --eval \
+  'rs.initiate({_id: "meteor", members: [{_id: 0, host: "127.0.0.1:27017"}]});'
