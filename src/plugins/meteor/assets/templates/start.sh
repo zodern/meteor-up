@@ -9,13 +9,14 @@ PORT=<%= port %>
 BIND=<%= bind %>
 NGINX_PROXY_VERSION=latest
 LETS_ENCRYPT_VERSION=latest
-IMAGE=mup-<%= appName %>:latest
+APP_IMAGE=mup-<%= appName.toLowerCase() %>
+IMAGE=$APP_IMAGE:latest
 VOLUME="--volume=$BUNDLE_PATH:/bundle"
 LOCAL_IMAGE=false
 
 sudo docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
 
-if [ $IMAGE == mup-<%= appName %>:latest  ]; then
+if [ $IMAGE == $APP_IMAGE:latest  ]; then
   VOLUME=""
   LOCAL_IMAGE=true
 fi
@@ -67,7 +68,6 @@ sudo docker run \
   <% } %> \
   --hostname="$HOSTNAME-$APPNAME" \
   --env-file=$ENV_FILE \
-  <% if(useLocalMongo)  { %>--link=mongodb:mongodb --env=MONGO_URL=mongodb://mongodb:27017/$APPNAME <% } %> \
   <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %> \
   <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %> \
   <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %> \

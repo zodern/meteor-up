@@ -163,7 +163,8 @@ export async function push(api) {
     script: prepareSupported ? supportedScript : unsupportedScript,
     vars: {
       appName: config.name,
-      dockerImage: config.docker.image
+      dockerImage: config.docker.image,
+      env: config.env
     }
   });
 
@@ -232,7 +233,6 @@ export function envconfig(api) {
     dest: '/opt/' + config.name + '/config/start.sh',
     vars: {
       appName: config.name,
-      useLocalMongo: api.getConfig().mongo ? 1 : 0,
       port: config.env.PORT || 80,
       bind: bindAddress,
       sslConfig: config.ssl,

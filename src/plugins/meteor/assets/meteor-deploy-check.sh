@@ -2,7 +2,7 @@
 
 APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
-IMAGE=mup-<%= appName %>
+IMAGE=mup-<%= appName.toLowerCase() %>
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
 DEPLOY_CHECK_URL=<%= `localhost:${deployCheckPort}${deployCheckPath}` %>
@@ -14,7 +14,7 @@ revert_app (){
   sudo docker logs --tail=100 $APPNAME 1>&2
 
   if sudo docker image inspect $IMAGE:previous >/dev/null; then
-    sudo docker tag $IMAGE:previous $IMAGE:latest 
+    sudo docker tag $IMAGE:previous $IMAGE:latest
     sudo bash $START_SCRIPT > /dev/null 2>&1
 
     echo " " 1>&2
@@ -29,8 +29,8 @@ revert_app (){
     echo "=> Redeploying previous version of the app" 1>&2
     echo " " 1>&2
   fi
-  
-  echo 
+
+  echo
   echo "To see more logs type 'mup logs --tail=100'"
   echo ""
 }
@@ -48,11 +48,10 @@ while [[ true ]]; do
     --insecure \
     $DEPLOY_CHECK_URL \
     <% if (host) { %> --header "HOST:$HOST" <% } %>  \
-    && exit 0 
+    && exit 0
 
   if [ "$elaspsed" "==" "$DEPLOY_CHECK_WAIT_TIME" ]; then
     revert_app
     exit 1
   fi
 done
- 

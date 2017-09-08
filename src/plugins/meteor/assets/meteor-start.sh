@@ -3,13 +3,13 @@
 set -e
 
 APP_DIR=/opt/<%=appName %>
-IMAGE=mup-<%= appName %>
+IMAGE=mup-<%= appName.toLowerCase() %>
 
 # save the last known version
 cd $APP_DIR
 if sudo docker image inspect $IMAGE:latest >/dev/null; then
   echo "using image"
-  sudo rm -rf current
+  sudo rm -rf current || true
 else
   echo "using bundle"
   sudo rm -rf last
@@ -28,4 +28,4 @@ if sudo docker image inspect $IMAGE:previous >/dev/null; then
 fi
 
 # start app
-sudo bash config/start.sh 
+sudo bash config/start.sh

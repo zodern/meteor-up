@@ -5,7 +5,7 @@ set -e
 APP_DIR=/opt/<%= appName %>
 APPNAME=<%= appName %>
 START_SCRIPT=$APP_DIR/config/start.sh
-IMAGE=mup-<%= appName %> 
+IMAGE=mup-<%= appName.toLowerCase() %>
 
 build_failed() {
   sudo docker start $APPNAME || true
@@ -29,7 +29,11 @@ sudo cat <<EOT > Dockerfile
 FROM <%= dockerImage %>
 RUN mkdir /built_app
 COPY ./ /built_app
-RUN cd /built_app/programs/server && npm install --unsafe-perm
+<% for(var key in env) { %>
+ENV <%- key %>=<%- env[key] %>
+<% } %>
+RUN cd  /built_app/programs/server && \
+    npm install --unsafe-perm
 EOT
 
 sudo docker build -t $IMAGE:build . || build_failed

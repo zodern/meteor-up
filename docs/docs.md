@@ -732,11 +732,15 @@ mup usually will let you know when there is an update available. You should try 
 ### Check Logs
 If you suddenly can't deploy your app anymore, first use the `mup logs -f` command to check the logs for error messages.
 
+You can also view logs for:
+- Built-in MongoDB with `mup mongo logs`
+- Reverse proxy with `mup proxy logs`
+
 ### Docker image
 Make sure that the docker image you are using supports your app's meteor version.
 
 ### Update Docker
-Some problems are caused by old versions of docker.
+Some problems are caused by old versions of docker. Since mup 1.3, `mup setup` and `mup docker setup` will update Docker if it is older than 1.13.
 
 ### Increase RAM
 Some problems are caused by the server running out of ram.
@@ -782,7 +786,7 @@ This error happens when your config gets bundled with the app. Try moving it and
 
 ### Mup silently fails, mup.js file opens instead, or you get a Windows script error
 
-If you are using windows, make sure you run commands with `mup.cmd <command>` instead of `mup <command>`.
+If you are using Windows, make sure you run commands with `mup.cmd <command>` instead of `mup <command>`, or use PowerShell.
 If it silently fails for a different reason, please create an issue.
 
 ### Error: spawn meteor ENOENT

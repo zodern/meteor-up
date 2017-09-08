@@ -11,9 +11,11 @@ export const validate = {
 };
 
 export function prepareConfig(config) {
-  if (!config.app || !config.app.env || !config.proxy) {
+  if (!config.app || !config.proxy) {
     return config;
   }
+
+  config.app.env = config.app.env || {};
 
   config.app.env['VIRTUAL_HOST'] = config.proxy.domains;
 
