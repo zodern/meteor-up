@@ -1,4 +1,4 @@
-## Next
+## 1.3.2 - September 8, 2017
 - App's env variables are set before `npm install` during Prepare Bundle
 - Fix error sometimes encountered when starting app after updating Mup to 1.3
 - Periods are removed from the database name when using built-in MongoDB
