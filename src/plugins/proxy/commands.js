@@ -19,6 +19,15 @@ export const logs = {
   handler: handlers.logs
 };
 
+export const leLogs = {
+  name: 'logs-le',
+  description: 'View logs for Let\'s Encrypt',
+  builder(yargs) {
+    return yargs.strict(false);
+  },
+  handler: handlers.leLogs
+}
+
 export const envconfig = {
   description: 'Configure environment variables for proxy',
   handler: handlers.envconfig
