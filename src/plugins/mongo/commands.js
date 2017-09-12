@@ -1,21 +1,21 @@
-import * as commandFunctions from './command-handlers';
+import * as commandHandlers from './command-handlers';
 
 export let setup = {
   description: 'Installs and starts MongoDB',
-  handler: commandFunctions.setup
+  handler: commandHandlers.setup
 };
 
 export let logs = {
   description: 'View MongoDB logs',
-  handler: commandFunctions.logs
+  handler: commandHandlers.logs
 };
 
 export let start = {
   description: 'Start MongoDB',
-  handler: commandFunctions.start
+  handler: commandHandlers.start
 };
 
 export let stop = {
   description: 'Stop MongoDB',
-  handler: commandFunctions.stop
+  handler: commandHandlers.stop
 };

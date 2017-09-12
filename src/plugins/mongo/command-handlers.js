@@ -3,14 +3,6 @@ import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:mongo');
 
-export function dump() {
-  log('exec => mup mongo dump');
-}
-
-export function help() {
-  log('exec => mup mongo help');
-}
-
 export function logs(api) {
   log('exec => mup mongo logs');
 

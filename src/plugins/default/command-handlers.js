@@ -136,7 +136,7 @@ export function ssh(api) {
 
 export function validate(api) {
   // Shows validation errors
-  api.getConfig()
+  api.getConfig();
 
   if (api.getOptions()['show']) {
     console.log(JSON.stringify(api.getConfig(), null, 2));

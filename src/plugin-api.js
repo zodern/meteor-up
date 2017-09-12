@@ -151,7 +151,7 @@ export default class PluginAPI {
           [
             'It does not exist.',
             '',
-            `You can create the file with "mup init" or add the option`,
+            'You can create the file with "mup init" or add the option',
             '"--settings path/to/settings.json" to load it from a',
             'different location.'
           ].forEach(text => console.log(text));
@@ -163,7 +163,7 @@ export default class PluginAPI {
       } catch (e) {
         console.log('Error parsing settings file:');
         console.log(e.message);
-        
+
         process.exit(1);
       }
     }
