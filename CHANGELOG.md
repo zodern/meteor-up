@@ -1,4 +1,4 @@
-## Next
+## 1.3.3 - September 12, 2017
 - Add `mup validate` command, which validates the config. Has `--show` option which shows the config after it has been normalized and modified by plugin's `prepareConfig` functions
 - Add `mup proxy logs-le` to view the Let's Encrypt logs
 - Fix mup ignoring `app.dockerImage` in the config when using Mongo, the reverse proxy, or Redis
