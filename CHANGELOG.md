@@ -1,3 +1,10 @@
+## Next
+- Add `mup validate` command, which validates the config. Has `--show` option which shows the config after it has been normalized and modified by plugin's `prepareConfig` functions
+- Add `mup proxy logs-le` to view the Let's Encrypt logs
+- Fix mup ignoring `app.dockerImage` in the config when using Mongo, the reverse proxy, or Redis
+- Fix error encountered during Verifying SSL Certificates after it had failed previously due to a docker container still running
+- Give more details when unable to load settings.json
+
 ## 1.3.2 - September 8, 2017
 - App's env variables are set before `npm install` during Prepare Bundle
 - Fix error sometimes encountered when starting app after updating Mup to 1.3

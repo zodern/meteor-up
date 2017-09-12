@@ -1,13 +1,13 @@
-import * as commandFunctions from './command-handlers';
+import * as commandHandlers from './command-handlers';
 
 export let setup = {
   description: 'Install and start docker',
-  handler: commandFunctions.setup
+  handler: commandHandlers.setup
 };
 
 export let restart = {
   description: 'Restart docker daemon',
-  handler: commandFunctions.restart
+  handler: commandHandlers.restart
 };
 
 export let ps = {
@@ -15,5 +15,5 @@ export let ps = {
   builder(builder) {
     return builder.strict(false);
   },
-  handler: commandFunctions.ps
+  handler: commandHandlers.ps
 };

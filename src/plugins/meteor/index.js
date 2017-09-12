@@ -16,6 +16,17 @@ export const validate = {
   }
 };
 
+export function prepareConfig(config) {
+  if (!config.app) {
+    return config;
+  }
+
+  config.app.docker = config.app.docker || {};
+  config.app.docker.image = config.app.docker.image || config.app.dockerImage || 'kadirahq/meteord';
+  delete config.app.dockerImage;
+  return config;
+}
+
 export let hooks = {
   'post.default.setup'(api) {
     const config = api.getConfig();

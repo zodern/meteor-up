@@ -130,21 +130,6 @@ export async function push(api) {
     progressBar: config.enableUploadProgressBar
   });
 
-  if (!config.docker) {
-    if (config.dockerImage) {
-      config.docker = {
-        image: config.dockerImage
-      };
-      delete config.dockerImage;
-    } else {
-      config.docker = {
-        image: 'kadirahq/meteord'
-      };
-    }
-  }
-
-  config.docker.image = config.docker.image || 'kadirahq/meteord';
-
   let prepareSupported = config.docker.image.indexOf('abernix/meteord') === 0;
   if ('prepareBundle' in config.docker) {
     prepareSupported = config.docker.prepareBundle;
@@ -200,18 +185,6 @@ export function envconfig(api) {
     bindAddress = config.docker.bind;
   }
 
-  if (!config.docker) {
-    if (config.dockerImage) {
-      config.docker = {
-        image: config.dockerImage
-      };
-      delete config.dockerImage;
-    } else {
-      config.docker = {
-        image: 'kadirahq/meteord'
-      };
-    }
-  }
   if (config.dockerImageFrontendServer) {
     config.docker.imageFrontendServer = config.dockerImageFrontendServer;
   }

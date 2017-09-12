@@ -64,3 +64,14 @@ export let ssh = {
   description: 'SSH into server',
   handler: commandHandlers.ssh
 };
+
+export let validate = {
+  description: 'validate config',
+  builder(yargs) {
+    return yargs.option('show', {
+      description: 'Show config after being modified by plugins',
+      bool: true
+    });
+  },
+  handler: commandHandlers.validate
+};

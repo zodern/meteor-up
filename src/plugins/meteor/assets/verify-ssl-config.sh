@@ -3,6 +3,7 @@
 APPNAME=<%= name %>
 DUMMY_SERVER_NAME=$APPNAME-dummy-http-server-for-ssl-check
 
+sudo docker rm -f $DUMMY_SERVER_NAME || true
 sudo docker run \
   -d \
   --name $DUMMY_SERVER_NAME \

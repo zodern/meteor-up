@@ -19,6 +19,26 @@ export function logs(api) {
   return api.getDockerLogs(PROXY_CONTAINER_NAME, sessions, args);
 }
 
+export function leLogs(api) {
+  log('exec => mup proxy le-logs');
+  const config = api.getConfig().proxy;
+
+  if (!config) {
+    console.error('error: no configs found for proxy');
+    process.exit(1);
+  }
+
+  const args = api.getArgs().slice(1);
+  args[0] = 'logs';
+  const sessions = api.getSessions(['app']);
+
+  return api.getDockerLogs(
+    `${PROXY_CONTAINER_NAME}-letsencrypt`,
+    sessions,
+    args
+  );
+}
+
 export function setup(api) {
   log('exec => mup proxy setup');
   const config = api.getConfig().proxy;

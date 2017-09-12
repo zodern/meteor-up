@@ -133,3 +133,12 @@ export function ssh(api) {
     });
   }).connect(sshOptions);
 }
+
+export function validate(api) {
+  // Shows validation errors
+  api.getConfig();
+
+  if (api.getOptions()['show']) {
+    console.log(JSON.stringify(api.getConfig(), null, 2));
+  }
+}
