@@ -11,6 +11,7 @@ import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
 import { runConfigPreps } from './prepare-config';
+import serverInfo from './server-info';
 
 const { resolvePath } = utils;
 
@@ -267,7 +268,12 @@ export default class PluginAPI {
       return potentialPromise.then(() => this._runPostHooks(name));
     }
     return await this._runPostHooks(name);
-  };
+  }
+
+  getServerInfo() {
+    const servers = Object.values(this.getConfig().servers);
+    return serverInfo(null, servers);
+  }
 
   getSessions(modules = []) {
     const sessions = this._pickSessions(modules);

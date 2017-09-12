@@ -19,6 +19,7 @@ function uniqueSessions(api) {
 }
 
 export function setup(api) {
+  api.getServerInfo();
   log('exec => mup docker setup');
   const list = nodemiral.taskList('Setup Docker');
 
