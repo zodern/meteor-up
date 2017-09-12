@@ -147,6 +147,14 @@ export default class PluginAPI {
         console.log(`Unable to load settings.json at ${filePath}`);
         if (e.code !== 'ENOENT') {
           console.log(e);
+        } else {
+          [
+            'It does not exist.',
+            '',
+            `You can create the file with "mup init" or add the option`,
+            '"--settings path/to/settings.json" to load it from a',
+            'different location.'
+          ].forEach(text => console.log(text));
         }
         process.exit(1);
       }
@@ -155,6 +163,7 @@ export default class PluginAPI {
       } catch (e) {
         console.log('Error parsing settings file:');
         console.log(e.message);
+        
         process.exit(1);
       }
     }
