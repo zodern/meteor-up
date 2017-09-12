@@ -166,7 +166,7 @@ describe('PluginAPI', () => {
 
   describe('_normalizeConfig', () => {
     it('should copy meteor object to app', () => {
-      const expected = { meteor: { path: '../' }, app: { type: 'meteor', path: '../' } };
+      const expected = { meteor: { path: '../' }, app: { type: 'meteor', path: '../', docker: { image: 'kadirahq/meteord' } } };
       const config = { meteor: { path: '../' } };
       const result = api._normalizeConfig(config);
 
