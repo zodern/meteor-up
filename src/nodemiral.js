@@ -33,11 +33,15 @@ function executeScript(session, _options, callback, varsMapper) {
     options.vars = merge(options.vars, options.hostVars[session._host]);
   }
 
-  session.executeScript(options.script, options, createCallback(callback, varsMapper));
+  session.executeScript(
+    options.script,
+    options,
+    createCallback(callback, varsMapper)
+  );
 }
 
 function createCallback(cb, varsMapper) {
-  return function (err, code, logs) {
+  return function(err, code, logs) {
     logs.stderr = logs.stderr || '';
     logs.stdout = logs.stdout || '';
 
@@ -51,8 +55,8 @@ function createCallback(cb, varsMapper) {
       ------------------------------------STDOUT------------------------------------
       ${logs.stdout.substring(logs.stdout.length - 2000)}
       ------------------------------------------------------------------------------      
-      `
-      return callback(new Error(message));
+      `;
+      return cb(new Error(message));
     }
 
     if (varsMapper) {
@@ -60,7 +64,7 @@ function createCallback(cb, varsMapper) {
     }
 
     cb();
-  }
+  };
 }
 
 nodemiral.registerTask('copy', copy);
