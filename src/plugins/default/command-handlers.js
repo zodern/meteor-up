@@ -99,13 +99,17 @@ export function stop(api) {
 
 export function ssh(api) {
   const servers = api.getConfig().servers;
-  const serverOption = api.getArgs()[1];
+  let serverOption = api.getArgs()[1];
 
   if (!(serverOption in servers)) {
+    if (Object.keys(servers).length === 1) {
+      serverOption = Object.keys(servers)[0];
+    } else {
     console.log('mup ssh <server>');
     console.log('Available servers are:\n', Object.keys(servers).join('\n'));
     process.exitCode = 1;
     return;
+  }
   }
 
   const server = servers[serverOption];
