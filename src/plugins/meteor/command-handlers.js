@@ -200,6 +200,8 @@ export function envconfig(api) {
     config.ssl.port = config.ssl.port || 443;
   }
 
+  const list = nodemiral.taskList('Configuring App');
+
   if (config.nginx.configPath) {
     list.copy('Pushing the nginx config', {
       src: config.nginx.configPath,
@@ -208,7 +210,6 @@ export function envconfig(api) {
     });
   }
 
-  const list = nodemiral.taskList('Configuring App');
   list.copy('Pushing the Startup Script', {
     src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
     dest: '/opt/' + config.name + '/config/start.sh',
