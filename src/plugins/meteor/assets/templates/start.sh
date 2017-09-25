@@ -106,7 +106,7 @@ EOT
       --name $APPNAME-nginx-proxy \
       --restart=always \
       -e "DEFAULT_HOST=<%= sslConfig.autogenerate.domains.split(',')[0] %>" \
-      -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
+      -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/00my_proxy.conf:ro \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
       -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
