@@ -90,7 +90,7 @@ sleep 15s
     wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl -O /opt/$APPNAME/config/nginx.tmpl
 
     # Update nginx config based on user input or default passed by js
-sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
+sudo cat <<EOT >> /opt/$APPNAME/config/nginx-default.conf
 client_max_body_size $CLIENTSIZE;
 EOT
 
