@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/plugins/default/index.js"],"names":["_commands","commands"],"mappings":";;;;;;;AAAA;;IAAYA,S;;;;AAEL,IAAIC,8BAAWD,SAAf","file":"index.js","sourcesContent":["import * as _commands from './commands';\r\n\r\nexport let commands = _commands;\r\n"]}

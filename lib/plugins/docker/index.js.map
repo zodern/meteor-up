@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/plugins/docker/index.js"],"names":["_commands","description","commands"],"mappings":";;;;;;;AAAA;;IAAYA,S;;;;AAEL,IAAMC,oCAAc,yBAApB;AACA,IAAMC,8BAAWF,SAAjB","file":"index.js","sourcesContent":["import * as _commands from './commands';\r\n\r\nexport const description = 'Setup and manage docker';\r\nexport const commands = _commands;\r\n"]}
