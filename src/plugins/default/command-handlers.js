@@ -141,4 +141,9 @@ export function validate(api) {
   if (api.getOptions()['show']) {
     console.log(JSON.stringify(api.getConfig(), null, 2));
   }
+
+  const errors = api.validateConfig('');
+  if (errors.length > 0) {
+    process.exitCode = 1;
+  }
 }

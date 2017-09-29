@@ -85,6 +85,16 @@ module.exports = {
       opts: {
         port: 22
       }
+    },
+    two: {
+      host: '5.6.7.8',
+      username: 'root',
+      pem: '~/.ssh/id_rsa'
+    },
+    three: {
+      host: '2.3.4.5',
+      username: 'root',
+      password: 'password'
     }
   },
 
@@ -356,13 +366,14 @@ In the staging `mup.js`, add a field called `appName` with the value `staging`. 
 
 Next, add the proxy object to both configs. For your production app, it would be:
 
-```ts
-{
-  ...
+```js
+module.exports = {
+  // ... rest of config
+
   proxy: {
     domains: 'myapp.com'
   }
-}
+};
 ```
 
 For the staging app, `proxy.domains` would be `staging.myapp.com`.
@@ -416,15 +427,17 @@ This currently is an experimental feature. This means that the configuration mig
 
 Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` section:
 
-```ts
-{
-  ...
+```js
+module.exports = {
+  // ... rest of config
+
   proxy: {
     // comma-separated list of domains your website
     // will be accessed at.
     // You will need to configure your DNS for each one.
     domains: 'website.com,www.website.com'
-}
+  }
+};
 ```
 
 You need to stop each app deployed to the servers:
@@ -440,38 +453,49 @@ mup reconfig
 
 ### SSL
 Add an `ssl` object to your `proxy` config:
-```ts
-{
-  ...
+```js
+module.exports = {
+  // ... rest of config
+
   proxy: {
-    ...
+    domains: 'website.com,www.website.com',
     ssl: {
       // Enable let's encrypt to create free certificates
       letsEncryptEmail: 'email@domain.com'
     }
   }
-}
+};
 ```
 
 If you are using custom certificates instead, it would look like:
-```ts
-proxy: {
-  ssl: {
-    crt: './bundle.crt',
-    key: './private.pem',
+```js
+module.exports = {
+  // .. rest of config
+
+  proxy: {
+    domains: 'website.com,www.website.com',
+    ssl: {
+      crt: './bundle.crt',
+      key: './private.pem'
+    }
   }
-}
+};
 ```
 
 ### Redirect http to https
 
 In your config, add:
-```ts
-proxy: {
-  ssl: {
-    forceSSL: true
+```js
+module.exports = {
+  // ... rest of config
+
+  proxy: {
+    domains: 'website.com,www.website.com',
+    ssl: {
+      forceSSL: true
+    }
   }
-}
+};
 ```
 
 It uses HSTS. This means that if you set it to `false` after it's been true, the browser used by anyone that visited it while it was set to true will still be redirected to `https` for one year.
@@ -479,10 +503,15 @@ It uses HSTS. This means that if you set it to `false` after it's been true, the
 ### Advanced configuration
 The `proxy.shared` object has settings that most apps won't need to change, but if they are they apply to every app using the proxy. After you change `proxy.shared`, you need to run `mup proxy reconfig-shared` for it to take effect.
 
-```ts
-{
+```js
+module.exports = {
+  // ... rest of config
+
   proxy: {
-    // Settings in "proxy.shared" will be applied to every app deployed on the servers.
+    domains: 'website.com,www.website.com',
+
+    // Settings in "proxy.shared" will be applied to every app
+    // deployed on the servers using the reverse proxy.
     // Everything is optional.
     // After changing this object, run `mup proxy reconfig-shared`
     shared: {
@@ -497,17 +526,23 @@ The `proxy.shared` object has settings that most apps won't need to change, but 
         DEFAULT_HOST: 'foo.bar.com'
       },
       // env for the jrcs/letsencrypt-nginx-proxy-companion container
-      envLetsencrypt: {
-      // Directory URI for the CA ACME API endpoint (default: https://acme-v01.api.letsencrypt.org/directory).
-      // If you set it's value to https://acme-staging.api.letsencrypt.org/directory letsencrypt will use test
-      // servers that don't have the 5 certs/week/domain limits.
-      ACME_CA_URI:  'https://acme-v01.api.letsencrypt.org/directory',
-      // Set it to true to enable debugging of the entrypoint script and generation of LetsEncrypt certificates,
-      // which could help you pin point any configuration issues.
-      DEBUG: true
-    },
+      envLetsEncrypt: {
+        // Directory URI for the CA ACME API endpoint 
+        // (default: https://acme-v01.api.letsencrypt.org/directory).
+        // If you set it's value to 
+        // https://acme-staging.api.letsencrypt.org/directory
+        // letsencrypt will use test servers that
+        // don't have the 5 certs/week/domain limits.
+        ACME_CA_URI: 'https://acme-v01.api.letsencrypt.org/directory',
+
+        // Set it to true to enable debugging of the entrypoint script and
+        // generation of LetsEncrypt certificates,
+        // which could help you pin point any configuration issues.
+        DEBUG: true
+      }
+    }
   }
-}
+};
 ```
 
 
@@ -609,16 +644,17 @@ It is recommended to use an external database instead of the one built-in to mup
 
 Add the `mongo` object to your config:
 
-```ts
-{
-  ...
+```js
+module.exports = {
+  // .. rest of config
+
   mongo: {
     version: '3.4.1',
     servers: {
       one: {}
     }
   }
-}
+};
 ```
 
 Before your first setup, it is recommended to change `mongo.version` to the newest version of MongoDB your app or meteor supports. After Mongo is started, it is more complex to upgrade it.
@@ -836,11 +872,12 @@ Then do `mup setup` and then `mup deploy`.
 ### Using Plugins
 
 Plugins are npm packages and can be installed with the `npm` tool. You can install them locally to the app or config folders, or globally (locally is recommended since it is easier for mup to find). After the plugin is installed, add a `plugin` array to your config:
-```ts
-{
-  ...
+```js
+module.exports = {
+  // ... rest of config
+
   plugins: ['name-of-plugin', 'name-of-other-plugin']
-}
+};
 ```
 
 ### List of plugins
