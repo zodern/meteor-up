@@ -30,10 +30,11 @@
     "test:module": "mocha --compilers js:babel-register --require babel-polyfill ",
     "test:parallel": "bash ./tests/run-parallel.sh",
     "test:unit": "cross-env NODE_ENV=test nyc --all mocha --compilers js:babel-register --require babel-polyfill src/**/*.unit.js",
-    "lint": "npm run lint:code && npm run lint:defaultConfig && npm run lint:readme",
+    "lint": "npm run lint:code && npm run lint:defaultConfig && npm run lint:readme && npm run lint:css",
     "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" .",
     "lint:code": "eslint .",
     "lint:readme": "eslint --ext md .",
+    "lint:css": "cd docs && stylelint css/*.css",
     "docs": "cd docs && bundle exec jekyll serve",
     "postinstall": "opencollective postinstall"
   },
@@ -57,7 +58,9 @@
     "mocha": "^3.2.0",
     "node-forge": "^0.7.1",
     "nyc": "^11.0.3",
-    "sinon": "^3.2.1"
+    "sinon": "^3.2.1",
+    "stylelint": "^8.1.1",
+    "stylelint-config-standard": "^17.0.0"
   },
   "dependencies": {
     "archiver": "^2.0.0",
