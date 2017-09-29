@@ -1,3 +1,12 @@
+## Next
+- The exit code for `mup validate` is now 1 when there are validation errors
+
+**Docs**
+- Color, font, and spacing changes were made to the docs
+- Fixed grammer and capitilization
+- Many example configs in the docs are validated with `mup validate`
+- Many example configs show more of the config surrounding the section being documented
+
 ## 1.3.3 - September 12, 2017
 - Add `mup validate` command, which validates the config. Has `--show` option which shows the config after it has been normalized and modified by plugin's `prepareConfig` functions
 - Add `mup proxy logs-le` to view the Let's Encrypt logs
