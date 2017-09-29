@@ -111,7 +111,7 @@ module.exports = {
         '--memory-reservation 200M' // memory reservation example
       ],
 
-      // Only used if using your own ssl certificates.
+      // Only used if using your own SSL certificates.
       // Default is "meteorhacks/mup-frontend-server" (optional)
       imageFrontendServer: 'meteorhacks/mup-frontend-server',
 
@@ -165,7 +165,7 @@ module.exports = {
       executable: 'meteor'
     },
     env: {
-      // If you are using ssl, this needs to start with https
+      // If you are using SSL, this needs to start with https
       ROOT_URL: 'http://app.com',
 
       MONGO_URL: 'mongodb://localhost/meteor'
@@ -185,7 +185,7 @@ module.exports = {
       // Enables let's encrypt (optional)
       autogenerate: {
         email: 'email.address@domain.com',
-        // Comma seperated list of domains
+        // Comma-seperated list of domains
         domains: 'website.com,www.website.com'
       }
     },
@@ -203,7 +203,7 @@ module.exports = {
     enableUploadProgressBar: true // default false.
   },
 
-  // (optional but remove it if you want to use a remote mongodb!)
+  // (optional but remove it if you want to use a remote MongoDB!)
   mongo: {
     // (optional), default is 3.4.1
     version: '3.4.1',
@@ -222,7 +222,7 @@ module.exports = {
 
 Running this locally will set up the remote servers you have specified in your config. It will take around 2-5 minutes depending on the server's performance and network availability.
 
-It is safe to run `mup setup` multiple times if needed. After making changes to custom ssl certificates, mongodb, or servers in your config, you need to run `mup setup` for the changes to take effect.
+It is safe to run `mup setup` multiple times if needed. After making changes to custom SSL certificates, MongoDB, or servers in your config, you need to run `mup setup` for the changes to take effect.
 
 ## Deploying an App
 
@@ -406,11 +406,11 @@ meteor: {
 
 ### Image Port
 
-You can set `meteor.docker.port` to the port to expose from the container. This does not effect the port the app is accessed on, only the port the app runs on inside the docker container.
+You can set `meteor.docker.port` to the port to expose from the container. This does not affect the port the app is accessed on, only the port the app runs on inside the docker container.
 
 ## Reverse Proxy
 
-Meteor Up can create a nginx reverse proxy that will handle ssl, and, if you are running multiple apps on the server, it will route requests to the correct app. The proxy is shared between all apps on the servers.
+Meteor Up can create a nginx reverse proxy that will handle SSL, and, if you are running multiple apps on the server, it will route requests to the correct app. The proxy is shared between all apps on the servers.
 
 This currently is an experimental feature. This means that the configuration might have breaking changes between releases until it is finalized. This will eventually replace the former nginx setup, configured using `meteor.ssl` and `meteor.nginx`.
 
@@ -420,9 +420,9 @@ Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` sectio
 {
   ...
   proxy: {
-    // comma separated list of domains your website
+    // comma-separated list of domains your website
     // will be accessed at.
-    // You will need to configure your dns for each one.
+    // You will need to configure your DNS for each one.
     domains: 'website.com,www.website.com'
 }
 ```
@@ -476,7 +476,7 @@ proxy: {
 
 It uses HSTS. This means that if you set it to `false` after it's been true, the browser used by anyone that visited it while it was set to true will still be redirected to `https` for one year.
 
-### Advance configuration
+### Advanced configuration
 The `proxy.shared` object has settings that most apps won't need to change, but if they are they apply to every app using the proxy. After you change `proxy.shared`, you need to run `mup proxy reconfig-shared` for it to take effect.
 
 ```ts
@@ -522,7 +522,7 @@ You can keep multiple configuration and settings files in the same directory and
     mup deploy --config=mup-staging.js --settings=staging-settings.json
 
 ## SSL Support
-Meteor UP can enable SSL support for your app. It can either autogenerate the certificates, or upload them from your dev computer.
+Meteor UP can enable SSL support for your app. It can either autogenerate the certificates or upload them from your dev computer.
 
 **If you are using the reverse proxy, follow [these instructions](#ssl) instead.**
 
@@ -545,7 +545,7 @@ meteor: {
 
 You also need to:
 1. Make sure `meteor.env.ROOT_URL` starts with `https://`
-2. Setup DNS for each of the domains in `meteor.ssl.autogenerate.domains`
+2. Set up DNS for each of the domains in `meteor.ssl.autogenerate.domains`
 
 Then run `mup deploy`. It will automatically create certificates and set up SSL, which can take up to a few minutes. The certificates will be automatically renewed when they expire within 30 days.
 
@@ -576,7 +576,7 @@ To learn more about SSL setup when using your own certificates, refer to the [`m
 
 ***This Only Works if you are using the Let's Encrypt Autogenerated SSL's***
 
-**If you are using the reverse proxy, follow [these instructions](#advance-configuration) instead.**
+**If you are using the reverse proxy, follow [these instructions](#advanced-configuration) instead.**
 
 If you would like to increase the client upload limits, you can change it by adding:
 ```ts
@@ -633,7 +633,7 @@ and
 mup deploy
 ```
 
-### Multiple apps use same database
+### Multiple apps use the same database
 It is possible for two apps to use the same database from the built-in MongoDB instance.
 
 In the config for one of the apps, follow the instructions for [Built-in Database](#built-in-database).
@@ -682,14 +682,14 @@ mongo: {
 
 If you have deployed to the server, it involves a couple more steps.
 
-1. Go to the [MongoDB manual](https://docs.mongodb.com/manual/) > Release Notes > Current version of Mongodb > Upgrade or Downgrade Standalone
+1. Go to the [MongoDB manual](https://docs.mongodb.com/manual/) > Release Notes > Current version of MongoDB > Upgrade or Downgrade Standalone
 2. Follow the directions listed there. You can access the MongoDB console by running `docker exec -it mongodb mongo` on the server.
-3. During the steps for install or replace binaries or restarting mongodb, instead change the version in your `mup.js` and run `mup setup`.
-4. To verify that it worked, run `docker ps` to check if mongodb keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
+3. During the steps for install or replace binaries or restarting MongoDB, instead change the version in your `mup.js` and run `mup setup`.
+4. To verify that it worked, run `docker ps` to check if MongoDB keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
 
 ## Hooks
 
-Hooks allow you to run a command or function before or after a cli command is run. The config looks like:
+Hooks allow you to run a command or function before or after a CLI command is run. The config looks like:
 
 ```js
 module.exports = {
@@ -716,7 +716,7 @@ module.exports = {
 
 The hook name format is `{pre or post}.topLevelCommand.subCommand`. For example, if you want a command to run after `mup deploy`, the hook name would be `post.deploy`. Or if you want it to run after `mup mongo restart`, the hook name would be `post.mongo.restart`.
 
-Some cli commands run other cli commands. For example, `mup setup` runs `mup docker setup` and `mup mongo setup`. To see all of the available hooks while a command runs, use the `--show-hook-names` option.
+Some CLI commands run other CLI commands. For example, `mup setup` runs `mup docker setup` and `mup mongo setup`. To see all of the available hooks while a command runs, use the `--show-hook-names` option.
 
 
 ## Updating Mup
@@ -760,7 +760,7 @@ If you need to see the output of `mup` (to see more precisely where it's failing
 
 where `<command>` is one of the `mup` commands such as `setup`, `deploy`, etc.
 
-The environment variable `DEBUG=mup*` gives more information on what the `mup` cli is doing.
+The environment variable `DEBUG=mup*` gives more information on what the `mup` CLI is doing.
 
 The `--verbose` flag shows output from commands and scripts run on the server.
 
@@ -770,7 +770,7 @@ The `--verbose` flag shows output from commands and scripts run on the server.
 
 If you do not see `=> Starting meteor app on port` in the logs, your app did not have enough time to start. Try increase `meteor.deployCheckWaitTime`.
 
-If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using ssl or not. If that did not fix it, create a new issue with your config and output from `mup deploy --verbose`.
+If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using SSL or not. If that did not fix it, create a new issue with your config and output from `mup deploy --verbose`.
 
 If you are using Meteor 1.3, you might see this error:
 ```
@@ -795,7 +795,7 @@ Make sure meteor is installed on the computer you are deploying from.
 
 ### Let's Encrypt is not working
 
-Make sure your `meteor.env.ROOT_URL` starts with `https://`. Also, check that the dns for all of the domains in `ssl.autogenerate.domains` is correctly configured to point to the server. Port 80 needs to be open in the server so it can verify that you control the domain.
+Make sure your `meteor.env.ROOT_URL` starts with `https://`. Also, check that the DNS for all of the domains in `ssl.autogenerate.domains` is correctly configured to point to the server. Port 80 needs to be open on the server so it can verify that you control the domain.
 
 You can view the Let's Encrypt logs by running this command on the server:
 ```
@@ -805,17 +805,17 @@ Replace `<AppName>` with the name of the app.
 
 ### Unwanted redirects to https
 
-Make sure `force-ssl` is not in `.meteor/versions`. If it is, either your app, or a package it uses has `force-ssl` as a dependency.
+Make sure `force-ssl` is not in `.meteor/versions`. If it is, either your app or a package it uses has `force-ssl` as a dependency.
 
 ## Migration Guide
 `mup` is not backward compatible with Meteor Up 0.x. or `mupx`.
 
 * Docker is now the runtime for Meteor Up
-* We don't have to use Upstart any more
+* We don't have to use Upstart anymore
 * You don't need to set up NodeJS version or PhantomJS manually (MeteorD will take care of it)
-* We use a mongodb docker container to run the local mongodb data (it uses the old mongodb location)
+* We use a mongodb docker container to run the local MongoDB data (it uses the old MongoDB location)
 * It uses Nginx and different SSL configurations
-* Now we don't re-build binaries. Instead we build for the `os.linux.x86_64` architecture. (This is the same thing what meteor-deploy does)
+* Now we don't re-build binaries. Instead, we build for the `os.linux.x86_64` architecture. (This is the same thing what meteor-deploy does)
 
 > Use a new server if you can. Then migrate DNS accordingly. That's the easiest and safest way.
 
@@ -823,9 +823,9 @@ Make sure `force-ssl` is not in `.meteor/versions`. If it is, either your app, o
 
 Let's assume our appName is `meteor`
 
-Remove old docker container with: `docker rm -f meteor`
-Remove old mongodb container with: `docker rm -f mongodb`
-If present remove nginx container with: `docker rm -f meteor-frontend`
+Remove old docker container with `docker rm -f meteor`
+Remove old mongodb container with `docker rm -f mongodb`
+If present remove nginx container with `docker rm -f meteor-frontend`
 
 The new config format is different from mupx.
 Run `mup init` to create a new config file.
@@ -835,7 +835,7 @@ Then do `mup setup` and then `mup deploy`.
 
 ### Using Plugins
 
-Plugins are npm packages, and can be installed with the `npm` tool. You can install them locally to the app or config folders, or globally (locally is recommended since it is easier for mup to find). After the plugin is installed, add a `plugin` array to your config:
+Plugins are npm packages and can be installed with the `npm` tool. You can install them locally to the app or config folders, or globally (locally is recommended since it is easier for mup to find). After the plugin is installed, add a `plugin` array to your config:
 ```ts
 {
   ...
@@ -845,17 +845,17 @@ Plugins are npm packages, and can be installed with the `npm` tool. You can inst
 
 ### List of plugins
 
-- [mup-disk](https://www.npmjs.com/package/mup-disk) Shows disk usage, and cleans up old files and docker items
-- [mup-redis](https://www.npmjs.com/package/mup-redis) Setup and manage Redis
+- [mup-disk](https://www.npmjs.com/package/mup-disk) Shows disk usage and cleans up old files and docker items
+- [mup-redis](https://www.npmjs.com/package/mup-redis) Set up and manage Redis
 - [mup-fix-bin-paths](https://www.npmjs.com/package/mup-fix-bin-paths) Fix npm bin paths that break deploying from Windows
 
 If you have created a plugin, create a pull request to add it to this list.
 
 Meteor Up comes with some built-in plugins. These include:
 - `default` Handles most of the top-level commands, such as `mup setup`, `mup init`, and `mup deploy`
-- `meteor` Adds the `meteor` top-level command, and adds meteor specific functionality to the `default` commands
-- `docker` Adds the `docker` top-level command, and sets-up docker
-- `mongo` Adds the `mongo` top-level command, and manages the MongoDB instance
+- `meteor` Adds the `meteor` top-level command and adds meteor specific functionality to the `default` commands
+- `docker` Adds the `docker` top-level command and sets-up docker
+- `mongo` Adds the `mongo` top-level command and manages the MongoDB instance
 
 ## Creating a plugin
 
@@ -898,10 +898,10 @@ module.exports = {
 
 Commands serve two purposes:
 
-1. They can be run from the mup cli
+1. They can be run from the mup CLI
 2. Commands can run other commands from the same plugin or other plugins
 
-Commands can optionally be hidden from the cli help if they are intended to only be run by other commands.
+Commands can optionally be hidden from the CLI help if they are intended to only be run by other commands.
 
 The command config is:
 ```js
@@ -942,7 +942,7 @@ You can also set the property `name` for a command, useful when the name has cha
 Hooks allow you to run a function before or after commands in other plugins.
 
 A couple examples:
-1. Your plugin needs to setup the servers with `mup setup`
+1. Your plugin needs to set up the servers with `mup setup`
 2. Your plugin deploys non-meteor apps, and needs to run with `mup deploy`
 3. Add environmental variables for the app before `mup reconfig`
 
@@ -972,7 +972,7 @@ You should never directly call a command handler function. Instead, you should u
 Returns a string. Is the folder the config should be in, and all paths are relative to.
 
 #### **getArgs()**
-The arguments given to mup, with global options removed (such as verbose, config, settings).
+The arguments that are given to mup, with global options removed (such as verbose, config, settings).
 
 #### **getVerbose()**
 Returns boolean. True if verbose is enabled.
@@ -1001,14 +1001,14 @@ Set a new config object. Plugins can use this to add env variables or make other
 #### **runCommand(commandName)**
 Runs the command, and it's pre and post hooks.
 
-`commandName` is in the format of `pluginName.commandName`. For example, `mongo.restart`, `docker.setup`, and `meteor.push` all all valid strings for `commandName`.
+`commandName` is in the format of `pluginName.commandName`. For example, `mongo.restart`, `docker.setup`, and `meteor.push` are all valid strings for `commandName`.
 
 It returns a promise.
 
 #### **getSessions(plugins[])**
 Returns array of sessions for the servers listed in the plugin's config, to use in nodemiral.
 
-For example, in the mup config, there are `app.servers`, and `mongo.servers`. If your plugin wants to access the servers running mongo, you would call `getSessions(['mongo'])`; If you wanted sessions for all of the servers, you can call `getSessions(['mongo', 'app'])`.
+For example, in the mup config, there are `app.servers` and `mongo.servers`. If your plugin wants to access the servers running mongo, you would call `getSessions(['mongo'])`; If you wanted sessions for all of the servers, you can call `getSessions(['mongo', 'app'])`.
 
 #### **resolvePath(...paths)**
 Same as `path.resolve`, but supports `~`.
@@ -1081,7 +1081,7 @@ Changes error.message for certain error types to be easier to understand
 #### addLocation(details, location)
 - details is an array of errors from `combineErrorDetails`
 
-Usually the joi errors don't have the full path to the property. This prepends the location to each detail's path, and adds the full path to the beginning of the error message.
+Usually, the joi errors don't have the full path to the property. This prepends the location to each detail's path and adds the full path to the beginning of the error message.
 
 Returns details
 
