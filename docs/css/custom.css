@@ -92,7 +92,7 @@ body {
 }
 
 .section-spacer {
-  height: 100px;
+  height: 75px;
   width: 100%;
   display: block;
 }
@@ -106,7 +106,7 @@ body {
 
 .blurb-text {
   text-align: center;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .stat-num {
