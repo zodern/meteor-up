@@ -155,7 +155,7 @@ export async function push(api) {
 
   var bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
-  if (shouldRebuild()) {
+  if (shouldRebuild(api)) {
     await promisify(archiveApp)(buildOptions.buildLocation, api);
   }
 
