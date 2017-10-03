@@ -31,7 +31,7 @@ echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
 
 
 # This updates nginx for all vhosts
-NGINX_CONFIG="client_max_body_size $CLIENT_UPLOAD_LIMIT"
+NGINX_CONFIG="client_max_body_size $CLIENT_UPLOAD_LIMIT;";
 echo $NGINX_CONFIG > /opt/$APPNAME/config/nginx-default.conf
 # sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
 # client_max_body_size  clientUploadLimit ;
@@ -47,9 +47,7 @@ sudo docker run \
   -v /opt/$APPNAME/mounted-certs:/etc/nginx/certs \
   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
-  <% if(typeof clientUploadLimit === 'number') { %> \
   -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
-  <% } %> \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
   jwilder/nginx-proxy
 echo "Ran nginx-proxy as $APPNAME"

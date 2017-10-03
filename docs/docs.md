@@ -527,9 +527,9 @@ module.exports = {
       },
       // env for the jrcs/letsencrypt-nginx-proxy-companion container
       envLetsEncrypt: {
-        // Directory URI for the CA ACME API endpoint 
+        // Directory URI for the CA ACME API endpoint
         // (default: https://acme-v01.api.letsencrypt.org/directory).
-        // If you set it's value to 
+        // If you set it's value to
         // https://acme-staging.api.letsencrypt.org/directory
         // letsencrypt will use test servers that
         // don't have the 5 certs/week/domain limits.
