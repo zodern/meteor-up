@@ -55,3 +55,7 @@ validConfigs.forEach(config => {
 });
 
 console.log(`${success - failed}/${success} configs are valid`);
+
+if (failed > 0) {
+  process.exitCode = 1;
+}
