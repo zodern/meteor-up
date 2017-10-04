@@ -30,10 +30,12 @@
     "test:module": "mocha --compilers js:babel-register --require babel-polyfill ",
     "test:parallel": "bash ./tests/run-parallel.sh",
     "test:unit": "cross-env NODE_ENV=test nyc --all mocha --compilers js:babel-register --require babel-polyfill src/**/*.unit.js",
-    "lint": "npm run lint:code && npm run lint:defaultConfig && npm run lint:readme",
+    "lint": "npm run lint:code && npm run lint:defaultConfig && npm run lint:readme && npm run lint:css && npm run lint:docs-configs",
     "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" .",
     "lint:code": "eslint .",
     "lint:readme": "eslint --ext md .",
+    "lint:docs-configs": "node tests/validate-docs.js",
+    "lint:css": "cd docs && stylelint css/*.css",
     "docs": "cd docs && bundle exec jekyll serve",
     "postinstall": "opencollective postinstall"
   },
@@ -53,11 +55,14 @@
     "eslint": "^4.5.0",
     "eslint-plugin-babel": "^4.1.0",
     "eslint-plugin-markdown": "^1.0.0-beta.4",
+    "gfm-code-blocks": "^1.0.0",
     "keypair": "^1.0.1",
     "mocha": "^3.2.0",
     "node-forge": "^0.7.1",
     "nyc": "^11.0.3",
-    "sinon": "^3.2.1"
+    "sinon": "^3.2.1",
+    "stylelint": "^8.1.1",
+    "stylelint-config-standard": "^17.0.0"
   },
   "dependencies": {
     "archiver": "^2.0.0",
@@ -79,6 +84,7 @@
     "shelljs": "~0.5.0",
     "silent-npm-registry-client": "^3.0.1",
     "ssh2": "0.4.x",
+    "traverse": "^0.6.6",
     "uuid": "^3.1.0",
     "yargs": "~8.0.2"
   },

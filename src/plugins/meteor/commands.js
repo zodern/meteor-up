@@ -51,6 +51,17 @@ export let restart = {
 };
 
 // Hidden commands
+export const build = {
+  description: false,
+  builder(yargs) {
+    return yargs.option('cached-build', {
+      description: 'Use build from previous deploy',
+      boolean: true
+    });
+  },
+  handler: commandHandlers.build
+};
+
 export const push = {
   description: false,
   builder(yargs) {
