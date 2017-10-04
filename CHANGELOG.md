@@ -11,6 +11,7 @@
 - Plugins can export a `scrubConfig(config, utils)` function, which should return the config with all sensitive information removed
 - `api.scrubConfig()` was added, which returns the config after modified by any `scrubConfig` functions from plugins
 - `api.validateConfig` only shows the errors on the console the first time it is run
+- `MODULE_NOT_FOUND` errors are now shown when a plugin fails to load due to being unable to resolve a module
 
 **Docs**
 - Color, font, and spacing changes were made to the docs. It should look nicer and be easier to read.
