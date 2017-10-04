@@ -1,5 +1,6 @@
 import * as _commands from './commands';
 import _validator from './validate';
+import traverse from 'traverse';
 
 export const description = 'Deploy and manage meteor apps';
 
@@ -41,3 +42,38 @@ export let hooks = {
     }
   }
 };
+
+export function scrubConfig(config, utils) {
+  if (config.meteor) {
+    delete config.meteor;
+  }
+
+  if (config.app) {
+    config.app = traverse(config.app).map(function() {
+      let path = this.path.join('.');
+
+      switch (path) {
+        case 'name':
+          return this.update('my-app');
+        case 'buildOptions.server':
+          return this.update(utils.scrubUrl(this.node));
+
+        case 'env.ROOT_URL':
+          return this.update(utils.scrubUrl(this.node));
+
+        case 'env.MONGO_URL':
+          if (config.mongo) {
+            let url = this.node.split('/');
+            url.pop();
+            url.push('my-app');
+
+            return this.update(url.join('/'));
+          }
+
+          return this.update(utils.scrubUrl(this.node));
+      }
+    });
+  }
+
+  return config;
+}

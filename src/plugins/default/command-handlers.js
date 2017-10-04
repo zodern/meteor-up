@@ -139,7 +139,11 @@ export function validate(api) {
   api.getConfig();
 
   if (api.getOptions()['show']) {
-    console.log(JSON.stringify(api.getConfig(), null, 2));
+    let config = api.getConfig();
+    if (api.getOptions()['scrub']) {
+      config = api.scrubConfig();
+    }
+    console.log(JSON.stringify(config, null, 2));
   }
 
   const errors = api.validateConfig('');

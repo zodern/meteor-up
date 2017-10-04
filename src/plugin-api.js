@@ -11,6 +11,7 @@ import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
 import { runConfigPreps } from './prepare-config';
+import { scrubConfig } from './scrub-config';
 
 const { resolvePath } = utils;
 
@@ -26,6 +27,8 @@ export default class PluginAPI {
     this.settingsPath = program['settings'];
     this.verbose = program.verbose;
     this.program = program;
+
+    this.validationErrors = [];
 
     this.resolvePath = utils.resolvePath;
     this.runTaskList = utils.runTaskList;
@@ -68,6 +71,11 @@ export default class PluginAPI {
   }
 
   validateConfig(configPath) {
+    // Only print errors once.
+    if (this.validationErrors.length > 0) {
+      return this.validationErrors;
+    }
+
     let problems = configValidator(this.getConfig());
 
     if (problems.length > 0) {
@@ -90,6 +98,7 @@ export default class PluginAPI {
       console.log('');
     }
 
+    this.validationErrors = problems;
     return problems;
   }
   _normalizeConfig(config) {
@@ -130,6 +139,11 @@ export default class PluginAPI {
     }
 
     return this.config;
+  }
+
+  scrubConfig() {
+    const config = this.getConfig();
+    return scrubConfig(config);
   }
 
   getSettings() {

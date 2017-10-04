@@ -927,6 +927,14 @@ module.exports = {
   prepareConfig(config) {
     // Normalize config, add env variables, etc
     return config;
+  },
+  // (optional) Called by api.scrubConfig(),
+  // which is used by `mup validate --show --scrub`
+  scrubConfig(config) {
+    // Replace any senstive information in the config,
+    // such as passwords and ip addresses.
+
+    return config;
   }
 };
 ```
@@ -1021,13 +1029,17 @@ Returns object, with the key being the option given to mup, and the value being 
 Returns true if the app is using the Meteor package. Returns false if it isn't or if it could not load `appPath/.meteor/versions`.
 
 #### **validateConfig(configPath)**
-Runs the config through all of the plugin's validators and shows any errors in the console.
+Runs the config through all of the plugin's validators. The first time it is run, it shows any errors in the console.
 
 Returns array of errors.
 
 #### **getConfig(validate = true)**
 
 Returns the config, loading it if it hasn't been loaded yet. If validate is true, it will call `api.validateConfig`. Setting `validate` to false also hides errors from not finding the config.
+
+#### **scrubConfig()**
+
+Returns the config after it has been modified by any `scrubConfig` functions from plugins. Most sensitive information should be removed from the config.
 
 #### **getSettings()**
 Returns the Meteor settings file, loading it if it hasn't been yet.

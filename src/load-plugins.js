@@ -6,6 +6,7 @@ import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { addPluginValidator } from './validate';
 import { registerPreparer } from './prepare-config';
+import { registerScrubber } from './scrub-config';
 import path from 'path';
 import debug from 'debug';
 
@@ -14,7 +15,7 @@ const log = debug('mup:plugin-loader');
 const modules = {};
 export default modules;
 
-// Load all folders in ./plugins as MUP modules.
+// Load all folders in ./plugins as mup plugins.
 // The directory name is the module name.
 let bundledPlugins = fs
   .readdirSync(resolve(__dirname, 'plugins'))
@@ -77,10 +78,8 @@ export function loadPlugins(plugins) {
         return { name: module.name || plugin.name, failed: true };
       }
     })
+    .filter(plugin => !plugin.failed)
     .forEach(plugin => {
-      if (plugin.failed) {
-        return;
-      }
       modules[plugin.name] = plugin.module;
       if (plugin.module.commands) {
         Object.keys(plugin.module.commands).forEach(key => {
@@ -100,6 +99,9 @@ export function loadPlugins(plugins) {
       }
       if (plugin.module.prepareConfig) {
         registerPreparer(plugin.module.prepareConfig);
+      }
+      if (plugin.module.scrubConfig) {
+        registerScrubber(plugin.module.scrubConfig);
       }
     });
 }
