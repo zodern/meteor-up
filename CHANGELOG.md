@@ -1,9 +1,20 @@
 ## Next
 - The exit code for `mup validate` is now 1 when there are validation errors
+- Fix changing proxy's clientUploadLimit with `proxy.shared.clientUploadLimit`
+- Added a `--scrub` option to `mup validate`, which when used with `--show` shows the config with most of the sensitive information removed
+- `mup mongo logs` accepts the same options as `mup logs` and other log commands
+- Use npm-shrinkwrap to prevent https://github.com/zodern/meteor-up/issues/757 from happening again
+- Hide docker error when trying to roll back and checking if an image exists. It is handled and normal, but could be confused with the reason for the app failing to start
+
+**Plugins and Hooks**
+- Building the app (but not archiving it) was moved to a new command `meteor.build`, which is run by `meteor.deploy` and `meteor.push`. This allows plugins or hooks to modify the bundle before it is archived and uploaded to the servers.
+- Plugins can export a `scrubConfig(config, utils)` function, which should return the config with all sensitive information removed
+- `api.scrubConfig()` was added, which returns the config after modified by any `scrubConfig` functions from plugins
+- `api.validateConfig` only shows the errors on the console the first time it is run
 
 **Docs**
-- Color, font, and spacing changes were made to the docs
-- Fixed grammer and capitilization
+- Color, font, and spacing changes were made to the docs. It should look nicer and be easier to read.
+- Fixed grammer and capitalization
 - Many example configs in the docs are validated with `mup validate`
 - Many example configs show more of the config surrounding the section being documented
 
