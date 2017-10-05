@@ -1,4 +1,4 @@
-## Next
+## 1.3.4 - October 4, 2017
 - The exit code for `mup validate` is now 1 when there are validation errors
 - Fix changing proxy's clientUploadLimit with `proxy.shared.clientUploadLimit`
 - Added a `--scrub` option to `mup validate`, which when used with `--show` shows the config with most of the sensitive information removed
