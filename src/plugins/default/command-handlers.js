@@ -151,3 +151,7 @@ export function validate(api) {
     process.exitCode = 1;
   }
 }
+
+export function status() {
+
+}

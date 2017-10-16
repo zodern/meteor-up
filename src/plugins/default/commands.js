@@ -79,3 +79,8 @@ export let validate = {
   },
   handler: commandHandlers.validate
 };
+
+export let status = {
+  description: 'View status of your app, databases and other components',
+  handler: commandHandlers.status
+};

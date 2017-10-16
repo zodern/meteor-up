@@ -140,3 +140,37 @@ export function ps(api) {
     });
   });
 }
+
+export async function status(api) {
+  const config = api.getConfig();
+  if (!config.swarm) {
+    console.log('Swarm not enabled');
+    return;
+  }
+
+  const serverInfo = await api.getServerInfo();
+  const hosts = Object.keys(serverInfo);
+  let manager = null;
+  let nodes = null;
+
+  for (let i = 0; i < hosts.length; i++) {
+    const server = serverInfo[hosts[i]];
+
+    if (server.swarm && server.swarm.LocalNodeState !== 'inactive') {
+      manager = server.swarm;
+      nodes = server.swarmNodes;
+      break;
+    }
+  }
+
+  if (manager === null) {
+    console.log('No swarm managers');
+    return;
+  }
+
+  console.log(`Managers: ${manager.Managers}`);
+  console.log(manager.RemoteManagers.map(swarmManager => `- ${swarmManager.Addr}`).join('\n'));
+  console.log('');
+  console.log(`Nodes: ${nodes.length}`);
+  console.log(nodes.map(node => `- ${node.ID}`).join('\n'));
+}

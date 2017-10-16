@@ -17,3 +17,8 @@ export let ps = {
   },
   handler: commandHandlers.ps
 };
+
+export let status = {
+  description: 'View status of docker swarm',
+  handler: commandHandlers.status
+};
