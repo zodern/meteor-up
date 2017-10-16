@@ -1,12 +1,12 @@
-import { spawn } from 'child_process';
 import archiver from 'archiver';
-import fs from 'fs';
 import debug from 'debug';
+import fs from 'fs';
 import { once } from 'lodash';
+import { spawn } from 'child_process';
 
 const log = debug('mup:module:meteor');
 
-function buildApp(appPath, buildOptions, verbose, api) {
+export default function buildApp(appPath, buildOptions, verbose, api) {
   // Check if the folder exists
   try {
     fs.statSync(api.resolvePath(appPath));
@@ -41,7 +41,7 @@ function buildApp(appPath, buildOptions, verbose, api) {
     };
     buildMeteorApp(appPath, buildOptions, verbose, function(code) {
       if (code === 0) {
-        archiveIt(buildOptions.buildLocation, api, callback);
+        callback();
         return;
       }
       console.log('\n=> Build Error. Check the logs printed above.');
@@ -120,7 +120,7 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
   meteor.on('close', callback);
 }
 
-function archiveIt(buildLocation, api, cb) {
+export function archiveApp(buildLocation, api, cb) {
   var callback = once(cb);
   var bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
   var sourceDir = api.resolvePath(buildLocation, 'bundle');
@@ -143,5 +143,3 @@ function archiveIt(buildLocation, api, cb) {
 
   archive.directory(sourceDir, 'bundle').finalize();
 }
-
-module.exports = buildApp;
