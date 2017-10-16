@@ -37,7 +37,7 @@
     "lint:docs-configs": "node tests/validate-docs.js",
     "lint:css": "cd docs && stylelint css/*.css",
     "docs": "cd docs && bundle exec jekyll serve",
-    "postinstall": "opencollective postinstall"
+    "postinstall": "opencollective  || true"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -53,6 +53,7 @@
     "chai-string": "^1.4.0",
     "cross-env": "^5.0.1",
     "eslint": "^4.5.0",
+    "eslint-config-es": "^0.8.12",
     "eslint-plugin-babel": "^4.1.0",
     "eslint-plugin-markdown": "^1.0.0-beta.4",
     "gfm-code-blocks": "^1.0.0",
