@@ -294,6 +294,24 @@ export default class PluginAPI {
     return Object.keys(sessions).map(name => sessions[name]);
   }
 
+  getSessionsForHosts(hosts = []) {
+    if (!this.sessions) {
+      this._loadSessions();
+    }
+
+    const servers = this.getConfig().servers;
+    const sessionNames = [];
+
+    Object.keys(servers).forEach(key => {
+      if (hosts.indexOf(servers[key].host) > -1) {
+        console.log('server for host found');
+        sessionNames.push(key);
+      }
+    });
+
+    return sessionNames.map(name => this.sessions[name]);
+  }
+
   _pickSessions(plugins = []) {
     if (!this.sessions) {
       this._loadSessions();

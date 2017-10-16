@@ -5,8 +5,45 @@ export const _collectors = {
     command: 'docker info --format \'{{json .Swarm}}\'',
     parser(stdout, code) {
       if (code === 0) {
-        return JSON.parse(stdout);
+        try {
+          return JSON.parse(stdout);
+        } catch (e) {
+          return null;
+        }
       }
+
+      return null;
+    }
+  },
+  swarmNodes: {
+    command: 'docker node ls --format \'{{json .}}\'',
+    parser(stdout, code) {
+      console.log(stdout);
+      if (code === 0) {
+        try {
+          let output = stdout.split('\n').join(',');
+          output = `[${output}]`;
+
+          const result = JSON.parse(output);
+
+          if (!(result instanceof Array)) {
+            return [result];
+          }
+          return result;
+        } catch (e) {
+          return null;
+        }
+      }
+      return null;
+    }
+  },
+  swarmToken: {
+    command: 'docker swarm join-token worker -q',
+    parser(stdout, code) {
+      if (code === 0 && stdout.indexOf('Error response') === -1) {
+        return stdout.trim();
+      }
+      return null;
     }
   }
 };
@@ -18,7 +55,7 @@ const codeSeperator = 'mup-var-code=======';
 function generateVarCommand(name, command) {
   return `
   echo "${prefix}${name}${suffix}"
-  ${command} 2>&1  
+  ${command} 2>&1
   echo "${codeSeperator}"
   echo $?
   `;
