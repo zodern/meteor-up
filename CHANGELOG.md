@@ -1,3 +1,7 @@
+## Next
+- `mup init` will create a `.deploy` folder when run in the same folder as a Meteor app
+- When mup can find a meteor app near to where `mup init` is run, the default config's `app.path` will be the path to that app
+
 ## 1.3.4 - October 4, 2017
 - The exit code for `mup validate` is now 1 when there are validation errors
 - Fix changing proxy's clientUploadLimit with `proxy.shared.clientUploadLimit`
