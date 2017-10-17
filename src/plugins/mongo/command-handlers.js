@@ -8,7 +8,10 @@ export function logs(api) {
 
   const args = api.getArgs();
   const sessions = api.getSessions(['mongo']);
-  args.shift(); // remove mongo from args sent to docker
+
+  // remove mongo from args sent to docker
+  args.shift();
+
   return api.getDockerLogs('mongodb', sessions, args);
 }
 
@@ -20,6 +23,7 @@ export function setup(api) {
     console.log(
       'Not setting up built-in mongodb since there is no mongo config'
     );
+
     return;
   }
 
@@ -30,11 +34,13 @@ export function setup(api) {
     console.log(
       'To use mup built-in mongodb setup, you should have only one meteor app server. To have more app servers, use an external mongodb setup'
     );
+
     return;
   } else if (mongoSessions[0]._host !== meteorSessions[0]._host) {
     console.log(
       'To use mup built-in mongodb setup, you should have both meteor app and mongodb on the same server'
     );
+
     return;
   }
 
@@ -66,6 +72,7 @@ export function start(api) {
     mongoSessions[0]._host !== meteorSessions[0]._host
   ) {
     log('Skipping mongodb start. Incompatible config');
+
     return;
   }
 
@@ -80,6 +87,7 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
+
   return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
@@ -92,5 +100,6 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['mongo']);
+
   return api.runTaskList(list, sessions, { verbose: api.verbose });
 }

@@ -1,11 +1,11 @@
 import * as commandHandlers from './command-handlers';
 
-export let setup = {
+export const setup = {
   description: 'Prepare server to deploy meteor apps',
   handler: commandHandlers.setup
 };
 
-export let deploy = {
+export const deploy = {
   description: 'Deploy meteor apps',
   builder(subYargs) {
     return subYargs.option('cached-build', {
@@ -16,7 +16,7 @@ export let deploy = {
   handler: commandHandlers.deploy
 };
 
-export let logs = {
+export const logs = {
   description: 'View meteor app\'s logs',
   builder(yargs) {
     return yargs
@@ -35,17 +35,17 @@ export let logs = {
   handler: commandHandlers.logs
 };
 
-export let start = {
+export const start = {
   description: 'Start meteor app',
   handler: commandHandlers.start
 };
 
-export let stop = {
+export const stop = {
   description: 'Stop meteor app',
   handler: commandHandlers.stop
 };
 
-export let restart = {
+export const restart = {
   description: 'Restart meteor app',
   handler: commandHandlers.restart
 };

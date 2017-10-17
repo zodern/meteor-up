@@ -1,7 +1,5 @@
 import * as utils from './utils';
-
 import { hooks, runRemoteHooks } from './hooks';
-
 import chalk from 'chalk';
 import childProcess from 'child_process';
 import { commands } from './commands';
@@ -11,21 +9,21 @@ import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
 import { runConfigPreps } from './prepare-config';
-import serverInfo from './server-info';
 import { scrubConfig } from './scrub-config';
+import serverInfo from './server-info';
 
 const { resolvePath } = utils;
 
 export default class PluginAPI {
   constructor(base, filteredArgs, program) {
-    this.base = program['config'] ? path.dirname(program['config']) : base;
+    this.base = program.config ? path.dirname(program.config) : base;
     this.args = filteredArgs;
     this.config = null;
     this.settings = null;
     this.sessions = null;
     this._enabledSessions = program.servers ? program.servers.split(',') : [];
-    this.configPath = program['config'] ? resolvePath(program['config']) : path.join(this.base, 'mup.js');
-    this.settingsPath = program['settings'];
+    this.configPath = program.config ? resolvePath(program.config) : path.join(this.base, 'mup.js');
+    this.settingsPath = program.settings;
     this.verbose = program.verbose;
     this.program = program;
 
@@ -57,16 +55,17 @@ export default class PluginAPI {
   hasMeteorPackage(name) {
     // Check if app is using the package
     try {
-      var contents = fs
+      const contents = fs
         .readFileSync(resolvePath(this.getBasePath(), this.getConfig().meteor.path, '.meteor/versions'))
         .toString();
       // Looks for "package-name@" in the beginning of a
       // line or at the start of the file
-      let regex = new RegExp(`(^|\\s)${name}@`, 'm');
-      return regex.test(contents);
+      const regex = new RegExp(`(^|\\s)${name}@`, 'm');
 
+      return regex.test(contents);
     } catch (e) {
       console.log(`Unable to load file ${resolvePath(this.getBasePath(), this.getConfig().meteor.path, '.meteor/versions')}`);
+
       return false;
     }
   }
@@ -77,11 +76,11 @@ export default class PluginAPI {
       return this.validationErrors;
     }
 
-    let problems = configValidator(this.getConfig());
+    const problems = configValidator(this.getConfig());
 
     if (problems.length > 0) {
-      let red = chalk.red;
-      let plural = problems.length > 1 ? 's' : '';
+      const red = chalk.red;
+      const plural = problems.length > 1 ? 's' : '';
 
       console.log(`loaded config from ${configPath}`);
       console.log('');
@@ -100,6 +99,7 @@ export default class PluginAPI {
     }
 
     this.validationErrors = problems;
+
     return problems;
   }
   _normalizeConfig(config) {
@@ -144,6 +144,7 @@ export default class PluginAPI {
 
   scrubConfig() {
     const config = this.getConfig();
+
     return scrubConfig(config);
   }
 
@@ -202,7 +203,7 @@ export default class PluginAPI {
   }
   _runHooks = async function(handlers, hookName) {
     const messagePrefix = `> Running hook ${hookName}`;
-    for (let hookHandler of handlers) {
+    for (const hookHandler of handlers) {
       if (hookHandler.localCommand) {
         console.log(`${messagePrefix} "${hookHandler.localCommand}"`);
         this._runHookScript(hookHandler.localCommand);
@@ -226,14 +227,14 @@ export default class PluginAPI {
     }
   }
   _runPreHooks = async function(name) {
-    let hookName = `pre.${name}`;
+    const hookName = `pre.${name}`;
 
     if (this.program['show-hook-names']) {
       console.log(chalk.yellow(`Hook: ${hookName}`));
     }
 
     if (hookName in hooks) {
-      let hookList = hooks[hookName];
+      const hookList = hooks[hookName];
       await this._runHooks(hookList, name);
     }
   };
@@ -245,10 +246,9 @@ export default class PluginAPI {
     }
 
     if (hookName in hooks) {
-      let hookList = hooks[hookName];
+      const hookList = hooks[hookName];
       await this._runHooks(hookList, hookName);
     }
-    return;
   };
   _commandErrorHandler(e) {
     process.exitCode = 1;
@@ -281,16 +281,19 @@ export default class PluginAPI {
     if (potentialPromise && typeof potentialPromise.then === 'function') {
       return potentialPromise.then(() => this._runPostHooks(name));
     }
+
     return await this._runPostHooks(name);
   }
 
   getServerInfo() {
     const servers = Object.values(this.getConfig().servers);
+
     return serverInfo(null, servers);
   }
 
   getSessions(modules = []) {
     const sessions = this._pickSessions(modules);
+
     return Object.keys(sessions).map(name => sessions[name]);
   }
 
@@ -325,7 +328,7 @@ export default class PluginAPI {
         return;
       }
 
-      for (var name in moduleConfig.servers) {
+      for (const name in moduleConfig.servers) {
         if (!moduleConfig.servers.hasOwnProperty(name)) {
           continue;
         }
@@ -345,7 +348,7 @@ export default class PluginAPI {
 
     // `mup.servers` contains login information for servers
     // Use this information to create nodemiral sessions.
-    for (var name in config.servers) {
+    for (const name in config.servers) {
       if (!config.servers.hasOwnProperty(name)) {
         continue;
       }
@@ -365,7 +368,7 @@ export default class PluginAPI {
         ssh: {}
       };
 
-      var sshAgent = process.env.SSH_AUTH_SOCK;
+      const sshAgent = process.env.SSH_AUTH_SOCK;
 
       if (info.opts) {
         opts.ssh = info.opts;

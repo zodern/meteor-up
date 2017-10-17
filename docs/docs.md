@@ -117,8 +117,10 @@ module.exports = {
       // lets you add/overwrite any parameter on
       // the docker run command (optional)
       args: [
-        '--link=myCustomMongoDB:myCustomMongoDB', // linking example
-        '--memory-reservation 200M' // memory reservation example
+        // linking example
+        '--link=myCustomMongoDB:myCustomMongoDB',
+        // memory resvevation example
+        '--memory-reservation 200M'
       ],
 
       // Only used if using your own SSL certificates.
@@ -200,17 +202,18 @@ module.exports = {
       }
     },
     // The maximum number of seconds it will wait
-    // for your app to successfully start
-    deployCheckWaitTime: 60, // default is 60 (optional)
+    // for your app to successfully start (optional, default is 60)
+    deployCheckWaitTime: 60,
 
     // lets you define which port to check after the deploy process, if it
     // differs from the meteor port you are serving
     // (like meteor behind a proxy/firewall) (optional)
     deployCheckPort: 80,
 
-    // Shows progress bar while uploading bundle to server (optional)
+    // Shows progress bar while uploading bundle to server
     // You might need to disable it on CI servers
-    enableUploadProgressBar: true // default false.
+    // (optional, default is false)
+    enableUploadProgressBar: true
   },
 
   // (optional but remove it if you want to use a remote MongoDB!)
@@ -744,6 +747,7 @@ module.exports = {
       // Same api as is given to plugin command handlers
       // If this runs asynchronous tasks, it needs to return a promise.
       const config = api.getConfig();
+
       return api.runSSHCommand(config.servers.one, 'docker --version');
     }
   }

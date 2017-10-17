@@ -14,7 +14,8 @@ export function improveErrors(error) {
     error.message = error.message.replace(
       ' conflict with forbidden peer ',
       ' and '
-    ) + ' cannot both be defined';
+    );
+    error.message += ' cannot both be defined';
   } else if (error.type === 'object.min') {
     error.message = error.message.replace('.value', '');
   }
@@ -29,6 +30,7 @@ export function addLocation(details, location) {
     detail.message = detail.message.replace(/^".*?"\s+/, '');
 
     detail.message = `"${location}.${detail.path}" ${detail.message}`;
+
     return detail;
   });
 }
@@ -38,15 +40,15 @@ export function combineErrorDetails(details, results) {
     return details.concat(results);
   }
 
-  let additionalDetails = results.error ? results.error.details : [];
+  const additionalDetails = results.error ? results.error.details : [];
 
   return details.concat(additionalDetails);
 }
 
 export function serversExist(serversConfig = {}, serversUsed = {}) {
-  let messages = [];
-  let servers = Object.keys(serversConfig);
-  let using = Object.keys(serversUsed);
+  const messages = [];
+  const servers = Object.keys(serversConfig);
+  const using = Object.keys(serversUsed);
   using.forEach(key => {
     if (servers.indexOf(key) === -1) {
       messages.push({

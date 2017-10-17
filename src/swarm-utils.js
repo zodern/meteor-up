@@ -22,4 +22,9 @@ export function findNodes(serverInfo) {
 
   const manager = managers[0];
   const nodeIds = serverInfo[manager].nodes.map(node => node.ID);
+
+  return {
+    manager,
+    nodeIds
+  };
 }

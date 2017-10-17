@@ -1,19 +1,19 @@
 import './node-version';
 import './nodemiral';
-import checkUpdates from './updates';
 import modules, { loadPlugins, locatePluginDir } from './load-plugins';
-import { registerHook } from './hooks';
-import pkg from '../package.json';
-import yargs from 'yargs';
 import chalk from 'chalk';
-import MupAPI from './plugin-api';
+import checkUpdates from './updates';
 import { filterArgv } from './utils';
+import MupAPI from './plugin-api';
+import pkg from '../package.json';
+import { registerHook } from './hooks';
+import yargs from 'yargs';
 
 const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help', 'servers'];
 
 function addModuleCommands(builder, module, moduleName) {
   Object.keys(module.commands).forEach(commandName => {
-    let command = module.commands[commandName];
+    const command = module.commands[commandName];
     command.builder = command.builder || {};
 
     builder.command(
@@ -57,12 +57,10 @@ const config = preAPI.getConfig(false);
 // Load plugins
 if (config.plugins instanceof Array) {
   loadPlugins(
-    config.plugins.map(plugin => {
-      return {
-        name: plugin,
-        path: locatePluginDir(plugin, preAPI.configPath, preAPI.app ? preAPI.app.path : '')
-      };
-    })
+    config.plugins.map(plugin => ({
+      name: plugin,
+      path: locatePluginDir(plugin, preAPI.configPath, preAPI.app ? preAPI.app.path : '')
+    }))
   );
 }
 

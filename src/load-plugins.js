@@ -1,10 +1,8 @@
 import { join, resolve } from 'path';
-
 import { addPluginValidator } from './validate';
 import debug from 'debug';
 import fs from 'fs';
 import globalModules from 'global-modules';
-import path from 'path';
 import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { registerPreparer } from './prepare-config';
@@ -18,11 +16,9 @@ export default modules;
 
 // Load all folders in ./plugins as mup plugins.
 // The directory name is the module name.
-let bundledPlugins = fs
+const bundledPlugins = fs
   .readdirSync(resolve(__dirname, 'plugins'))
-  .map(name => {
-    return { name, path: `./plugins/${name}` };
-  })
+  .map(name => ({ name, path: `./plugins/${name}` }))
   .filter(isDirectoryMupModule);
 
 loadPlugins(bundledPlugins);
@@ -32,17 +28,20 @@ export function locatePluginDir(name, configPath, appPath) {
 
   if (name.indexOf('.') === 0 || name.indexOf('/') === 0 || name.indexOf('~') === 0) {
     log('plugin name is a path to the plugin');
+
     return name;
   }
 
   const configLocalPath = resolveFrom.silent(configPath, name);
   if (configLocalPath) {
     log('plugin installed locally to config folder');
+
     return configLocalPath;
   }
   try {
     const mupLocal = require.resolve(name);
     log('plugin installed locally with mup');
+
     return mupLocal;
   } catch (e) {
     // Continues to next location to resolve from
@@ -51,16 +50,19 @@ export function locatePluginDir(name, configPath, appPath) {
   const appLocalPath = resolveFrom.silent(appPath, name);
   if (appLocalPath) {
     log('plugin installed locall in app folder');
+
     return appLocalPath;
   }
 
   log(`global install path: ${globalModules}`);
-  const globalPath = resolveFrom.silent(path.resolve(globalModules, '..'), name);
+  const globalPath = resolveFrom.silent(resolve(globalModules, '..'), name);
   if (globalPath) {
     log('plugin installed globally');
+
     return globalPath;
   }
   log('plugin not found');
+
   return name;
 }
 
@@ -68,8 +70,10 @@ export function loadPlugins(plugins) {
   plugins
     .map(plugin => {
       try {
-        let module = require(plugin.path); // eslint-disable-line global-require
-        let name = module.name || plugin.name;
+        // eslint-disable-next-line global-require
+        const module = require(plugin.path);
+        const name = module.name || plugin.name;
+
         return { name, module };
       } catch (e) {
         const pathPosition = e.message.length - plugin.path.length - 1;
@@ -84,6 +88,7 @@ export function loadPlugins(plugins) {
         }
 
         console.log(`Unable to load plugin ${plugin.name}`);
+
         return { name: module.name || plugin.name, failed: true };
       }
     })
@@ -121,5 +126,6 @@ function isDirectoryMupModule({ name, path: modulePath }) {
   }
 
   const moduleDir = join(__dirname, modulePath);
+
   return fs.statSync(moduleDir).isDirectory();
 }

@@ -1,5 +1,4 @@
 import { _configPreps, registerPreparer, runConfigPreps } from '../prepare-config';
-
 import { expect } from 'chai';
 
 describe('prepare-config', () => {
@@ -17,6 +16,7 @@ describe('prepare-config', () => {
     const preparer = function(config) {
       expect(config).to.be.an('object');
       config.ran = true;
+
       return config;
     };
 

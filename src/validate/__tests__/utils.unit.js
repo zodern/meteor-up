@@ -1,9 +1,9 @@
 import assert from 'assert';
 import { serversExist } from '../utils';
 
-describe('validator utils', function() {
-  describe('serversExist', function() {
-    it('should find nonexistent servers', function() {
+describe('validator utils', () => {
+  describe('serversExist', () => {
+    it('should find nonexistent servers', () => {
       const serversConfig = { one: {}, two: {} };
       const usedServers = { one: {}, three: {}};
       const result = serversExist(serversConfig, usedServers);

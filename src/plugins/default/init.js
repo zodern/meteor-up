@@ -17,7 +17,8 @@ function findDestination(api) {
   let otherChild = '';
 
   if (parentChildren.length === 2) {
-    otherChild = parentChildren.filter(child => child !== path.basename(base))[0];
+    otherChild = parentChildren
+      .filter(child => child !== path.basename(base))[0];
     if (fs.existsSync(api.resolvePath('..', otherChild, '.meteor/release'))) {
       siblingMeteorApp = true;
     }

@@ -1,5 +1,5 @@
-import debug from 'debug';
 import { Client } from 'ssh2';
+import debug from 'debug';
 
 const log = debug('mup:module:default');
 
@@ -20,7 +20,7 @@ export function restart() {
 }
 
 export function setup(api) {
-  process.on('exit', function displayNextSteps(code) {
+  process.on('exit', code => {
     if (code > 0) {
       return;
     }
@@ -32,6 +32,7 @@ export function setup(api) {
 
   log('exec => mup setup');
   const config = api.getConfig();
+
   return api.runCommand('docker.setup')
     .then(() => {
       if (config.proxy) {
@@ -60,6 +61,7 @@ export function ssh(api) {
       console.log('mup ssh <server>');
       console.log('Available servers are:\n', Object.keys(servers).join('\n'));
       process.exitCode = 1;
+
       return;
     }
   }
@@ -67,11 +69,13 @@ export function ssh(api) {
   const server = servers[serverOption];
   const sshOptions = api._createSSHOptions(server);
 
-  var conn = new Client();
-  conn.on('ready', function() {
-    conn.shell(function(err, stream) {
-      if (err) { throw err; }
-      stream.on('close', function() {
+  const conn = new Client();
+  conn.on('ready', () => {
+    conn.shell((err, stream) => {
+      if (err) {
+        throw err;
+      }
+      stream.on('close', () => {
         conn.end();
         process.exit();
       });
@@ -94,9 +98,9 @@ export function validate(api) {
   // Shows validation errors
   api.getConfig();
 
-  if (api.getOptions()['show']) {
+  if (api.getOptions().show) {
     let config = api.getConfig();
-    if (api.getOptions()['scrub']) {
+    if (api.getOptions().scrub) {
       config = api.scrubConfig();
     }
     console.log(JSON.stringify(config, null, 2));
@@ -109,5 +113,5 @@ export function validate(api) {
 }
 
 export function status() {
-
+  // Everything is in post hooks in other plugins
 }

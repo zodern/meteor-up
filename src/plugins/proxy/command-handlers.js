@@ -16,6 +16,7 @@ export function logs(api) {
 
   const args = api.getArgs().slice(1);
   const sessions = api.getSessions(['app']);
+
   return api.getDockerLogs(PROXY_CONTAINER_NAME, sessions, args);
 }
 
@@ -60,7 +61,7 @@ export function setup(api) {
 
   list.copy('Pushing the Startup Script', {
     src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
-    dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/start.sh',
+    dest: `/opt/${PROXY_CONTAINER_NAME}/config/start.sh`,
     vars: {
       appName: PROXY_CONTAINER_NAME,
       letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null
@@ -127,7 +128,7 @@ export function reconfigShared(api) {
 
   list.copy('Sending shared variables', {
     src: api.resolvePath(__dirname, 'assets/templates/shared-config.sh'),
-    dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/shared-config.sh',
+    dest: `/opt/${PROXY_CONTAINER_NAME}/config/shared-config.sh`,
     vars: {
       httpPort: shared.httpPort,
       httpsPort: shared.httpsPort,
@@ -139,7 +140,7 @@ export function reconfigShared(api) {
 
   list.copy('Sending proxy environment variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),
-    dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/env.list',
+    dest: `/opt/${PROXY_CONTAINER_NAME}/config/env.list`,
     vars: {
       env: env || {}
     }
@@ -149,13 +150,14 @@ export function reconfigShared(api) {
 
   list.copy('Sending let\'s encrypt environment variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),
-    dest: '/opt/' + PROXY_CONTAINER_NAME + '/config/env_letsencrypt.list',
+    dest: `/opt/${PROXY_CONTAINER_NAME}/config/env_letsencrypt.list`,
     vars: {
       env: envLetsEncrypt || {}
     }
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
@@ -180,6 +182,7 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.getVerbose()
@@ -199,5 +202,6 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, { verbose: api.getVerbose() });
 }

@@ -1,11 +1,11 @@
-import { expect } from 'chai';
-import PluginAPI from '../plugin-api';
-import path from 'path';
-import sinon from 'sinon';
-import fs from 'fs';
 import * as validate from '../validate';
 import { commands } from '../commands';
+import { expect } from 'chai';
+import fs from 'fs';
 import { hooks } from '../hooks';
+import path from 'path';
+import PluginAPI from '../plugin-api';
+import sinon from 'sinon';
 
 describe('PluginAPI', () => {
   let api;
@@ -90,25 +90,21 @@ describe('PluginAPI', () => {
     let configStub;
 
     beforeEach(() => {
-      fsStub = sinon.stub(fs, 'readFileSync').callsFake(() => {
-        return {
-          toString() {
-            return `
+      fsStub = sinon.stub(fs, 'readFileSync').callsFake(() => ({
+        toString() {
+          return `
             package1@3
             package2@3
             #package3@3
             `;
-          }
-        };
-      });
+        }
+      }));
 
-      configStub = sinon.stub(api, 'getConfig').callsFake(() => {
-        return {
-          meteor: {
-            path: '../'
-          }
-        };
-      });
+      configStub = sinon.stub(api, 'getConfig').callsFake(() => ({
+        meteor: {
+          path: '../'
+        }
+      }));
     });
 
     afterEach(() => {
@@ -131,7 +127,7 @@ describe('PluginAPI', () => {
   });
 
   describe('validateConfig', () => {
-    let errors = ['error1', 'error2'];
+    const errors = ['error1', 'error2'];
     let validatorStub;
     let totalConsoleOutput = '';
     let consoleStub;
@@ -241,9 +237,10 @@ describe('PluginAPI', () => {
         expect(preHookCalled).to.equal(true);
         expect(postHookCalled).to.equal(true);
         cb();
-      }).catch(e => {
-        console.log(e);
-      });
+      })
+        .catch(e => {
+          console.log(e);
+        });
     });
   });
 

@@ -1,5 +1,4 @@
 import buildApp, { archiveApp } from './build.js';
-
 import { cloneDeep } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
@@ -12,11 +11,12 @@ import uuid from 'uuid';
 const log = debug('mup:module:meteor');
 
 function tmpBuildPath(appPath, api) {
-  let rand = random.create(appPath);
-  let uuidNumbers = [];
+  const rand = random.create(appPath);
+  const uuidNumbers = [];
   for (let i = 0; i < 16; i++) {
     uuidNumbers.push(rand(255));
   }
+
   return api.resolvePath(
     os.tmpdir(),
     `mup-meteor-${uuid.v4({ random: uuidNumbers })}`
@@ -37,6 +37,7 @@ export function logs(api) {
   }
 
   const sessions = api.getSessions(['app']);
+
   return api.getDockerLogs(config.name, sessions, args);
 }
 
@@ -69,12 +70,12 @@ export function setup(api) {
       });
       list.copy('Copying SSL Certificate Bundle', {
         src: api.resolvePath(basePath, config.ssl.crt),
-        dest: '/opt/' + config.name + '/config/bundle.crt'
+        dest: `/opt/${config.name}/config/bundle.crt`
       });
 
       list.copy('Copying SSL Private Key', {
         src: api.resolvePath(basePath, config.ssl.key),
-        dest: '/opt/' + config.name + '/config/private.key'
+        dest: `/opt/${config.name}/config/private.key`
       });
     }
 
@@ -95,7 +96,7 @@ function getBuildOptions(api) {
   const config = api.getConfig().app;
   const appPath = api.resolvePath(api.getBasePath(), config.path);
 
-  let buildOptions = config.buildOptions || {};
+  const buildOptions = config.buildOptions || {};
   buildOptions.buildLocation =
     buildOptions.buildLocation || tmpBuildPath(appPath, api);
 
@@ -103,9 +104,9 @@ function getBuildOptions(api) {
 }
 
 function shouldRebuild(api) {
-  var rebuild = true;
+  let rebuild = true;
   const { buildLocation } = getBuildOptions(api);
-  var bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
+  const bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
 
   if (api.getOptions()['cached-build']) {
     const buildCached = fs.existsSync(bundlePath);
@@ -125,7 +126,7 @@ export async function build(api) {
   const appPath = api.resolvePath(api.getBasePath(), config.path);
   const buildOptions = getBuildOptions(api);
 
-  var rebuild = shouldRebuild(api);
+  const rebuild = shouldRebuild(api);
 
   if (rebuild && api.getOptions()['cached-build']) {
     console.log('Unable to use previous build. It doesn\'t exist.');
@@ -151,9 +152,9 @@ export async function push(api) {
     process.exit(1);
   }
 
-  let buildOptions = getBuildOptions(api);
+  const buildOptions = getBuildOptions(api);
 
-  var bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+  const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
   if (shouldRebuild(api)) {
     await promisify(archiveApp)(buildOptions.buildLocation, api);
@@ -163,7 +164,7 @@ export async function push(api) {
 
   list.copy('Pushing Meteor App Bundle to The Server', {
     src: bundlePath,
-    dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
+    dest: `/opt/${config.name}/tmp/bundle.tar.gz`,
     progressBar: config.enableUploadProgressBar
   });
 
@@ -191,6 +192,7 @@ export async function push(api) {
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
@@ -240,7 +242,7 @@ export function envconfig(api) {
   const list = nodemiral.taskList('Configuring App');
   list.copy('Pushing the Startup Script', {
     src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
-    dest: '/opt/' + config.name + '/config/start.sh',
+    dest: `/opt/${config.name}/config/start.sh`,
     vars: {
       appName: config.name,
       port: config.env.PORT || 80,
@@ -254,7 +256,7 @@ export function envconfig(api) {
     }
   });
 
-  var env = cloneDeep(config.env);
+  const env = cloneDeep(config.env);
   env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
   // sending PORT to the docker container is useless.
 
@@ -275,7 +277,7 @@ export function envconfig(api) {
 
   list.copy('Sending Environment Variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),
-    dest: '/opt/' + config.name + '/config/env.list',
+    dest: `/opt/${config.name}/config/env.list`,
     hostVars,
     vars: {
       env: env || {},
@@ -284,6 +286,7 @@ export function envconfig(api) {
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
@@ -321,6 +324,7 @@ export function start(api) {
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
@@ -362,6 +366,7 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 

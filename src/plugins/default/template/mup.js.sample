@@ -13,7 +13,7 @@ module.exports = {
   app: {
     // TODO: change app name and path
     name: 'app',
-    path: '../app',
+    path: '<app path>',
 
     servers: {
       one: {},

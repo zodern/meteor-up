@@ -1,9 +1,8 @@
 import * as _commands from './commands';
-
 import _validator from './validate';
 
 export const description = 'Commands to manage MongoDB';
-export let commands = _commands;
+export const commands = _commands;
 export const validate = {
   mongo: _validator
 };
@@ -14,7 +13,7 @@ export function prepareConfig(config) {
   }
 
   config.app.env = config.app.env || {};
-  config.app.env['MONGO_URL'] = `mongodb://mongodb:27017/${config.app.name.split('.').join('')}`;
+  config.app.env.MONGO_URL = `mongodb://mongodb:27017/${config.app.name.split('.').join('')}`;
 
   if (!config.app.docker) {
     config.app.docker = {};
@@ -25,6 +24,7 @@ export function prepareConfig(config) {
   }
 
   config.app.docker.args.push('--link=mongodb:mongodb');
+
   return config;
 }
 

@@ -1,5 +1,4 @@
 import { difference, intersection } from 'lodash';
-
 import chalk from 'chalk';
 import debug from 'debug';
 import { each } from 'async';
@@ -9,11 +8,13 @@ const log = debug('mup:module:docker');
 
 function uniqueSessions(api) {
   const sessions = api.getSessions(['app', 'mongo', 'proxy']);
+
   return sessions.reduce(
     (prev, curr) => {
       if (prev.map(session => session._host).indexOf(curr._host) === -1) {
         prev.push(curr);
       }
+
       return prev;
     },
     []
@@ -29,6 +30,7 @@ export function setup(api) {
   });
 
   const sessions = uniqueSessions(api);
+
   return api
     .runTaskList(list, sessions, { verbose: api.verbose })
     .then(() => setupSwarm(api));
@@ -43,8 +45,8 @@ export async function setupSwarm(api) {
 
   let serverInfo = await api.getServerInfo();
 
-  let currentManagers = [];
-  let wantedManagers = [];
+  const currentManagers = [];
+  const wantedManagers = [];
 
   Object.keys(serverInfo).forEach(key => {
     const server = serverInfo[key];
@@ -59,7 +61,7 @@ export async function setupSwarm(api) {
   });
 
   const managersToAdd = difference(wantedManagers, currentManagers);
-  const managersToRemove = difference(currentManagers, wantedManagers);
+  // const managersToRemove = difference(currentManagers, wantedManagers);
   const managersToKeep = intersection(currentManagers, wantedManagers);
 
   if (currentManagers.length === 0) {
@@ -71,7 +73,8 @@ export async function setupSwarm(api) {
         host: managersToKeep[0]
       }
     });
-    let sessions = uniqueSessions(api).filter(session => session._host === managersToKeep[0]);
+    const sessions = uniqueSessions(api)
+      .filter(session => session._host === managersToKeep[0]);
     await api.runTaskList(list, sessions, { verbose: true });
     serverInfo = await api.getServerInfo();
   }
@@ -96,7 +99,8 @@ export async function setupSwarm(api) {
     });
   });
 
-  const wantedNodes = Object.keys(config.servers).map(server => config.servers[server].host);
+  const wantedNodes = Object.keys(config.servers)
+    .map(server => config.servers[server].host);
 
   const nodesToAdd = difference(wantedNodes, currentNodes);
 
@@ -105,7 +109,8 @@ export async function setupSwarm(api) {
 
   const sessions = api.getSessionsForHosts(nodesToAdd);
   const list = nodemiral.taskList('Add nodes to swarm');
-  const token = Object.keys(serverInfo).reduce((result, item) => result ? result : serverInfo[item].swarmToken, null);
+  const token = Object.keys(serverInfo)
+    .reduce((result, item) => result || serverInfo[item].swarmToken, null);
   list.executeScript('Joining node', {
     script: api.resolvePath(__dirname, 'assets/swarm-join.sh'),
     vars: {
@@ -130,7 +135,7 @@ export function restart(api) {
 }
 
 export function ps(api) {
-  let args = api.getArgs();
+  const args = api.getArgs();
   args.shift();
   each(uniqueSessions(api), (session, cb) => {
     session.execute(`sudo docker ${args.join(' ')} 2>&1`, (err, code, logs) => {
@@ -145,6 +150,7 @@ export async function status(api) {
   const config = api.getConfig();
   if (!config.swarm) {
     console.log('Swarm not enabled');
+
     return;
   }
 
@@ -165,6 +171,7 @@ export async function status(api) {
 
   if (manager === null) {
     console.log('No swarm managers');
+
     return;
   }
 

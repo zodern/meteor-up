@@ -1,8 +1,8 @@
 import modules, { locatePluginDir } from '../load-plugins';
 import { expect } from 'chai';
 
-describe('load-plugins', function() {
-  it('should load included plugins', function() {
+describe('load-plugins', () => {
+  it('should load included plugins', () => {
     expect(Object.keys(modules)).to.have.length.greaterThan(4);
     expect(Object.keys(modules)).to.contain('default');
   });

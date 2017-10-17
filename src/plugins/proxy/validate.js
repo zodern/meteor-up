@@ -51,5 +51,6 @@ export default function(config, {
       path: ''
     });
   }
+
   return addLocation(details, 'proxy');
 }

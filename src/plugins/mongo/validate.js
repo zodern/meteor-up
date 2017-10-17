@@ -21,11 +21,12 @@ export default function(
 ) {
   let details = [];
 
-  let validationErrors = joi.validate(config.mongo, schema, VALIDATE_OPTIONS);
+  const validationErrors = joi.validate(config.mongo, schema, VALIDATE_OPTIONS);
   details = combineErrorDetails(details, validationErrors);
   details = combineErrorDetails(
     details,
     serversExist(config.servers, config.mongo.servers)
   );
+
   return addLocation(details, 'mongo');
 }

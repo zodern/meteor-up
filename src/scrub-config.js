@@ -9,7 +9,7 @@ export function registerScrubber(scrubber) {
 
 export const utils = {
   scrubUrl(url) {
-    let {
+    const {
       protocol,
       auth,
       hostname,
@@ -18,7 +18,7 @@ export const utils = {
       hash
     } = parse(url);
 
-    let href = protocol + '//';
+    let href = `${protocol}//`;
 
     if (auth) {
       href += 'user:pass@';
@@ -33,7 +33,7 @@ export const utils = {
     href += 'host.com';
 
     if (port) {
-      href += ':' + port;
+      href += `:${port}`;
     }
 
     if (path && path !== '/') {
@@ -52,5 +52,6 @@ export function scrubConfig(_config) {
   _configScrubbers.forEach(scrubber => {
     config = scrubber(config, utils);
   });
+
   return config;
 }

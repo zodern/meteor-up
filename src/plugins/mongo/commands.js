@@ -1,11 +1,11 @@
 import * as commandHandlers from './command-handlers';
 
-export let setup = {
+export const setup = {
   description: 'Installs and starts MongoDB',
   handler: commandHandlers.setup
 };
 
-export let logs = {
+export const logs = {
   description: 'View MongoDB logs',
   builder(yargs) {
     return yargs.strict(false);
@@ -13,12 +13,12 @@ export let logs = {
   handler: commandHandlers.logs
 };
 
-export let start = {
+export const start = {
   description: 'Start MongoDB',
   handler: commandHandlers.start
 };
 
-export let stop = {
+export const stop = {
   description: 'Stop MongoDB',
   handler: commandHandlers.stop
 };

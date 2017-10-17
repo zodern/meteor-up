@@ -11,7 +11,6 @@ export default function buildApp(appPath, buildOptions, verbose, api) {
   try {
     fs.statSync(api.resolvePath(appPath));
   } catch (e) {
-
     if (e.code === 'ENOENT') {
       console.log(`${api.resolvePath(appPath)} does not exist`);
     } else {
@@ -35,13 +34,15 @@ export default function buildApp(appPath, buildOptions, verbose, api) {
     const callback = err => {
       if (err) {
         reject(err);
+
         return;
       }
       resolve();
     };
-    buildMeteorApp(appPath, buildOptions, verbose, function(code) {
+    buildMeteorApp(appPath, buildOptions, verbose, code => {
       if (code === 0) {
         callback();
+
         return;
       }
       console.log('\n=> Build Error. Check the logs printed above.');
@@ -51,8 +52,8 @@ export default function buildApp(appPath, buildOptions, verbose, api) {
 }
 
 function buildMeteorApp(appPath, buildOptions, verbose, callback) {
-  var executable = buildOptions.executable || 'meteor';
-  var args = [
+  let executable = buildOptions.executable || 'meteor';
+  let args = [
     'build',
     '--directory',
     buildOptions.buildLocation,
@@ -73,7 +74,7 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
     args.push('--server-only');
   } else if (!buildOptions.mobileSettings) {
     args.push('--mobile-settings');
-    args.push(appPath + '/settings.json');
+    args.push(`${appPath}/settings.json`);
   }
 
   if (buildOptions.server) {
@@ -85,7 +86,7 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
     args.push('--allow-incompatible-update');
   }
 
-  var isWin = /^win/.test(process.platform);
+  const isWin = /^win/.test(process.platform);
   if (isWin) {
     // Sometimes cmd.exe not available in the path
     // See: http://goo.gl/ADmzoD
@@ -93,7 +94,7 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
     args = ['/c', 'meteor'].concat(args);
   }
 
-  var options = {
+  const options = {
     cwd: appPath,
     env: {
       ...process.env,
@@ -105,7 +106,7 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
   log(`Build Path: ${appPath}`);
   log(`Build Command:  ${executable} ${args.join(' ')}`);
 
-  var meteor = spawn(executable, args, options);
+  const meteor = spawn(executable, args, options);
 
   if (!verbose) {
     meteor.stdout.pipe(process.stdout, { end: false });
@@ -121,12 +122,12 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
 }
 
 export function archiveApp(buildLocation, api, cb) {
-  var callback = once(cb);
-  var bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
-  var sourceDir = api.resolvePath(buildLocation, 'bundle');
+  const callback = once(cb);
+  const bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
+  const sourceDir = api.resolvePath(buildLocation, 'bundle');
 
-  var output = fs.createWriteStream(bundlePath);
-  var archive = archiver('tar', {
+  const output = fs.createWriteStream(bundlePath);
+  const archive = archiver('tar', {
     gzip: true,
     gzipOptions: {
       level: 9
@@ -136,7 +137,7 @@ export function archiveApp(buildLocation, api, cb) {
   archive.pipe(output);
   output.once('close', callback);
 
-  archive.once('error', function(err) {
+  archive.once('error', err => {
     console.log('=> Archiving failed:', err.message);
     callback(err);
   });

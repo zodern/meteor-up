@@ -29,11 +29,13 @@ export const _collectors = {
           if (!(result instanceof Array)) {
             return [result];
           }
+
           return result;
         } catch (e) {
           return null;
         }
       }
+
       return null;
     }
   },
@@ -43,6 +45,7 @@ export const _collectors = {
       if (code === 0 && stdout.indexOf('Error response') === -1) {
         return stdout.trim();
       }
+
       return null;
     }
   }
@@ -67,18 +70,20 @@ function generateScript() {
     const collector = _collectors[key];
     script += generateVarCommand(key, collector.command);
   });
+
   return script;
 }
 
 export function seperateCollectors(output) {
-  let collectors = output.split(prefix);
+  const collectors = output.split(prefix);
   collectors.shift();
 
   return collectors.map(collectorOutput => {
-    let name = collectorOutput.split(suffix)[0];
-    let commandOutput = collectorOutput
+    const name = collectorOutput.split(suffix)[0];
+    const commandOutput = collectorOutput
       .split(suffix)[1]
       .split(codeSeperator)[0];
+
     return {
       name: name.trim(),
       output: commandOutput.trim(),
@@ -92,21 +97,22 @@ export function parseCollectorOutput(name, output, code) {
 }
 
 export function createHostResult(collectorData, host) {
-  let result = {_host: host};
+  const result = {_host: host};
 
   collectorData.forEach(data => {
     result[data.name] = parseCollectorOutput(data.name, data.output, data.code);
   });
+
   return result;
 }
 
 export function getServerInfo(vars, server) {
-  let command = generateScript();
+  const command = generateScript();
 
   return runSSHCommand(server, command)
     .then(result => {
-      let collectorData = seperateCollectors(result.output);
-      let hostResult = createHostResult(collectorData, server.host);
+      const collectorData = seperateCollectors(result.output);
+      const hostResult = createHostResult(collectorData, server.host);
 
       return hostResult;
     })
@@ -117,7 +123,7 @@ export default function serverInfo(vars, servers) {
   return Promise.all(
     servers.map(server => getServerInfo(vars, server))
   ).then(serverResults => {
-    let result = {};
+    const result = {};
     serverResults.forEach(serverResult => {
       result[serverResult._host] = serverResult;
     });

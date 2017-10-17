@@ -1,9 +1,7 @@
 import * as utils from './utils';
-
+const { combineErrorDetails, VALIDATE_OPTIONS, improveErrors } = utils;
 import joi from 'joi';
 import validateServer from './servers';
-
-const { combineErrorDetails, VALIDATE_OPTIONS, improveErrors } = utils;
 
 export const _pluginValidators = {};
 
@@ -55,8 +53,7 @@ function validateAll(config) {
 }
 
 export default function validate(config) {
-  let errors = validateAll(config);
-  return errors.map(error => {
-    return error.message;
-  });
+  const errors = validateAll(config);
+
+  return errors.map(error => error.message);
 }

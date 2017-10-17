@@ -4,7 +4,7 @@ import traverse from 'traverse';
 
 export const description = 'Deploy and manage meteor apps';
 
-export let commands = _commands;
+export const commands = _commands;
 
 export const validate = {
   meteor: _validator,
@@ -13,6 +13,7 @@ export const validate = {
       // The meteor validator will check the config
       return [];
     }
+
     return _validator(config, utils);
   }
 };
@@ -25,6 +26,7 @@ export function prepareConfig(config) {
   config.app.docker = config.app.docker || {};
   config.app.docker.image = config.app.docker.image || config.app.dockerImage || 'kadirahq/meteord';
   delete config.app.dockerImage;
+
   return config;
 }
 
@@ -33,10 +35,11 @@ function meteorEnabled(api) {
   if (config.app && config.app.type === 'meteor') {
     return true;
   }
+
   return false;
 }
 
-export let hooks = {
+export const hooks = {
   'post.default.setup'(api) {
     if (meteorEnabled(api)) {
       return api.runCommand('meteor.setup');
@@ -81,8 +84,9 @@ export function scrubConfig(config, utils) {
   }
 
   if (config.app) {
+    // eslint-disable-next-line
     config.app = traverse(config.app).map(function() {
-      let path = this.path.join('.');
+      const path = this.path.join('.');
 
       switch (path) {
         case 'name':
@@ -95,7 +99,7 @@ export function scrubConfig(config, utils) {
 
         case 'env.MONGO_URL':
           if (config.mongo) {
-            let url = this.node.split('/');
+            const url = this.node.split('/');
             url.pop();
             url.push('my-app');
 
@@ -103,6 +107,8 @@ export function scrubConfig(config, utils) {
           }
 
           return this.update(utils.scrubUrl(this.node));
+
+        // no default
       }
     });
   }
