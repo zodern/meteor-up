@@ -32,13 +32,19 @@ function uniqueSessions(api) {
 
 export function setup(api) {
   log('exec => mup docker setup');
+  const config = api.getConfig();
+  const swarmEnabled = config.swarm;
+  const servers = Object.keys(config.servers);
+
   const list = nodemiral.taskList('Setup Docker');
 
   list.executeScript('Setup Docker', {
     script: api.resolvePath(__dirname, 'assets/docker-setup.sh')
   });
 
-  const sessions = uniqueSessions(api);
+  const sessions = swarmEnabled ?
+    api.getSessionsForServers(servers) :
+    uniqueSessions(api);
 
   return api
     .runTaskList(list, sessions, {
