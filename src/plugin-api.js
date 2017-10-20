@@ -1,3 +1,4 @@
+import * as swarmUtils from './swarm-utils';
 import * as utils from './utils';
 import { hooks, runRemoteHooks } from './hooks';
 import chalk from 'chalk';
@@ -285,10 +286,21 @@ export default class PluginAPI {
     return await this._runPostHooks(name);
   }
 
-  getServerInfo() {
+  async getServerInfo() {
+    if (this._cachedServerInfo) {
+      return this._cachedServerInfo;
+    }
+
     const servers = Object.values(this.getConfig().servers);
 
-    return serverInfo(null, servers);
+    const result = await serverInfo(null, servers);
+    this._cachedServerInfo = result;
+
+    return result;
+  }
+
+  serverInfoStale() {
+    this._cachedServerInfo = null;
   }
 
   getSessions(modules = []) {
@@ -297,22 +309,12 @@ export default class PluginAPI {
     return Object.keys(sessions).map(name => sessions[name]);
   }
 
-  getSessionsForHosts(hosts = []) {
+  getSessionsForServers(servers = []) {
     if (!this.sessions) {
       this._loadSessions();
     }
 
-    const servers = this.getConfig().servers;
-    const sessionNames = [];
-
-    Object.keys(servers).forEach(key => {
-      if (hosts.indexOf(servers[key].host) > -1) {
-        console.log('server for host found');
-        sessionNames.push(key);
-      }
-    });
-
-    return sessionNames.map(name => this.sessions[name]);
+    return servers.map(name => this.sessions[name]);
   }
 
   _pickSessions(plugins = []) {
@@ -400,5 +402,21 @@ export default class PluginAPI {
       const session = nodemiral.session(info.host, auth, opts);
       this.sessions[name] = session;
     }
+  }
+
+  async currentSwarmManagers() {
+    const info = await this.getServerInfo();
+
+    return swarmUtils.currentManagers(this.getConfig(), info);
+  }
+  async desiredManagers() {
+    const info = await this.getServerInfo();
+
+    return swarmUtils.desiredManagers(this.getConfig(), info);
+  }
+  async swarmNodes() {
+    const info = await this.getServerInfo();
+
+    return swarmUtils.findNodes(this.getConfig(), info);
   }
 }

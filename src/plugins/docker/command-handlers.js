@@ -1,7 +1,17 @@
-import { difference, intersection } from 'lodash';
+import {
+  addManagers,
+  joinNodes,
+  removeManagers
+} from './swarm';
+import {
+  difference,
+  intersection
+} from 'lodash';
 import chalk from 'chalk';
 import debug from 'debug';
-import { each } from 'async';
+import {
+  each
+} from 'async';
 import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:docker');
@@ -16,8 +26,7 @@ function uniqueSessions(api) {
       }
 
       return prev;
-    },
-    []
+    }, []
   );
 }
 
@@ -32,7 +41,9 @@ export function setup(api) {
   const sessions = uniqueSessions(api);
 
   return api
-    .runTaskList(list, sessions, { verbose: api.verbose })
+    .runTaskList(list, sessions, {
+      verbose: api.verbose
+    })
     .then(() => setupSwarm(api));
 }
 
@@ -45,81 +56,55 @@ export async function setupSwarm(api) {
 
   let serverInfo = await api.getServerInfo();
 
-  const currentManagers = [];
-  const wantedManagers = [];
+  const currentManagers = await api.currentSwarmManagers();
+  const wantedManagers = await api.desiredManagers();
 
-  Object.keys(serverInfo).forEach(key => {
-    const server = serverInfo[key];
-
-    if (server.swarm && server.swarm.LocalNodeState !== 'inactive') {
-      currentManagers.push(server._hot);
-    }
-  });
-
-  Object.keys(swarmConfig.managers).forEach(manager => {
-    wantedManagers.push(config.servers[manager].host);
-  });
+  log('currentManagers', currentManagers);
+  log('wantedManagers', wantedManagers);
 
   const managersToAdd = difference(wantedManagers, currentManagers);
-  // const managersToRemove = difference(currentManagers, wantedManagers);
+  const managersToRemove = difference(currentManagers, wantedManagers);
   const managersToKeep = intersection(currentManagers, wantedManagers);
 
+  log('managers to add', managersToAdd);
+  log('managers to remove', managersToRemove);
+  log('managers keeping', managersToKeep);
+
   if (currentManagers.length === 0) {
-    const list = nodemiral.taskList('Setting Up Docker Swarm');
+    log('Creating swarm cluster');
+    const host = config.servers[managersToAdd[0]].host;
+
+    await addManagers(managersToAdd, host, api);
+
     managersToKeep.push(managersToAdd.shift());
-    list.executeScript('Creating Manager', {
-      script: api.resolvePath(__dirname, 'assets/init-swarm.sh'),
-      vars: {
-        host: managersToKeep[0]
-      }
-    });
-    const sessions = uniqueSessions(api)
-      .filter(session => session._host === managersToKeep[0]);
-    await api.runTaskList(list, sessions, { verbose: true });
-    serverInfo = await api.getServerInfo();
+    log('finished creating cluster');
+    api.serverInfoStale();
   }
 
-  const nodeIdToHost = {};
-  Object.keys(serverInfo).forEach(key => {
-    const server = serverInfo[key];
-    if (server.swarm) {
-      nodeIdToHost[server.swarm.NodeID] = key;
-    }
-  });
+  // refresh server info after updating managers
+  serverInfo = await api.getServerInfo();
 
-  const currentNodes = [];
-  Object.keys(serverInfo).forEach(key => {
-    const server = serverInfo[key];
-    if (server.swarmNodes === null || currentNodes.length > 0) {
-      return;
-    }
+  // TODO: we should always keep one manager until
+  // after the new managers are added
+  if (managersToRemove.length > 0) {
+    removeManagers(managersToRemove, api);
+    api.serverInfoStale();
+  }
 
-    server.swarmNodes.forEach(node => {
-      currentNodes.push(nodeIdToHost[node.ID]);
-    });
-  });
-
-  const wantedNodes = Object.keys(config.servers)
-    .map(server => config.servers[server].host);
-
+  const currentNodes = await api.swarmNodes();
+  const wantedNodes = Object.keys(config.servers);
   const nodesToAdd = difference(wantedNodes, currentNodes);
 
-  console.log(currentNodes);
-  console.log('adding nodes', nodesToAdd);
+  log('current nodes', currentNodes);
+  log('adding nodes', nodesToAdd);
 
-  const sessions = api.getSessionsForHosts(nodesToAdd);
-  const list = nodemiral.taskList('Add nodes to swarm');
-  const token = Object.keys(serverInfo)
-    .reduce((result, item) => result || serverInfo[item].swarmToken, null);
-  list.executeScript('Joining node', {
-    script: api.resolvePath(__dirname, 'assets/swarm-join.sh'),
-    vars: {
-      token,
-      managerIP: wantedManagers[0]
-    }
-  });
-
-  await api.runTaskList(list, sessions);
+  if (nodesToAdd.length > 0) {
+    // TODO: make sure token is for correct cluster
+    const token = Object.keys(serverInfo)
+      .reduce((result, item) => result || serverInfo[item].swarmToken, null);
+    const managerIP = config.servers[wantedManagers[0]].host;
+    await joinNodes(nodesToAdd, token, managerIP, api);
+  }
 }
 
 export function restart(api) {
@@ -131,7 +116,23 @@ export function restart(api) {
 
   const sessions = uniqueSessions(api);
 
-  return api.runTaskList(list, sessions, { verbose: api.verbose });
+  return api.runTaskList(list, sessions, {
+    verbose: api.verbose
+  });
+}
+
+export function removeSwarm(api) {
+  const list = nodemiral.taskList('Removing swarm');
+  const servers = Object.keys(api.getConfig().servers);
+  const sessions = api.getSessionsForServers(servers);
+
+  list.executeScript('Removing swarm', {
+    script: api.resolvePath(__dirname, 'assets/swarm-leave.sh')
+  });
+
+  return api.runTaskList(list, sessions, {
+    verbose: api.verbose
+  });
 }
 
 export function ps(api) {
@@ -148,36 +149,34 @@ export function ps(api) {
 
 export async function status(api) {
   const config = api.getConfig();
+
   if (!config.swarm) {
     console.log('Swarm not enabled');
 
     return;
   }
 
-  const serverInfo = await api.getServerInfo();
-  const hosts = Object.keys(serverInfo);
-  let manager = null;
-  let nodes = null;
+  const managers = await api.currentSwarmManagers();
+  const nodes = await api.swarmNodes();
+  const list = [];
 
-  for (let i = 0; i < hosts.length; i++) {
-    const server = serverInfo[hosts[i]];
+  managers.forEach(manager => {
+    list.push(`- ${manager} (Manager)`);
+  });
 
-    if (server.swarm && server.swarm.LocalNodeState !== 'inactive') {
-      manager = server.swarm;
-      nodes = server.swarmNodes;
-      break;
-    }
-  }
+  difference(nodes, managers).forEach(node => {
+    list.push(`- ${node}`);
+  });
 
-  if (manager === null) {
+  if (managers.length === 0) {
     console.log('No swarm managers');
 
     return;
   }
 
-  console.log(`Managers: ${manager.Managers}`);
-  console.log(manager.RemoteManagers.map(swarmManager => `- ${swarmManager.Addr}`).join('\n'));
-  console.log('');
-  console.log(`Nodes: ${nodes.length}`);
-  console.log(nodes.map(node => `- ${node.ID}`).join('\n'));
+  // TODO show swarm health: 
+  // https://docs.docker.com/engine/swarm/admin_guide/#monitor-swarm-health
+
+  console.log(`Swarm Nodes: ${nodes.length}`);
+  console.log(list.join('\n'));
 }

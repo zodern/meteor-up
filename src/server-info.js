@@ -1,4 +1,8 @@
+import debug from 'debug';
+import { map } from 'bluebird';
 import { runSSHCommand } from './utils';
+
+const log = debug('mup:server-info');
 
 export const _collectors = {
   swarm: {
@@ -18,7 +22,6 @@ export const _collectors = {
   swarmNodes: {
     command: 'docker node ls --format \'{{json .}}\'',
     parser(stdout, code) {
-      console.log(stdout);
       if (code === 0) {
         try {
           let output = stdout.split('\n').join(',');
@@ -116,17 +119,25 @@ export function getServerInfo(vars, server) {
 
       return hostResult;
     })
-    .catch(console.log);
+    .catch(err => {
+      console.log(err, server);
+    });
 }
 
 export default function serverInfo(vars, servers) {
-  return Promise.all(
-    servers.map(server => getServerInfo(vars, server))
+  log('starting');
+
+  return map(
+    servers,
+    server => getServerInfo(vars, server),
+    { concurrency: 1 }
   ).then(serverResults => {
     const result = {};
     serverResults.forEach(serverResult => {
       result[serverResult._host] = serverResult;
     });
+
+    log('finished');
 
     return result;
   });

@@ -7,6 +7,7 @@ import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { registerPreparer } from './prepare-config';
 import { registerScrubber } from './scrub-config';
+import { registerSwarmOptions } from './swarm-options';
 import resolveFrom from 'resolve-from';
 
 const log = debug('mup:plugin-loader');
@@ -19,7 +20,7 @@ export default modules;
 const bundledPlugins = fs
   .readdirSync(resolve(__dirname, 'plugins'))
   .map(name => ({ name, path: `./plugins/${name}` }))
-  .filter(isDirectoryMupModule);
+  .filter(isDirectoryMupPlugin);
 
 loadPlugins(bundledPlugins);
 
@@ -117,10 +118,13 @@ export function loadPlugins(plugins) {
       if (plugin.module.scrubConfig) {
         registerScrubber(plugin.module.scrubConfig);
       }
+      if (plugin.module.swarmOptions) {
+        registerSwarmOptions(plugin.module.swarmOptions);
+      }
     });
 }
 
-function isDirectoryMupModule({ name, path: modulePath }) {
+function isDirectoryMupPlugin({ name, path: modulePath }) {
   if (name === '__tests__') {
     return false;
   }

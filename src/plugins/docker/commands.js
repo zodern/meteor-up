@@ -22,3 +22,9 @@ export const status = {
   description: 'View status of docker swarm',
   handler: commandHandlers.status
 };
+
+export const destroyCluster = {
+  name: 'destroy-cluster',
+  description: 'Destroy swarm cluster',
+  handler: commandHandlers.removeSwarm
+};

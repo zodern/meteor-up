@@ -26,3 +26,15 @@ export function prepareConfig(config) {
 
   return config;
 }
+
+export function swarmOptions(config) {
+  if (config && config.proxy) {
+    const managers = [];
+    const servers = Object.keys(config.proxy.servers);
+    managers.push(servers[0]);
+
+    return {
+      managers
+    };
+  }
+}
