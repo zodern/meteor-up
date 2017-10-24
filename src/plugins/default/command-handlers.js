@@ -59,7 +59,7 @@ export function ssh(api) {
       serverOption = Object.keys(servers)[0];
     } else {
       console.log('mup ssh <server>');
-      console.log('Available servers are:\n', Object.keys(servers).join('\n'));
+      console.log('Available servers are:\n', Object.keys(servers).join('\n '));
       process.exitCode = 1;
 
       return;
