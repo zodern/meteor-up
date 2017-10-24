@@ -255,13 +255,15 @@ export default class PluginAPI {
   _commandErrorHandler(e) {
     process.exitCode = 1;
 
-    if (e.nodemiralHistory instanceof Array) {
-      // Error is from nodemiral when running a task list.
-      // Nodemiral should have already displayed the error
-      return;
+    // Only show error when not from nodemiral
+    // since nodemiral would have already shown the error
+    if (!(e.nodemiralHistory instanceof Array)) {
+      console.error(e);
     }
 
-    console.error(e);
+      if (e.solution) {
+        console.log(chalk.yellow(e.solution));
+      }
   }
   runCommand = async function(name) {
     if (!name) {

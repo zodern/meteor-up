@@ -3,7 +3,7 @@ import nodemiral from 'nodemiral';
 
 function copy(session, _options, callback) {
   const options = clone(_options);
-  const retries = 0;
+  let retries = 0;
 
   if (typeof options.hostVars === 'object' && options.hostVars[session._host]) {
     options.vars = merge(options.vars, options.hostVars[session._host]);
@@ -13,11 +13,25 @@ function copy(session, _options, callback) {
     session.copy(options.src, options.dest, options, cb);
   }
   function cb(err) {
-    if (err && retries < 3) {
-      console.log('Failed to copy file ', err);
-      console.log('Retrying in 3 seconds');
+    // Check if common error that a known fix
+    if (err) {
+      if (err.message === 'No such file') {
+        err.solution = 'Please run "mup setup" to create missing folders on the server.';
 
-      setTimeout(doCopy, 3000);
+        // Skip retries since we will have the same error
+        retries = 10;
+      }
+    }
+
+    retries += 1;
+
+    if (err && retries < 4) {
+      const timeout = retries * 3000;
+
+      console.log('Failed to copy file ', err.message);
+      console.log(`Retrying in ${timeout / 1000} seconds`);
+
+      setTimeout(doCopy, timeout);
 
       return;
     }
@@ -54,7 +68,7 @@ function createCallback(cb, varsMapper) {
       ${logs.stderr.substring(logs.stderr.length - 2000)}
       ------------------------------------STDOUT------------------------------------
       ${logs.stdout.substring(logs.stdout.length - 2000)}
-      ------------------------------------------------------------------------------      
+      ------------------------------------------------------------------------------
       `;
 
       return cb(new Error(message));

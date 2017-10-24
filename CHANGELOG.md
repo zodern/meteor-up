@@ -1,6 +1,13 @@
 ## Next
+
+**Plugins**
+- Plugins can add a `solution` property to errors. Mup will show the solution in yellow before exiting.
+
+**Other Changes**
 - `mup init` will create a `.deploy` folder when run in the same folder as a Meteor app
 - When mup can find a meteor app near to where `mup init` is run, the default config's `app.path` will be the path to that app
+- When copying a file fails with the error `No such file`, it will tell the user to run `mup setup` to fix it
+- Fix retry logic for the copy file task
 
 ## 1.3.4 - October 4, 2017
 - The exit code for `mup validate` is now 1 when there are validation errors
