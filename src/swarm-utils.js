@@ -46,20 +46,24 @@ export function currentManagers(config, serverInfo) {
 
 export function desiredManagers(config, serverInfo) {
   const { managers } = getOptions(config);
+  const servers = Object.keys(config.servers);
   let additionalManagers = 0;
 
   log('requrested managers', managers);
 
-  if (managers.length === 0 || managers.length === 2 || managers.length === 4) {
+  // Try to get an odd number of managers
+  if (managers.length % 2 === 0 && managers.length < servers.length) {
     additionalManagers = 1;
   }
 
-  log('additional managers', additionalManagers);
+  // When there are enough servers, make sure there are
+  // at least 3 managers, since it can then handle one manager
+  // going down
+  if (servers.length >= 3 && managers.length < 3) {
+    additionalManagers = 3 - managers.length;
+  }
 
-  // TODO: handle more than 5 managers
-  // TODO: handle when there are 2 or 4 servers
-  // TODO: When there are at least 3 servers, 
-  // there should be at least 3 managers
+  log('additional managers', additionalManagers);
 
   if (additionalManagers > 0) {
     const current = currentManagers(config, serverInfo);
