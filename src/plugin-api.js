@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import childProcess from 'child_process';
 import { commands } from './commands';
 import configValidator from './validate/index';
+import debug from 'debug';
 import fs from 'fs';
 import { getOptions } from './swarm-options';
 import nodemiral from 'nodemiral';
@@ -15,6 +16,7 @@ import { scrubConfig } from './scrub-config';
 import serverInfo from './server-info';
 
 const { resolvePath } = utils;
+const log = debug('mup:api');
 
 export default class PluginAPI {
   constructor(base, filteredArgs, program) {
@@ -276,6 +278,7 @@ export default class PluginAPI {
     await this._runPreHooks(name);
     let potentialPromise;
     try {
+      log('Running command', name);
       potentialPromise = commands[name].handler(this, nodemiral);
     } catch (e) {
       this._commandErrorHandler(e);
@@ -295,6 +298,8 @@ export default class PluginAPI {
     }
 
     const servers = Object.values(this.getConfig().servers);
+
+    console.log('=> Collecting server information');
 
     const result = await serverInfo(null, servers);
     this._cachedServerInfo = result;

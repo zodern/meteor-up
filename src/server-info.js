@@ -4,6 +4,27 @@ import { runSSHCommand } from './utils';
 
 const log = debug('mup:server-info');
 
+function parseJSONArray(stdout, code) {
+  if (code === 0) {
+    try {
+      let output = stdout.split('\n').join(',');
+      output = `[${output}]`;
+
+      const result = JSON.parse(output);
+
+      if (!(result instanceof Array)) {
+        return [result];
+      }
+
+      return result;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  return null;
+}
+
 export const _collectors = {
   swarm: {
     command: 'docker info --format \'{{json .Swarm}}\'',
@@ -20,27 +41,8 @@ export const _collectors = {
     }
   },
   swarmNodes: {
-    command: 'docker node ls --format \'{{json .}}\'',
-    parser(stdout, code) {
-      if (code === 0) {
-        try {
-          let output = stdout.split('\n').join(',');
-          output = `[${output}]`;
-
-          const result = JSON.parse(output);
-
-          if (!(result instanceof Array)) {
-            return [result];
-          }
-
-          return result;
-        } catch (e) {
-          return null;
-        }
-      }
-
-      return null;
-    }
+    command: 'docker node inspect $(docker node ls -q) --format \'{{json .}}\'',
+    parser: parseJSONArray
   },
   swarmToken: {
     command: 'docker swarm join-token worker -q',
@@ -51,6 +53,14 @@ export const _collectors = {
 
       return null;
     }
+  },
+  swarmServices: {
+    command: 'docker service ls --format \'{{json .}}\'',
+    parser: parseJSONArray
+  },
+  images: {
+    command: 'docker images --format \'{{json .}}\'',
+    parser: parseJSONArray
   }
 };
 
@@ -130,7 +140,7 @@ export default function serverInfo(vars, servers) {
   return map(
     servers,
     server => getServerInfo(vars, server),
-    { concurrency: 1 }
+    { concurrency: 2 }
   ).then(serverResults => {
     const result = {};
     serverResults.forEach(serverResult => {
