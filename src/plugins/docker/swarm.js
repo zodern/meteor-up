@@ -14,6 +14,20 @@ export function initSwarm(managers, host, api) {
   return api.runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
 
+export function promoteNodes(manager, nodeIds, api) {
+  const list = nodemiral.taskList('Promoting Nodes to Managers');
+  const sessions = api.getSessionsForServers([manager]);
+
+  list.executeScript('Promoting Node', {
+    script: api.resolvePath(__dirname, 'assets/swarm-promote.sh'),
+    vars: {
+      nodeIds
+    }
+  });
+
+  return api.runTaskList(list, sessions, { verbose: api.getVerbose() });
+}
+
 export function removeManagers(managers, api) {
   const list = nodemiral.taskList('Removing Swarm Managers');
   const sessions = api.getSessionsForServers(managers);

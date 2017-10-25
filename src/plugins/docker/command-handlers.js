@@ -8,6 +8,7 @@ import {
 import {
   initSwarm,
   joinNodes,
+  promoteNodes,
   removeManagers
 } from './swarm';
 import chalk from 'chalk';
@@ -114,6 +115,14 @@ export async function setupSwarm(api) {
       .reduce((result, item) => result || serverInfo[item].swarmToken, null);
     const managerIP = config.servers[desiredManagers[0]].host;
     await joinNodes(nodesToAdd, token, managerIP, api);
+  }
+
+  log('remaining managers to add', managersToAdd);
+  if (managersToAdd.length > 0) {
+    const managerIDs = managersToAdd
+      .map(name => findKey(nodeIDs, partial(isEqual, name)));
+
+    await promoteNodes(managersToKeep[0], managerIDs, api);
   }
 }
 
