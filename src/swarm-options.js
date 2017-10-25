@@ -1,3 +1,4 @@
+import { union } from 'lodash';
 export const _optionFunctions = [];
 
 export function registerSwarmOptions(optionFunction) {
@@ -9,9 +10,9 @@ export function getOptions(config) {
     const { tags, managers } = optionFunction(config) || {};
 
     if (tags) {
-      Object.keys(tags).forEach(host => {
-        result.tags[host] = result.tags[host] || [];
-        result.tags[host].push(...tags[host]);
+      Object.keys(tags).forEach(tag => {
+        result.tags[tag] = result.tags[tag] || [];
+        result.tags[tag] = union(result.tags[tag], tags[tag]);
       });
     }
 
