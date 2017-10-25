@@ -113,3 +113,33 @@ export function findNodes(config, serverInfo) {
 
   return hostsToServer(config, nodeHosts);
 }
+
+export function nodeIdsToServer(config, serverInfo) {
+  const hostToServer = Object.keys(config.servers).reduce((result, key) => {
+    result[config.servers[key].host] = key;
+
+    return result;
+  }, {});
+
+  const allIds = [];
+  const result = {};
+
+  Object.keys(serverInfo).forEach(host => {
+    if (serverInfo[host].swarm) {
+      result[serverInfo[host].swarm.NodeID] = hostToServer[host];
+    }
+    if (serverInfo[host].swarmNodes) {
+      const nodes = serverInfo[host].swarmNodes;
+      allIds.push(...nodes.map(node => node.ID));
+    }
+  });
+
+  allIds.forEach(id => {
+    if (!(id in result)) {
+      // This node isn't listed in config.servers
+      result[id] = null;
+    }
+  });
+
+  return result;
+}

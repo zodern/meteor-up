@@ -1,6 +1,6 @@
 import nodemiral from 'nodemiral';
 
-export function addManagers(managers, host, api) {
+export function initSwarm(managers, host, api) {
   const list = nodemiral.taskList('Setting Up Docker Swarm');
   const sessions = api.getSessionsForServers(managers);
 

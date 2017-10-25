@@ -6,6 +6,7 @@ import childProcess from 'child_process';
 import { commands } from './commands';
 import configValidator from './validate/index';
 import fs from 'fs';
+import { getOptions } from './swarm-options';
 import nodemiral from 'nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
@@ -404,19 +405,20 @@ export default class PluginAPI {
     }
   }
 
-  async currentSwarmManagers() {
+  async swarmInfo() {
     const info = await this.getServerInfo();
+    const currentManagers = swarmUtils.currentManagers(this.getConfig(), info);
+    const desiredManagers = swarmUtils.desiredManagers(this.getConfig(), info);
+    const nodes = swarmUtils.findNodes(this.getConfig(), info);
+    const nodeIdsToServer = swarmUtils.nodeIdsToServer(this.getConfig(), info);
+    const tags = getOptions();
 
-    return swarmUtils.currentManagers(this.getConfig(), info);
-  }
-  async desiredManagers() {
-    const info = await this.getServerInfo();
-
-    return swarmUtils.desiredManagers(this.getConfig(), info);
-  }
-  async swarmNodes() {
-    const info = await this.getServerInfo();
-
-    return swarmUtils.findNodes(this.getConfig(), info);
+    return {
+      currentManagers,
+      desiredManagers,
+      nodes,
+      nodeIDs: nodeIdsToServer,
+      desiredTags: tags
+    };
   }
 }

@@ -1,12 +1,15 @@
 import {
-  addManagers,
+  difference,
+  findKey,
+  intersection,
+  isEqual,
+  partial
+} from 'lodash';
+import {
+  initSwarm,
   joinNodes,
   removeManagers
 } from './swarm';
-import {
-  difference,
-  intersection
-} from 'lodash';
 import chalk from 'chalk';
 import debug from 'debug';
 import {
@@ -61,16 +64,17 @@ export async function setupSwarm(api) {
   }
 
   let serverInfo = await api.getServerInfo();
-
-  const currentManagers = await api.currentSwarmManagers();
-  const wantedManagers = await api.desiredManagers();
+  const {
+    currentManagers,
+    desiredManagers
+  } = await api.swarmInfo();
 
   log('currentManagers', currentManagers);
-  log('wantedManagers', wantedManagers);
+  log('wantedManagers', desiredManagers);
 
-  const managersToAdd = difference(wantedManagers, currentManagers);
-  const managersToRemove = difference(currentManagers, wantedManagers);
-  const managersToKeep = intersection(currentManagers, wantedManagers);
+  const managersToAdd = difference(desiredManagers, currentManagers);
+  const managersToRemove = difference(currentManagers, desiredManagers);
+  const managersToKeep = intersection(currentManagers, desiredManagers);
 
   log('managers to add', managersToAdd);
   log('managers to remove', managersToRemove);
@@ -80,7 +84,7 @@ export async function setupSwarm(api) {
     log('Creating swarm cluster');
     const host = config.servers[managersToAdd[0]].host;
 
-    await addManagers(managersToAdd, host, api);
+    await initSwarm(managersToAdd, host, api);
 
     managersToKeep.push(managersToAdd.shift());
     log('finished creating cluster');
@@ -97,7 +101,7 @@ export async function setupSwarm(api) {
     api.serverInfoStale();
   }
 
-  const currentNodes = await api.swarmNodes();
+  const { nodes: currentNodes, nodeIDs } = await api.swarmInfo();
   const wantedNodes = Object.keys(config.servers);
   const nodesToAdd = difference(wantedNodes, currentNodes);
 
@@ -108,7 +112,7 @@ export async function setupSwarm(api) {
     // TODO: make sure token is for correct cluster
     const token = Object.keys(serverInfo)
       .reduce((result, item) => result || serverInfo[item].swarmToken, null);
-    const managerIP = config.servers[wantedManagers[0]].host;
+    const managerIP = config.servers[desiredManagers[0]].host;
     await joinNodes(nodesToAdd, token, managerIP, api);
   }
 }
@@ -162,19 +166,18 @@ export async function status(api) {
     return;
   }
 
-  const managers = await api.currentSwarmManagers();
-  const nodes = await api.swarmNodes();
+  const { currentManagers, nodes } = await api.swarmInfo();
   const list = [];
 
-  managers.forEach(manager => {
+  currentManagers.forEach(manager => {
     list.push(`- ${manager} (Manager)`);
   });
 
-  difference(nodes, managers).forEach(node => {
+  difference(nodes, currentManagers).forEach(node => {
     list.push(`- ${node}`);
   });
 
-  if (managers.length === 0) {
+  if (currentManagers.length === 0) {
     console.log('No swarm managers');
 
     return;
