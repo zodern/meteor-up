@@ -299,7 +299,7 @@ export default class PluginAPI {
 
     const servers = Object.values(this.getConfig().servers);
 
-    console.log('=> Collecting server information');
+    console.log('=> Collecting Docker information');
 
     const result = await serverInfo(null, servers);
     this._cachedServerInfo = result;
@@ -424,14 +424,16 @@ export default class PluginAPI {
     const desiredManagers = swarmUtils.desiredManagers(this.getConfig(), info);
     const nodes = swarmUtils.findNodes(this.getConfig(), info);
     const nodeIdsToServer = swarmUtils.nodeIdsToServer(this.getConfig(), info);
-    const tags = getOptions();
+    const desiredLabels = getOptions(this.getConfig()).labels;
+    const currentLabels = swarmUtils.currentLabels(this.getConfig(), info);
 
     return {
       currentManagers,
       desiredManagers,
       nodes,
       nodeIDs: nodeIdsToServer,
-      desiredTags: tags
+      desiredLabels,
+      currentLabels
     };
   }
 }

@@ -1,4 +1,4 @@
-import { union } from 'lodash';
+import { merge } from 'lodash';
 export const _optionFunctions = [];
 
 export function registerSwarmOptions(optionFunction) {
@@ -7,12 +7,11 @@ export function registerSwarmOptions(optionFunction) {
 
 export function getOptions(config) {
   return _optionFunctions.reduce((result, optionFunction) => {
-    const { tags, managers } = optionFunction(config) || {};
-
-    if (tags) {
-      Object.keys(tags).forEach(tag => {
-        result.tags[tag] = result.tags[tag] || [];
-        result.tags[tag] = union(result.tags[tag], tags[tag]);
+    const { labels, managers } = optionFunction(config) || {};
+    if (typeof labels === 'object') {
+      Object.keys(labels).forEach(host => {
+        result.labels[host] = result.labels[host] || {};
+        result.labels[host] = merge(result.labels[host], labels[host]);
       });
     }
 
@@ -21,5 +20,5 @@ export function getOptions(config) {
     }
 
     return result;
-  }, { tags: {}, managers: [] });
+  }, { labels: {}, managers: [] });
 }

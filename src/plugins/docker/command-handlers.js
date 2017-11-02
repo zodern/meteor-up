@@ -6,10 +6,12 @@ import {
   partial
 } from 'lodash';
 import {
+  diffLabels,
   initSwarm,
   joinNodes,
   promoteNodes,
-  removeManagers
+  removeManagers,
+  updateLabels
 } from './swarm';
 import chalk from 'chalk';
 import debug from 'debug';
@@ -102,7 +104,12 @@ export async function setupSwarm(api) {
     api.serverInfoStale();
   }
 
-  const { nodes: currentNodes, nodeIDs } = await api.swarmInfo();
+  const {
+    nodes: currentNodes,
+    nodeIDs,
+    currentLabels,
+    desiredLabels
+  } = await api.swarmInfo();
   const wantedNodes = Object.keys(config.servers);
   const nodesToAdd = difference(wantedNodes, currentNodes);
 
@@ -123,6 +130,24 @@ export async function setupSwarm(api) {
       .map(name => findKey(nodeIDs, partial(isEqual, name)));
 
     await promoteNodes(managersToKeep[0], managerIDs, api);
+  }
+
+  // Update tags
+  let { toRemove, toAdd } = diffLabels(currentLabels, desiredLabels);
+  if (toRemove.length > 0 || toAdd.length > 0) {
+    toRemove = toRemove.map(data => {
+      data.server = findKey(nodeIDs, partial(isEqual, data.server));
+
+      return data;
+    });
+
+    toAdd = toAdd.map(data => {
+      data.server = findKey(nodeIDs, partial(isEqual, data.server));
+
+      return data;
+    });
+
+    await updateLabels(api, currentManagers[0], toAdd, toRemove);
   }
 }
 

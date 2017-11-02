@@ -143,3 +143,25 @@ export function nodeIdsToServer(config, serverInfo) {
 
   return result;
 }
+
+export function currentLabels(config, info) {
+  const result = {};
+  const idToHost = nodeIdsToServer(config, info);
+
+  Object.keys(info).forEach(host => {
+    if (info[host].swarmNodes instanceof Array) {
+      info[host].swarmNodes.forEach(node => {
+        const nodeHost = idToHost[node.ID];
+
+        // Check if it is a server mup has access to
+        if (nodeHost === null) {
+          return;
+        }
+
+        result[nodeHost] = node.Spec.Labels;
+      });
+    }
+  });
+
+  return result;
+}

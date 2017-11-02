@@ -119,9 +119,13 @@ export function scrubConfig(config, utils) {
 export function swarmOptions(config) {
   if (config && config.app && config.app.type === 'meteor') {
     return {
-      tags: {
-        [`mup-app-${config.app.name}`]: Object.keys(config.app.servers)
-      }
+      labels: Object.keys(config.app.servers).reduce((result, server) => {
+        result[server] = {
+          [`mup-app-${config.app.name}`]: 'true'
+        };
+
+        return result;
+      }, {})
     };
   }
 }
