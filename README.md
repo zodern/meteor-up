@@ -8,7 +8,7 @@ You can install and use Meteor Up on Linux, Mac and Windows. It can deploy to se
 
 This version of Meteor Up is powered by [Docker](http://www.docker.com/), making deployment easy to manage and reducing server specific errors.
 
-Read the [getting started tutorial](http://meteor-up.com/getting-started.html).  
+Read the [getting started tutorial](http://meteor-up.com/getting-started.html).
 
 ### Features
 

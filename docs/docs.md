@@ -252,6 +252,16 @@ The `--cached-build` option will use the build from the last time you deployed t
 * `mup restart` - restart the app
 * `mup logs [-f --tail=50]` - view the app's logs. Supports all of the flags from `docker logs`.
 
+## Meteor Support
+
+Mup supports Meteor 1.2 and newer, though you might need to change the docker image in your mup config.
+
+| Meteor version | Docker image | Notes |
+| --- | --- | --- |
+| 1.2 - 1.3 | `kadirahq/meteord` | This is the default docker image. When using Meteor 1.2, `app.buildOptions.serverOnly` should be false. |
+| 1.4 - 1.5 | `abernix/meteord:base` |  |
+| 1.6 | `abernix/meteord:node-8.4.0-base` | |
+
 ## Build Options
 
 You can define Meteor build options in `mup.js` like this:
