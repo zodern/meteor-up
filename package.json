@@ -65,7 +65,6 @@
     "stylelint-config-standard": "^17.0.0"
   },
   "dependencies": {
-    "archiver": "^2.0.0",
     "async": "~2.5.0",
     "babel-polyfill": "^6.26.0",
     "bluebird": "~3.5.0",
