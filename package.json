@@ -84,6 +84,7 @@
     "shelljs": "~0.5.0",
     "silent-npm-registry-client": "^3.0.1",
     "ssh2": "0.4.x",
+    "tar": "^4.0.2",
     "traverse": "^0.6.6",
     "uuid": "^3.1.0",
     "yargs": "~8.0.2"
