@@ -1,7 +1,6 @@
 import tar from 'tar';
 import debug from 'debug';
 import fs from 'fs';
-import { once } from 'lodash';
 import { spawn } from 'child_process';
 
 const log = debug('mup:module:meteor');
