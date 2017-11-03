@@ -1,6 +1,8 @@
 ## Next
 - Fix tar related errors
 - The validation message shown when the `servers` object is missing from the config has been removed since some deployment plugins might not need it
+- The config created by `mup init` has the correct docker image for Meteor 1.6
+- Add table to docs to show which docker image to use for each Meteor version
 
 **Plugins**
 - The remaining Meteor functionality has been removed from the default plugin, allowing plugins to completely take over deploying and managing the app when `app.type` in the config is set to something besides `meteor`
