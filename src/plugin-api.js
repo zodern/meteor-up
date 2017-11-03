@@ -263,9 +263,9 @@ export default class PluginAPI {
       console.error(e);
     }
 
-      if (e.solution) {
-        console.log(chalk.yellow(e.solution));
-      }
+    if (e.solution) {
+      console.log(chalk.yellow(e.solution));
+    }
   }
   runCommand = async function(name) {
     if (!name) {
@@ -323,6 +323,12 @@ export default class PluginAPI {
     }
 
     return servers.map(name => this.sessions[name]);
+  }
+
+  async getManagerSession() {
+    const managers = await this.currentSwarmManagers();
+
+    return this.getSessionsForServers(managers)[0];
   }
 
   _pickSessions(plugins = []) {
