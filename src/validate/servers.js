@@ -15,7 +15,7 @@ const schema = joi.object().keys().pattern(/.*/, {
   opts: joi.object().keys({
     port: joi.number()
   })
-}).min(1);
+});
 
 export default function validateServers(servers) {
   let details = [];

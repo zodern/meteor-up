@@ -13,7 +13,7 @@ export function addPluginValidator(rootPath, handler) {
 
 function generateSchema() {
   const topLevelKeys = {
-    servers: joi.object().required(),
+    servers: joi.object(),
     app: joi.object(),
     plugins: joi.array(),
     hooks: joi.object().pattern(/.*/, joi.alternatives(joi.object({

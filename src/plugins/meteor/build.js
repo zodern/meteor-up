@@ -1,7 +1,6 @@
-import archiver from 'archiver';
+import tar from 'tar';
 import debug from 'debug';
 import fs from 'fs';
-import { once } from 'lodash';
 import { spawn } from 'child_process';
 
 const log = debug('mup:module:meteor');
@@ -121,25 +120,23 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
 }
 
 export function archiveApp(buildLocation, api, cb) {
-  var callback = once(cb);
-  var bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
-  var sourceDir = api.resolvePath(buildLocation, 'bundle');
+  const bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
 
-  var output = fs.createWriteStream(bundlePath);
-  var archive = archiver('tar', {
-    gzip: true,
-    gzipOptions: {
+  log('starting archive');
+  tar.c({
+    file: bundlePath,
+    onwarn(message, data) { console.log(message, data); },
+    cwd: buildLocation,
+    gzip: {
       level: 9
     }
+  }, ['bundle'], err => {
+    log('archive finished');
+
+    if (err) {
+      console.log('=> Archiving failed: ', err.message);
+    }
+
+    cb(err);
   });
-
-  archive.pipe(output);
-  output.once('close', callback);
-
-  archive.once('error', function(err) {
-    console.log('=> Archiving failed:', err.message);
-    callback(err);
-  });
-
-  archive.directory(sourceDir, 'bundle').finalize();
 }

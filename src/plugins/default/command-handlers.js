@@ -51,19 +51,16 @@ export function init(api) {
   }
 }
 
-export function logs(api) {
+export function logs() {
   log('exec => mup logs');
-  return api.runCommand('meteor.logs');
 }
 
-export function reconfig(api) {
+export function reconfig() {
   log('exec => mup reconfig');
-  return api.runCommand('meteor.envconfig').then(() => api.runCommand('meteor.start'));
 }
 
-export function restart(api) {
+export function restart() {
   log('exec => mup restart');
-  return api.runCommand('meteor.restart');
 }
 
 export function setup(api) {
@@ -87,14 +84,12 @@ export function setup(api) {
     });
 }
 
-export function start(api) {
+export function start() {
   log('exec => mup start');
-  return api.runCommand('meteor.start');
 }
 
-export function stop(api) {
+export function stop() {
   log('exec => mup stop');
-  return api.runCommand('meteor.stop');
 }
 
 export function ssh(api) {
