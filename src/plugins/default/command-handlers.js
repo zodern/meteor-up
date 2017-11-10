@@ -47,7 +47,6 @@ export function start() {
 
 export function stop() {
   log('exec => mup stop');
-  // return api.runCommand('meteor.stop');
 }
 
 export function ssh(api) {
