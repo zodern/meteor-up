@@ -316,8 +316,8 @@ export function start(api) {
       deployCheckPath: '',
       host: api.getConfig().proxy ?
         api.getConfig().proxy.domains.split(',')[0] : null,
-	  bind: api.getConfig().app.docker.bind ? 
-	    api.getConfig().app.docker.bind : 'localhost'
+      bind: api.getConfig().app.docker.bind ?
+        api.getConfig().app.docker.bind : 'localhost'
     }
   });
 
@@ -394,7 +394,7 @@ export function restart(api) {
       deployCheckPath: '',
       host: api.getConfig().proxy ?
         api.getConfig().proxy.domains.split(',')[0] : null,
-	  bind: api.getConfig().app.docker.bind ?
+      bind: api.getConfig().app.docker.bind ?
         api.getConfig().app.docker.bind : 'localhost'
     }
   });
