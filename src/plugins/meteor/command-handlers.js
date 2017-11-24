@@ -161,7 +161,7 @@ export async function push(api) {
 
   const list = nodemiral.taskList('Pushing Meteor App');
 
-  list.copy('Pushing Meteor App Bundle to The Server', {
+  list.copy('Pushing Meteor App Bundle to the Server', {
     src: bundlePath,
     dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
     progressBar: config.enableUploadProgressBar
