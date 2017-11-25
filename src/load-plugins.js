@@ -1,20 +1,22 @@
+import { join, resolve } from 'path';
+
+import { addPluginValidator } from './validate';
+import debug from 'debug';
 import fs from 'fs';
-import resolveFrom from 'resolve-from';
 import globalModules from 'global-modules';
-import { resolve, join } from 'path';
+import path from 'path';
 import registerCommand from './commands';
 import { registerHook } from './hooks';
-import { addPluginValidator } from './validate';
 import { registerPreparer } from './prepare-config';
-import path from 'path';
-import debug from 'debug';
+import { registerScrubber } from './scrub-config';
+import resolveFrom from 'resolve-from';
 
 const log = debug('mup:plugin-loader');
 
 const modules = {};
 export default modules;
 
-// Load all folders in ./plugins as MUP modules.
+// Load all folders in ./plugins as mup plugins.
 // The directory name is the module name.
 let bundledPlugins = fs
   .readdirSync(resolve(__dirname, 'plugins'))
@@ -70,17 +72,23 @@ export function loadPlugins(plugins) {
         let name = module.name || plugin.name;
         return { name, module };
       } catch (e) {
-        if (e.code !== 'MODULE_NOT_FOUND') {
+        const pathPosition = e.message.length - plugin.path.length - 1;
+
+        // Hides error when plugin cannot be loaded
+        // Show the error when a plugin cannot resolve a module
+        if (
+          e.code !== 'MODULE_NOT_FOUND' ||
+          e.message.indexOf(plugin.path) !== pathPosition
+        ) {
           console.log(e);
         }
+
         console.log(`Unable to load plugin ${plugin.name}`);
         return { name: module.name || plugin.name, failed: true };
       }
     })
+    .filter(plugin => !plugin.failed)
     .forEach(plugin => {
-      if (plugin.failed) {
-        return;
-      }
       modules[plugin.name] = plugin.module;
       if (plugin.module.commands) {
         Object.keys(plugin.module.commands).forEach(key => {
@@ -100,6 +108,9 @@ export function loadPlugins(plugins) {
       }
       if (plugin.module.prepareConfig) {
         registerPreparer(plugin.module.prepareConfig);
+      }
+      if (plugin.module.scrubConfig) {
+        registerScrubber(plugin.module.scrubConfig);
       }
     });
 }

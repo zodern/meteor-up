@@ -7,6 +7,9 @@ export let setup = {
 
 export let logs = {
   description: 'View MongoDB logs',
+  builder(yargs) {
+    return yargs.strict(false);
+  },
   handler: commandHandlers.logs
 };
 

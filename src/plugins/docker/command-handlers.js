@@ -27,6 +27,12 @@ export function setup(api) {
   });
 
   const sessions = uniqueSessions(api);
+
+  if (sessions.length === 0) {
+    // There are no servers, so we can skip running the list
+    return;
+  }
+
   return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 

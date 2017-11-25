@@ -21,7 +21,8 @@ sudo docker stop $APPNAME || true
 cd $APP_DIR/tmp
 
 sudo rm -rf bundle
-tar -xzf bundle.tar.gz
+sudo tar -xzf bundle.tar.gz
+sudo chmod +x bundle
 
 cd bundle
 
@@ -35,6 +36,8 @@ ENV <%- key %>=<%- env[key] %>
 RUN cd  /built_app/programs/server && \
     npm install --unsafe-perm
 EOT
+
+sudo chmod 777 ./ -R
 
 sudo docker build -t $IMAGE:build . || build_failed
 

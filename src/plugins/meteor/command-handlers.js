@@ -1,9 +1,11 @@
-import buildApp from './build.js';
+import buildApp, { archiveApp } from './build.js';
+
 import { cloneDeep } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
 import os from 'os';
+import { promisify } from 'bluebird';
 import random from 'random-seed';
 import uuid from 'uuid';
 
@@ -89,42 +91,77 @@ export function setup(api) {
   return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
-export async function push(api) {
-  log('exec => mup meteor push');
+function getBuildOptions(api) {
   const config = api.getConfig().app;
-  if (!config) {
-    console.error('error: no configs found for meteor');
-    process.exit(1);
-  }
-
   const appPath = api.resolvePath(api.getBasePath(), config.path);
 
   let buildOptions = config.buildOptions || {};
   buildOptions.buildLocation =
     buildOptions.buildLocation || tmpBuildPath(appPath, api);
 
-  var bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+  return buildOptions;
+}
+
+function shouldRebuild(api) {
   var rebuild = true;
+  const { buildLocation } = getBuildOptions(api);
+  var bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
 
   if (api.getOptions()['cached-build']) {
     const buildCached = fs.existsSync(bundlePath);
-    if (!buildCached) {
-      console.log('Unable to use previous build. It doesn\'t exist.');
-    } else {
+
+    // If build is not cached, rebuild is true
+    // even though the --cached-build flag was used
+    if (buildCached) {
       rebuild = false;
-      console.log('Not building app. Using build from previous deploy at');
-      console.log(buildOptions.buildLocation);
     }
+  }
+
+  return rebuild;
+}
+
+export async function build(api) {
+  const config = api.getConfig().app;
+  const appPath = api.resolvePath(api.getBasePath(), config.path);
+  const buildOptions = getBuildOptions(api);
+
+  var rebuild = shouldRebuild(api);
+
+  if (rebuild && api.getOptions()['cached-build']) {
+    console.log('Unable to use previous build. It doesn\'t exist.');
+  } else if (!rebuild) {
+    console.log('Not building app. Using build from previous deploy at');
+    console.log(buildOptions.buildLocation);
   }
 
   if (rebuild) {
     console.log('Building App Bundle Locally');
     await buildApp(appPath, buildOptions, api.getVerbose(), api);
   }
+}
+
+export async function push(api) {
+  log('exec => mup meteor push');
+
+  await api.runCommand('meteor.build');
+
+  const config = api.getConfig().app;
+  if (!config) {
+    console.error('error: no configs found for meteor');
+    process.exit(1);
+  }
+
+  let buildOptions = getBuildOptions(api);
+
+  var bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+
+  if (shouldRebuild(api)) {
+    await promisify(archiveApp)(buildOptions.buildLocation, api);
+  }
 
   const list = nodemiral.taskList('Pushing Meteor App');
 
-  list.copy('Pushing Meteor App Bundle to The Server', {
+  list.copy('Pushing Meteor App Bundle to the Server', {
     src: bundlePath,
     dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
     progressBar: config.enableUploadProgressBar
@@ -287,8 +324,9 @@ export function start(api) {
       deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
       deployCheckPath: '',
       host: api.getConfig().proxy ?
-        api.getConfig().proxy.domains.split(',')[0] :
-        null
+        api.getConfig().proxy.domains.split(',')[0] : null,
+      bind: api.getConfig().app.docker.bind ?
+        api.getConfig().app.docker.bind : 'localhost'
     }
   });
 
@@ -364,7 +402,9 @@ export function restart(api) {
       deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
       deployCheckPath: '',
       host: api.getConfig().proxy ?
-        api.getConfig().proxy.domains.split(',')[0] : null
+        api.getConfig().proxy.domains.split(',')[0] : null,
+      bind: api.getConfig().app.docker.bind ?
+        api.getConfig().app.docker.bind : 'localhost'
     }
   });
 

@@ -25,6 +25,7 @@ export function prepareConfig(config) {
   }
 
   config.app.docker.args.push('--link=mongodb:mongodb');
+  return config;
 }
 
 export const hooks = {

@@ -1,3 +1,37 @@
+## 1.3.6 - Nov 24, 2017
+- Fix permission denied errors when deploying to nonroot user (@nickich)
+- Make bundle portable (@m-niesluchow)
+
+## 1.3.5 - Nov 3, 2017
+- Fix tar errors
+- The validation message shown when the `servers` object is missing from the config has been removed since some deployment plugins might not need it
+- The config created by `mup init` has the correct docker image for Meteor 1.6
+- Add table to docs that shows which docker image to use for each Meteor version
+
+**Plugins**
+- The remaining Meteor functionality has been removed from the default plugin, allowing plugins to completely take over deploying and managing the app when `app.type` in the config is set to something besides `meteor`
+
+## 1.3.4 - October 4, 2017
+- The exit code for `mup validate` is now 1 when there are validation errors
+- Fix changing proxy's clientUploadLimit with `proxy.shared.clientUploadLimit`
+- Added a `--scrub` option to `mup validate`, which when used with `--show` shows the config with most of the sensitive information removed
+- `mup mongo logs` accepts the same options as `mup logs` and other log commands
+- Use npm-shrinkwrap to prevent https://github.com/zodern/meteor-up/issues/757 from happening again
+- Hide docker error when trying to roll back and checking if an image exists. It is handled and normal, but could be confused with the reason for the app failing to start
+
+**Plugins and Hooks**
+- Building the app (but not archiving it) was moved to a new command `meteor.build`, which is run by `meteor.deploy` and `meteor.push`. This allows plugins or hooks to modify the bundle before it is archived and uploaded to the servers.
+- Plugins can export a `scrubConfig(config, utils)` function, which should return the config with all sensitive information removed
+- `api.scrubConfig()` was added, which returns the config after modified by any `scrubConfig` functions from plugins
+- `api.validateConfig` only shows the errors on the console the first time it is run
+- `MODULE_NOT_FOUND` errors are now shown when a plugin fails to load due to being unable to resolve a module
+
+**Docs**
+- Color, font, and spacing changes were made to the docs. It should look nicer and be easier to read.
+- Fixed grammar and capitalization
+- Many example configs in the docs are validated with `mup validate`
+- Many example configs show more of the config surrounding the section being documented
+
 ## 1.3.3 - September 12, 2017
 - Add `mup validate` command, which validates the config. Has `--show` option which shows the config after it has been normalized and modified by plugin's `prepareConfig` functions
 - Add `mup proxy logs-le` to view the Let's Encrypt logs
@@ -95,7 +129,7 @@ Big thanks to @shaiamir for his work on the shared proxy.
 - App inside container's port is set to `docker.imagePort`. The app is still accessible on `env.PORT`.
 - Will build app if cached build is not found and `--cached-build` flag is set
 - Fix some bugs with verifying deployment
-- Add support for `zodern:mup-helpers` package. Since version 1.2.7, verifying deployment fails if the app's `/` route's http code is other than 200, or if it does not redirect on the server to a page that does have that http code. Adding `zodern:mup-helpers` allows meteor up to sucessfully validate the deployment.
+- Add support for `zodern:mup-helpers` package. Since version 1.2.7, verifying deployment fails if the app's `/` route's http code is other than 200, or if it does not redirect on the server to a page that does have that http code. Adding `zodern:mup-helpers` allows meteor up to successfully validate the deployment.
 
 ## 1.2.7 - May 5, 2017
 - Fix verifying deployment when using ssl autogenerate
@@ -118,7 +152,7 @@ Big thanks to @shaiamir for his work on the shared proxy.
 - MongoDB is safely shutdown for `Start Mongo` and `Stop Mongo` task lists
 - Reduced number of dependencies installed
 - Better error message on meteor build spawn error
-- Setup tasks are consistently capitilized
+- Setup tasks are consistently capitalized
 - Clearer validator message for `ROOT_URL`
 - Add warning message when using `force-ssl` without ssl setup
 - Validate `meteor.ssl.upload` @markreid

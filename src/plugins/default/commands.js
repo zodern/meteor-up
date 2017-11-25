@@ -71,7 +71,11 @@ export let validate = {
     return yargs.option('show', {
       description: 'Show config after being modified by plugins',
       bool: true
-    });
+    })
+      .option('scrub', {
+        description: 'When used with --show, hides sensitive information',
+        bool: true
+      });
   },
   handler: commandHandlers.validate
 };

@@ -1,12 +1,11 @@
-import { spawn } from 'child_process';
-import archiver from 'archiver';
-import fs from 'fs';
+import tar from 'tar';
 import debug from 'debug';
-import { once } from 'lodash';
+import fs from 'fs';
+import { spawn } from 'child_process';
 
 const log = debug('mup:module:meteor');
 
-function buildApp(appPath, buildOptions, verbose, api) {
+export default function buildApp(appPath, buildOptions, verbose, api) {
   // Check if the folder exists
   try {
     fs.statSync(api.resolvePath(appPath));
@@ -41,7 +40,7 @@ function buildApp(appPath, buildOptions, verbose, api) {
     };
     buildMeteorApp(appPath, buildOptions, verbose, function(code) {
       if (code === 0) {
-        archiveIt(buildOptions.buildLocation, api, callback);
+        callback();
         return;
       }
       console.log('\n=> Build Error. Check the logs printed above.');
@@ -120,28 +119,25 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
   meteor.on('close', callback);
 }
 
-function archiveIt(buildLocation, api, cb) {
-  var callback = once(cb);
-  var bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
-  var sourceDir = api.resolvePath(buildLocation, 'bundle');
+export function archiveApp(buildLocation, api, cb) {
+  const bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
 
-  var output = fs.createWriteStream(bundlePath);
-  var archive = archiver('tar', {
-    gzip: true,
-    gzipOptions: {
+  log('starting archive');
+  tar.c({
+    file: bundlePath,
+    onwarn(message, data) { console.log(message, data); },
+    cwd: buildLocation,
+    portable: true,
+    gzip: {
       level: 9
     }
+  }, ['bundle'], err => {
+    log('archive finished');
+
+    if (err) {
+      console.log('=> Archiving failed: ', err.message);
+    }
+
+    cb(err);
   });
-
-  archive.pipe(output);
-  output.once('close', callback);
-
-  archive.once('error', function(err) {
-    console.log('=> Archiving failed:', err.message);
-    callback(err);
-  });
-
-  archive.directory(sourceDir, 'bundle').finalize();
 }
-
-module.exports = buildApp;
