@@ -1,4 +1,9 @@
+## 1.3.7 - Nov 28, 2017
+
+- Fix permission denied error sometimes encountered during Prepare Bundle
+
 ## 1.3.6 - Nov 24, 2017
+
 - Fix permission denied errors when deploying to nonroot user (@nickich)
 - Make bundle portable (@m-niesluchow)
 
