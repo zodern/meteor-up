@@ -21,10 +21,12 @@ sudo docker stop $APPNAME || true
 cd $APP_DIR/tmp
 
 sudo rm -rf bundle
-tar -xzf bundle.tar.gz
-
+sudo tar -xzf bundle.tar.gz
+sudo chmod 777 ./ -R
+echo "Finished Extracting"
 cd bundle
 
+echo "Creating Dockerfile"
 sudo cat <<EOT > Dockerfile
 FROM <%= dockerImage %>
 RUN mkdir /built_app
@@ -35,6 +37,12 @@ ENV <%- key %>=<%- env[key] %>
 RUN cd  /built_app/programs/server && \
     npm install --unsafe-perm
 EOT
+
+echo "Finished creating Dockerfile"
+
+sudo chmod 777 ./Dockerfile
+
+echo "Building image"
 
 sudo docker build -t $IMAGE:build . || build_failed
 

@@ -239,6 +239,13 @@ export function envconfig(api) {
 
   const list = nodemiral.taskList('Configuring App');
 
+  list.executeScript('Cleaning up previous nginx configs', {
+    script: api.resolvePath(__dirname, 'assets/nginx-cleanup.sh'),
+    vars: {
+      name: config.name
+    }
+  });
+
   if (config.nginx.configPath) {
     list.copy('Pushing the nginx config', {
       src: config.nginx.configPath,

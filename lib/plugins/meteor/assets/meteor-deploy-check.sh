@@ -5,7 +5,7 @@ APP_PATH=/opt/$APPNAME
 IMAGE=mup-<%= appName.toLowerCase() %>
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
-DEPLOY_CHECK_URL=<%= `localhost:${deployCheckPort}${deployCheckPath}` %>
+DEPLOY_CHECK_URL=<%= `${bind}:${deployCheckPort}${deployCheckPath}` %>
 HOST=<%= host %>
 
 cd $APP_PATH
@@ -13,7 +13,7 @@ cd $APP_PATH
 revert_app (){
   sudo docker logs --tail=100 $APPNAME 1>&2
 
-  if sudo docker image inspect $IMAGE:previous >/dev/null; then
+  if sudo docker image inspect $IMAGE:previous >/dev/null 2>&1; then
     sudo docker tag $IMAGE:previous $IMAGE:latest
     sudo bash $START_SCRIPT > /dev/null 2>&1
 
