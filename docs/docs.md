@@ -425,6 +425,22 @@ meteor: {
 }
 ```
 
+### Custom Docker Registry
+
+Simply reference the docker image by url in the `meteor.docker.image` setting:
+
+```
+meteor: {
+ ...
+  docker: {
+    ...
+    image: 'registry.gitlab.com/someregistry/someimage:sometag'
+  }
+}
+```
+
+And then add a docker setup hook to login to your private registry on the server. See [Hooks](#hooks) for example of logging into a private docker registry.
+
 ### Image Port
 
 You can set `meteor.docker.port` to the port to expose from the container. This does not affect the port the app is accessed on, only the port the app runs on inside the docker container.
@@ -749,6 +765,22 @@ module.exports = {
     },
     'post.meteor.restart': {
       remoteCommand: 'docker logs --tail 50 app-name'
+    },
+    'pre.docker.setup'(api) {
+      // Login to private Gitlab docker registry
+      const config = api.getConfig();
+      const registry = 'registry.gitlab.com';
+      const u = process.env.REGISTRY_USERNAME;
+      const p = process.env.REGISTRY_PASSWORD;
+      if (!u || !p) {
+        throw new Error(
+          'You must provide registry login details'
+        );
+      }
+      return api.runSSHCommand(
+        config.servers.one,
+        `docker login -u ${u} -p ${p} ${registry}`
+      );
     },
     'post.docker.setup'(api) {
       // Same api as is given to plugin command handlers
