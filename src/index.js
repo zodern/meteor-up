@@ -56,10 +56,13 @@ const config = preAPI.getConfig(false);
 
 // Load plugins
 if (config.plugins instanceof Array) {
+  const appPath = config.app ? config.app.path : '';
+  const absoluteAppPath = preAPI.resolvePath(preAPI.base, appPath);
+
   loadPlugins(
     config.plugins.map(plugin => ({
       name: plugin,
-      path: locatePluginDir(plugin, preAPI.configPath, preAPI.app ? preAPI.app.path : '')
+      path: locatePluginDir(plugin, preAPI.configPath, absoluteAppPath)
     }))
   );
 }
