@@ -128,6 +128,7 @@ export function archiveApp(buildLocation, api, cb) {
     file: bundlePath,
     onwarn(message, data) { console.log(message, data); },
     cwd: buildLocation,
+    portable: true,
     gzip: {
       level: 9
     }

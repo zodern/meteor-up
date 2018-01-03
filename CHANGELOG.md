@@ -1,3 +1,12 @@
+## 1.3.7 - Nov 28, 2017
+
+- Fix permission denied error sometimes encountered during Prepare Bundle
+
+## 1.3.6 - Nov 24, 2017
+
+- Fix permission denied errors when deploying to nonroot user (@nickich)
+- Make bundle portable (@m-niesluchow)
+
 ## Next
 
 **Plugins**
@@ -36,7 +45,7 @@
 
 **Docs**
 - Color, font, and spacing changes were made to the docs. It should look nicer and be easier to read.
-- Fixed grammer and capitalization
+- Fixed grammar and capitalization
 - Many example configs in the docs are validated with `mup validate`
 - Many example configs show more of the config surrounding the section being documented
 
@@ -137,7 +146,7 @@ Big thanks to @shaiamir for his work on the shared proxy.
 - App inside container's port is set to `docker.imagePort`. The app is still accessible on `env.PORT`.
 - Will build app if cached build is not found and `--cached-build` flag is set
 - Fix some bugs with verifying deployment
-- Add support for `zodern:mup-helpers` package. Since version 1.2.7, verifying deployment fails if the app's `/` route's http code is other than 200, or if it does not redirect on the server to a page that does have that http code. Adding `zodern:mup-helpers` allows meteor up to sucessfully validate the deployment.
+- Add support for `zodern:mup-helpers` package. Since version 1.2.7, verifying deployment fails if the app's `/` route's http code is other than 200, or if it does not redirect on the server to a page that does have that http code. Adding `zodern:mup-helpers` allows meteor up to successfully validate the deployment.
 
 ## 1.2.7 - May 5, 2017
 - Fix verifying deployment when using ssl autogenerate
@@ -160,7 +169,7 @@ Big thanks to @shaiamir for his work on the shared proxy.
 - MongoDB is safely shutdown for `Start Mongo` and `Stop Mongo` task lists
 - Reduced number of dependencies installed
 - Better error message on meteor build spawn error
-- Setup tasks are consistently capitilized
+- Setup tasks are consistently capitalized
 - Clearer validator message for `ROOT_URL`
 - Add warning message when using `force-ssl` without ssl setup
 - Validate `meteor.ssl.upload` @markreid

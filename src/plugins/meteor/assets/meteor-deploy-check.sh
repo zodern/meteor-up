@@ -5,7 +5,7 @@ APP_PATH=/opt/$APPNAME
 IMAGE=mup-<%= appName.toLowerCase() %>
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
-DEPLOY_CHECK_URL=<%= `localhost:${deployCheckPort}${deployCheckPath}` %>
+DEPLOY_CHECK_URL=<%= `${bind}:${deployCheckPort}${deployCheckPath}` %>
 HOST=<%= host %>
 
 cd $APP_PATH

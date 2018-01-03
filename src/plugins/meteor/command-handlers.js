@@ -162,7 +162,7 @@ export async function push(api) {
 
   const list = nodemiral.taskList('Pushing Meteor App');
 
-  list.copy('Pushing Meteor App Bundle to The Server', {
+  list.copy('Pushing Meteor App Bundle to the Server', {
     src: bundlePath,
     dest: `/opt/${config.name}/tmp/bundle.tar.gz`,
     progressBar: config.enableUploadProgressBar
@@ -318,8 +318,9 @@ export function start(api) {
       deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
       deployCheckPath: '',
       host: api.getConfig().proxy ?
-        api.getConfig().proxy.domains.split(',')[0] :
-        null
+        api.getConfig().proxy.domains.split(',')[0] : null,
+      bind: api.getConfig().app.docker.bind ?
+        api.getConfig().app.docker.bind : 'localhost'
     }
   });
 
@@ -397,7 +398,9 @@ export function restart(api) {
       deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
       deployCheckPath: '',
       host: api.getConfig().proxy ?
-        api.getConfig().proxy.domains.split(',')[0] : null
+        api.getConfig().proxy.domains.split(',')[0] : null,
+      bind: api.getConfig().app.docker.bind ?
+        api.getConfig().app.docker.bind : 'localhost'
     }
   });
 
