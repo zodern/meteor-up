@@ -895,6 +895,7 @@ module.exports = {
 - [mup-disk](https://www.npmjs.com/package/mup-disk) Shows disk usage and cleans up old files and docker items
 - [mup-redis](https://www.npmjs.com/package/mup-redis) Set up and manage Redis
 - [mup-fix-bin-paths](https://www.npmjs.com/package/mup-fix-bin-paths) Fix npm bin paths that break deploying from Windows
+- [mup-aws-beanstalk](https://github.com/zodern/mup-aws-beanstalk) Deploy using AWS Elsatic Beanstalk. Supports load balancing, auto scaling, and rolling deploys.
 
 If you have created a plugin, create a pull request to add it to this list.
 
