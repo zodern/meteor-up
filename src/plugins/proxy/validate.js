@@ -13,6 +13,8 @@ const schema = joi.object().keys({
     .without('letsEncryptEmail', ['crt', 'key'])
     .or('letsEncryptEmail', 'crt', 'forceSSL'),
   domains: joi.string().required(),
+  nginxServerConfig: joi.string(),
+  nginxLocationConfig: joi.string(),
   shared: joi.object().keys({
     clientUploadLimit: joi.alternatives().try(joi.number(), joi.string()),
     httpPort: joi.number(),

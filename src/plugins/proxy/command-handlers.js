@@ -1,5 +1,6 @@
 import { clone } from 'lodash';
 import debug from 'debug';
+import fs from 'fs';
 import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:proxy');
@@ -51,6 +52,7 @@ export function setup(api) {
   }
 
   const list = nodemiral.taskList('Setup proxy');
+  const domains = config.domains.split(',');
 
   list.executeScript('Setup Environment', {
     script: api.resolvePath(__dirname, 'assets/proxy-setup.sh'),
@@ -68,6 +70,31 @@ export function setup(api) {
     }
   });
 
+  let nginxServerConfig = '';
+  if (config.nginxServerConfig) {
+    nginxServerConfig = fs.readFileSync(
+      api.resolvePath(api.getBasePath(), config.nginxServerConfig)
+    ).toString('utf8');
+  }
+
+  let nginxLocationConfig = '';
+  if (config.nginxLocationConfig) {
+    nginxLocationConfig = fs.readFileSync(
+      api.resolvePath(api.getBasePath(), config.nginxLocationConfig)
+    ).toString('utf8');
+  }
+
+  list.executeScript('Pushing Nginx Config', {
+    script: api.resolvePath(__dirname, 'assets/nginx-config.sh'),
+    vars: {
+      hasServerConfig: config.nginxServerConfig,
+      hasLocationConfig: config.nginxLocationConfig,
+      serverConfig: nginxServerConfig,
+      locationConfig: nginxLocationConfig,
+      domains,
+      proxyName: PROXY_CONTAINER_NAME
+    }
+  });
 
   list.executeScript('Cleaning Up SSL Certificates', {
     script: api.resolvePath(__dirname, 'assets/ssl-cleanup.sh'),
@@ -96,7 +123,7 @@ export function setup(api) {
       vars: {
         appName,
         proxyName: PROXY_CONTAINER_NAME,
-        domains: config.domains.split(',')
+        domains
       }
     });
   }
