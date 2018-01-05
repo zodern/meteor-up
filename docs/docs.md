@@ -513,6 +513,36 @@ module.exports = {
 
 It uses HSTS. This means that if you set it to `false` after it's been true, the browser used by anyone that visited it while it was set to true will still be redirected to `https` for one year.
 
+### Custom NGINX Config
+
+The nginx config is generated based on the docker containers running on the same server. At this time, it is not possible to modify the majority it. However, you can modify the server and `/` location blocks for the app.
+
+To extend the server block for the app, save the rules to a file and add the path to your config:
+
+```js
+module.exports = {
+  // ... rest of config
+
+  proxy: {
+    domains: 'website.com',
+    nginxServerConfig: './path/to/config'
+  }
+};
+```
+
+To modify the `/` location block, save the rules to a file and add the path to your config:
+
+```js
+module.exports = {
+  // ... rest of config
+
+  proxy: {
+    domains: 'website.com',
+    nginxLocationConfig: './path/to/config'
+  }
+};
+```
+
 ### Advanced configuration
 The `proxy.shared` object has settings that most apps won't need to change, but if they are they apply to every app using the proxy. After you change `proxy.shared`, you need to run `mup proxy reconfig-shared` for it to take effect.
 
