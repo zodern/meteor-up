@@ -543,6 +543,14 @@ module.exports = {
 };
 ```
 
+You can view the generated config by running
+
+```bash
+mup proxy nginx-config
+```
+
+There will be `include` statements for each custom config.
+
 ### Advanced configuration
 The `proxy.shared` object has settings that most apps won't need to change, but if they are they apply to every app using the proxy. After you change `proxy.shared`, you need to run `mup proxy reconfig-shared` for it to take effect.
 

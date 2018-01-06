@@ -232,3 +232,23 @@ export function stop(api) {
 
   return api.runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
+
+export async function nginxConfig(api) {
+  log('exec => mup proxy nginx-config');
+
+  const command = `docker exec ${PROXY_CONTAINER_NAME}  cat /etc/nginx/conf.d/default.conf`;
+  const { servers, app } = api.getConfig();
+  const serverObjects = Object.keys(app.servers)
+    .map(serverName => servers[serverName]);
+
+  await Promise.all(
+    serverObjects.map(server =>
+      api.runSSHCommand(server, command)
+    )
+  ).then(results => {
+    results.forEach(({ host, output }) => {
+      console.log(`===== ${host} ======`);
+      console.log(output);
+    });
+  });
+}

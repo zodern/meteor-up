@@ -176,7 +176,7 @@ export function runSSHCommand(info, command) {
 
         outputStream.once('close', code => {
           conn.end();
-          resolve({ code, output });
+          resolve({ code, output, host: info.host });
         });
       });
     });

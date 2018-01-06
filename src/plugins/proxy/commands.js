@@ -42,3 +42,9 @@ export const stop = {
   description: 'Stop proxy',
   handler: commandHandlers.stop
 };
+
+export const nginxConfig = {
+  name: 'nginx-config',
+  description: 'View generated nginx config',
+  handler: commandHandlers.nginxConfig
+};
