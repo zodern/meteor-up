@@ -1,5 +1,7 @@
 import { Client } from 'ssh2';
 import debug from 'debug';
+import chalk from 'chalk';
+import { map } from 'bluebird';
 
 const log = debug('mup:module:default');
 
@@ -111,6 +113,51 @@ export function validate(api) {
   }
 }
 
-export function status() {
-  // Everything is in post hooks in other plugins
+export async function status(api) {
+  const servers = Object.values(api.getConfig().servers);
+  const lines = [];
+  let overallColor = 'green';
+  const command = 'lsb_release -r -s || echo "false"; lsb_release -is; apt-get -v &> /dev/null && echo "true" || echo "false"';
+  const results = await map(
+    servers,
+    server => api.runSSHCommand(server, command),
+    { concurrency: 2 }
+  );
+
+  results.forEach(({ host, output }) => {
+    let text = `  - ${host}: `;
+    let color = chalk.green;
+    const [
+      version,
+      distribution,
+      aptGet
+    ] = output.trim().split('\n');
+
+    const versionCorrect = parseInt(version, 10) > 13;
+    const distributionCorrect = distribution === 'Ubuntu';
+    const hasAptGet = aptGet.trim() === 'true';
+
+    if (!hasAptGet) {
+      color = chalk.red;
+      overallColor = 'red';
+    } else if (!distributionCorrect) {
+      color = chalk.yellow;
+      if (overallColor !== 'red') {
+        overallColor = 'yellow';
+      }
+    } else if (!versionCorrect) {
+      color = chalk.red;
+      overallColor = 'red';
+    }
+
+    text += color(`${distribution} ${version}`);
+    if (!hasAptGet) {
+      text += chalk.red(' apt-get not available');
+    }
+
+    lines.push(text);
+  });
+
+  console.log(chalk[overallColor]('=> Servers'));
+  console.log(lines.join('\n'));
 }

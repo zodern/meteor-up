@@ -34,5 +34,11 @@ export const hooks = {
     if (config.mongo) {
       return api.runCommand('mongo.setup').then(() => api.runCommand('mongo.start'));
     }
+  },
+  'post.default.status'(api) {
+    const config = api.getConfig();
+    if (config.mongo) {
+      return api.runCommand('mongo.status');
+    }
   }
 };

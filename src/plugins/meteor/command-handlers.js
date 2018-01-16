@@ -1,10 +1,12 @@
 import buildApp, { archiveApp } from './build.js';
+import { map, promisify } from 'bluebird';
 import { cloneDeep } from 'lodash';
 import debug from 'debug';
+import chalk from 'chalk';
 import fs from 'fs';
+import { getInformation } from './status';
 import nodemiral from 'nodemiral';
 import os from 'os';
-import { promisify } from 'bluebird';
 import random from 'random-seed';
 import uuid from 'uuid';
 
@@ -408,4 +410,64 @@ export function restart(api) {
     series: true,
     verbose: api.verbose
   });
+}
+
+export async function status(api) {
+  const config = api.getConfig();
+  const lines = [];
+  const servers = Object.keys(config.app.servers)
+    .map(key => config.servers[key]);
+
+  const results = await map(
+    servers,
+    server => getInformation(server, config.app.name, api),
+    { concurrency: 2 }
+  );
+
+  let overallColor = 'green';
+
+  function updateColor(color) {
+    if (color === 'yellow' && overallColor !== 'red') {
+      overallColor = color;
+    } else if (color === 'red') {
+      overallColor = color;
+    }
+  }
+
+  results.forEach(result => {
+    updateColor(result.statusColor);
+    updateColor(result.restartColor);
+
+    lines.push(` - ${result.host}: ${chalk[result.statusColor](result.status)} `);
+    lines.push(`    Created at ${result.created}`);
+    lines.push(chalk[result.restartColor](`    Restarted ${result.restartCount} times`));
+
+    lines.push('    ENV: ');
+    result.env.forEach(envVar => {
+      lines.push(`     - ${envVar}`);
+    });
+
+    if (result.exposedPorts.length > 0) {
+      lines.push('    Exposed Ports:');
+      result.exposedPorts.forEach(port => {
+        lines.push(`     - ${port}`);
+      });
+    }
+
+    if (result.publishedPorts.length > 0) {
+      lines.push('    Published Ports:');
+      result.publishedPorts.forEach(port => {
+        lines.push(`     - ${port}`);
+      });
+    }
+
+    if (result.publishedPorts.length > 0) {
+      lines.push(`    App running at http://${result.host}:${result.publishedPorts[0].split('/')[0]}`);
+    } else {
+      lines.push('    App available through reverse proxy');
+    }
+  });
+
+  console.log(chalk[overallColor]('\n=> Meteor Status'));
+  console.log(lines.join('\n'));
 }

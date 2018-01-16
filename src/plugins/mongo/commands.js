@@ -22,3 +22,8 @@ export const stop = {
   description: 'Stop MongoDB',
   handler: commandHandlers.stop
 };
+
+export const status = {
+  description: 'View MongoDB status',
+  handler: commandHandlers.status
+};

@@ -292,17 +292,22 @@ export default class PluginAPI {
     return await this._runPostHooks(name);
   }
 
-  async getServerInfo() {
-    if (this._cachedServerInfo) {
+  async getServerInfo(selectedServers, collectors) {
+    if (this._cachedServerInfo && !collectors) {
       return this._cachedServerInfo;
     }
 
-    const servers = Object.values(this.getConfig().servers);
+    const servers = selectedServers ||
+      Object.values(this.getConfig().servers);
 
+    if (!collectors) {
     console.log('=> Collecting Docker information');
+    }
 
-    const result = await serverInfo(null, servers);
+    const result = await serverInfo(servers, collectors);
+    if (!collectors) {
     this._cachedServerInfo = result;
+    }
 
     return result;
   }

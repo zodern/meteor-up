@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { clone } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
@@ -236,10 +237,11 @@ export function stop(api) {
 export async function nginxConfig(api) {
   log('exec => mup proxy nginx-config');
 
-  const command = `docker exec ${PROXY_CONTAINER_NAME}  cat /etc/nginx/conf.d/default.conf`;
+  const command = `docker exec ${PROXY_CONTAINER_NAME} cat /etc/nginx/conf.d/default.conf`;
   const { servers, app } = api.getConfig();
   const serverObjects = Object.keys(app.servers)
     .map(serverName => servers[serverName]);
+
 
   await Promise.all(
     serverObjects.map(server =>
@@ -251,4 +253,66 @@ export async function nginxConfig(api) {
       console.log(output);
     });
   });
+}
+
+export async function status(api) {
+  const config = api.getConfig();
+  const servers = Object.keys(config.app.servers)
+    .map(key => config.servers[key]);
+  const lines = [];
+  let overallColor = 'green';
+
+  const collectorConfig = {
+    nginxDocker: {
+      command: `docker inspect ${PROXY_CONTAINER_NAME} --format "{{json .}}"`,
+      parser: 'json'
+    },
+    letsEncryptDocker: {
+      command: `docker inspect ${PROXY_CONTAINER_NAME}-letsencrypt --format "{{json .}}"`,
+      parser: 'json'
+    },
+    certificateExpire: {
+      command: `cd /opt/${PROXY_CONTAINER_NAME}/mounted-certs && find . -name '*.chain.pem' -exec echo '{}' \\; -exec openssl x509 -enddate -noout -in '{}' \\;`,
+      parser(stdout, code) {
+        if (code === 0) {
+          return stdout.split('\n').reduce((result, item, index, items) => {
+            if (!(index % 2) && item.trim() !== '') {
+              result[item.slice(2)] = items[index + 1].split('=')[1];
+            }
+
+            return result;
+          }, {});
+        }
+        return null;
+      }
+    }
+  };
+
+  const serverInfo = await api.getServerInfo(servers, collectorConfig);
+
+  Object.values(serverInfo).forEach(({ _host, nginxDocker, letsEncryptDocker, certificateExpire }) => {
+    lines.push(` - ${_host}:`);
+    lines.push('   - NGINX:');
+    lines.push(`     - Status: ${nginxDocker.State.Status}`);
+    lines.push('     - Ports:');
+
+    // TODO: instead, show https and http port
+    Object.keys(nginxDocker.NetworkSettings.Ports || {}).forEach(key => {
+      if (nginxDocker.NetworkSettings.Ports[key]) {
+        lines.push(`       - ${key} => ${nginxDocker.NetworkSettings.Ports[key][0].HostPort}`);
+      }
+    });
+
+    lines.push('   - Let\'s Encrypt');
+    lines.push(`     - Status: ${letsEncryptDocker.State.Status}`);
+
+    lines.push('     - Certificates');
+
+    Object.keys(certificateExpire).forEach((key) => {
+      lines.push(`       - ${key}: ${certificateExpire[key]}`);
+    });
+  });
+
+  console.log(chalk[overallColor]('=> Reverse Proxy Status'));
+  console.log(lines.join('\n'));
 }

@@ -76,6 +76,11 @@ export const hooks = {
     if (meteorEnabled(api)) {
       return api.runCommand('meteor.restart');
     }
+  },
+  'post.default.status'(api) {
+    if (meteorEnabled(api)) {
+      return api.runCommand('meteor.status');
+    }
   }
 };
 

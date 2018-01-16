@@ -48,3 +48,8 @@ export const nginxConfig = {
   description: 'View generated nginx config',
   handler: commandHandlers.nginxConfig
 };
+
+export const status = {
+  description: 'View the proxy\'s status',
+  handler: commandHandlers.status
+};

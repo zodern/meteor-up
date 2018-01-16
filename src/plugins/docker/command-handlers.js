@@ -18,6 +18,7 @@ import debug from 'debug';
 import {
   each
 } from 'async';
+import { map } from 'bluebird';
 import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:docker');
@@ -56,6 +57,7 @@ export function setup(api) {
     // There are no servers, so we can skip running the list
     return;
   }
+
   return api
     .runTaskList(list, sessions, {
       verbose: api.verbose
@@ -198,9 +200,49 @@ export function ps(api) {
 export async function status(api) {
   const config = api.getConfig();
 
-  if (!config.swarm) {
-    console.log('Swarm not enabled');
+  if (!config.servers) {
+    return;
+  }
 
+  const results = await map(
+    Object.values(config.servers),
+    server => api.runSSHCommand(server, 'sudo docker version --format "{{.Server.Version}}" && sudo service docker status')
+      .then(({ host, output }) => ({ host, output })),
+    { concurrency: 2 }
+  );
+
+  const minMajor = 1;
+  const minMinor = 13;
+  let lines = [];
+  let overallColor = chalk.green;
+  results.forEach(result => {
+    const version = result.output.trim().split('.');
+    const dockerStatus = result.output.match(/\/(.*),/).pop();
+    let versionColor = chalk.green;
+    let statusColor = chalk.green;
+
+    if (parseInt(version[0], 10) < minMajor) {
+      versionColor = chalk.red;
+      overallColor = chalk.red;
+    } else if (
+      parseInt(version[0], 10) === minMajor &&
+      parseInt(version[1], 10) < minMinor
+    ) {
+      versionColor = chalk.red;
+      overallColor = chalk.red;
+    }
+
+    if (dockerStatus !== 'running') {
+      statusColor = chalk.red;
+    }
+
+    lines.push(` - ${result.host}: ${versionColor(result.output.split('\n')[0].trim())} ${statusColor(dockerStatus)}`);
+  });
+
+  console.log(overallColor('\n=> Docker Status'));
+  console.log(lines.join('\n'));
+
+  if (!config.swarm) {
     return;
   }
 

@@ -5,6 +5,6 @@ export const commands = _commands;
 
 export const hooks = {
   'post.default.status'(api) {
-    api.runCommand('docker.status');
+    return api.runCommand('docker.status');
   }
 };

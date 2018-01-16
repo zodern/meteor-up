@@ -25,6 +25,21 @@ function parseJSONArray(stdout, code) {
   return null;
 }
 
+export const builtInParsers = {
+  json(stdout, code) {
+    if (code === 0) {
+      try {
+        return JSON.parse(stdout);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    return null;
+  },
+  jsonArray: parseJSONArray
+};
+
 export const _collectors = {
   swarm: {
     command: 'docker info --format \'{{json .Swarm}}\'',
@@ -77,10 +92,10 @@ function generateVarCommand(name, command) {
   `;
 }
 
-function generateScript() {
+function generateScript(collectors) {
   let script = '';
-  Object.keys(_collectors).forEach(key => {
-    const collector = _collectors[key];
+  Object.keys(collectors).forEach(key => {
+    const collector = collectors[key];
     script += generateVarCommand(key, collector.command);
   });
 
@@ -105,27 +120,39 @@ export function seperateCollectors(output) {
   });
 }
 
-export function parseCollectorOutput(name, output, code) {
-  return _collectors[name].parser(output, code);
+export function parseCollectorOutput(name, output, code, collectors) {
+  if (typeof collectors[name].parser === 'string') {
+    return builtInParsers[collectors[name].parser](output, code);
+  }
+
+  return collectors[name].parser(output, code);
 }
 
-export function createHostResult(collectorData, host) {
-  const result = {_host: host};
-
+export function createHostResult(collectorData, host, collectors) {
+  const result = { _host: host };
   collectorData.forEach(data => {
-    result[data.name] = parseCollectorOutput(data.name, data.output, data.code);
+    result[data.name] = parseCollectorOutput(
+      data.name,
+      data.output,
+      data.code,
+      collectors
+    );
   });
 
   return result;
 }
 
-export function getServerInfo(vars, server) {
-  const command = generateScript();
+export function getServerInfo(server, collectors) {
+  const command = generateScript(collectors);
 
   return runSSHCommand(server, command)
     .then(result => {
       const collectorData = seperateCollectors(result.output);
-      const hostResult = createHostResult(collectorData, server.host);
+      const hostResult = createHostResult(
+        collectorData,
+        server.host,
+        collectors
+      );
 
       return hostResult;
     })
@@ -134,12 +161,12 @@ export function getServerInfo(vars, server) {
     });
 }
 
-export default function serverInfo(vars, servers) {
+export default function serverInfo(servers, collectors = _collectors) {
   log('starting');
 
   return map(
     servers,
-    server => getServerInfo(vars, server),
+    server => getServerInfo(server, collectors),
     { concurrency: 2 }
   ).then(serverResults => {
     const result = {};

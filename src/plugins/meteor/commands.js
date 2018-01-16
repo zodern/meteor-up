@@ -77,3 +77,8 @@ export const envconfig = {
   description: false,
   handler: commandHandlers.envconfig
 };
+
+export const status = {
+  description: 'View the app\'s status',
+  handler: commandHandlers.status
+};

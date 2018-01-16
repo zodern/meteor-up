@@ -27,6 +27,14 @@ export function prepareConfig(config) {
   return config;
 }
 
+export const hooks = {
+  'post.default.status'(api) {
+    if (api.getConfig().proxy) {
+      api.runCommand('proxy.status');
+    }
+  }
+};
+
 export function swarmOptions(config) {
   if (config && config.proxy) {
     const managers = [];
