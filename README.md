@@ -48,7 +48,7 @@ npm install -g mup
 
 ### Support
 
-First, look at the [troubleshooting](http://meteor-up.com/docs.html#troubleshooting) and [common problems](http://http://meteor-up.com/docs.html#common-problems) sections of the docs. You can also search the [github issues](https://github.com/zodern/meteor-up/issues).
+First, look at the [troubleshooting](http://meteor-up.com/docs.html#troubleshooting) and [common problems](http://meteor-up.com/docs.html#common-problems) sections of the docs. You can also search the [github issues](https://github.com/zodern/meteor-up/issues).
 
 If that doesn't solve the problem, you can:
 - [Create a Github issue](https://github.com/zodern/meteor-up/issues/new)
