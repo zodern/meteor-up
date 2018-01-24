@@ -99,8 +99,9 @@ export function validate(api) {
   // Shows validation errors
   api.getConfig();
 
-  if (api.getOptions().show) {
+  if (api.getOptions().show || api.getOptions().scrub) {
     let config = api.getConfig();
+
     if (api.getOptions().scrub) {
       config = api.scrubConfig();
     }
