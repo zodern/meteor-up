@@ -347,7 +347,7 @@ export function deploy(api) {
 
   return api
     .runCommand('meteor.push')
-    .then(() => api.runCommand('meteor.envconfig'))
+    .then(() => api.runCommand('default.reconfig'))
     .then(() => api.runCommand('meteor.start'));
 }
 
