@@ -122,6 +122,7 @@ export default class PluginAPI {
   getConfig(validate = true) {
     if (!this.config) {
       try {
+        delete require.cache[require.resolve(this.configPath)];
         // eslint-disable-next-line global-require
         this.config = require(this.configPath);
       } catch (e) {
