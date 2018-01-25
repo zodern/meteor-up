@@ -1,3 +1,31 @@
+## Next
+
+
+**Status**
+The `mup status` command gives an overview of what is running on the servers and shows any problems plugins detected.
+
+**Reverse Proxy**
+- Support for customizing the generated server and location blocks of the nginx config
+
+**Mongo**
+- Oplog is automatically enabled
+
+**Other Changes**
+- `mup init` will create a `.deploy` folder when run in the same folder as a Meteor app
+- When mup can find a meteor app near to where `mup init` is run, the default config's `app.path` will be the path to that app
+- When copying a file fails with the error `No such file`, it will tell the user to run `mup setup` to fix it
+- `reconfig` hooks will now run during `mup deploy`
+- `--show` is no longer needed to show the config when `mup validate --scrub` is run
+- Initial work has been done to support Docker Swarm
+- Fix setting up proxy when non-root user
+- Fix retry logic for the copy file task
+- Fix alignment of list of servers when running `mup ssh` without specifying a server
+- Fix plugins preparing the config multiple times
+
+**Plugins**
+- Using the `post.status` hook, plugins can show their status
+- Plugins can add a `solution` property to errors. Mup will show the solution in yellow before exiting
+
 ## 1.3.7 - Nov 28, 2017
 
 - Fix permission denied error sometimes encountered during Prepare Bundle
@@ -6,18 +34,6 @@
 
 - Fix permission denied errors when deploying to nonroot user (@nickich)
 - Make bundle portable (@m-niesluchow)
-
-## Next
-
-**Plugins**
-- Plugins can add a `solution` property to errors. Mup will show the solution in yellow before exiting
-
-**Other Changes**
-- `mup init` will create a `.deploy` folder when run in the same folder as a Meteor app
-- When mup can find a meteor app near to where `mup init` is run, the default config's `app.path` will be the path to that app
-- When copying a file fails with the error `No such file`, it will tell the user to run `mup setup` to fix it
-- Fix retry logic for the copy file task
-- Fix alignment of list of servers when running `mup ssh` without specifying a server
 
 ## 1.3.5 - Nov 3, 2017
 - Fix tar errors
