@@ -1,5 +1,5 @@
-import debug from 'debug';
 import chalk from 'chalk';
+import debug from 'debug';
 import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:mongo');
@@ -154,7 +154,8 @@ export async function status(api) {
 
     const hour = 1000 * 60 * 60;
     createdTime = info.Created;
-    const upTime = new Date(info.State.FinishedAt).getTime() - new Date(info.Created).getTime();
+    const upTime = new Date(info.State.FinishedAt).getTime() -
+     new Date(info.Created).getTime();
     restartCount = info.RestartCount;
 
     if (restartCount > 0 && upTime / hour <= restartCount) {

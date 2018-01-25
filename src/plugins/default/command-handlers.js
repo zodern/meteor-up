@@ -1,6 +1,6 @@
+import chalk from 'chalk';
 import { Client } from 'ssh2';
 import debug from 'debug';
-import chalk from 'chalk';
 import { map } from 'bluebird';
 
 const log = debug('mup:module:default');

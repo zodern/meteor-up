@@ -260,7 +260,7 @@ export async function status(api) {
   const servers = Object.keys(config.app.servers)
     .map(key => config.servers[key]);
   const lines = [];
-  let overallColor = 'green';
+  const overallColor = 'green';
 
   const collectorConfig = {
     nginxDocker: {
@@ -283,6 +283,7 @@ export async function status(api) {
             return result;
           }, {});
         }
+
         return null;
       }
     }
@@ -290,28 +291,29 @@ export async function status(api) {
 
   const serverInfo = await api.getServerInfo(servers, collectorConfig);
 
-  Object.values(serverInfo).forEach(({ _host, nginxDocker, letsEncryptDocker, certificateExpire }) => {
-    lines.push(` - ${_host}:`);
-    lines.push('   - NGINX:');
-    lines.push(`     - Status: ${nginxDocker.State.Status}`);
-    lines.push('     - Ports:');
+  Object.values(serverInfo).forEach(
+    ({ _host, nginxDocker, letsEncryptDocker, certificateExpire }) => {
+      lines.push(` - ${_host}:`);
+      lines.push('   - NGINX:');
+      lines.push(`     - Status: ${nginxDocker.State.Status}`);
+      lines.push('     - Ports:');
 
-    // TODO: instead, show https and http port
-    Object.keys(nginxDocker.NetworkSettings.Ports || {}).forEach(key => {
-      if (nginxDocker.NetworkSettings.Ports[key]) {
-        lines.push(`       - ${key} => ${nginxDocker.NetworkSettings.Ports[key][0].HostPort}`);
-      }
+      // TODO: instead, show https and http port
+      Object.keys(nginxDocker.NetworkSettings.Ports || {}).forEach(key => {
+        if (nginxDocker.NetworkSettings.Ports[key]) {
+          lines.push(`       - ${key} => ${nginxDocker.NetworkSettings.Ports[key][0].HostPort}`);
+        }
+      });
+
+      lines.push('   - Let\'s Encrypt');
+      lines.push(`     - Status: ${letsEncryptDocker.State.Status}`);
+
+      lines.push('     - Certificates');
+
+      Object.keys(certificateExpire).forEach(key => {
+        lines.push(`       - ${key}: ${certificateExpire[key]}`);
+      });
     });
-
-    lines.push('   - Let\'s Encrypt');
-    lines.push(`     - Status: ${letsEncryptDocker.State.Status}`);
-
-    lines.push('     - Certificates');
-
-    Object.keys(certificateExpire).forEach((key) => {
-      lines.push(`       - ${key}: ${certificateExpire[key]}`);
-    });
-  });
 
   console.log(chalk[overallColor]('=> Reverse Proxy Status'));
   console.log(lines.join('\n'));

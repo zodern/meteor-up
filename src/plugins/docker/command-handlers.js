@@ -213,7 +213,7 @@ export async function status(api) {
 
   const minMajor = 1;
   const minMinor = 13;
-  let lines = [];
+  const lines = [];
   let overallColor = chalk.green;
   results.forEach(result => {
     const version = result.output.trim().split('.');
