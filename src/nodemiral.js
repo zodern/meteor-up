@@ -65,9 +65,9 @@ function createCallback(cb, varsMapper) {
     if (code > 0) {
       const message = `
       ------------------------------------STDERR------------------------------------
-      ${logs.stderr.substring(logs.stderr.length - 2000)}
+      ${logs.stderr.substring(logs.stderr.length - 4200)}
       ------------------------------------STDOUT------------------------------------
-      ${logs.stdout.substring(logs.stdout.length - 2000)}
+      ${logs.stdout.substring(logs.stdout.length - 4200)}
       ------------------------------------------------------------------------------
       `;
 
