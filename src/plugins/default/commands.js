@@ -73,7 +73,7 @@ export const validate = {
       description: 'Show config after being modified by plugins',
       bool: true
     }).option('scrub', {
-      description: 'When used with --show, hides sensitive information',
+      description: 'Shows the config with sensitive information removed',
       bool: true
     });
   },
