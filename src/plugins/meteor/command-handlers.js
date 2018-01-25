@@ -1,8 +1,8 @@
 import buildApp, { archiveApp } from './build.js';
 import { map, promisify } from 'bluebird';
+import chalk from 'chalk';
 import { cloneDeep } from 'lodash';
 import debug from 'debug';
-import chalk from 'chalk';
 import fs from 'fs';
 import { getInformation } from './status';
 import nodemiral from 'nodemiral';
@@ -347,8 +347,7 @@ export function deploy(api) {
 
   return api
     .runCommand('meteor.push')
-    .then(() => api.runCommand('default.reconfig'))
-    .then(() => api.runCommand('meteor.start'));
+    .then(() => api.runCommand('default.reconfig'));
 }
 
 export function stop(api) {
