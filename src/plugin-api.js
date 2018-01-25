@@ -138,10 +138,11 @@ export default class PluginAPI {
         }
         process.exit(1);
       }
+      this.config = this._normalizeConfig(this.config);
+
       if (validate) {
         this.validateConfig(this.configPath);
       }
-      this.config = this._normalizeConfig(this.config);
     }
 
     return this.config;
@@ -287,7 +288,8 @@ export default class PluginAPI {
     }
 
     if (potentialPromise && typeof potentialPromise.then === 'function') {
-      return potentialPromise.then(() => this._runPostHooks(name));
+      return potentialPromise
+        .then(() => this._runPostHooks(name));
     }
 
     return await this._runPostHooks(name);
@@ -302,12 +304,12 @@ export default class PluginAPI {
       Object.values(this.getConfig().servers);
 
     if (!collectors) {
-    console.log('=> Collecting Docker information');
+      console.log('=> Collecting Docker information');
     }
 
     const result = await serverInfo(servers, collectors);
     if (!collectors) {
-    this._cachedServerInfo = result;
+      this._cachedServerInfo = result;
     }
 
     return result;
@@ -377,7 +379,7 @@ export default class PluginAPI {
 
       if (
         this._enabledSessions.length > 0 &&
-          this._enabledSessions.indexOf(name) === -1
+        this._enabledSessions.indexOf(name) === -1
       ) {
         continue;
       }
