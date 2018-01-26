@@ -1,7 +1,19 @@
+import axios from 'axios';
+
 export function getInformation(server, appName, api) {
   return api.runSSHCommand(server, `docker inspect ${appName} --format "{{json .}}"`)
     .then(({ host, output }) => {
-      const info = JSON.parse(output.trim());
+      let info;
+
+      try {
+        info = JSON.parse(output.trim());
+      } catch (e) {
+        return {
+          statusColor: 'red',
+          status: 'Stopped',
+          host: server.host
+        };
+      }
 
       let statusColor = 'green';
       if (info.State.Restarting) {
@@ -46,4 +58,22 @@ export function getInformation(server, appName, api) {
         exposedPorts
       };
     });
+}
+
+export async function checkUrls(server, appConfig, api) {
+  const remote = await api.runSSHCommand(server, `curl 127.0.0.1:${appConfig.env.PORT}`);
+  const inDocker = await api.runSSHCommand(server, `docker exec ${appConfig.name} curl http://localhost:${appConfig.docker.imagePort}`);
+  let local;
+
+  try {
+    local = await axios.get(`http://${server.host}:${appConfig.env.PORT}`);
+  } catch (e) {
+    local = false;
+  }
+
+  return {
+    inDocker: inDocker.code === 0,
+    remote: remote.code === 0,
+    local: local !== false
+  };
 }

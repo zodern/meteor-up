@@ -1,10 +1,10 @@
 import buildApp, { archiveApp } from './build.js';
+import { checkUrls, getInformation } from './status';
 import { map, promisify } from 'bluebird';
 import chalk from 'chalk';
 import { cloneDeep } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
-import { getInformation } from './status';
 import nodemiral from 'nodemiral';
 import os from 'os';
 import random from 'random-seed';
@@ -422,6 +422,11 @@ export async function status(api) {
     server => getInformation(server, config.app.name, api),
     { concurrency: 2 }
   );
+  const urlResults = await map(
+    servers,
+    server => checkUrls(server, config.app, api),
+    { concurrency: 2 }
+  );
 
   let overallColor = 'green';
 
@@ -433,11 +438,16 @@ export async function status(api) {
     }
   }
 
-  results.forEach(result => {
+  results.forEach((result, index) => {
     updateColor(result.statusColor);
     updateColor(result.restartColor);
 
     lines.push(` - ${result.host}: ${chalk[result.statusColor](result.status)} `);
+
+    if (result.status === 'Stopped') {
+      return;
+    }
+
     lines.push(`    Created at ${result.created}`);
     lines.push(chalk[result.restartColor](`    Restarted ${result.restartCount} times`));
 
@@ -460,10 +470,15 @@ export async function status(api) {
       });
     }
 
+    const urlResult = urlResults[index];
     if (result.publishedPorts.length > 0) {
       lines.push(`    App running at http://${result.host}:${result.publishedPorts[0].split('/')[0]}`);
+      lines.push(`     - Available in app's docker container: ${urlResult.inDocker}`);
+      lines.push(`     - Available on server: ${urlResult.remote}`);
+      lines.push(`     - Available on local computer: ${urlResult.local}`);
     } else {
       lines.push('    App available through reverse proxy');
+      lines.push(`     - Available in app's docker container: ${urlResult.inDocker}`);
     }
   });
 

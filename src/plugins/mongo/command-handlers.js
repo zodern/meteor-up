@@ -126,7 +126,14 @@ export async function status(api) {
     `docker exec mongodb mongo --eval ${mongoCommand} --quiet`
   );
 
-  mongoStatus = JSON.parse(mongoStatus);
+  try {
+    mongoStatus = JSON.parse(mongoStatus);
+  } catch (e) {
+    console.log(chalk.red('\n=> Mongo Status'));
+    console.log(chalk.red(' - Stopped'));
+
+    return;
+  }
 
   const mongoVersion = mongoStatus.version;
   const connections = mongoStatus.connections.current;

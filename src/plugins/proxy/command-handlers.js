@@ -295,26 +295,29 @@ export async function status(api) {
     ({ _host, nginxDocker, letsEncryptDocker, certificateExpire }) => {
       lines.push(` - ${_host}:`);
       lines.push('   - NGINX:');
-      lines.push(`     - Status: ${nginxDocker.State.Status}`);
-      lines.push('     - Ports:');
+      lines.push(`     - Status: ${nginxDocker ? nginxDocker.State.Status : 'Stopped'}`);
 
       // TODO: instead, show https and http port
-      Object.keys(nginxDocker.NetworkSettings.Ports || {}).forEach(key => {
-        if (nginxDocker.NetworkSettings.Ports[key]) {
-          lines.push(`       - ${key} => ${nginxDocker.NetworkSettings.Ports[key][0].HostPort}`);
-        }
-      });
+      if (nginxDocker) {
+        lines.push('     - Ports:');
+        Object.keys(nginxDocker.NetworkSettings.Ports || {}).forEach(key => {
+          if (nginxDocker.NetworkSettings.Ports[key]) {
+            lines.push(`       - ${key} => ${nginxDocker.NetworkSettings.Ports[key][0].HostPort}`);
+          }
+        });
+      }
 
       lines.push('   - Let\'s Encrypt');
-      lines.push(`     - Status: ${letsEncryptDocker.State.Status}`);
+      lines.push(`     - Status: ${letsEncryptDocker ? letsEncryptDocker.State.Status : 'Stopped'}`);
 
-      lines.push('     - Certificates');
-
-      Object.keys(certificateExpire).forEach(key => {
-        lines.push(`       - ${key}: ${certificateExpire[key]}`);
-      });
+      if (certificateExpire && certificateExpire.length > 0) {
+        lines.push('     - Certificates');
+        Object.keys(certificateExpire).forEach(key => {
+          lines.push(`       - ${key}: ${certificateExpire[key]}`);
+        });
+      }
     });
 
-  console.log(chalk[overallColor]('=> Reverse Proxy Status'));
+  console.log(chalk[overallColor]('\n=> Reverse Proxy Status'));
   console.log(lines.join('\n'));
 }

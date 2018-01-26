@@ -206,8 +206,7 @@ export async function status(api) {
 
   const results = await map(
     Object.values(config.servers),
-    server => api.runSSHCommand(server, 'sudo docker version --format "{{.Server.Version}}" && sudo service docker status')
-      .then(({ host, output }) => ({ host, output })),
+    server => api.runSSHCommand(server, 'sudo service docker status && sudo docker version --format "{{.Server.Version}}"'),
     { concurrency: 2 }
   );
 
@@ -216,17 +215,23 @@ export async function status(api) {
   const lines = [];
   let overallColor = chalk.green;
   results.forEach(result => {
-    const version = result.output.trim().split('.');
-    const dockerStatus = result.output.match(/\/(.*),/).pop();
+    const outputLines = result.output.split('\n');
+    let dockerStatus = outputLines.length === 1 ? 'Not installed' : 'stopped';
+    const version = outputLines.length > 1 ? outputLines[outputLines.length - 2] : '';
+    const versionParts = version.split('.');
     let versionColor = chalk.green;
     let statusColor = chalk.green;
 
-    if (parseInt(version[0], 10) < minMajor) {
+    if (/\/(.*),/.test(result.output)) {
+      dockerStatus = result.output.match(/\/(.*),/).pop();
+    }
+
+    if (parseInt(versionParts[0], 10) < minMajor) {
       versionColor = chalk.red;
       overallColor = chalk.red;
     } else if (
-      parseInt(version[0], 10) === minMajor &&
-      parseInt(version[1], 10) < minMinor
+      parseInt(versionParts[0], 10) === minMajor &&
+      parseInt(versionParts[1], 10) < minMinor
     ) {
       versionColor = chalk.red;
       overallColor = chalk.red;
@@ -236,7 +241,7 @@ export async function status(api) {
       statusColor = chalk.red;
     }
 
-    lines.push(` - ${result.host}: ${versionColor(result.output.split('\n')[0].trim())} ${statusColor(dockerStatus)}`);
+    lines.push(` - ${result.host}: ${versionColor(version)} ${statusColor(dockerStatus)}`);
   });
 
   console.log(overallColor('\n=> Docker Status'));
