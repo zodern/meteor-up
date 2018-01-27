@@ -77,6 +77,6 @@ Congratulations! Your app is now running on the server, accessible to your poten
 
 ## Next Steps
 
-- [View logs](https://github.com/zodern/meteor-up#other-utility-commands)
-- [Setup SSL](https://github.com/zodern/meteor-up#ssl-support)
-- [View config options](https://github.com/zodern/meteor-up#example-config)
+- [View logs](docs.html#other-utility-commands)
+- [Setup SSL](docs.html#ssl-support)
+- [View config options](docs.html#example-configs)
