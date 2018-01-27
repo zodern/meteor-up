@@ -297,12 +297,13 @@ export async function status(api) {
       lines.push('   - NGINX:');
       lines.push(`     - Status: ${nginxDocker ? nginxDocker.State.Status : 'Stopped'}`);
 
-      // TODO: instead, show https and http port
       if (nginxDocker) {
         lines.push('     - Ports:');
         Object.keys(nginxDocker.NetworkSettings.Ports || {}).forEach(key => {
-          if (nginxDocker.NetworkSettings.Ports[key]) {
-            lines.push(`       - ${key} => ${nginxDocker.NetworkSettings.Ports[key][0].HostPort}`);
+          if (key === '443/tcp') {
+            lines.push(`       - HTTPS: ${nginxDocker.NetworkSettings.Ports[key][0].HostPort}`);
+          } else if (key === '80/tcp') {
+            lines.push(`       - HTTP: ${nginxDocker.NetworkSettings.Ports[key][0].HostPort}`);
           }
         });
       }
