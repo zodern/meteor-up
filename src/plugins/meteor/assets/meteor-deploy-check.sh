@@ -5,7 +5,8 @@ APP_PATH=/opt/$APPNAME
 IMAGE=mup-<%= appName.toLowerCase() %>
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
-DEPLOY_CHECK_URL=<%= `${bind}:${deployCheckPort}${deployCheckPath}` %>
+CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
+DEPLOY_CHECK_URL=$CONTAINER_IP<%= `:${deployCheckPort}${deployCheckPath}` %>
 HOST=<%= host %>
 
 cd $APP_PATH
