@@ -3,7 +3,7 @@ module.exports = {
     one: {
       // TODO: set host address, username, and authentication method
       host: '1.2.3.4',
-      username: 'root',
+      username: 'root'
       // pem: './path/to/pem'
       // password: 'server-password'
       // or neither for authenticate from ssh-agent
@@ -16,18 +16,18 @@ module.exports = {
     path: '../app',
 
     servers: {
-      one: {},
+      one: {}
     },
 
     buildOptions: {
-      serverOnly: true,
+      serverOnly: true
     },
 
     env: {
       // TODO: Change to your app's url
       // If you are using ssl, it needs to start with https://
       ROOT_URL: 'http://app.com',
-      MONGO_URL: 'mongodb://localhost/meteor',
+      MONGO_URL: 'mongodb://localhost/meteor'
     },
 
     // ssl: { // (optional)
@@ -41,7 +41,7 @@ module.exports = {
 
     docker: {
       // change to 'abernix/meteord:base' if your app is using Meteor 1.4 - 1.5
-      image: 'abernix/meteord:node-8.4.0-base',
+      image: 'abernix/meteord:node-8.4.0-base'
     },
 
     // Show progress bar while uploading bundle to server

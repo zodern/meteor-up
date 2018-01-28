@@ -238,6 +238,22 @@ export function envconfig(api) {
   }
 
   const list = nodemiral.taskList('Configuring App');
+
+  list.executeScript('Cleaning up previous nginx configs', {
+    script: api.resolvePath(__dirname, 'assets/nginx-cleanup.sh'),
+    vars: {
+      name: config.name
+    }
+  });
+
+  if (config.nginx.configPath) {
+    list.copy('Pushing the nginx config', {
+      src: config.nginx.configPath,
+      dest: '/opt/' + config.name + '/config/nginx-default.conf',
+      progressBar: config.enableUploadProgressBar
+    });
+  }
+
   list.copy('Pushing the Startup Script', {
     src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
     dest: '/opt/' + config.name + '/config/start.sh',

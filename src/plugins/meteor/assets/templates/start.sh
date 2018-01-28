@@ -90,7 +90,7 @@ sleep 15s
     wget https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl -O /opt/$APPNAME/config/nginx.tmpl
 
     # Update nginx config based on user input or default passed by js
-sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
+sudo cat <<EOT >> /opt/$APPNAME/config/nginx-default.conf
 client_max_body_size $CLIENTSIZE;
 EOT
 
@@ -106,7 +106,7 @@ EOT
       --name $APPNAME-nginx-proxy \
       --restart=always \
       -e "DEFAULT_HOST=<%= sslConfig.autogenerate.domains.split(',')[0] %>" \
-      -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
+      -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/00my_proxy.conf:ro \
       -v /opt/$APPNAME/certs:/etc/nginx/certs:ro \
       -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
       -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
