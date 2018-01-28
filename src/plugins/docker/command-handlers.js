@@ -268,7 +268,7 @@ export async function status(api) {
     return;
   }
 
-  // TODO show swarm health: 
+  // TODO show swarm health:
   // https://docs.docker.com/engine/swarm/admin_guide/#monitor-swarm-health
 
   console.log(`Swarm Nodes: ${nodes.length}`);

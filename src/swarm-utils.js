@@ -22,7 +22,7 @@ export function hostsToServer(config, hosts) {
 export function currentManagers(config, serverInfo) {
   const hosts = [];
 
-  // TODO: handle managers from multiple clusters. 
+  // TODO: handle managers from multiple clusters.
 
   Object.keys(serverInfo).forEach(key => {
     const server = serverInfo[key];
