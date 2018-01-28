@@ -93,7 +93,8 @@ export function setup(api) {
       serverConfig: nginxServerConfig,
       locationConfig: nginxLocationConfig,
       domains,
-      proxyName: PROXY_CONTAINER_NAME
+      proxyName: PROXY_CONTAINER_NAME,
+      clientUploadLimit: config.clientUploadLimit || '10M'
     }
   });
 

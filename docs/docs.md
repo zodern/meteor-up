@@ -552,6 +552,22 @@ mup proxy nginx-config
 There will be `include` statements for each custom config.
 
 ### Advanced configuration
+
+These are additional options that can be used to customize the reverse proxy. The defaults are compatible with most apps.
+
+```js
+module.exports = {
+  // ... rest of config
+
+  proxy: {
+    domains: 'website.com,www.website.com',
+
+    // (optional, default=10M) Limit for the size of file uploads
+    clientUploadLimit: '50M'
+  }
+};
+```
+
 The `proxy.shared` object has settings that most apps won't need to change, but if they are they apply to every app using the proxy. After you change `proxy.shared`, you need to run `mup proxy reconfig-shared` for it to take effect.
 
 ```js
