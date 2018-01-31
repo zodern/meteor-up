@@ -579,9 +579,6 @@ module.exports = {
       httpPort: 80,
       // The port to listen for https connections. Default is 443.
       httpsPort: 443,
-      // Depreciated. Set proxy wide upload limit.
-      // Setting 0 will disable the limit.
-      clientUploadLimit: '10M',
       // Environment variables for nginx proxy
       env: {
         DEFAULT_HOST: 'foo.bar.com'
