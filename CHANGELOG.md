@@ -6,6 +6,7 @@ The `mup status` command gives an overview of what is running on the servers and
 
 **Reverse Proxy**
 - Support for customizing the generated server and location blocks of the nginx config
+- Fix deploying when `app.env.PORT` is set to a value other than 80
 
 **Mongo**
 - Oplog is automatically enabled

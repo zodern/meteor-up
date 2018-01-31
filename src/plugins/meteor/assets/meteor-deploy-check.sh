@@ -6,8 +6,7 @@ IMAGE=mup-<%= appName.toLowerCase() %>
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
 CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
-DEPLOY_CHECK_URL=$CONTAINER_IP<%= `:${deployCheckPort}${deployCheckPath}` %>
-HOST=<%= host %>
+DEPLOY_CHECK_URL=$CONTAINER_IP<%= `:${deployCheckPort}` %>
 
 cd $APP_PATH
 
@@ -48,7 +47,6 @@ while [[ true ]]; do
   curl \
     --insecure \
     $DEPLOY_CHECK_URL \
-    <% if (host) { %> --header "HOST:$HOST" <% } %>  \
     && exit 0
 
   if [ "$elaspsed" "==" "$DEPLOY_CHECK_WAIT_TIME" ]; then

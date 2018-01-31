@@ -2,6 +2,7 @@ import buildApp, { archiveApp } from './build.js';
 import { checkUrls, getInformation } from './status';
 import { map, promisify } from 'bluebird';
 import chalk from 'chalk';
+import { checkAppStarted } from './utils';
 import { cloneDeep } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
@@ -312,19 +313,7 @@ export function start(api) {
     }
   });
 
-  list.executeScript('Verifying Deployment', {
-    script: api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh'),
-    vars: {
-      deployCheckWaitTime: config.deployCheckWaitTime || 60,
-      appName: config.name,
-      deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
-      deployCheckPath: '',
-      host: api.getConfig().proxy ?
-        api.getConfig().proxy.domains.split(',')[0] : null,
-      bind: api.getConfig().app.docker.bind ?
-        api.getConfig().app.docker.bind : 'localhost'
-    }
-  });
+  checkAppStarted(list, api);
 
   const sessions = api.getSessions(['app']);
 
@@ -391,19 +380,7 @@ export function restart(api) {
     }
   });
 
-  list.executeScript('Verifying Deployment', {
-    script: api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh'),
-    vars: {
-      deployCheckWaitTime: config.deployCheckWaitTime || 60,
-      appName: config.name,
-      deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
-      deployCheckPath: '',
-      host: api.getConfig().proxy ?
-        api.getConfig().proxy.domains.split(',')[0] : null,
-      bind: api.getConfig().app.docker.bind ?
-        api.getConfig().app.docker.bind : 'localhost'
-    }
-  });
+  checkAppStarted(list, api);
 
   return api.runTaskList(list, sessions, {
     series: true,

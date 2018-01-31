@@ -46,12 +46,10 @@ export default function(config, {
     joi.validate(config.proxy, schema, VALIDATE_OPTIONS)
   );
   if (
-    config.app && config.app.env &&
-    typeof config.app.env.PORT === 'number' &&
-    config.app.env.PORT !== 80
+    config.app && config.app.env && config.app.env.PORT
   ) {
     details.push({
-      message: 'app.env.PORT can not be set when using proxy',
+      message: 'app.env.PORT is ignored when using the reverse proxy',
       path: ''
     });
   }
