@@ -26,11 +26,18 @@ describe('module - default', function() {
 
       expect(out.code).to.equal(0);
       expect(
-        countOccurences('Building App Bundle Locally', out.output)
-      ).to.be.equal(1);
+        out.output
+      ).satisfy(text => {
+        if (text.indexOf('Building App Bundle Locally') > -1) {
+          return true;
+        }
+
+        return text.indexOf('Using build from previous deploy at') > -1;
+      });
+
       expect(
         countOccurences(
-          'Pushing Meteor App Bundle to The Server: SUCCESS',
+          'Pushing Meteor App Bundle to the Server: SUCCESS',
           out.output
         )
       ).to.be.equal(1);
@@ -188,7 +195,7 @@ describe('module - default', function() {
   describe('syslog', () => {
     const serverInfo = servers.mymeteor;
 
-    it('should write meteor logst to syslog on "meteor" vm', async () => {
+    it('should write meteor logs to syslog on "meteor" vm', async () => {
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-2'));
 
       sh.exec('mup setup && mup deploy --cached-build');

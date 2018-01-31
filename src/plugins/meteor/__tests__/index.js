@@ -53,7 +53,7 @@ describe('module - meteor', function() {
       assert.equal(out.code, 0);
 
       const num = countOccurences(
-        'Pushing Meteor App Bundle to The Server: SUCCESS',
+        'Pushing Meteor App Bundle to the Server: SUCCESS',
         out.output
       );
       assert.equal(num, 1);
@@ -107,6 +107,7 @@ describe('module - meteor', function() {
         serverInfo,
         'cat /opt/myapp/config/env.list'
       );
+
       expect(sshOut.output).to.have.entriesCount('TEST=true', 1);
     });
   });
@@ -150,7 +151,7 @@ describe('module - meteor', function() {
       assert.equal(num2, 1);
 
       const num3 = countOccurences(
-        'Pushing Meteor App Bundle to The Server: SUCCESS',
+        'Pushing Meteor App Bundle to the Server: SUCCESS',
         out.output
       );
       assert.equal(num3, 1);
@@ -177,7 +178,7 @@ describe('module - meteor', function() {
 
       sh.exec('mup setup --config mup.old.js');
       const out = sh.exec('mup meteor deploy --cached-build --config mup.old.js');
-
+      expect(out.code).to.equal(0);
       checkDeploy(out, '<title>helloapp</title>');
     });
   });
