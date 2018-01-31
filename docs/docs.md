@@ -554,7 +554,8 @@ module.exports = {
   proxy: {
     domains: 'website.com,www.website.com',
 
-    // (optional, default=10M) Limit for the size of file uploads
+    // (optional, default=10M) Limit for the size of file uploads.
+    // Setting to 0 disables the limit.
     clientUploadLimit: '50M'
   }
 };
@@ -578,7 +579,8 @@ module.exports = {
       httpPort: 80,
       // The port to listen for https connections. Default is 443.
       httpsPort: 443,
-      // Set proxy wide upload limit. Setting 0 will disable the limit.
+      // Depreciated. Set proxy wide upload limit.
+      // Setting 0 will disable the limit.
       clientUploadLimit: '10M',
       // Environment variables for nginx proxy
       env: {

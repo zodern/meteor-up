@@ -35,6 +35,7 @@ const schema = joi.object().keys({
 });
 
 export default function(config, {
+  addDepreciation,
   combineErrorDetails,
   VALIDATE_OPTIONS,
   addLocation
@@ -53,6 +54,16 @@ export default function(config, {
       message: 'app.env.PORT can not be set when using proxy',
       path: ''
     });
+  }
+
+  if (config.proxy.shared && config.proxy.shared.clientUploadLimit) {
+    details = addDepreciation(
+      details,
+      'shared.clientUploadLimit',
+      'Use proxy.clientUploadLimit instead',
+      // TODO: update link
+      'http://meteor-up.com'
+    );
   }
 
   return addLocation(details, 'proxy');
