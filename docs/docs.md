@@ -156,7 +156,9 @@ module.exports = {
       // but still build the web.cordova architecture. (recommended)
       serverOnly: true,
 
-      debug: true,
+      // Set to true to disable minification and bundling,
+      // and include debugOnly packages
+      debug: false,
 
       // defaults to a a folder in your tmp folder.
       buildLocation: '/my/build/folder',
@@ -169,8 +171,8 @@ module.exports = {
       // your app url for mobile app access
       server: 'http://app.com',
 
-      // adds --allow-incompatible-updates arg to build command
-      allowIncompatibleUpdates: true,
+      // When true, adds --allow-incompatible-updates arg to build command
+      allowIncompatibleUpdates: false,
 
       // Executable used to build the meteor project
       // You can set to a local repo path if needed
@@ -265,8 +267,9 @@ You can define Meteor build options in `mup.js` like this:
 ...
 meteor: {
   buildOptions: {
-    // build with the debug mode on
-    debug: true,
+    // Set to true to disable minification and bundling,
+    // and include debugOnly packages
+    debug: false,
     // mobile setting for cordova apps
     mobileSettings: {
       public: {
