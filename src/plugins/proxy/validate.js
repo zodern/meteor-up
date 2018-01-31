@@ -59,8 +59,7 @@ export default function(config, {
       details,
       'shared.clientUploadLimit',
       'Use proxy.clientUploadLimit instead',
-      // TODO: update link
-      'http://meteor-up.com'
+      'https://git.io/vN5tn'
     );
   }
 

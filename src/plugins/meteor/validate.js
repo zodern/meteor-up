@@ -121,8 +121,7 @@ export default function(
       details,
       'ssl',
       'Use the reverse proxy instead',
-      // TODO: update link
-      'https://github.com/zodern/meteor-up'
+      'https://git.io/vN5tn'
     );
   }
 
@@ -131,8 +130,7 @@ export default function(
       details,
       'nginx',
       'Use the reverse proxy instead',
-      // TODO: update link
-      'https://github.com/zodern/meteor-up'
+      'https://git.io/vN5tn'
     );
   }
 
