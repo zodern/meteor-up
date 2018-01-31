@@ -81,7 +81,13 @@ const schema = joi.object().keys({
 
 export default function(
   config,
-  { combineErrorDetails, VALIDATE_OPTIONS, serversExist, addLocation }
+  {
+    addDepreciation,
+    combineErrorDetails,
+    VALIDATE_OPTIONS,
+    serversExist,
+    addLocation
+  }
 ) {
   let details = [];
   details = combineErrorDetails(
@@ -108,6 +114,27 @@ export default function(
     details,
     serversExist(config.servers, config.app.servers)
   );
+
+  // Depreciations
+  if (config.app.ssl) {
+    details = addDepreciation(
+      details,
+      'ssl',
+      'Use the reverse proxy instead',
+      // TODO: update link
+      'https://github.com/zodern/meteor-up'
+    );
+  }
+
+  if (config.app.nginx) {
+    details = addDepreciation(
+      details,
+      'nginx',
+      'Use the reverse proxy instead',
+      // TODO: update link
+      'https://github.com/zodern/meteor-up'
+    );
+  }
 
   return addLocation(details, config.meteor ? 'meteor' : 'app');
 }

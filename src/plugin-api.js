@@ -1,10 +1,10 @@
 import * as swarmUtils from './swarm-utils';
 import * as utils from './utils';
+import configValidator, { showDepreciations, showErrors } from './validate/index';
 import { hooks, runRemoteHooks } from './hooks';
 import chalk from 'chalk';
 import childProcess from 'child_process';
 import { commands } from './commands';
-import configValidator from './validate/index';
 import debug from 'debug';
 import fs from 'fs';
 import { getOptions } from './swarm-options';
@@ -80,21 +80,21 @@ export default class PluginAPI {
       return this.validationErrors;
     }
 
-    const problems = configValidator(this.getConfig());
+    const { errors, depreciations } = configValidator(this.getConfig());
+    const problems = [...errors, ...depreciations];
 
     if (problems.length > 0) {
-      const red = chalk.red;
-      const plural = problems.length > 1 ? 's' : '';
-
       console.log(`loaded config from ${configPath}`);
       console.log('');
-      console.log(red(`${problems.length} Validation Error${plural}`));
 
-      problems.forEach(problem => {
-        console.log(red(`  - ${problem}`));
-      });
+      if (errors.length) {
+        showErrors(errors);
+      }
 
-      console.log('');
+      if (depreciations.length) {
+        showDepreciations(depreciations);
+      }
+
       console.log(
         'Read the docs and view example configs at'
       );

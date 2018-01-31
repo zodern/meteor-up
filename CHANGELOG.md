@@ -10,6 +10,10 @@ The `mup status` command gives an overview of what is running on the servers and
 **Mongo**
 - Oplog is automatically enabled
 
+**Depreciations**
+
+`meteor.ssl` and `meteor.nginx` is depreciated. It uses a different implementation for custom certificates and lets encrypt, each with different features and restrictions. Also, the custom certificate implementation has security problems. The reverse proxy should be used instead. It doesn't have the security problems, uses the same implementation for custom certificates and lets encrypt, and has many additional features. Learn how to use the [reverse proxy in the docs](http://meteor-up.com/docs#reverse-proxy).
+
 **Other Changes**
 - `mup init` will create a `.deploy` folder when run in the same folder as a Meteor app
 - When mup can find a meteor app near to where `mup init` is run, the default config's `app.path` will be the path to that app
@@ -25,6 +29,7 @@ The `mup status` command gives an overview of what is running on the servers and
 **Plugins**
 - Using the `post.status` hook, plugins can show their status
 - Plugins can add a `solution` property to errors. Mup will show the solution in yellow before exiting
+- Plugins can add a depreciation warning while validating a config with `utils.addDepreciation`
 
 ## 1.3.7 - Nov 28, 2017
 

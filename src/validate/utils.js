@@ -60,3 +60,13 @@ export function serversExist(serversConfig = {}, serversUsed = {}) {
 
   return messages;
 }
+
+export function addDepreciation(details, path, reason, link) {
+  details.push({
+    type: 'depreciation',
+    path,
+    message: `${reason}\n  Learn more at ${link}`
+  });
+
+  return details;
+}
