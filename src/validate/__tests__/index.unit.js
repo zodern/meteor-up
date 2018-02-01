@@ -27,15 +27,16 @@ describe('validator', () => {
         }
       };
 
-      let errors;
+      let problems;
 
       try {
-        errors = validate(config);
+        problems = validate(config);
       } catch (e) {
         console.log(e);
       }
       // console.log(errors);
-      expect(errors).instanceOf(Array);
+      expect(problems.errors).instanceOf(Array);
+      expect(problems.depreciations).instanceOf(Array);
     });
   });
 });

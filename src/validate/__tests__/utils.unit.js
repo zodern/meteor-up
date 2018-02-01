@@ -1,11 +1,11 @@
-import { addDepreciation, serversExist } from '../utils';
+import { addDepreciation, addLocation, serversExist } from '../utils';
 import assert from 'assert';
 
 describe('validator utils', () => {
   describe('serversExist', () => {
     it('should find nonexistent servers', () => {
       const serversConfig = { one: {}, two: {} };
-      const usedServers = { one: {}, three: {}};
+      const usedServers = { one: {}, three: {} };
       const result = serversExist(serversConfig, usedServers);
       const expectedLength = 1;
 
@@ -25,6 +25,33 @@ describe('validator utils', () => {
       assert(result.path === path);
       assert(result.message.indexOf(reason) > -1);
       assert(result.message.indexOf(link) > -1);
+    });
+  });
+
+  describe('addLocation', () => {
+    it('should add location to message', () => {
+      const expected = '"app.a.b.c" message';
+      const details = [{
+        path: ['a', 'b', 'c'],
+        message: 'message'
+      }];
+      const location = 'app';
+
+      const [{ message }] = addLocation(details, location);
+
+      assert(message === expected, message);
+    });
+    it('should support paths from joi v10', () => {
+      const expected = '"app.a.b.c" message';
+      const details = [{
+        path: 'a.b.c',
+        message: 'message'
+      }];
+      const location = 'app';
+
+      const [{ message }] = addLocation(details, location);
+
+      assert(message === expected, message);
     });
   });
 });

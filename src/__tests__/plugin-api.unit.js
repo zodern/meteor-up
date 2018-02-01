@@ -127,7 +127,7 @@ describe('PluginAPI', () => {
   });
 
   describe('validateConfig', () => {
-    const errors = ['error1', 'error2'];
+    const errors = { errors: ['error1', 'error2'], depreciations: [] };
     let validatorStub;
     let totalConsoleOutput = '';
     let consoleStub;
@@ -146,13 +146,15 @@ describe('PluginAPI', () => {
 
     it('should show validation errors', () => {
       api.validateConfig(api.configPath);
+      consoleStub.restore();
 
       expect(totalConsoleOutput).to.contain('- error1');
       expect(totalConsoleOutput).to.contain('- error2');
     });
 
     it('should show nothing when config is valid', () => {
-      errors.splice(0, errors.length);
+      errors.errors = [];
+      errors.depreciations = [];
 
       api.validateConfig(api.configPath);
 
@@ -180,7 +182,6 @@ describe('PluginAPI', () => {
   });
 
   describe('runCommand', () => {
-    let errorHandlerStub;
     let commandCalled = false;
     let preHookCalled = false;
     let postHookCalled = false;
@@ -202,18 +203,6 @@ describe('PluginAPI', () => {
           commandCalled = true;
         }
       };
-      commands['test.syncError'] = {
-        handler() {
-          throw new Error('test');
-        }
-      };
-      commands['test.rejectedPromise'] = {
-        handler() {
-          return new Promise((resolve, reject) => {
-            reject(new Error('test'));
-          });
-        }
-      };
 
       commandCalled = false;
       preHookCalled = false;
@@ -221,14 +210,9 @@ describe('PluginAPI', () => {
     });
 
     after(() => {
-      if (errorHandlerStub) {
-        errorHandlerStub.restore();
-      }
       delete hooks['pre.test.logs'];
       delete hooks['post.test.logs'];
       delete commands['test.logs'];
-      delete commands['test.syncError'];
-      delete commands['test.rejectedPromise'];
     });
 
     it('should throw if name is not provided', cb => {
@@ -259,17 +243,6 @@ describe('PluginAPI', () => {
         .catch(e => {
           console.log(e);
         });
-    });
-
-    it('should handle synchronous errors', done => {
-      errorHandlerStub = sinon.stub(api, '_commandErrorHandler')
-        .callsFake(() => { done(); });
-      api.runCommand('test.syncError');
-    });
-
-    it('should handle rejected promises', done => {
-      errorHandlerStub = sinon.stub(api, '_commandErrorHandler').callsFake(() => done());
-      api.runCommand('test.rejectedPromise');
     });
   });
 

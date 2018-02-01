@@ -15,6 +15,9 @@ module.exports = {
     servers: {
       one: {}, two: {}
     },
+    env: {
+      ROOT_URL: 'http://app.com'
+    },
     name: 'app',
     path: '../'
   },
