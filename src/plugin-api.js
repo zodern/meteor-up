@@ -398,6 +398,9 @@ export default class PluginAPI {
         opts.ssh = info.opts;
       }
 
+      opts.ssh.keepaliveInterval = 1000 * 30;
+      opts.ssh.keepaliveCountMax = 4;
+
       if (info.pem) {
         try {
           auth.pem = fs.readFileSync(resolvePath(info.pem), 'utf8');

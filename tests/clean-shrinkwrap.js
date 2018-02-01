@@ -1,5 +1,5 @@
 /* eslint-disable no-var */
-// NPM 5 now adds optional dependencies, which older versions of npm 
+// NPM 5 now adds optional dependencies, which older versions of npm
 // try to install even if it is the wrong architecture.
 
 var fs = require('fs');
