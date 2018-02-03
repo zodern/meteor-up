@@ -46,6 +46,11 @@ npm install -g mup
 - [Getting Started](http://meteor-up.com/getting-started.html)
 - [Docs](http://meteor-up.com/docs.html)
 
+## Meteor compatibility
+
+Mup supports Meteor 1.2 and newer.
+To use Meteor 1.4 and newer, you will need to change the docker image. A list of docker images is available [here](http://meteor-up.com/docs#meteor-support).
+
 ### Support
 
 First, look at the [troubleshooting](http://meteor-up.com/docs.html#troubleshooting) and [common problems](http://http://meteor-up.com/docs.html#common-problems) sections of the docs. You can also search the [github issues](https://github.com/zodern/meteor-up/issues).
