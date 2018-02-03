@@ -13,7 +13,7 @@ The `mup status` command gives an overview of what is running on the servers and
 - Fix setting up proxy when non-root user
 
 **Mongo**
-- Oplog is automatically enabled
+- Oplog is automatically enabled. To use, set `app.env.MONGO_OPLOG_URL` to `mongodb://mongodb/local`  (@edemaine)
 
 **Depreciations**
 

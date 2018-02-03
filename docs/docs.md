@@ -725,6 +725,8 @@ module.exports = {
 };
 ```
 
+To use the oplog, set `app.env.MONGO_OPLOG_URL` to `mongodb://mongodb/local`.
+
 Before your first setup, it is recommended to change `mongo.version` to the newest version of MongoDB your app or meteor supports. After Mongo is started, it is more complex to upgrade it.
 
 After you finished changing the config, run
