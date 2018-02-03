@@ -14,7 +14,7 @@ sh.config.silent = false;
 const servers = require('../../../../tests/fixtures/servers');
 
 describe('module - default', function() {
-  this.timeout(600000);
+  this.timeout(900000);
 
   describe('deploy', () => {
     it('should deploy meteor app on "meteor" vm', async () => {
