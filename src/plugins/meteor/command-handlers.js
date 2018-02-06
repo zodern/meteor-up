@@ -171,7 +171,11 @@ export async function push(api) {
     progressBar: config.enableUploadProgressBar
   });
 
-  let prepareSupported = config.docker.image.indexOf('abernix/meteord') === 0;
+  const prepareBundleImages = ['abernix/meteord', 'zodern/meteor'];
+
+  let prepareSupported = prepareBundleImages.find(
+    image => config.docker.image.indexOf(image) === 0
+  );
   if ('prepareBundle' in config.docker) {
     prepareSupported = config.docker.prepareBundle;
   }
