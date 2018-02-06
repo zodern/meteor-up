@@ -14,6 +14,7 @@ import {
   updateLabels
 } from './swarm';
 import chalk from 'chalk';
+import { checkVersion } from './utils';
 import debug from 'debug';
 import {
   each
@@ -206,42 +207,36 @@ export async function status(api) {
 
   const results = await map(
     Object.values(config.servers),
-    server => api.runSSHCommand(server, 'sudo service docker status && sudo docker version --format "{{.Server.Version}}"'),
+    server => api.runSSHCommand(server, 'sudo docker version --format "{{.Server.Version}}"'),
     { concurrency: 2 }
   );
 
-  const minMajor = 1;
-  const minMinor = 13;
   const lines = [];
   let overallColor = chalk.green;
+
   results.forEach(result => {
-    const outputLines = result.output.split('\n');
-    let dockerStatus = outputLines.length === 1 ? 'Not installed' : 'stopped';
-    const version = outputLines.length > 1 ? outputLines[outputLines.length - 2] : '';
-    const versionParts = version.split('.');
+    let dockerStatus = 'Running';
+    let color = 'green';
+
+    if (result.code === 1) {
+      dockerStatus = 'Stopped';
+      color = 'red';
+      overallColor = chalk.red;
+    } else if (result.code === 127) {
+      dockerStatus = 'Not installed';
+      color = 'red';
+      overallColor = chalk.red;
+    }
+
+    const version = result.output.trim().length > 1 ? result.output.trim() : '';
     let versionColor = chalk.green;
-    let statusColor = chalk.green;
 
-    if (/\/(.*),/.test(result.output)) {
-      dockerStatus = result.output.match(/\/(.*),/).pop();
-    }
-
-    if (parseInt(versionParts[0], 10) < minMajor) {
-      versionColor = chalk.red;
+    if (!checkVersion(version)) {
       overallColor = chalk.red;
-    } else if (
-      parseInt(versionParts[0], 10) === minMajor &&
-      parseInt(versionParts[1], 10) < minMinor
-    ) {
       versionColor = chalk.red;
-      overallColor = chalk.red;
     }
 
-    if (dockerStatus !== 'running') {
-      statusColor = chalk.red;
-    }
-
-    lines.push(` - ${result.host}: ${versionColor(version)} ${statusColor(dockerStatus)}`);
+    lines.push(` - ${result.host}: ${versionColor(version)} ${chalk[color](dockerStatus)}`);
   });
 
   console.log(overallColor('\n=> Docker Status'));
