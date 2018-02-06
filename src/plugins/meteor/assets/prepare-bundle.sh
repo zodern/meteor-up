@@ -29,7 +29,7 @@ cd bundle
 echo "Creating Dockerfile"
 sudo cat <<EOT > Dockerfile
 FROM <%= dockerImage %>
-RUN mkdir /built_app
+RUN mkdir /built_app || true
 COPY ./ /built_app
 <% for(var key in env) { %>
 ENV <%- key %>=<%- env[key] %>

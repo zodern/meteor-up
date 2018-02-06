@@ -31,8 +31,9 @@ The `mup status` command gives an overview of what is running on the servers and
 - `--show` is no longer needed to show the config when `mup validate --scrub` is run
 - Add section to readme about Meteor compatibility
 - Initial work has been done to support Docker Swarm
-- Fix retry logic for the copy file task
 - When there is only one server, `mup ssh` will not require the name of a server
+- Fix retry logic for the copy file task
+- Fix running Prepare Bundle when image already has a `/built_app` folder
 - Fix alignment of list of servers when running `mup ssh` without specifying a server
 - Fix plugins preparing the config multiple times
 - Fix loading locally installed plugins
