@@ -11,7 +11,8 @@ const schema = joi.object().keys({
       env: joi.object().pattern(
         /[/s/S]*/,
         [joi.string(), joi.number(), joi.bool()]
-      )
+      ),
+      settings: joi.string(),
     })
   ),
   deployCheckWaitTime: joi.number(),

@@ -185,6 +185,37 @@ export default class PluginAPI {
     return this.settings;
   }
 
+  getSettingsFromPath(settingsPath) {
+      let filePath = resolvePath(settingsPath);
+      let settings;
+      try {
+        settings = fs.readFileSync(filePath).toString();
+      } catch (e) {
+        console.log(`Unable to load settings.json at ${filePath}`);
+        if (e.code !== 'ENOENT') {
+          console.log(e);
+        } else {
+          [
+            'It does not exist.',
+            '',
+            'You can create the file with "mup init" or add the option',
+            '"--settings path/to/settings.json" to load it from a',
+            'different location.'
+          ].forEach(text => console.log(text));
+        }
+        process.exit(1);
+      }
+      try {
+        settings = parseJson(settings);
+      } catch (e) {
+        console.log('Error parsing settings file:');
+        console.log(e.message);
+
+        process.exit(1);
+      }
+    return settings;
+  }
+
   setConfig(newConfig) {
     this.config = newConfig;
   }

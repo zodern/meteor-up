@@ -271,6 +271,14 @@ export function envconfig(api) {
     if (config.servers[key].env) {
       hostVars[servers[key].host] = {env: config.servers[key].env};
     }
+    if (config.servers[key].settings) {
+      let settings = JSON.stringify(api.getSettingsFromPath(config.servers[key].settings));
+      if (hostVars[servers[key].host]) {
+        hostVars[servers[key].host].env.METEOR_SETTINGS = settings;
+      } else {
+        hostVars[servers[key].host] = {env: {METEOR_SETTINGS: settings}};
+      }
+    }
   });
 
   list.copy('Sending Environment Variables', {
