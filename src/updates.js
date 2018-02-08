@@ -1,14 +1,15 @@
-import Npm from 'silent-npm-registry-client';
 import boxen from 'boxen';
 import chalk from 'chalk';
 import debug from 'debug';
+import Npm from 'silent-npm-registry-client';
 import pkg from '../package.json';
 
-let log = debug('mup:updates');
+const log = debug('mup:updates');
 
 export default function() {
   log('checking for updates');
-  return new Promise(function(resolve) {
+
+  return new Promise(resolve => {
     const params = {
       timeout: 1000,
       package: pkg.name,
@@ -17,31 +18,52 @@ export default function() {
 
     const npm = new Npm();
     const uri = 'https://registry.npmjs.org/npm';
-    npm.distTags.fetch(uri, params, function(err, res) {
+    npm.distTags.fetch(uri, params, (err, res) => {
       if (err) {
         resolve();
+
         return;
       }
 
+      let showStable = true;
+
       const npmVersion = res.latest;
-      const local = pkg.version.split('.').slice(0, 3).map(n => Number(n.split('-')[0]));
+      const nextVersion = res.next;
+
+      const local = pkg.version.split('.').slice(0, 3)
+        .map(n => Number(n.split('-')[0]));
       const remote = npmVersion.split('.').map(n => Number(n.split('-')[0]));
+      const next = nextVersion.split('.').map(n => Number(n.split('-')[0]));
+      next.push(nextVersion.split('.')[2].split('beta')[1]);
 
       const beta = pkg.version.split('.')[2].split('-').length > 1;
+
+      if (beta) {
+        local.push(pkg.version.split('.')[2].split('beta')[1]);
+      }
 
       let available = remote[0] > local[0] ||
         remote[0] === local[0] && remote[1] > local[1] ||
         remote[1] === local[1] && remote[2] > local[2];
 
       if (beta && !available) {
+        // check if stable for beta is available
         available = remote[0] === local[0] &&
-         remote[1] === local[1] &&
-         remote[2] === local[2];
+          remote[1] === local[1] &&
+          remote[2] === local[2];
+      }
+
+      if (beta && !available) {
+        available = next[3] > local[3];
+        showStable = false;
       }
 
       if (available) {
-        let text = `update available ${pkg.version} => ${npmVersion}`;
-        text += `\nTo update, run ${chalk.green('npm i -g mup')}`;
+        const version = showStable ? npmVersion : nextVersion;
+        const command = showStable ? 'npm i -g mup' : 'npm i -g mup@next';
+
+        let text = `update available ${pkg.version} => ${version}`;
+        text += `\nTo update, run ${chalk.green(command)}`;
         console.log(
           boxen(text, {
             padding: 1,

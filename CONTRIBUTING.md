@@ -1,63 +1,90 @@
 ## Pull request Guidelines
 
-We are excited that you are interested in contributing to Meteor Up. Bug Fixes and feature implementations can be submitted as pull request on the master branch. Make sure your modifications does not break any of the current tests.
+We are excited that you are interested in contributing to Meteor Up. Bug Fixes and feature implementations can be submitted as pull request on the dev branch. Make sure your modifications does not break any of the current tests.
 
 ## Running Tests
-Our test suit is written using [mocha](https://mochajs.org/) + [shelljs](https://github.com/shelljs/shelljs) and parallelled using [GNU parallel](http://www.gnu.org/software/parallel/) + docker. Parallel testing is currently supported for Ubuntu 14.04 and 16.10, as well as Bash on Ubuntu on Windows.
+Our test suit is written using [mocha](https://mochajs.org/) + [shelljs](https://github.com/shelljs/shelljs) and parallelled using [GNU parallel](http://www.gnu.org/software/parallel/) + docker. Parallel testing is currently supported for Ubuntu 14.04 and 16.10.
 
-Before running the tests, make sure the server's user account running the tests is in the sudoers list. The test suit depends on node, docker, meteor and gnu parallel. If any of them are not available, the test suit will automatically install them.
+## Running tests on linux
 
-If your internet and computer are fast enough, you can run the tests locally. Otherwise, you will want to run the tests on a server.
+Before running the tests, make sure the server's user account running the tests is in the sudoers list. The test suit depends on node, docker, meteor and gnu parallel. Before the tests start, it will try to automatically install missing dependencies.
+
+## Running tests on Mac/Windows
+
+The test suit depends on node, docker, and meteor. Please make sure they are installed before running the tests.
 
 ### Running Tests Parallelly
-Parallel testing works by creating docker instances per each test case given and actually deploying a meteor app inside that using meteor up. So the box running tests should have a higher CPU/RAM depending on your `MOCHA_PARALLEL` env setting.
+Parallel testing works by creating docker instances per each test case given and actually deploying a meteor app inside that using meteor up. So the box running tests should have a higher CPU/RAM depending on your `MOCHA_PARALLEL` env setting. This is only supported on linux.
 
 Start parallel tests with:
 ```
 npm run test:parallel
 ```
 
-#### How to run tests on a server
-
-* Get a Ubuntu (14.04) box (Our setup is 4vCPU/10GB ram VM for 6 parallel tests)
-* Clone your meteor up fork into `~/meteor-up`
-* Decide your parallelism setting (default is 2)
-```
-export MOCHA_PARALLEL=<number of cores * 1.5>
-```
-* Start testing
-```
-npm install
-npm run test:parallel
-```
-
 ## Running Tests Serially
-If the server or your local computer can not handle parallel tests, you can run tests serially. It will create one docker container that all of the tests will use.
+If the server or your local computer can not handle parallel tests, or you are running the tests on Windows or OSX, you can run tests serially. It will create one docker container that all of the tests will use.
 ```
 npm test
 ```
 
-### Running Tests Serially Without Docker
-
-Another option is to run the tests serially, and deploy to a remote server instead of a docker image. This will not use docker. Instead, it will deploy meteor app on the given server using meteor up. Either use `ssh-agent` or modify `<meteor-up dir>/tests/project-1/mup.js` file to setup authentication to the test box.
-```
-export PROD_SERVER=<server ip> #localhost for local testing
-export PROD_SERVER_USER=<server user>
-npm test:custom-server
-
-# or for individual/selective tests
-npm test -- -g "<regex>"
-# ex npm test -- -g "meteor.deploy"
-```
-
 ### A note about docker
 
-Since we are using docker inside docker for parallel testing, `Aufs` storage driver for docker(the default) should be disabled. Our test script automatically does this by setting `DOCKER_OPTS="--storage-driver=devicemapper"` in `/etc/default/docker`. In case you installed docker yourself. You should set this manually.
-
-If you are running a docker instance as the PROD_SERVER above, It should be run with `--privileged=true` flag to be able to run a docker daemon inside.
-
+Since we are using docker inside docker for parallel testing, `Aufs` storage driver for docker(the default) should be disabled. Our test script automatically does this by setting `DOCKER_OPTS="--storage-driver=devicemapper"` in `/etc/default/docker`. In case you installed docker yourself, you should set this manually.
 
 ## Adding Tests
-Write tests for modules in `<meteor-up dir>/lib/modules/<module name>/__tests__/index.js`.
+Write tests for plugins in `<meteor-up dir>/src/plugins/<plugin name>/__tests__/index.js`.
 To run the test in parallel, add a matching regex to the `<meteor-up dir>/tests/tests.list` on a new line.
 
+## Test options
+`--watch`
+
+`-g <regex>`
+
+`--path <test files>` Defaults to `src/**/__tests__/**/*.js`
+
+`--plugin <plugin name>` Runs tests for plugin. Overrides `--path`
+
+`--skip-pull` To speedup running the tests, it creates a docker image before the first run that has docker installed and has pulled all of the images used during the tests. This option disables creating or using the image.
+
+For example:
+```
+npm test -- --watch
+```
+
+
+## Financial contributions
+
+We also welcome financial contributions in full transparency on our [open collective](https://opencollective.com/meteor-up).
+Anyone can file an expense. If the expense makes sense for the development of the community, it will be "merged" in the ledger of our open collective by the core contributors and the person who filed the expense will be reimbursed.
+
+
+## Credits
+
+
+### Contributors
+
+Thank you to all the people who have already contributed to meteor-up!
+<a href="graphs/contributors"><img src="https://opencollective.com/meteor-up/contributors.svg?width=890" /></a>
+
+
+### Backers
+
+Thank you to all our backers! [[Become a backer](https://opencollective.com/meteor-up#backer)]
+
+<a href="https://opencollective.com/meteor-up#backers" target="_blank"><img src="https://opencollective.com/meteor-up/backers.svg?width=890"></a>
+
+
+### Sponsors
+
+Thank you to all our sponsors! (please ask your company to also support this open source project by [becoming a sponsor](https://opencollective.com/meteor-up#sponsor))
+
+<a href="https://opencollective.com/meteor-up/sponsor/0/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/meteor-up/sponsor/1/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/meteor-up/sponsor/2/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/meteor-up/sponsor/3/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/meteor-up/sponsor/4/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/meteor-up/sponsor/5/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/meteor-up/sponsor/6/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/meteor-up/sponsor/7/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/meteor-up/sponsor/8/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/meteor-up/sponsor/9/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/9/avatar.svg"></a>

@@ -12,10 +12,10 @@ export function improveErrors(error) {
     );
   } else if (error.type === 'object.without') {
     error.message = error.message.replace(
-        ' conflict with forbidden peer ',
-        ' and '
-      ) +
-      ' cannot both be defined';
+      ' conflict with forbidden peer ',
+      ' and '
+    );
+    error.message += ' cannot both be defined';
   } else if (error.type === 'object.min') {
     error.message = error.message.replace('.value', '');
   }
@@ -25,30 +25,32 @@ export function improveErrors(error) {
 
 export function addLocation(details, location) {
   return details.map(detail => {
+    const detailPath = detail.path instanceof Array ? detail.path.join('.') : detail.path;
+
     // removes property name from message since it is
     // already part of detail.path
     detail.message = detail.message.replace(/^".*?"\s+/, '');
 
-    detail.message = `"${location}.${detail.path}" ${detail.message}`;
+    detail.message = `"${location}.${detailPath}" ${detail.message}`;
+
     return detail;
   });
 }
 
 export function combineErrorDetails(details, results) {
-
   if (results instanceof Array) {
     return details.concat(results);
   }
 
-  let additionalDetails = results.error ? results.error.details : [];
+  const additionalDetails = results.error ? results.error.details : [];
 
   return details.concat(additionalDetails);
 }
 
-export function serversExist(serversConfig = {}, serversUsed) {
-  let messages = [];
-  let servers = Object.keys(serversConfig);
-  let using = Object.keys(serversUsed);
+export function serversExist(serversConfig = {}, serversUsed = {}) {
+  const messages = [];
+  const servers = Object.keys(serversConfig);
+  const using = Object.keys(serversUsed);
   using.forEach(key => {
     if (servers.indexOf(key) === -1) {
       messages.push({
@@ -59,4 +61,14 @@ export function serversExist(serversConfig = {}, serversUsed) {
   });
 
   return messages;
+}
+
+export function addDepreciation(details, path, reason, link) {
+  details.push({
+    type: 'depreciation',
+    path,
+    message: `${reason}\n  Learn more at ${link}`
+  });
+
+  return details;
 }

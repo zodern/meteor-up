@@ -1,13 +1,33 @@
+<!-- Google Analytics -->
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-93931053-2', 'auto');
+    ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
 <header>
 
-    <nav>
+    <nav class="fix-shadow">
         <div class="brand"><a href="{{ site.baseurl }}/">Meteor Up</a></div>
         <ul class="nav-links">
             <li><a href="{{site.baseurl}}{% link getting-started.md %}">Tutorial</a></div>
             <li><a href="{{site.baseurl}}{% link docs.md %}">Docs</a></div>
-            <li><a href="https://gitter.im/meteor-up/Lobby">Chat</a></li>
+<!-- Remove and replace with gitter sidecar            <li><a href="https://gitter.im/meteor-up/Lobby">Chat</a></li> -->
         </ul>
     </nav>
+
+    <!-- Added gitter Sidecar -->
+    <script>
+      ((window.gitter = {}).chat = {}).options = {
+        room: 'meteor-up/Lobby'
+      };
+    </script>
+    <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+    <!-- End Gitter Sidecar -->
 
     <a href="https://github.com/zodern/meteor-up" class="github-corner" aria-label="View source on Github">
         <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#151513; position: absolute; top: 0; border: 0; right: 0;"

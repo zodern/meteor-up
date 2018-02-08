@@ -1,12 +1,11 @@
-import { VALIDATE_OPTIONS, addLocation, combineErrorDetails } from './utils';
-
+import { addLocation, combineErrorDetails, VALIDATE_OPTIONS } from './utils';
 import joi from 'joi';
 
 // The regexp used matches everything
 const schema = joi.object().keys().pattern(/.*/, {
   host: joi
     .alternatives(
-    joi.string().trim()
+      joi.string().trim()
     )
     .required(),
   username: joi.string().required(),
@@ -15,14 +14,14 @@ const schema = joi.object().keys().pattern(/.*/, {
   opts: joi.object().keys({
     port: joi.number()
   })
-}).min(1);
+});
 
 export default function validateServers(servers) {
   let details = [];
-  let result = joi.validate(servers, schema, VALIDATE_OPTIONS);
+  const result = joi.validate(servers, schema, VALIDATE_OPTIONS);
   details = combineErrorDetails(details, result);
 
-  Object.keys(servers).forEach((key) => {
+  Object.keys(servers).forEach(key => {
     const server = servers[key];
     if (server.pem && server.pem.indexOf('.pub') === server.pem.length - 4) {
       details.push({

@@ -1,8 +1,163 @@
 ## Next
+
+
+**Status**
+The `mup status` command gives an overview of what is running on the servers and shows any problems plugins detected.
+
+**Reverse Proxy**
+- The reverse proxy is no longer an "experimental feature"
+- Support for customizing the generated server and location blocks of the nginx config
+- Add `mup proxy nginx-config` command to view the generated config
+- Fix checking deployment when using the reverse proxy.
+- Fix deploying when `app.env.PORT` is set to a value other than 80
+- Fix setting up proxy when non-root user
+
+**Mongo**
+- Oplog is automatically enabled. To use, set `app.env.MONGO_OPLOG_URL` to `mongodb://mongodb/local`  (@edemaine)
+
+**Depreciations**
+
+`meteor.ssl` and `meteor.nginx` is depreciated. It uses a different implementation for custom certificates and lets encrypt, each with different features and restrictions. Also, the custom certificate implementation has security problems. The reverse proxy should be used instead. It doesn't have the security problems, uses the same implementation for custom certificates and lets encrypt, and has many additional features. Learn how to use the [reverse proxy in the docs](http://meteor-up.com/docs#reverse-proxy).
+
+`proxy.shared.clientUploadLimit` is depreciated. Use `proxy.clientUploadLimit` instead, which allows each app to have a different clientUploadLimit.
+
+**Other Changes**
+- `mup init` will create a `.deploy` folder when run in the same folder as a Meteor app
+- When mup can find a meteor app near to where `mup init` is run, the default config's `app.path` will be the path to that app
+- When a deploy fails, the last 200 instead of 100 lines of the app's logs are shown
+- More of the logs are shown when a command fails
+- When copying a file fails with the error `No such file`, it will tell the user to run `mup setup` to fix it
+- `reconfig` hooks will now run during `mup deploy`
+- `--show` is no longer needed to show the config when `mup validate --scrub` is run
+- Add section to readme about Meteor compatibility
+- Initial work has been done to support Docker Swarm
+- When there is only one server, `mup ssh` will not require the name of a server
+- Fix retry logic for the copy file task
+- Fix running Prepare Bundle when image already has a `/built_app` folder
+- Fix alignment of list of servers when running `mup ssh` without specifying a server
+- Fix plugins preparing the config multiple times
+- Fix loading locally installed plugins
+- `npm install` will still succeed even if Open Collectives's post install hook fails
+
+**Plugins**
+- list.executeScript supports server specific variables
+- Using the `post.status` hook, plugins can show their status
+- Plugins can add a `solution` property to errors. Mup will show the solution in yellow before exiting
+- Plugins can add a depreciation warning while validating a config with `utils.addDepreciation`
+
+## 1.3.7 - Nov 28, 2017
+
+- Fix permission denied error sometimes encountered during Prepare Bundle
+
+## 1.3.6 - Nov 24, 2017
+
+- Fix permission denied errors when deploying to nonroot user (@nickich)
+- Make bundle portable (@m-niesluchow)
+
+## 1.3.5 - Nov 3, 2017
+- Fix tar errors
+- The validation message shown when the `servers` object is missing from the config has been removed since some deployment plugins might not need it
+- The config created by `mup init` has the correct docker image for Meteor 1.6
+- Add table to docs that shows which docker image to use for each Meteor version
+
+**Plugins**
+- The remaining Meteor functionality has been removed from the default plugin, allowing plugins to completely take over deploying and managing the app when `app.type` in the config is set to something besides `meteor`
+
+## 1.3.4 - October 4, 2017
+- The exit code for `mup validate` is now 1 when there are validation errors
+- Fix changing proxy's clientUploadLimit with `proxy.shared.clientUploadLimit`
+- Added a `--scrub` option to `mup validate`, which when used with `--show` shows the config with most of the sensitive information removed
+- `mup mongo logs` accepts the same options as `mup logs` and other log commands
+- Use npm-shrinkwrap to prevent https://github.com/zodern/meteor-up/issues/757 from happening again
+- Hide docker error when trying to roll back and checking if an image exists. It is handled and normal, but could be confused with the reason for the app failing to start
+
+**Plugins and Hooks**
+- Building the app (but not archiving it) was moved to a new command `meteor.build`, which is run by `meteor.deploy` and `meteor.push`. This allows plugins or hooks to modify the bundle before it is archived and uploaded to the servers.
+- Plugins can export a `scrubConfig(config, utils)` function, which should return the config with all sensitive information removed
+- `api.scrubConfig()` was added, which returns the config after modified by any `scrubConfig` functions from plugins
+- `api.validateConfig` only shows the errors on the console the first time it is run
+- `MODULE_NOT_FOUND` errors are now shown when a plugin fails to load due to being unable to resolve a module
+
+**Docs**
+- Color, font, and spacing changes were made to the docs. It should look nicer and be easier to read.
+- Fixed grammar and capitalization
+- Many example configs in the docs are validated with `mup validate`
+- Many example configs show more of the config surrounding the section being documented
+
+## 1.3.3 - September 12, 2017
+- Add `mup validate` command, which validates the config. Has `--show` option which shows the config after it has been normalized and modified by plugin's `prepareConfig` functions
+- Add `mup proxy logs-le` to view the Let's Encrypt logs
+- Fix mup ignoring `app.dockerImage` in the config when using Mongo, the reverse proxy, or Redis
+- Fix error encountered during Verifying SSL Certificates after it had failed previously due to a docker container still running
+- Give more details when unable to load settings.json
+
+## 1.3.2 - September 8, 2017
+- App's env variables are set before `npm install` during Prepare Bundle
+- Fix error sometimes encountered when starting app after updating Mup to 1.3
+- Periods are removed from the database name when using built-in MongoDB
+- Removed validation error `"meteor.name" has a period`
+- Fix Prepare Bundle when app name has uppercase letters
+- Fix reverse proxy's let's encrypt and force ssl not working when `app.env` is missing
+- Fix crash when `app.name` is missing
+
+## 1.3.1 - August 23, 2017
+- Add `mup ssh <server>` command
+- Exit code when task list fails is now 1 instead of 0
+- Fix deploying when server's default shell is zsh @thsowers
+- All docker commands are run with `sudo`
+- `mup proxy stop` doesn't require the `proxy` object to be in the config
+- Add option `app.docker.prepareBundle` to enable or disable prepare bundle
+
+## 1.3.0 - August 22, 2017
+
+**Hooks**
+
+It is now possible to add hooks that run before or after commands. The new `--show-hook-names` option shows all of the available hooks for a cli command while it is running. Hooks can be a command to run locally or on the servers, or a function.
+
+**Plugins**
+
+Plugins are npm packages that can add commands (commands can be run from the mup cli or by other plugins), hooks, and config validators. All of the included cli commands and task lists have been moved to plugins.
+
+**Changes to Deployment and Deployment validation**
+
+*This is currently only enabled for the `abernix/meteord` docker image.*
+
+After the bundle is uploaded to each server, a new task is run called "Prepare bundle". It installs the Meteor npm dependencies, rebuilds native modules, and stores the result in a docker image. This has a few benefits:
+- The time in `meteor.deployCheckWaitTime` no longer needs to include the time to install npm dependencies
+- When installing dependencies fails, it does not continuously restart until `meteor.deployCheckWaitTime` expires, and running with `--verbose` shows the full logs from `npm install`
+- Dependencies are only installed once during each deploy. This means that `mup start`, `mup restart`, and `mup reconfig` are all much faster.
+
+**Improved Support for Multiple Servers**
+- `mup restart` restarts only one server at a time
+- Add `--servers` option to list which servers to use
+- Add support for server specific env variables, which can be configured in `meteor.servers.<server name>.env`
+
+**Config Changes**
+- The `meteor` object has been renamed to `app`. The `meteor` object will be supported until Mup 2.0
+- You can remove `mongo.port` and `mongo.oplog` from your config since they have never been used
+
+**Docs**
+- Remove `meteor.docker.imagePort`, `mongo.port`, and `mongo.oplog` from example configs
+- Document `meteor.docker.imagePort`
+- Update documentation for `meteor.deployCheckWaitTime`
+- Improve mongo, migration, proxy, and troubleshooting docs
+
+**Other Changes**
+- The reverse proxy can redirect `http` to `https`, configured with `proxy.ssl.forceSSL`
+- `mup setup` updates Docker if it is older than 1.13
+- Add `mup proxy reconfig-shared` to update the server after changing `proxy.shared` in the config.
+- Remove `meteor.deployCheckWaitTime`, `meteor.docker.imagePort`, and `mongo.port` from default config
+- Renamed the `meteor` object in the default config to `app`
+- Improve cli help output (commands have a description, command specific options are documented)
 - Show link to docs when there are validation errors
-- Improve some of the validation messages
 - Show validation error when `server.pem` is a path to a public key
-- Removed unnecessary stack traces when the app's path is incorrect or `meteor build` failed
+- Show validation error when `app.name` has a period
+- Improve some of the validation messages
+- Fix validating `proxy.shared.clientUploadLimit`
+- Mup displays message and exits if the node version is older than v4
+- Remove unnecessary stack traces when the app's path is incorrect or `meteor build` fails
+- Add `mup meteor restart` command
+- Remove `mup mongo dump` command since it did nothing
 
 ## 1.2.11 - June 14, 2017
 - Deployment verifier shows last 100 lines of the app's log when it fails (it previously was 50 lines)
@@ -26,7 +181,7 @@ Big thanks to @shaiamir for his work on the shared proxy.
 - App inside container's port is set to `docker.imagePort`. The app is still accessible on `env.PORT`.
 - Will build app if cached build is not found and `--cached-build` flag is set
 - Fix some bugs with verifying deployment
-- Add support for `zodern:mup-helpers` package. Since version 1.2.7, verifying deployment fails if the app's `/` route's http code is other than 200, or if it does not redirect on the server to a page that does have that http code. Adding `zodern:mup-helpers` allows meteor up to sucessfully validate the deployment.
+- Add support for `zodern:mup-helpers` package. Since version 1.2.7, verifying deployment fails if the app's `/` route's http code is other than 200, or if it does not redirect on the server to a page that does have that http code. Adding `zodern:mup-helpers` allows meteor up to successfully validate the deployment.
 
 ## 1.2.7 - May 5, 2017
 - Fix verifying deployment when using ssl autogenerate
@@ -49,7 +204,7 @@ Big thanks to @shaiamir for his work on the shared proxy.
 - MongoDB is safely shutdown for `Start Mongo` and `Stop Mongo` task lists
 - Reduced number of dependencies installed
 - Better error message on meteor build spawn error
-- Setup tasks are consistently capitilized
+- Setup tasks are consistently capitalized
 - Clearer validator message for `ROOT_URL`
 - Add warning message when using `force-ssl` without ssl setup
 - Validate `meteor.ssl.upload` @markreid
