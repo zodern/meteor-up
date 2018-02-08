@@ -817,6 +817,8 @@ If you have deployed to the server, it involves a couple more steps.
 Hooks allow you to run a command or function before or after a CLI command is run. The config looks like:
 
 ```js
+const childProcess = require('child_process');
+
 module.exports = {
   hooks: {
     hookName: {
@@ -829,28 +831,31 @@ module.exports = {
     'post.meteor.restart': {
       remoteCommand: 'docker logs --tail 50 app-name'
     },
-    'pre.docker.setup'(api) {
+    'pre.reconfig'(api) {
+      // Same api as is given to plugin command handlers
+      // If this runs asynchronous tasks, it needs to return a promise.
+      const gitHash = childProcess.execSync('git rev-parse HEAD').toString().trim();
+
+      api.getSettings();
+      api.settings.GIT_HASH = gitHash;
+    },
+    'post.docker.setup'(api) {
       // Login to private Gitlab docker registry
       const config = api.getConfig();
       const registry = 'registry.gitlab.com';
-      const u = process.env.REGISTRY_USERNAME;
-      const p = process.env.REGISTRY_PASSWORD;
-      if (!u || !p) {
+      const username = process.env.REGISTRY_USERNAME;
+      const password = process.env.REGISTRY_PASSWORD;
+
+      if (!username || !password) {
         throw new Error(
           'You must provide registry login details'
         );
       }
+
       return api.runSSHCommand(
         config.servers.one,
-        `docker login -u ${u} -p ${p} ${registry}`
+        `docker login -u ${username} -p ${password} ${registry}`
       );
-    },
-    'post.docker.setup'(api) {
-      // Same api as is given to plugin command handlers
-      // If this runs asynchronous tasks, it needs to return a promise.
-      const config = api.getConfig();
-
-      return api.runSSHCommand(config.servers.one, 'docker --version');
     }
   }
 };
