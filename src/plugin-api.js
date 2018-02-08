@@ -262,7 +262,7 @@ export default class PluginAPI {
     // Only show error when not from nodemiral
     // since nodemiral would have already shown the error
     if (!(e.nodemiralHistory instanceof Array)) {
-      console.error(e);
+      console.error(e.stack || e);
     }
 
     if (e.solution) {
@@ -398,8 +398,8 @@ export default class PluginAPI {
         opts.ssh = info.opts;
       }
 
-      opts.ssh.keepaliveInterval = 1000 * 30;
-      opts.ssh.keepaliveCountMax = 4;
+      opts.ssh.keepaliveInterval = 1000 * 28;
+      opts.ssh.keepaliveCountMax = 12;
 
       if (info.pem) {
         try {
