@@ -29,7 +29,6 @@ sudo docker pull jwilder/nginx-proxy
 set -e
 echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
 
-
 # This updates nginx for all vhosts
 NGINX_CONFIG="client_max_body_size $CLIENT_UPLOAD_LIMIT;";
 echo $NGINX_CONFIG > /opt/$APPNAME/config/nginx-default.conf

@@ -1,11 +1,12 @@
 import * as commandHandlers from './command-handlers';
+import initHandler from './init';
 
-export let init = {
+export const init = {
   description: 'Setup files for new mup project',
-  handler: commandHandlers.init
+  handler: initHandler
 };
 
-export let deploy = {
+export const deploy = {
   description: 'Deploy app to server',
   builder(yargs) {
     return yargs.option('cached-build', {
@@ -16,8 +17,8 @@ export let deploy = {
   handler: commandHandlers.deploy
 };
 
-export let logs = {
-  description: "Show app\'s logs. Supports options from docker logs",
+export const logs = {
+  description: 'Show app\'s logs. Supports options from docker logs',
   builder(yargs) {
     return yargs
       .strict(false)
@@ -34,48 +35,52 @@ export let logs = {
   handler: commandHandlers.logs
 };
 
-export let reconfig = {
+export const reconfig = {
   description: 'Updates server env and start script to match config',
   handler: commandHandlers.reconfig
 };
 
-export let restart = {
+export const restart = {
   description: 'Restart app',
   handler: commandHandlers.restart
 };
 
-export let setup = {
+export const setup = {
   description: 'Install dependencies, custom certificates, and MongoDB on server',
   handler: commandHandlers.setup
 };
 
-export let start = {
+export const start = {
   description: 'Start app',
   handler: commandHandlers.start
 };
 
-export let stop = {
+export const stop = {
   description: 'Stop app',
   handler: commandHandlers.stop
 };
 
-export let ssh = {
+export const ssh = {
   name: 'ssh [server]',
   description: 'SSH into server',
   handler: commandHandlers.ssh
 };
 
-export let validate = {
+export const validate = {
   description: 'validate config',
   builder(yargs) {
     return yargs.option('show', {
       description: 'Show config after being modified by plugins',
       bool: true
-    })
-      .option('scrub', {
-        description: 'When used with --show, hides sensitive information',
-        bool: true
-      });
+    }).option('scrub', {
+      description: 'Shows the config with sensitive information removed',
+      bool: true
+    });
   },
   handler: commandHandlers.validate
+};
+
+export const status = {
+  description: 'View status of your app, databases and other components',
+  handler: commandHandlers.status
 };

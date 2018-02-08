@@ -4,8 +4,8 @@ import expandTilde from 'expand-tilde';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'bluebird';
-import stream from 'stream';
 import readline from 'readline';
+import stream from 'stream';
 
 const log = debug('mup:utils');
 
@@ -13,17 +13,14 @@ export function addStdioHandlers(list) {
   list._taskQueue = list._taskQueue.map(task => {
     task.options = task.options || {};
 
-    task.options.onStdout = () => {
-      return data => {
-        process.stdout.write(data);
-      };
+    task.options.onStdout = () => data => {
+      process.stdout.write(data);
     };
 
-    task.options.onStderr = () => {
-      return data => {
-        process.stderr.write(data);
-      };
+    task.options.onStderr = () => data => {
+      process.stderr.write(data);
     };
+
     return task;
   });
 }
@@ -33,13 +30,14 @@ export function runTaskList(list, sessions, opts) {
     addStdioHandlers(list);
     delete opts.verbose;
   }
+
   return new Promise((resolve, reject) => {
     list.run(sessions, opts, summaryMap => {
-      for (var host in summaryMap) {
+      for (const host in summaryMap) {
         if (summaryMap.hasOwnProperty(host)) {
           const summary = summaryMap[host];
           if (summary.error) {
-            let error = summary.error;
+            const error = summary.error;
             error.nodemiralHistory = summary.history;
             reject(error);
 
@@ -73,7 +71,7 @@ class Callback2Stream extends stream.Readable {
   _read() {
     this.reading = true;
     this.data.forEach(() => {
-      let shouldContinue = this.reading && this.push(this.data.shift());
+      const shouldContinue = this.reading && this.push(this.data.shift());
       if (!shouldContinue) {
         this.reading = false;
       }
@@ -82,13 +80,13 @@ class Callback2Stream extends stream.Readable {
 }
 
 export function getDockerLogs(name, sessions, args) {
-  const command = 'sudo docker ' + args.join(' ') + ' ' + name + ' 2>&1';
+  const command = `sudo docker ${args.join(' ')} ${name} 2>&1`;
 
   log(`getDockerLogs command: ${command}`);
 
-  let promises = sessions.map(session => {
+  const promises = sessions.map(session => {
     const input = new Callback2Stream();
-    const host = '[' + session._host + ']';
+    const host = `[${session._host}]`;
     const lineSeperator = readline.createInterface({
       input,
       terminal: true
@@ -105,14 +103,16 @@ export function getDockerLogs(name, sessions, args) {
         process.stdout.write(host + data);
       }
     };
+
     return promisify(session.execute.bind(session))(command, options);
   });
+
   return Promise.all(promises);
 }
 
 export function createSSHOptions(server) {
-  var sshAgent = process.env.SSH_AUTH_SOCK;
-  var ssh = {
+  const sshAgent = process.env.SSH_AUTH_SOCK;
+  const ssh = {
     host: server.host,
     port: (server.opts && server.opts.port) || 22,
     username: server.username
@@ -125,6 +125,7 @@ export function createSSHOptions(server) {
   } else if (sshAgent && fs.existsSync(sshAgent)) {
     ssh.agent = sshAgent;
   }
+
   return ssh;
 }
 
@@ -135,8 +136,8 @@ export function runSSHCommand(info, command) {
     const conn = new Client();
 
     // TODO better if we can extract SSH agent info from original session
-    var sshAgent = process.env.SSH_AUTH_SOCK;
-    var ssh = {
+    const sshAgent = process.env.SSH_AUTH_SOCK;
+    const ssh = {
       host: info.host,
       port: (info.opts && info.opts.port) || 22,
       username: info.username
@@ -151,30 +152,31 @@ export function runSSHCommand(info, command) {
     }
     conn.connect(ssh);
 
-    conn.once('error', function(err) {
+    conn.once('error', err => {
       if (err) {
         reject(err);
       }
     });
 
     // TODO handle error events
-    conn.once('ready', function() {
-      conn.exec(command, function(err, outputStream) {
+    conn.once('ready', () => {
+      conn.exec(command, (err, outputStream) => {
         if (err) {
           conn.end();
           reject(err);
+
           return;
         }
 
         let output = '';
 
-        outputStream.on('data', function(data) {
+        outputStream.on('data', data => {
           output += data;
         });
 
-        outputStream.once('close', function(code) {
+        outputStream.once('close', code => {
           conn.end();
-          resolve({ code, output });
+          resolve({ code, output, host: info.host });
         });
       });
     });
@@ -184,18 +186,18 @@ export function runSSHCommand(info, command) {
 export function countOccurences(needle, haystack) {
   const regex = new RegExp(needle, 'g');
   const match = haystack.match(regex) || [];
+
   return match.length;
 }
 
 export function resolvePath(...paths) {
-  let expandedPaths = paths.map(_path => {
-    return expandTilde(_path);
-  });
+  const expandedPaths = paths.map(_path => expandTilde(_path));
+
   return path.resolve(...expandedPaths);
 }
 
 export function filterArgv(argvArray, argv, unwanted) {
-  let result = argv._.slice();
+  const result = argv._.slice();
   Object.keys(argv).forEach(_key => {
     let add = false;
     let key = _key;
@@ -224,7 +226,6 @@ export function filterArgv(argvArray, argv, unwanted) {
         result.push(argv[_key]);
       }
     }
-
   });
 
   return result;

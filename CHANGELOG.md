@@ -1,3 +1,50 @@
+## Next
+
+
+**Status**
+The `mup status` command gives an overview of what is running on the servers and shows any problems plugins detected.
+
+**Reverse Proxy**
+- The reverse proxy is no longer an "experimental feature"
+- Support for customizing the generated server and location blocks of the nginx config
+- Add `mup proxy nginx-config` command to view the generated config
+- Fix checking deployment when using the reverse proxy.
+- Fix deploying when `app.env.PORT` is set to a value other than 80
+- Fix setting up proxy when non-root user
+
+**Mongo**
+- Oplog is automatically enabled. To use, set `app.env.MONGO_OPLOG_URL` to `mongodb://mongodb/local`  (@edemaine)
+
+**Depreciations**
+
+`meteor.ssl` and `meteor.nginx` is depreciated. It uses a different implementation for custom certificates and lets encrypt, each with different features and restrictions. Also, the custom certificate implementation has security problems. The reverse proxy should be used instead. It doesn't have the security problems, uses the same implementation for custom certificates and lets encrypt, and has many additional features. Learn how to use the [reverse proxy in the docs](http://meteor-up.com/docs#reverse-proxy).
+
+`proxy.shared.clientUploadLimit` is depreciated. Use `proxy.clientUploadLimit` instead, which allows each app to have a different clientUploadLimit.
+
+**Other Changes**
+- `mup init` will create a `.deploy` folder when run in the same folder as a Meteor app
+- When mup can find a meteor app near to where `mup init` is run, the default config's `app.path` will be the path to that app
+- When a deploy fails, the last 200 instead of 100 lines of the app's logs are shown
+- More of the logs are shown when a command fails
+- When copying a file fails with the error `No such file`, it will tell the user to run `mup setup` to fix it
+- `reconfig` hooks will now run during `mup deploy`
+- `--show` is no longer needed to show the config when `mup validate --scrub` is run
+- Add section to readme about Meteor compatibility
+- Initial work has been done to support Docker Swarm
+- When there is only one server, `mup ssh` will not require the name of a server
+- Fix retry logic for the copy file task
+- Fix running Prepare Bundle when image already has a `/built_app` folder
+- Fix alignment of list of servers when running `mup ssh` without specifying a server
+- Fix plugins preparing the config multiple times
+- Fix loading locally installed plugins
+- `npm install` will still succeed even if Open Collectives's post install hook fails
+
+**Plugins**
+- list.executeScript supports server specific variables
+- Using the `post.status` hook, plugins can show their status
+- Plugins can add a `solution` property to errors. Mup will show the solution in yellow before exiting
+- Plugins can add a depreciation warning while validating a config with `utils.addDepreciation`
+
 ## 1.3.7 - Nov 28, 2017
 
 - Fix permission denied error sometimes encountered during Prepare Bundle

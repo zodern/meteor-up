@@ -13,7 +13,7 @@ module.exports = {
   app: {
     // TODO: change app name and path
     name: 'app',
-    path: '../app',
+    path: '<app path>',
 
     servers: {
       one: {},
@@ -27,17 +27,9 @@ module.exports = {
       // TODO: Change to your app's url
       // If you are using ssl, it needs to start with https://
       ROOT_URL: 'http://app.com',
-      MONGO_URL: 'mongodb://localhost/meteor',
+      MONGO_URL: 'mongodb://mongodb/meteor',
+      MONGO_OPLOG_URL: 'mongodb://mongodb/local',
     },
-
-    // ssl: { // (optional)
-    //   // Enables let's encrypt (optional)
-    //   autogenerate: {
-    //     email: 'email.address@domain.com',
-    //     // comma separated list of domains
-    //     domains: 'website.com,www.website.com'
-    //   }
-    // },
 
     docker: {
       // change to 'abernix/meteord:base' if your app is using Meteor 1.4 - 1.5
@@ -54,5 +46,18 @@ module.exports = {
     servers: {
       one: {}
     }
-  }
+  },
+
+  // (Optional)
+  // Use the proxy to setup ssl or to route requests to the correct
+  // app when there are several apps
+
+  // proxy: {
+  //   domains: 'mywebsite.com,www.mywebsite.com',
+
+  //   ssl: {
+  //     // Enable Let's Encrypt
+  //     letsEncryptEmail: 'email@domain.com'
+  //   }
+  // }
 };

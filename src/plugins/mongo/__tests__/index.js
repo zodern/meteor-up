@@ -1,19 +1,17 @@
 import { countOccurences, runSSHCommand } from '../../../utils';
 import { describe, it } from 'mocha';
-
-/* eslint-disable max-len */
 import { expect } from 'chai';
 import os from 'os';
 import path from 'path';
 import sh from 'shelljs';
+const servers = require('../../../../tests/fixtures/servers');
 
 sh.config.silent = false;
-const servers = require('../../../../tests/fixtures/servers');
 
 describe('module - mongo', function() {
   this.timeout(600000);
 
-  describe('logs', function() {
+  describe('logs', () => {
     it('should pull logs from "meteor" vm', async () => {
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
 
@@ -26,9 +24,9 @@ describe('module - mongo', function() {
     });
   });
 
-  describe('setup', function() {
+  describe('setup', () => {
     it('should setup mongodb on "mongo" vm', async () => {
-      const serverInfo = servers['mymongo'];
+      const serverInfo = servers.mymongo;
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
 
       const out = sh.exec('mup mongo setup');
@@ -47,9 +45,9 @@ describe('module - mongo', function() {
     });
   });
 
-  describe('start', function() {
+  describe('start', () => {
     it('should start mongodb on "mongo" vm', async () => {
-      const serverInfo = servers['mymongo'];
+      const serverInfo = servers.mymongo;
 
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
       sh.exec('mup docker setup && mup mongo setup');
@@ -66,9 +64,9 @@ describe('module - mongo', function() {
     });
   });
 
-  describe('stop', function() {
+  describe('stop', () => {
     it('should stop mongodb on "mongo" vm', async () => {
-      const serverInfo = servers['mymongo'];
+      const serverInfo = servers.mymongo;
 
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
       sh.exec('mup docker setup && mup mongo setup && mup mongo start');

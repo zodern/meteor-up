@@ -1,3 +1,5 @@
+/* eslint-disable no-var */
+
 var sh = require('shelljs');
 var os = require('os');
 var path = require('path');
@@ -87,7 +89,7 @@ if (!fs.existsSync(location)) {
 
   fs.writeFileSync(location, pair.private);
   fs.writeFileSync(
-    location + '.pub',
+    `${location}.pub`,
     forge.ssh.publicKeyToOpenSSH(publicKey, 'tests@test.com')
   );
 

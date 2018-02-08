@@ -81,7 +81,13 @@ const schema = joi.object().keys({
 
 export default function(
   config,
-  { combineErrorDetails, VALIDATE_OPTIONS, serversExist, addLocation }
+  {
+    addDepreciation,
+    combineErrorDetails,
+    VALIDATE_OPTIONS,
+    serversExist,
+    addLocation
+  }
 ) {
   let details = [];
   details = combineErrorDetails(
@@ -108,6 +114,25 @@ export default function(
     details,
     serversExist(config.servers, config.app.servers)
   );
+
+  // Depreciations
+  if (config.app.ssl) {
+    details = addDepreciation(
+      details,
+      'ssl',
+      'Use the reverse proxy instead',
+      'https://git.io/vN5tn'
+    );
+  }
+
+  if (config.app.nginx) {
+    details = addDepreciation(
+      details,
+      'nginx',
+      'Use the reverse proxy instead',
+      'https://git.io/vN5tn'
+    );
+  }
 
   return addLocation(details, config.meteor ? 'meteor' : 'app');
 }

@@ -5,8 +5,8 @@ APP_PATH=/opt/$APPNAME
 IMAGE=mup-<%= appName.toLowerCase() %>
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
-DEPLOY_CHECK_URL=<%= `${bind}:${deployCheckPort}${deployCheckPath}` %>
-HOST=<%= host %>
+CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
+DEPLOY_CHECK_URL=$CONTAINER_IP<%= `:${deployCheckPort}` %>
 
 cd $APP_PATH
 
@@ -31,7 +31,7 @@ revert_app (){
   fi
 
   echo
-  echo "To see more logs type 'mup logs --tail=100'"
+  echo "To see more logs type 'mup logs --tail=200'"
   echo ""
 }
 
@@ -47,7 +47,6 @@ while [[ true ]]; do
   curl \
     --insecure \
     $DEPLOY_CHECK_URL \
-    <% if (host) { %> --header "HOST:$HOST" <% } %>  \
     && exit 0
 
   if [ "$elaspsed" "==" "$DEPLOY_CHECK_WAIT_TIME" ]; then

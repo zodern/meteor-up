@@ -2,22 +2,22 @@ import registerCommand, { commands, registerCommandOverrides } from '../commands
 import assert from 'assert';
 import sinon from 'sinon';
 
-describe('commands', function() {
-  beforeEach(function() {
+describe('commands', () => {
+  beforeEach(() => {
     for (const prop of Object.keys(commands)) {
       delete commands[prop];
     }
   });
 
-  describe('registerCommad', function() {
-    it('should add command to list of commands', function() {
+  describe('registerCommad', () => {
+    it('should add command to list of commands', () => {
       function handler() {}
       registerCommand('docker', 'setup', handler);
       assert(commands['docker.setup'] === handler);
     });
   });
 
-  describe('registerCommandOverrides', function() {
+  describe('registerCommandOverrides', () => {
     let spy;
     beforeEach(() => {
       spy = sinon.spy(console, 'log');
@@ -26,7 +26,7 @@ describe('commands', function() {
       spy.restore();
     });
 
-    it('should add override to list of commands', function() {
+    it('should add override to list of commands', () => {
       function target() {}
       commands['plugin.docker-setup'] = target;
       registerCommandOverrides('plugin', {
@@ -34,7 +34,7 @@ describe('commands', function() {
       });
       assert(commands['docker.setup'] === target);
     });
-    it('should support shorter override format', function() {
+    it('should support shorter override format', () => {
       function target() {}
       commands['plugin.docker-setup'] = target;
 
@@ -43,7 +43,7 @@ describe('commands', function() {
       });
       assert(commands['docker.setup'] === target);
     });
-    it('should warn when override handler doesn\'t exist', function() {
+    it('should warn when override handler doesn\'t exist', () => {
       registerCommandOverrides('plugin', {
         'docker.setup': 'docker-setup'
       });

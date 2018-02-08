@@ -1,22 +1,25 @@
 import buildApp, { archiveApp } from './build.js';
-
+import { checkUrls, getInformation } from './status';
+import { map, promisify } from 'bluebird';
+import chalk from 'chalk';
+import { checkAppStarted } from './utils';
 import { cloneDeep } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
 import os from 'os';
-import { promisify } from 'bluebird';
 import random from 'random-seed';
 import uuid from 'uuid';
 
 const log = debug('mup:module:meteor');
 
 function tmpBuildPath(appPath, api) {
-  let rand = random.create(appPath);
-  let uuidNumbers = [];
+  const rand = random.create(appPath);
+  const uuidNumbers = [];
   for (let i = 0; i < 16; i++) {
     uuidNumbers.push(rand(255));
   }
+
   return api.resolvePath(
     os.tmpdir(),
     `mup-meteor-${uuid.v4({ random: uuidNumbers })}`
@@ -37,6 +40,7 @@ export function logs(api) {
   }
 
   const sessions = api.getSessions(['app']);
+
   return api.getDockerLogs(config.name, sessions, args);
 }
 
@@ -69,12 +73,12 @@ export function setup(api) {
       });
       list.copy('Copying SSL Certificate Bundle', {
         src: api.resolvePath(basePath, config.ssl.crt),
-        dest: '/opt/' + config.name + '/config/bundle.crt'
+        dest: `/opt/${config.name}/config/bundle.crt`
       });
 
       list.copy('Copying SSL Private Key', {
         src: api.resolvePath(basePath, config.ssl.key),
-        dest: '/opt/' + config.name + '/config/private.key'
+        dest: `/opt/${config.name}/config/private.key`
       });
     }
 
@@ -95,7 +99,7 @@ function getBuildOptions(api) {
   const config = api.getConfig().app;
   const appPath = api.resolvePath(api.getBasePath(), config.path);
 
-  let buildOptions = config.buildOptions || {};
+  const buildOptions = config.buildOptions || {};
   buildOptions.buildLocation =
     buildOptions.buildLocation || tmpBuildPath(appPath, api);
 
@@ -103,9 +107,9 @@ function getBuildOptions(api) {
 }
 
 function shouldRebuild(api) {
-  var rebuild = true;
+  let rebuild = true;
   const { buildLocation } = getBuildOptions(api);
-  var bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
+  const bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
 
   if (api.getOptions()['cached-build']) {
     const buildCached = fs.existsSync(bundlePath);
@@ -125,7 +129,7 @@ export async function build(api) {
   const appPath = api.resolvePath(api.getBasePath(), config.path);
   const buildOptions = getBuildOptions(api);
 
-  var rebuild = shouldRebuild(api);
+  const rebuild = shouldRebuild(api);
 
   if (rebuild && api.getOptions()['cached-build']) {
     console.log('Unable to use previous build. It doesn\'t exist.');
@@ -151,9 +155,9 @@ export async function push(api) {
     process.exit(1);
   }
 
-  let buildOptions = getBuildOptions(api);
+  const buildOptions = getBuildOptions(api);
 
-  var bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+  const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
   if (shouldRebuild(api)) {
     await promisify(archiveApp)(buildOptions.buildLocation, api);
@@ -163,11 +167,15 @@ export async function push(api) {
 
   list.copy('Pushing Meteor App Bundle to the Server', {
     src: bundlePath,
-    dest: '/opt/' + config.name + '/tmp/bundle.tar.gz',
+    dest: `/opt/${config.name}/tmp/bundle.tar.gz`,
     progressBar: config.enableUploadProgressBar
   });
 
-  let prepareSupported = config.docker.image.indexOf('abernix/meteord') === 0;
+  const prepareBundleImages = ['abernix/meteord', 'zodern/meteor'];
+
+  let prepareSupported = prepareBundleImages.find(
+    image => config.docker.image.indexOf(image) === 0
+  );
   if ('prepareBundle' in config.docker) {
     prepareSupported = config.docker.prepareBundle;
   }
@@ -191,6 +199,7 @@ export async function push(api) {
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
@@ -240,7 +249,7 @@ export function envconfig(api) {
   const list = nodemiral.taskList('Configuring App');
   list.copy('Pushing the Startup Script', {
     src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
-    dest: '/opt/' + config.name + '/config/start.sh',
+    dest: `/opt/${config.name}/config/start.sh`,
     vars: {
       appName: config.name,
       port: config.env.PORT || 80,
@@ -254,7 +263,7 @@ export function envconfig(api) {
     }
   });
 
-  var env = cloneDeep(config.env);
+  const env = cloneDeep(config.env);
   env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
   // sending PORT to the docker container is useless.
 
@@ -275,7 +284,7 @@ export function envconfig(api) {
 
   list.copy('Sending Environment Variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),
-    dest: '/opt/' + config.name + '/config/env.list',
+    dest: `/opt/${config.name}/config/env.list`,
     hostVars,
     vars: {
       env: env || {},
@@ -284,6 +293,7 @@ export function envconfig(api) {
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
@@ -307,21 +317,10 @@ export function start(api) {
     }
   });
 
-  list.executeScript('Verifying Deployment', {
-    script: api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh'),
-    vars: {
-      deployCheckWaitTime: config.deployCheckWaitTime || 60,
-      appName: config.name,
-      deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
-      deployCheckPath: '',
-      host: api.getConfig().proxy ?
-        api.getConfig().proxy.domains.split(',')[0] : null,
-      bind: api.getConfig().app.docker.bind ?
-        api.getConfig().app.docker.bind : 'localhost'
-    }
-  });
+  checkAppStarted(list, api);
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
@@ -341,8 +340,7 @@ export function deploy(api) {
 
   return api
     .runCommand('meteor.push')
-    .then(() => api.runCommand('meteor.envconfig'))
-    .then(() => api.runCommand('meteor.start'));
+    .then(() => api.runCommand('default.reconfig'));
 }
 
 export function stop(api) {
@@ -363,6 +361,7 @@ export function stop(api) {
   });
 
   const sessions = api.getSessions(['app']);
+
   return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
@@ -385,22 +384,85 @@ export function restart(api) {
     }
   });
 
-  list.executeScript('Verifying Deployment', {
-    script: api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh'),
-    vars: {
-      deployCheckWaitTime: config.deployCheckWaitTime || 60,
-      appName: config.name,
-      deployCheckPort: config.deployCheckPort || config.env.PORT || 80,
-      deployCheckPath: '',
-      host: api.getConfig().proxy ?
-        api.getConfig().proxy.domains.split(',')[0] : null,
-      bind: api.getConfig().app.docker.bind ?
-        api.getConfig().app.docker.bind : 'localhost'
-    }
-  });
+  checkAppStarted(list, api);
 
   return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
   });
+}
+
+export async function status(api) {
+  const config = api.getConfig();
+  const lines = [];
+  const servers = Object.keys(config.app.servers)
+    .map(key => config.servers[key]);
+
+  const results = await map(
+    servers,
+    server => getInformation(server, config.app.name, api),
+    { concurrency: 2 }
+  );
+  const urlResults = await map(
+    servers,
+    server => checkUrls(server, config.app, api),
+    { concurrency: 2 }
+  );
+
+  let overallColor = 'green';
+
+  function updateColor(color) {
+    if (color === 'yellow' && overallColor !== 'red') {
+      overallColor = color;
+    } else if (color === 'red') {
+      overallColor = color;
+    }
+  }
+
+  results.forEach((result, index) => {
+    updateColor(result.statusColor);
+    updateColor(result.restartColor);
+
+    lines.push(` - ${result.host}: ${chalk[result.statusColor](result.status)} `);
+
+    if (result.status === 'Stopped') {
+      return;
+    }
+
+    lines.push(`    Created at ${result.created}`);
+    lines.push(chalk[result.restartColor](`    Restarted ${result.restartCount} times`));
+
+    lines.push('    ENV: ');
+    result.env.forEach(envVar => {
+      lines.push(`     - ${envVar}`);
+    });
+
+    if (result.exposedPorts.length > 0) {
+      lines.push('    Exposed Ports:');
+      result.exposedPorts.forEach(port => {
+        lines.push(`     - ${port}`);
+      });
+    }
+
+    if (result.publishedPorts.length > 0) {
+      lines.push('    Published Ports:');
+      result.publishedPorts.forEach(port => {
+        lines.push(`     - ${port}`);
+      });
+    }
+
+    const urlResult = urlResults[index];
+    if (result.publishedPorts.length > 0) {
+      lines.push(`    App running at http://${result.host}:${result.publishedPorts[0].split('/')[0]}`);
+      lines.push(`     - Available in app's docker container: ${urlResult.inDocker}`);
+      lines.push(`     - Available on server: ${urlResult.remote}`);
+      lines.push(`     - Available on local computer: ${urlResult.local}`);
+    } else {
+      lines.push('    App available through reverse proxy');
+      lines.push(`     - Available in app's docker container: ${urlResult.inDocker}`);
+    }
+  });
+
+  console.log(chalk[overallColor]('\n=> Meteor Status'));
+  console.log(lines.join('\n'));
 }

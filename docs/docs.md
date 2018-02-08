@@ -117,8 +117,10 @@ module.exports = {
       // lets you add/overwrite any parameter on
       // the docker run command (optional)
       args: [
-        '--link=myCustomMongoDB:myCustomMongoDB', // linking example
-        '--memory-reservation 200M' // memory reservation example
+        // linking example
+        '--link=myCustomMongoDB:myCustomMongoDB',
+        // memory resvevation example
+        '--memory-reservation 200M'
       ],
 
       // Only used if using your own SSL certificates.
@@ -154,7 +156,9 @@ module.exports = {
       // but still build the web.cordova architecture. (recommended)
       serverOnly: true,
 
-      debug: true,
+      // Set to true to disable minification and bundling,
+      // and include debugOnly packages
+      debug: false,
 
       // defaults to a a folder in your tmp folder.
       buildLocation: '/my/build/folder',
@@ -167,8 +171,8 @@ module.exports = {
       // your app url for mobile app access
       server: 'http://app.com',
 
-      // adds --allow-incompatible-updates arg to build command
-      allowIncompatibleUpdates: true,
+      // When true, adds --allow-incompatible-updates arg to build command
+      allowIncompatibleUpdates: false,
 
       // Executable used to build the meteor project
       // You can set to a local repo path if needed
@@ -191,26 +195,19 @@ module.exports = {
         'syslog-address': 'udp://syslogserverurl.com:1234'
       }
     },
-    ssl: {
-      // Enables let's encrypt (optional)
-      autogenerate: {
-        email: 'email.address@domain.com',
-        // Comma-seperated list of domains
-        domains: 'website.com,www.website.com'
-      }
-    },
     // The maximum number of seconds it will wait
-    // for your app to successfully start
-    deployCheckWaitTime: 60, // default is 60 (optional)
+    // for your app to successfully start (optional, default is 60)
+    deployCheckWaitTime: 60,
 
     // lets you define which port to check after the deploy process, if it
     // differs from the meteor port you are serving
     // (like meteor behind a proxy/firewall) (optional)
     deployCheckPort: 80,
 
-    // Shows progress bar while uploading bundle to server (optional)
+    // Shows progress bar while uploading bundle to server
     // You might need to disable it on CI servers
-    enableUploadProgressBar: true // default false.
+    // (optional, default is false)
+    enableUploadProgressBar: true
   },
 
   // (optional but remove it if you want to use a remote MongoDB!)
@@ -256,11 +253,14 @@ The `--cached-build` option will use the build from the last time you deployed t
 
 Mup supports Meteor 1.2 and newer, though you might need to change the docker image in your mup config.
 
-| Meteor version | Docker image | Notes |
+| Meteor version | Docker image | Prepare Bundle | Notes |
 | --- | --- | --- |
-| 1.2 - 1.3 | `kadirahq/meteord` | This is the default docker image. When using Meteor 1.2, `app.buildOptions.serverOnly` should be false. |
-| 1.4 - 1.5 | `abernix/meteord:base` |  |
-| 1.6 | `abernix/meteord:node-8.4.0-base` | |
+| 1.2 - 1.3 | `kadirahq/meteord` | false | This is the default docker image. When using Meteor 1.2, `app.buildOptions.serverOnly` should be false. |
+| 1.4 - 1.5 | `abernix/meteord:base` | true |  |
+| 1.6 | `abernix/meteord:node-8.4.0-base` | true | |
+| 1.2 - 1.6 | `zodern/meteor:root` | true | Automatically uses the correct node version. |
+
+When using an image that supports `Prepare Bundle`, deployments are easier to debug and more reliable.
 
 ## Build Options
 
@@ -270,8 +270,9 @@ You can define Meteor build options in `mup.js` like this:
 ...
 meteor: {
   buildOptions: {
-    // build with the debug mode on
-    debug: true,
+    // Set to true to disable minification and bundling,
+    // and include debugOnly packages
+    debug: false,
     // mobile setting for cordova apps
     mobileSettings: {
       public: {
@@ -449,7 +450,7 @@ You can set `meteor.docker.port` to the port to expose from the container. This 
 
 Meteor Up can create a nginx reverse proxy that will handle SSL, and, if you are running multiple apps on the server, it will route requests to the correct app. The proxy is shared between all apps on the servers.
 
-This currently is an experimental feature. This means that the configuration might have breaking changes between releases until it is finalized. This will eventually replace the former nginx setup, configured using `meteor.ssl` and `meteor.nginx`.
+This replaces the former nginx setup, configured using `meteor.ssl` and `meteor.nginx`.
 
 Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` section:
 
@@ -526,7 +527,62 @@ module.exports = {
 
 It uses HSTS. This means that if you set it to `false` after it's been true, the browser used by anyone that visited it while it was set to true will still be redirected to `https` for one year.
 
+### Custom NGINX Config
+
+The nginx config is generated based on the docker containers running on the same server. At this time, it is not possible to modify the majority it. However, you can modify the server and `/` location blocks for the app.
+
+To extend the server block for the app, save the rules to a file and add the path to your config:
+
+```js
+module.exports = {
+  // ... rest of config
+
+  proxy: {
+    domains: 'website.com',
+    nginxServerConfig: './path/to/config'
+  }
+};
+```
+
+To modify the `/` location block, save the rules to a file and add the path to your config:
+
+```js
+module.exports = {
+  // ... rest of config
+
+  proxy: {
+    domains: 'website.com',
+    nginxLocationConfig: './path/to/config'
+  }
+};
+```
+
+You can view the generated config by running
+
+```bash
+mup proxy nginx-config
+```
+
+There will be `include` statements for each custom config.
+
 ### Advanced configuration
+
+These are additional options that can be used to customize the reverse proxy. The defaults are compatible with most apps.
+
+```js
+module.exports = {
+  // ... rest of config
+
+  proxy: {
+    domains: 'website.com,www.website.com',
+
+    // (optional, default=10M) Limit for the size of file uploads.
+    // Setting to 0 disables the limit.
+    clientUploadLimit: '50M'
+  }
+};
+```
+
 The `proxy.shared` object has settings that most apps won't need to change, but if they are they apply to every app using the proxy. After you change `proxy.shared`, you need to run `mup proxy reconfig-shared` for it to take effect.
 
 ```js
@@ -545,8 +601,6 @@ module.exports = {
       httpPort: 80,
       // The port to listen for https connections. Default is 443.
       httpsPort: 443,
-      // Set proxy wide upload limit. Setting 0 will disable the limit.
-      clientUploadLimit: '10M',
       // Environment variables for nginx proxy
       env: {
         DEFAULT_HOST: 'foo.bar.com'
@@ -583,11 +637,16 @@ You can keep multiple configuration and settings files in the same directory and
     mup deploy --config=mup-staging.js --settings=staging-settings.json
 
 ## SSL Support
+
+**This is depreciated. Use the [reverse proxy](#ssl) to setup ssl instead.**
+
+
 Meteor UP can enable SSL support for your app. It can either autogenerate the certificates or upload them from your dev computer.
 
-**If you are using the reverse proxy, follow [these instructions](#ssl) instead.**
 
 ### Autogenerate certificates
+
+**This is depreciated. Use the [reverse proxy](#ssl) to setup ssl instead.**
 
 Meteor Up can use Let's Encrypt to generate certificates for you. Add the following to your `mup.js` file:
 
@@ -612,6 +671,8 @@ Then run `mup deploy`. It will automatically create certificates and set up SSL,
 
 ### Upload certificates
 
+**This is depreciated. Use the [reverse proxy](#ssl) to setup ssl instead.**
+
 To upload certificates instead of having the server generate them for you, just add the following configuration to your `mup.js` file.
 
 ```ts
@@ -634,10 +695,10 @@ To learn more about SSL setup when using your own certificates, refer to the [`m
 
 ## Nginx Upload
 
+**This is depreciated. Use the [reverse proxy](#ssl) to configure this instead.**
 
 ***This Only Works if you are using the Let's Encrypt Autogenerated SSL's***
 
-**If you are using the reverse proxy, follow [these instructions](#advanced-configuration) instead.**
 
 If you would like to increase the client upload limits, you can change it by adding:
 ```ts
@@ -666,7 +727,7 @@ Two popular Mongo DbaaS's are [Compose](https://www.compose.com/mongodb) and [mL
 ### Built-in Database
 Meteor Up can start a MongoDB instance on the server and set `meteor.env.MONGO_URL` to connect to it.
 
-It is recommended to use an external database instead of the one built-in to mup for apps in production. The built-in database currently does not support oplog, is not easy to backup, and only works when the app is running on one server.
+It is recommended to use an external database instead of the one built-in to mup for apps in production. The built-in database is not easy to backup, and only works when the app is running on one server.
 
 Add the `mongo` object to your config:
 
@@ -682,6 +743,8 @@ module.exports = {
   }
 };
 ```
+
+To use the oplog, set `app.env.MONGO_OPLOG_URL` to `mongodb://mongodb/local`.
 
 Before your first setup, it is recommended to change `mongo.version` to the newest version of MongoDB your app or meteor supports. After Mongo is started, it is more complex to upgrade it.
 
@@ -786,6 +849,7 @@ module.exports = {
       // Same api as is given to plugin command handlers
       // If this runs asynchronous tasks, it needs to return a promise.
       const config = api.getConfig();
+
       return api.runSSHCommand(config.servers.one, 'docker --version');
     }
   }

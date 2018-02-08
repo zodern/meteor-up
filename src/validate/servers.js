@@ -1,5 +1,4 @@
-import { VALIDATE_OPTIONS, addLocation, combineErrorDetails } from './utils';
-
+import { addLocation, combineErrorDetails, VALIDATE_OPTIONS } from './utils';
 import joi from 'joi';
 
 // The regexp used matches everything
@@ -19,7 +18,7 @@ const schema = joi.object().keys().pattern(/.*/, {
 
 export default function validateServers(servers) {
   let details = [];
-  let result = joi.validate(servers, schema, VALIDATE_OPTIONS);
+  const result = joi.validate(servers, schema, VALIDATE_OPTIONS);
   details = combineErrorDetails(details, result);
 
   Object.keys(servers).forEach(key => {
