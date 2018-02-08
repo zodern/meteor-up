@@ -27,9 +27,21 @@ sudo docker run \
   --name=mongodb \
   mongo:$MONGO_VERSION mongod -f /mongodb.conf
 
-sleep 3
 
 echo "Creating replica set"
 
-sudo docker exec mongodb mongo --eval \
-  'rs.initiate({_id: "meteor", members: [{_id: 0, host: "127.0.0.1:27017"}]});'
+limit=20
+elaspsed=0
+
+while [[ true ]]; do
+  sleep 1
+  elaspsed=$((elaspsed+1))
+  sudo docker exec mongodb mongo --eval \
+    'rs.initiate({_id: "meteor", members: [{_id: 0, host: "127.0.0.1:27017"}]});' \
+    && exit 0
+  
+  if [ "$elaspsed" "==" "$limit" ]; then
+    echo "Failed connecting to mongo to create replica set" 1>&2 
+    exit 1
+  fi
+done
