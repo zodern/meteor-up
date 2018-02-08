@@ -14,7 +14,7 @@ sh.env.PROD_SERVER = '127.0.0.1';
 sh.env.PROD_SERVER_PORT = '3500';
 sh.env.PROD_SERVER_PEM = path.resolve(mupDir, 'tests/fixtures/ssh/new');
 
-var volume = `-v ${keyPath}:/root/.ssh/authorized_keys`;
+var volume = `-v ${keyPath}:/root/.ssh/authorized_keys2`;
 var publish = '-p 127.0.0.1:3500:22';
 var image = argv.skipPull ? 'mup-tests-server' : 'mup-tests-server-docker';
 
@@ -23,6 +23,7 @@ var containerId = sh.exec(
 ).output.trim();
 
 sh.exec(`docker exec ${containerId} sudo service docker start`);
+sh.exec(`docker exec ${containerId} cp /root/.ssh/authorized_keys2 /root/.ssh/authorized_keys`);
 
 var watch = argv.watch ? ' --watch' : '';
 var files = argv.path ? argv.path : ' src/**/__tests__/**/*.js';
