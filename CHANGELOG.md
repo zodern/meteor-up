@@ -25,13 +25,15 @@ The `mup status` command gives an overview of what is running on the servers and
 - `mup init` will create a `.deploy` folder when run in the same folder as a Meteor app
 - When mup can find a meteor app near to where `mup init` is run, the default config's `app.path` will be the path to that app
 - When a deploy fails, the last 200 instead of 100 lines of the app's logs are shown
-- More of the logs are shown when a command fails
+- More of the output is shown when a command fails
 - When copying a file fails with the error `No such file`, it will tell the user to run `mup setup` to fix it
 - `reconfig` hooks will now run during `mup deploy`
 - `--show` is no longer needed to show the config when `mup validate --scrub` is run
 - Add section to readme about Meteor compatibility
 - Initial work has been done to support Docker Swarm
 - When there is only one server, `mup ssh` will not require the name of a server
+- If the app's docker container is restarting during 10 checks, the Deployment Verifier will revert the app without waiting the full time in `deployCheckWaitTime`
+- Added 10 second timeout to the curl command in the Deployment Verifier
 - Fix retry logic for the copy file task
 - Fix running Prepare Bundle when image already has a `/built_app` folder
 - Fix alignment of list of servers when running `mup ssh` without specifying a server
