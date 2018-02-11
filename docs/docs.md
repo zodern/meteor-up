@@ -123,10 +123,6 @@ module.exports = {
         '--memory-reservation 200M'
       ],
 
-      // Only used if using your own SSL certificates.
-      // Default is "meteorhacks/mup-frontend-server" (optional)
-      imageFrontendServer: 'meteorhacks/mup-frontend-server',
-
       // lets you bind the docker container to a
       // specific network interface (optional)
       bind: '127.0.0.1',

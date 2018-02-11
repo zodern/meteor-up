@@ -134,5 +134,14 @@ export default function(
     );
   }
 
+  if (config.app.docker && config.app.docker.imageFrontendServer) {
+    details = addDepreciation(
+      details,
+      'docker.imageFrontendServer',
+      'Use the reverse proxy instead',
+      'https://git.io/vN5tn'
+    );
+  }
+
   return addLocation(details, config.meteor ? 'meteor' : 'app');
 }
