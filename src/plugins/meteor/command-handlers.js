@@ -367,7 +367,7 @@ export function stop(api) {
 
 export function restart(api) {
   const list = nodemiral.taskList('Restart Meteor');
-  const sessions = api.getSessions(['meteor']);
+  const sessions = api.getSessions(['app']);
   const config = api.getConfig().app;
 
   list.executeScript('Stop Meteor', {

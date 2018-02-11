@@ -39,6 +39,7 @@ The `mup status` command gives an overview of what is running on the servers and
 - Some of Mup's dependencies use Buffer.alloc. When the version of node used to run mup is missing the function, mup will show a message explaining the problem and exit
 - Added 10 second timeout to the curl command in the Deployment Verifier
 - Fix retry logic for the copy file task
+- Fix `mup restart` and `mup meteor restart` when config has an `app` object instead of `meteor`
 - Fix running Prepare Bundle when image already has a `/built_app` folder
 - Fix alignment of list of servers when running `mup ssh` without specifying a server
 - Fix showing stack trace of errors with old versions of Node
