@@ -185,6 +185,13 @@ export function reconfigShared(api) {
     }
   });
 
+  const sharedNginxConfig = shared.nginxConfig || api.resolvePath(__dirname, 'assets/proxy.conf');
+
+  list.copy('Sending nginx config', {
+    src: sharedNginxConfig,
+    dest: `/opt/${PROXY_CONTAINER_NAME}/nginx-default.conf`
+  });
+
   const sessions = api.getSessions(['app']);
 
   return api.runTaskList(list, sessions, {

@@ -20,6 +20,7 @@ const schema = joi.object().keys({
     clientUploadLimit: joi.alternatives().try(joi.number(), joi.string()),
     httpPort: joi.number(),
     httpsPort: joi.number(),
+    nginxConfig: joi.string(),
     env: joi
       .object()
       .pattern(/[\s\S]*/, [joi.string(), joi.number(), joi.boolean()]),

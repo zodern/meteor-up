@@ -534,7 +534,7 @@ It uses HSTS. This means that if you set it to `false` after it's been true, the
 
 ### Custom NGINX Config
 
-The nginx config is generated based on the docker containers running on the same server. At this time, it is not possible to modify the majority it. However, you can modify the server and `/` location blocks for the app.
+The nginx config is generated based on the docker containers running on the same server. At this time, it is not possible to modify the majority it. However, you can modify the server and `/` location blocks for the app. It is also possible to add a config that is used proxy-wide, and can add additional `upstream` and `server` blocks.
 
 To extend the server block for the app, save the rules to a file and add the path to your config:
 
@@ -561,6 +561,8 @@ module.exports = {
   }
 };
 ```
+
+To learn about the nginx config used proxy-wide, look at the `proxy.shared` example in the [`advanced configuration`](#advanced-configuration) docs.
 
 You can view the generated config by running
 
@@ -606,6 +608,9 @@ module.exports = {
       httpPort: 80,
       // The port to listen for https connections. Default is 443.
       httpsPort: 443,
+      // Add an nginx config that is used proxy-wide.
+      // This config can add additional upstream and server blocks if needed.
+      nginxConfig: './path/to/config',
       // Environment variables for nginx proxy
       env: {
         DEFAULT_HOST: 'foo.bar.com'
