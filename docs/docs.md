@@ -186,6 +186,11 @@ module.exports = {
 
       // The port you access the app on. (optional, default is 80)
       // PORT: 8000
+
+      // The number of proxies in front of your server (optional, default is
+      // 1 with reverse proxy, unused otherwise).
+      // https://docs.meteor.com/api/connections.html
+      // HTTP_FORWARDED_COUNT: 1
     },
 
     // Docker log options (optional)
