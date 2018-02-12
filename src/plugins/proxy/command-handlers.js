@@ -267,7 +267,7 @@ export async function status(api) {
   const servers = Object.keys(config.app.servers)
     .map(key => config.servers[key]);
   const lines = [];
-  const overallColor = 'green';
+  let overallColor = 'green';
 
   const collectorConfig = {
     nginxDocker: {
@@ -304,6 +304,10 @@ export async function status(api) {
       lines.push('   - NGINX:');
       lines.push(`     - Status: ${nginxDocker ? nginxDocker.State.Status : 'Stopped'}`);
 
+      if (nginxDocker && nginxDocker.State.Status !== 'running') {
+        overallColor = 'red';
+      }
+
       if (nginxDocker) {
         lines.push('     - Ports:');
         Object.keys(nginxDocker.NetworkSettings.Ports || {}).forEach(key => {
@@ -317,6 +321,10 @@ export async function status(api) {
 
       lines.push('   - Let\'s Encrypt');
       lines.push(`     - Status: ${letsEncryptDocker ? letsEncryptDocker.State.Status : 'Stopped'}`);
+
+      if (letsEncryptDocker && letsEncryptDocker.State.Status !== 'running') {
+        overallColor = 'red';
+      }
 
       if (certificateExpire && certificateExpire.length > 0) {
         lines.push('     - Certificates');
