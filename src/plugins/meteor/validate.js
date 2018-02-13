@@ -12,7 +12,7 @@ const schema = joi.object().keys({
         /[/s/S]*/,
         [joi.string(), joi.number(), joi.bool()]
       ),
-      settings: joi.string(),
+      settings: joi.string()
     })
   ),
   deployCheckWaitTime: joi.number(),
