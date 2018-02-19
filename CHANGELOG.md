@@ -1,4 +1,4 @@
-## Next
+## 1.4 - February 19, 2018
 
 **Status**
 The `mup status` command gives an overview of what is running on the servers and shows any problems plugins detected.
