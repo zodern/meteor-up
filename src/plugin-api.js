@@ -161,7 +161,7 @@ export default class PluginAPI {
   }
 
   getSettingsFromPath(settingsPath) {
-    let filePath = resolvePath(settingsPath);
+    const filePath = resolvePath(settingsPath);
     let settings;
     try {
       settings = fs.readFileSync(filePath).toString();
@@ -188,6 +188,7 @@ export default class PluginAPI {
 
       process.exit(1);
     }
+
     return settings;
   }
 

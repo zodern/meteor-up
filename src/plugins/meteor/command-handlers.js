@@ -272,7 +272,7 @@ export function envconfig(api) {
       hostVars[servers[key].host] = {env: config.servers[key].env};
     }
     if (config.servers[key].settings) {
-      let settings = JSON.stringify(api.getSettingsFromPath(
+      const settings = JSON.stringify(api.getSettingsFromPath(
         config.servers[key].settings));
       if (hostVars[servers[key].host]) {
         hostVars[servers[key].host].env.METEOR_SETTINGS = settings;
