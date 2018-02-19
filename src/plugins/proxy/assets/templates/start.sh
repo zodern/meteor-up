@@ -29,13 +29,18 @@ sudo docker pull jwilder/nginx-proxy
 set -e
 echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
 
-
 # This updates nginx for all vhosts
 NGINX_CONFIG="client_max_body_size $CLIENT_UPLOAD_LIMIT;";
-echo $NGINX_CONFIG > /opt/$APPNAME/config/nginx-default.conf
-# sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
-# client_max_body_size  clientUploadLimit ;
-# EOT
+NGINX_CONFIG_PATH="/opt/$APPNAME/config/nginx-default.conf"
+
+# Only add if it doesn't already exist
+# The value should only change when `mup proxy reconfig-shared` is run
+# That also resets the config, allowing this line to be added again with the new value
+# If the user's custom config already has this option, or a comment
+# containing this option, then the config will not be modified
+if ! grep -q "client_max_body_size" "$NGINX_CONFIG_PATH"; then
+  echo $NGINX_CONFIG >> /opt/$APPNAME/config/nginx-default.conf
+fi
 
 sudo docker run \
   -d \

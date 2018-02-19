@@ -1,12 +1,10 @@
 import chai, { expect } from 'chai';
 import { describe, it } from 'mocha';
-
 import chaiString from 'chai-string';
 import os from 'os';
 import path from 'path';
 import { runSSHCommand } from '../../../utils';
 import sh from 'shelljs';
-
 const servers = require('../../../../tests/fixtures/servers');
 
 chai.use(chaiString);
@@ -16,10 +14,9 @@ sh.config.silent = false;
 describe('module - proxy', function() {
   this.timeout(60000000);
 
-  describe('setup', function() {
-
+  describe('setup', () => {
     it('should setup proxy on "meteor" vm', async () => {
-      const serverInfo = servers['mymeteor'];
+      const serverInfo = servers.mymeteor;
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-3'));
       let out = sh.exec('mup setup');
 
@@ -48,7 +45,7 @@ describe('module - proxy', function() {
 
   describe('reconfig-shared', () => {
     it('it should update shared settings', async () => {
-      const serverInfo = servers['mymeteor'];
+      const serverInfo = servers.mymeteor;
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-3'));
       sh.exec('mup setup');
 
@@ -67,7 +64,7 @@ describe('module - proxy', function() {
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-3'));
       sh.exec('mup setup');
 
-      let out = sh.exec('mup proxy logs --tail 2');
+      const out = sh.exec('mup proxy logs --tail 2');
       expect(out.output).to.have.entriesCount('Received event start for', 1);
       expect(out.code).to.equal(0);
     });

@@ -1,23 +1,24 @@
-import { expect } from 'chai';
 import validate, { _pluginValidators, addPluginValidator } from '../index';
+import { expect } from 'chai';
 
-describe('validator', function() {
+describe('validator', () => {
   beforeEach(() => {
     for (const prop of Object.keys(_pluginValidators)) {
       delete _pluginValidators[prop];
     }
   });
 
-  describe('addPluginValidator', function() {
-    it('should add validator', function() {
+  describe('addPluginValidator', () => {
+    it('should add validator', () => {
       const handler = () => { };
+
       addPluginValidator('metrics', handler);
-      expect(_pluginValidators['metrics']).to.equal(handler);
+      expect(_pluginValidators.metrics).to.equal(handler);
     });
   });
 
-  describe('validate', function() {
-    it('should validate the config', function() {
+  describe('validate', () => {
+    it('should validate the config', () => {
       const config = {
         servers: {
           one: {
@@ -26,15 +27,16 @@ describe('validator', function() {
         }
       };
 
-      let errors;
+      let problems;
 
       try {
-        errors = validate(config);
+        problems = validate(config);
       } catch (e) {
         console.log(e);
       }
       // console.log(errors);
-      expect(errors).instanceOf(Array);
+      expect(problems.errors).instanceOf(Array);
+      expect(problems.depreciations).instanceOf(Array);
     });
   });
 });

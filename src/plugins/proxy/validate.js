@@ -13,10 +13,14 @@ const schema = joi.object().keys({
     .without('letsEncryptEmail', ['crt', 'key'])
     .or('letsEncryptEmail', 'crt', 'forceSSL'),
   domains: joi.string().required(),
+  nginxServerConfig: joi.string(),
+  nginxLocationConfig: joi.string(),
+  clientUploadLimit: joi.string(),
   shared: joi.object().keys({
     clientUploadLimit: joi.alternatives().try(joi.number(), joi.string()),
     httpPort: joi.number(),
     httpsPort: joi.number(),
+    nginxConfig: joi.string(),
     env: joi
       .object()
       .pattern(/[\s\S]*/, [joi.string(), joi.number(), joi.boolean()]),
@@ -32,6 +36,7 @@ const schema = joi.object().keys({
 });
 
 export default function(config, {
+  addDepreciation,
   combineErrorDetails,
   VALIDATE_OPTIONS,
   addLocation
@@ -42,14 +47,22 @@ export default function(config, {
     joi.validate(config.proxy, schema, VALIDATE_OPTIONS)
   );
   if (
-    config.app && config.app.env &&
-    typeof config.app.env.PORT === 'number' &&
-    config.app.env.PORT !== 80
+    config.app && config.app.env && config.app.env.PORT
   ) {
     details.push({
-      message: 'app.env.PORT can not be set when using proxy',
+      message: 'app.env.PORT is ignored when using the reverse proxy',
       path: ''
     });
   }
+
+  if (config.proxy.shared && config.proxy.shared.clientUploadLimit) {
+    details = addDepreciation(
+      details,
+      'shared.clientUploadLimit',
+      'Use proxy.clientUploadLimit instead',
+      'https://git.io/vN5tn'
+    );
+  }
+
   return addLocation(details, 'proxy');
 }

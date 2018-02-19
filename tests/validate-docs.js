@@ -1,3 +1,5 @@
+/* eslint-disable no-var */
+
 var codeBlocks = require('gfm-code-blocks');
 var fs = require('fs');
 var path = require('path');
@@ -41,7 +43,7 @@ validConfigs.forEach(config => {
 
   configObject.servers = configObject.servers || servers;
 
-  fs.writeFileSync(tmpConfig, 'module.exports = ' + JSON.stringify(configObject));
+  fs.writeFileSync(tmpConfig, `module.exports = ${JSON.stringify(configObject)}`);
   sh.cd(tmpPath);
   var out = sh.exec('node ../../index.js validate');
 

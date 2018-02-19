@@ -1,3 +1,67 @@
+## Next
+
+**Status**
+The `mup status` command gives an overview of what is running on the servers and shows any problems plugins detected.
+
+**Reverse Proxy**
+- The reverse proxy is no longer an "experimental feature"
+- Add support for customizing the generated nginx config
+- Add `mup proxy nginx-config` command to view the generated config
+- `HTTP_FORWARDED_COUNT` defaults to 1 when using the reverse proxy (@jehartzog)
+- Fix verifying deployment when using the reverse proxy.
+- Fix deploying when `app.env.PORT` is set to a value other than 80
+- Fix setting up proxy when using a non-root user
+
+**Mongo**
+- Oplog is automatically enabled. To use, set `app.env.MONGO_OPLOG_URL` to `mongodb://mongodb/local` (@edemaine)
+- The `Start Mongo` task now waits until mongo has sucessfully started before finishing
+- If mongo fails to start, the `Start Mongo` task will now fail
+
+**Depreciations**
+
+`meteor.ssl`, `meteor.nginx`, and `meteor.docker.imageFrontendServer` are depreciated. It uses a different implementation for custom certificates and lets encrypt, each with different features and restrictions. Also, the custom certificate implementation has security problems. The reverse proxy should be used instead. It doesn't have the security problems, uses the same implementation for custom certificates and lets encrypt, and has many additional features. Learn how to use the [reverse proxy in the docs](http://meteor-up.com/docs#reverse-proxy).
+
+`proxy.shared.clientUploadLimit` is depreciated. Use `proxy.clientUploadLimit` instead, which allows each app to have a different value.
+
+**Other Changes**
+- `mup init` will create a `.deploy` folder when run in the same folder as a Meteor app
+- When mup can find a meteor app near to where `mup init` is run, the default config's `app.path` will be the path to that app
+- When a deploy fails, the last 200 instead of 100 lines of the app's logs are shown
+- More of the output is shown when a command fails
+- When copying a file fails with the error `No such file`, it will tell the user to run `mup setup` to fix it
+- `reconfig` hooks will now run during `mup deploy`
+- `--show` is no longer needed to show the config when `mup validate --scrub` is run
+- Add section to readme about Meteor compatibility
+- Initial work has been done to support Docker Swarm
+- When there is only one server, `mup ssh` will not require the name of a server
+- Add `zodern/meteor` to list of images that Prepare Bundle is automatically enabled for
+- If the app's docker container is restarting during 10 checks, the Deployment Verifier will revert the app without waiting the full time in `deployCheckWaitTime`
+- Some of Mup's dependencies use Buffer.alloc. When the version of node used to run mup is missing the function, mup will show a message explaining the problem and exit
+- Added 10 second timeout to the curl command in the Deployment Verifier
+- Fix retry logic for the copy file task
+- Fix `mup restart` and `mup meteor restart` when config has an `app` object instead of `meteor`
+- Fix running Prepare Bundle when image already has a `/built_app` folder
+- Fix alignment of list of servers when running `mup ssh` without specifying a server
+- Fix showing stack trace of errors with old versions of Node
+- Fix plugins preparing the config multiple times
+- Fix loading locally installed plugins
+- `npm install` will still succeed even if Open Collectives's post-install hook fails
+
+**Docs**
+- Document using a private docker registry (@justinr1234)
+- Document `HTTP_FORWARDED_COUNT` (@jehartzog)
+- Change `app.buildOptions.debug` to `false` in example configs
+- Add section to readme about changing the docker image
+- Add the [`zodern:meteor`](https://github.com/zodern/meteor-docker) image to list of docker images
+- Improve the style of tables in the docs
+
+**Plugins**
+- list.executeScript supports server specific variables
+- Using the `post.status` hook, plugins can show their status
+- Plugins can add a `solution` property to errors. Mup will show the solution in yellow before exiting
+- Plugins can add a depreciation warning while validating a config with `utils.addDepreciation`
+- Validator utils support joi v11, v12, and v13 in addition to joi v10.
+
 ## 1.3.7 - Nov 28, 2017
 
 - Fix permission denied error sometimes encountered during Prepare Bundle

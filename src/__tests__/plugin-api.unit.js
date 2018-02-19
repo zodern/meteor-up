@@ -1,11 +1,11 @@
-import { expect } from 'chai';
-import PluginAPI from '../plugin-api';
-import path from 'path';
-import sinon from 'sinon';
-import fs from 'fs';
 import * as validate from '../validate';
 import { commands } from '../commands';
+import { expect } from 'chai';
+import fs from 'fs';
 import { hooks } from '../hooks';
+import path from 'path';
+import PluginAPI from '../plugin-api';
+import sinon from 'sinon';
 
 describe('PluginAPI', () => {
   let api;
@@ -90,25 +90,21 @@ describe('PluginAPI', () => {
     let configStub;
 
     beforeEach(() => {
-      fsStub = sinon.stub(fs, 'readFileSync').callsFake(() => {
-        return {
-          toString() {
-            return `
+      fsStub = sinon.stub(fs, 'readFileSync').callsFake(() => ({
+        toString() {
+          return `
             package1@3
             package2@3
             #package3@3
             `;
-          }
-        };
-      });
+        }
+      }));
 
-      configStub = sinon.stub(api, 'getConfig').callsFake(() => {
-        return {
-          meteor: {
-            path: '../'
-          }
-        };
-      });
+      configStub = sinon.stub(api, 'getConfig').callsFake(() => ({
+        meteor: {
+          path: '../'
+        }
+      }));
     });
 
     afterEach(() => {
@@ -131,7 +127,7 @@ describe('PluginAPI', () => {
   });
 
   describe('validateConfig', () => {
-    let errors = ['error1', 'error2'];
+    const errors = { errors: ['error1', 'error2'], depreciations: [] };
     let validatorStub;
     let totalConsoleOutput = '';
     let consoleStub;
@@ -150,13 +146,15 @@ describe('PluginAPI', () => {
 
     it('should show validation errors', () => {
       api.validateConfig(api.configPath);
+      consoleStub.restore();
 
       expect(totalConsoleOutput).to.contain('- error1');
       expect(totalConsoleOutput).to.contain('- error2');
     });
 
     it('should show nothing when config is valid', () => {
-      errors.splice(0, errors.length);
+      errors.errors = [];
+      errors.depreciations = [];
 
       api.validateConfig(api.configPath);
 
@@ -241,9 +239,10 @@ describe('PluginAPI', () => {
         expect(preHookCalled).to.equal(true);
         expect(postHookCalled).to.equal(true);
         cb();
-      }).catch(e => {
-        console.log(e);
-      });
+      })
+        .catch(e => {
+          console.log(e);
+        });
     });
   });
 

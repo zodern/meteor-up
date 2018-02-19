@@ -5,8 +5,8 @@ APP_PATH=/opt/$APPNAME
 IMAGE=mup-<%= appName.toLowerCase() %>
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
-DEPLOY_CHECK_URL=<%= `${bind}:${deployCheckPort}${deployCheckPath}` %>
-HOST=<%= host %>
+CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
+DEPLOY_CHECK_URL=$CONTAINER_IP<%= `:${deployCheckPort}` %>
 
 cd $APP_PATH
 
@@ -31,27 +31,47 @@ revert_app (){
   fi
 
   echo
-  echo "To see more logs type 'mup logs --tail=100'"
+  echo "To see more logs type 'mup logs --tail=200'"
   echo ""
 }
 
 elaspsed=0
+noIPCount=0
+MAX_NO_IP_COUNT=10
 while [[ true ]]; do
+  if [ "$elaspsed" "==" "$DEPLOY_CHECK_WAIT_TIME" ]; then
+    revert_app
+    exit 1
+  fi
+
   sleep 1
   elaspsed=$((elaspsed+1))
+
+  # If the container restarted, the ip address would have changed
+  # Get the current ip address right before it is used
+  CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
+
+  if [[ -z $CONTAINER_IP ]]; then
+    noIPCount=$((noIPCount+1))
+
+    if [ "$noIPCount" "==" "$MAX_NO_IP_COUNT" ]; then
+      echo "Too much time spent restarting." 1>&2
+      revert_app
+      exit 1
+    fi
+
+    continue
+  fi
+
+  DEPLOY_CHECK_URL=$CONTAINER_IP<%= `:${deployCheckPort}` %>
 
   # Since this failing causes the app to rollback, it should only
   # fail because of a problem with the app, not from problems with the config.
   #
   # --insecure Without this, it would sometimes fail when ssl is set up
   curl \
+    --max-time 10 \
     --insecure \
     $DEPLOY_CHECK_URL \
-    <% if (host) { %> --header "HOST:$HOST" <% } %>  \
     && exit 0
-
-  if [ "$elaspsed" "==" "$DEPLOY_CHECK_WAIT_TIME" ]; then
-    revert_app
-    exit 1
-  fi
 done

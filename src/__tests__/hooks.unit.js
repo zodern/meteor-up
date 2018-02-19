@@ -1,14 +1,14 @@
+import { hooks, registerHook } from '../hooks';
 import assert from 'assert';
-import { registerHook, hooks } from '../hooks';
 
-describe('hooks', function() {
+describe('hooks', () => {
   beforeEach(() => {
     for (const prop of Object.keys(hooks)) {
       delete hooks[prop];
     }
   });
 
-  it('should create new hooks', function() {
+  it('should create new hooks', () => {
     const target = { localScript: 'test' };
 
     registerHook('pre.default.setup', target);
@@ -16,7 +16,7 @@ describe('hooks', function() {
     assert(hooks['pre.default.setup'][0] === target);
   });
 
-  it('should add hooks when some already exist', function() {
+  it('should add hooks when some already exist', () => {
     const target = { localScript: 'test' };
 
     registerHook('pre.default.setup', target);
@@ -26,13 +26,13 @@ describe('hooks', function() {
     assert(hooks['pre.default.setup'][1] === target);
   });
 
-  it('should add missing plugin name to hooks for default commands', function() {
+  it('should add missing plugin name to hooks for default commands', () => {
     const target = { localScript: 'test' };
     registerHook('pre.setup', target);
 
     assert(hooks['pre.default.setup'][0] === target);
   });
-  it('should move functions to the method property', function() {
+  it('should move functions to the method property', () => {
     const target = function() {};
 
     registerHook('pre.setup', target);

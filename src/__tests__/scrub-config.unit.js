@@ -1,5 +1,4 @@
 import { _configScrubbers, registerScrubber, scrubConfig, utils } from '../scrub-config';
-
 import { expect } from 'chai';
 
 describe('scrub-config', () => {
@@ -9,6 +8,7 @@ describe('scrub-config', () => {
 
   it('should register scrubbers', () => {
     const scrubber = function() { };
+
     registerScrubber(scrubber);
     expect(_configScrubbers[0]).to.equal(scrubber);
   });
@@ -19,6 +19,7 @@ describe('scrub-config', () => {
       expect(scrubUtils).to.equal(utils);
 
       config.ran = true;
+
       return config;
     };
 
