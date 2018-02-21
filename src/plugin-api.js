@@ -30,6 +30,7 @@ export default class PluginAPI {
     this.settingsPath = program.settings;
     this.verbose = program.verbose;
     this.program = program;
+    this.commandHistory = [];
 
     this.validationErrors = [];
 
@@ -263,7 +264,7 @@ export default class PluginAPI {
     // Only show error when not from nodemiral
     // since nodemiral would have already shown the error
     if (!(e.nodemiralHistory instanceof Array)) {
-      log('_commandErrorHandler: nodemiral error');      
+      log('_commandErrorHandler: nodemiral error');
       console.error(e.stack || e);
     }
 
@@ -281,6 +282,9 @@ export default class PluginAPI {
     if (!(name in commands)) {
       throw new Error(`Unknown command name: ${name}`);
     }
+
+    this.commandHistory.push({ name });
+
     await this._runPreHooks(name);
     let potentialPromise;
     try {

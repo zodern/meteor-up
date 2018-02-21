@@ -1193,6 +1193,10 @@ Runs the nodemiral task list, and returns a promise. If any of the tasks fail, i
 
 Returns a promise. Shows the logs to the user, prefixing the host to each line.
 
+#### **commandHistory**
+
+Array of objects. Each object is in the format of `{name: 'plugin.commandName'}`, and shows what commands have already been run and in what order.
+
 #### **runSSHCommand(server, command)**
 server is an object from `servers` in the config
 
