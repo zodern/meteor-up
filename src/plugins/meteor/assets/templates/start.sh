@@ -53,8 +53,11 @@ sudo docker network disconnect bridge -f $APPNAME-nginx-proxy
 if [ $LOCAL_IMAGE == "false" ]; then
   set +e
   sudo docker pull <%= docker.image %>
-  set -e
   echo "Pulled <%= docker.image %>"
+  set -e
+
+else
+  set -e
 fi
 
 sudo docker run \
@@ -93,7 +96,6 @@ sleep 15s
 sudo cat <<EOT > /opt/$APPNAME/config/nginx-default.conf
 client_max_body_size $CLIENTSIZE;
 EOT
-
 
     # We don't need to fail the deployment because of a docker hub downtime
     set +e
