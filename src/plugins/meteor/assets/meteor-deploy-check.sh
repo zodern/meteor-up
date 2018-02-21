@@ -54,7 +54,7 @@ while [[ true ]]; do
 
   # If the container restarted, the ip address would have changed
   # Get the current ip address right before it is used
-  if [[ $HOST_NETWORK ]]; then
+  if [[ $HOST_NETWORK == 0 ]]; then
     CONTAINER_IP="localhost"
   else
     CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
