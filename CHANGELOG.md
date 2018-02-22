@@ -1,3 +1,18 @@
+## 1.4.2 - February 21, 2018
+
+- Fix `Start Meteor` task always succeeding despite errors starting the app when using `Prepare Bundle`
+- Fix `Verifying Deployment` when `app.env.PORT` is set
+- Fix `Verifying Deployment` when using the host network
+- Fix `proxy.setup` when running `mup setup` for the first time
+- Fix `app.docker.imagePort` documentation
+
+**Plugins**
+- Add `pluginApi.commandHistory` to check which commands have run
+
+## 1.4.1 - February 20, 2018
+
+- Add additional logging to the Verifying Deployment script
+
 ## 1.4 - February 19, 2018
 
 **Status**
