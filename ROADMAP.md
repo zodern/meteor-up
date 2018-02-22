@@ -38,7 +38,7 @@ ssh root@host "docker exec mongodb mongodump -d meteor --archive --gzip" > dump.
 ```
 and for restore:
 ```sh
-cat dump.gz | ssh root@host "cat | docker exec -i mongodb mongorestore --archive --gzip"
+cat dump.gz | ssh root@host "cat | docker exec -i mongodb mongorestore --archive --gzip" # use --drop if you want to drop existing collections first
 ```
 
 ## Faster bundle upload
