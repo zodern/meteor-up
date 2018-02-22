@@ -32,14 +32,7 @@ View realtime metrics from the mup cli, such as disk, ram, cpu, and network usag
 
 Commands to download a backup of the database, restore from a backup, and access the MongoDB shell will be added. We will also add support for the oplog, and custom mongo configs.
 
-Now for backup you can use:
-```sh
-ssh root@host "docker exec mongodb mongodump -d meteor --archive --gzip" > dump.gz
-```
-and for restore:
-```sh
-cat dump.gz | ssh root@host "cat | docker exec -i mongodb mongorestore --archive --gzip" # use --drop if you want to drop existing collections first
-```
+https://github.com/zodern/meteor-up/blob/master/docs/docs.md#backup-and-restore
 
 ## Faster bundle upload
 
