@@ -30,6 +30,7 @@ export default class PluginAPI {
     this.settingsPath = program.settings;
     this.verbose = program.verbose;
     this.program = program;
+    this.commandHistory = [];
 
     this.validationErrors = [];
 
@@ -257,17 +258,21 @@ export default class PluginAPI {
     }
   };
   _commandErrorHandler(e) {
+    log('_commandErrorHandler');
     process.exitCode = 1;
 
     // Only show error when not from nodemiral
     // since nodemiral would have already shown the error
     if (!(e.nodemiralHistory instanceof Array)) {
+      log('_commandErrorHandler: nodemiral error');
       console.error(e.stack || e);
     }
 
     if (e.solution) {
       console.log(chalk.yellow(e.solution));
     }
+
+    process.exit(1);
   }
   runCommand = async function(name) {
     if (!name) {
@@ -277,6 +282,9 @@ export default class PluginAPI {
     if (!(name in commands)) {
       throw new Error(`Unknown command name: ${name}`);
     }
+
+    this.commandHistory.push({ name });
+
     await this._runPreHooks(name);
     let potentialPromise;
     try {
@@ -284,7 +292,6 @@ export default class PluginAPI {
       potentialPromise = commands[name].handler(this, nodemiral);
     } catch (e) {
       this._commandErrorHandler(e);
-      process.exit(1);
     }
 
     if (potentialPromise && typeof potentialPromise.then === 'function') {
