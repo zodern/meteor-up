@@ -798,6 +798,17 @@ If you are experiencing problems with MongoDB (such as it frequently restarting)
 mup mongo logs
 ```
 
+### Backup and restore
+
+For backup you can use:
+```sh
+ssh root@host "docker exec mongodb mongodump -d meteor --archive --gzip" > dump.gz
+```
+and for restore:
+```sh
+cat dump.gz | ssh root@host "cat | docker exec -i mongodb mongorestore --archive --gzip" # use --drop if you want to drop existing collections first
+```
+
 ### Change MongoDB Version
 
 If you have not deployed to the server, you can change the mongo version by adding:
