@@ -196,6 +196,19 @@ export function resolvePath(...paths) {
   return path.resolve(...expandedPaths);
 }
 
+/**
+ * Checks if the module not found is a certain module
+ *
+ * @param {Error} e - Error that was thwon
+ * @param {String} modulePath - path to the module to compare the error to
+ * @returns {Boolean} true if the modulePath and path in the error is the same
+ */
+export function moduleNotFoundIsPath(e, modulePath) {
+  const pathPosition = e.message.length - modulePath.length - 1;
+
+  return e.message.indexOf(modulePath) === pathPosition;
+}
+
 export function filterArgv(argvArray, argv, unwanted) {
   const result = argv._.slice();
   Object.keys(argv).forEach(_key => {

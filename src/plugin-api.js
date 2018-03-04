@@ -15,7 +15,7 @@ import { runConfigPreps } from './prepare-config';
 import { scrubConfig } from './scrub-config';
 import serverInfo from './server-info';
 
-const { resolvePath } = utils;
+const { resolvePath, moduleNotFoundIsPath } = utils;
 const log = debug('mup:api');
 
 export default class PluginAPI {
@@ -130,11 +130,12 @@ export default class PluginAPI {
         if (!validate) {
           return {};
         }
-        if (e.code === 'MODULE_NOT_FOUND') {
+        if (e.code === 'MODULE_NOT_FOUND' && moduleNotFoundIsPath(e, this.configPath)) {
           console.error('"mup.js" file not found at');
           console.error(`  ${this.configPath}`);
           console.error('Run "mup init" to create it.');
         } else {
+          console.error(chalk.red('Error loading config file:'));
           console.error(e);
         }
         process.exit(1);
