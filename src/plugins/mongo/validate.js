@@ -10,6 +10,30 @@ const schema = joi.object().keys({
   servers: joi.object().keys().required()
 });
 
+function externalMongoUrl(appConfig) {
+  const result = [];
+
+  if (!appConfig || !appConfig.env || !appConfig.env.MONGO_URL) {
+    return result;
+  }
+
+  const mongoUrl = appConfig.env.MONGO_URL;
+
+  // Detect IP Addresses and domain names
+  const periodExists = mongoUrl.indexOf('.') > -1;
+  // Detect username:password@domain.com
+  const atExists = mongoUrl.indexOf('@') > -1;
+
+  if ( periodExists || atExists ) {
+    result.push({
+      message: 'It looks like app.env.MONGO_URL is for an external database. Remove the `mongo` object to use external databases.',
+      path: ''
+    });
+  }
+
+  return result;
+}
+
 export default function(
   config,
   {
@@ -19,6 +43,7 @@ export default function(
     VALIDATE_OPTIONS
   }
 ) {
+  const origionalConfig = config._origionalConfig;
   let details = [];
 
   const validationErrors = joi.validate(config.mongo, schema, VALIDATE_OPTIONS);
@@ -26,6 +51,10 @@ export default function(
   details = combineErrorDetails(
     details,
     serversExist(config.servers, config.mongo.servers)
+  );
+  details = combineErrorDetails(
+    details,
+    externalMongoUrl(origionalConfig.app || origionalConfig.meteor)
   );
 
   return addLocation(details, 'mongo');
