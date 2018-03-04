@@ -4,6 +4,7 @@ import configValidator, { showDepreciations, showErrors } from './validate/index
 import { hooks, runRemoteHooks } from './hooks';
 import chalk from 'chalk';
 import childProcess from 'child_process';
+import { cloneDeep } from 'lodash';
 import { commands } from './commands';
 import debug from 'debug';
 import fs from 'fs';
@@ -22,6 +23,7 @@ export default class PluginAPI {
   constructor(base, filteredArgs, program) {
     this.base = program.config ? path.dirname(program.config) : base;
     this.args = filteredArgs;
+    this._origionalConfig = null;
     this.config = null;
     this.settings = null;
     this.sessions = null;
@@ -80,8 +82,11 @@ export default class PluginAPI {
     if (this.validationErrors.length > 0) {
       return this.validationErrors;
     }
-
-    const { errors, depreciations } = configValidator(this.getConfig());
+    const config = this.getConfig();
+    const {
+      errors,
+      depreciations
+    } = configValidator(config, this._origionalConfig);
     const problems = [...errors, ...depreciations];
 
     if (problems.length > 0) {
@@ -126,6 +131,7 @@ export default class PluginAPI {
         delete require.cache[require.resolve(this.configPath)];
         // eslint-disable-next-line global-require
         this.config = require(this.configPath);
+        this._origionalConfig = cloneDeep(this.config);
       } catch (e) {
         if (!validate) {
           return {};

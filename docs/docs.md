@@ -1237,12 +1237,15 @@ module.exports = {
     'alerts'(config, utils) {
       // return array with validation
       // errors from validating the alerts object
+
+      // The config has an additional property, config._origionalConfig, which
+      // has the config before it was normalized or prepared by plugins.
     }
   }
 };
 ```
 
-It is recommended to use [joi](https://github.com/hapijs/joi) to validate the config.
+The validation utils are designed to be used with [joi](https://github.com/hapijs/joi).
 
 ### Validation Utils
 
