@@ -20,7 +20,7 @@ export const validate = {
 };
 
 export function prepareConfig(config) {
-  if (!config.app) {
+  if (!config.app || config.app.type !== 'meteor') {
     return config;
   }
 
