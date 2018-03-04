@@ -56,7 +56,7 @@ const config = preAPI.getConfig(false);
 
 // Load plugins
 if (config.plugins instanceof Array) {
-  const appPath = config.app ? config.app.path : '';
+  const appPath = config.app && config.app.path ? config.app.path : '';
   const absoluteAppPath = preAPI.resolvePath(preAPI.base, appPath);
 
   loadPlugins(
