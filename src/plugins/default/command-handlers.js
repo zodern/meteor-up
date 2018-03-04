@@ -105,6 +105,8 @@ export function validate(api) {
   const errors = api.validateConfig('');
   if (errors.length > 0) {
     process.exitCode = 1;
+  } else {
+    console.log(chalk.green('\u2713 Config is valid'));
   }
 }
 
