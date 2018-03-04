@@ -55,7 +55,7 @@ function executeScript(session, _options, callback, varsMapper) {
 }
 
 function createCallback(cb, varsMapper) {
-  return function(err, code, logs) {
+  return function(err, code, logs = {}) {
     logs.stderr = logs.stderr || '';
     logs.stdout = logs.stdout || '';
 
