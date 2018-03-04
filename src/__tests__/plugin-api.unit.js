@@ -46,6 +46,9 @@ describe('PluginAPI', () => {
     it('should have "program"', () => {
       expect(api).has.property('program');
     });
+    it('should have "commandHistory"', () => {
+      expect(api).has.property('commandHistory');
+    });
   });
   describe('utils', () => {
     it('should have resolvePath', () => {
@@ -243,6 +246,11 @@ describe('PluginAPI', () => {
         .catch(e => {
           console.log(e);
         });
+    });
+
+    it('should update commandHistory', () => {
+      api.runCommand('test.logs');
+      expect(api.commandHistory).to.deep.equal([{name: 'test.logs'}]);
     });
   });
 

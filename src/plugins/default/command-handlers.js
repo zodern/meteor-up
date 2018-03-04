@@ -33,14 +33,8 @@ export function setup(api) {
   });
 
   log('exec => mup setup');
-  const config = api.getConfig();
 
-  return api.runCommand('docker.setup')
-    .then(() => {
-      if (config.proxy) {
-        return api.runCommand('proxy.setup');
-      }
-    });
+  return api.runCommand('docker.setup');
 }
 
 export function start() {

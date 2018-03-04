@@ -32,6 +32,8 @@ View realtime metrics from the mup cli, such as disk, ram, cpu, and network usag
 
 Commands to download a backup of the database, restore from a backup, and access the MongoDB shell will be added. We will also add support for the oplog, and custom mongo configs.
 
+https://github.com/zodern/meteor-up/blob/master/docs/docs.md#backup-and-restore
+
 ## Faster bundle upload
 
 Mup can use rsync to only upload the parts of the bundle that changed, making subsequent deploys faster. Will only be enabled when `rsync` is available, so on Windows it will fall back to uploading the whole bundle.

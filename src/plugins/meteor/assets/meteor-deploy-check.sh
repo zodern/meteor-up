@@ -5,12 +5,17 @@ APP_PATH=/opt/$APPNAME
 IMAGE=mup-<%= appName.toLowerCase() %>
 START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
-CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
-DEPLOY_CHECK_URL=$CONTAINER_IP<%= `:${deployCheckPort}` %>
+
+# Check if using host network.
+$(docker inspect $APPNAME --format "{{(index .NetworkSettings.Networks)}}" | grep -q '\[host')
+HOST_NETWORK=$?
 
 cd $APP_PATH
 
-revert_app (){
+revert_app () {
+  echo "=> Container status:"
+  sudo docker inspect $APPNAME --format "restarted: {{.RestartCount}} times {{json .NetworkSettings}} {{json .State}}"
+  echo "=> Logs:"
   sudo docker logs --tail=100 $APPNAME 1>&2
 
   if sudo docker image inspect $IMAGE:previous >/dev/null 2>&1; then
@@ -49,9 +54,14 @@ while [[ true ]]; do
 
   # If the container restarted, the ip address would have changed
   # Get the current ip address right before it is used
-  CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
+  if [[ $HOST_NETWORK == 0 ]]; then
+    CONTAINER_IP="localhost"
+  else
+    CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
+  fi
 
   if [[ -z $CONTAINER_IP ]]; then
+    echo "Container has no IP Address, likely from it restarting."
     noIPCount=$((noIPCount+1))
 
     if [ "$noIPCount" "==" "$MAX_NO_IP_COUNT" ]; then

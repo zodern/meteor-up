@@ -445,7 +445,7 @@ And then add a docker setup hook to login to your private registry on the server
 
 ### Image Port
 
-You can set `meteor.docker.port` to the port to expose from the container. This does not affect the port the app is accessed on, only the port the app runs on inside the docker container.
+You can set `meteor.docker.imagePort` to the port to expose from the container. This does not affect the port the app is accessed on, only the port the app runs on inside the docker container.
 
 ## Reverse Proxy
 
@@ -796,6 +796,17 @@ If you are experiencing problems with MongoDB (such as it frequently restarting)
 
 ```bash
 mup mongo logs
+```
+
+### Backup and restore
+
+For backup you can use:
+```sh
+ssh root@host "docker exec mongodb mongodump -d meteor --archive --gzip" > dump.gz
+```
+and for restore:
+```sh
+cat dump.gz | ssh root@host "cat | docker exec -i mongodb mongorestore --archive --gzip" # use --drop if you want to drop existing collections first
 ```
 
 ### Change MongoDB Version
@@ -1192,6 +1203,10 @@ Runs the nodemiral task list, and returns a promise. If any of the tasks fail, i
 #### **getDockerLogs(imageName, sessions, dockerArgs)**
 
 Returns a promise. Shows the logs to the user, prefixing the host to each line.
+
+#### **commandHistory**
+
+Array of objects. Each object is in the format of `{name: 'plugin.commandName'}`, and shows what commands have already been run and in what order.
 
 #### **runSSHCommand(server, command)**
 server is an object from `servers` in the config
