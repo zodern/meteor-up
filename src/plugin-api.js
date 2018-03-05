@@ -4,6 +4,7 @@ import configValidator, { showDepreciations, showErrors } from './validate/index
 import { hooks, runRemoteHooks } from './hooks';
 import chalk from 'chalk';
 import childProcess from 'child_process';
+import { cloneDeep } from 'lodash';
 import { commands } from './commands';
 import debug from 'debug';
 import fs from 'fs';
@@ -15,13 +16,14 @@ import { runConfigPreps } from './prepare-config';
 import { scrubConfig } from './scrub-config';
 import serverInfo from './server-info';
 
-const { resolvePath } = utils;
+const { resolvePath, moduleNotFoundIsPath } = utils;
 const log = debug('mup:api');
 
 export default class PluginAPI {
   constructor(base, filteredArgs, program) {
     this.base = program.config ? path.dirname(program.config) : base;
     this.args = filteredArgs;
+    this._origionalConfig = null;
     this.config = null;
     this.settings = null;
     this.sessions = null;
@@ -80,8 +82,11 @@ export default class PluginAPI {
     if (this.validationErrors.length > 0) {
       return this.validationErrors;
     }
-
-    const { errors, depreciations } = configValidator(this.getConfig());
+    const config = this.getConfig();
+    const {
+      errors,
+      depreciations
+    } = configValidator(config, this._origionalConfig);
     const problems = [...errors, ...depreciations];
 
     if (problems.length > 0) {
@@ -126,15 +131,17 @@ export default class PluginAPI {
         delete require.cache[require.resolve(this.configPath)];
         // eslint-disable-next-line global-require
         this.config = require(this.configPath);
+        this._origionalConfig = cloneDeep(this.config);
       } catch (e) {
         if (!validate) {
           return {};
         }
-        if (e.code === 'MODULE_NOT_FOUND') {
+        if (e.code === 'MODULE_NOT_FOUND' && moduleNotFoundIsPath(e, this.configPath)) {
           console.error('"mup.js" file not found at');
           console.error(`  ${this.configPath}`);
           console.error('Run "mup init" to create it.');
         } else {
+          console.error(chalk.red('Error loading config file:'));
           console.error(e);
         }
         process.exit(1);
@@ -163,35 +170,42 @@ export default class PluginAPI {
       } else {
         filePath = path.join(this.base, 'settings.json');
       }
-
-      try {
-        this.settings = fs.readFileSync(filePath).toString();
-      } catch (e) {
-        console.log(`Unable to load settings.json at ${filePath}`);
-        if (e.code !== 'ENOENT') {
-          console.log(e);
-        } else {
-          [
-            'It does not exist.',
-            '',
-            'You can create the file with "mup init" or add the option',
-            '"--settings path/to/settings.json" to load it from a',
-            'different location.'
-          ].forEach(text => console.log(text));
-        }
-        process.exit(1);
-      }
-      try {
-        this.settings = parseJson(this.settings);
-      } catch (e) {
-        console.log('Error parsing settings file:');
-        console.log(e.message);
-
-        process.exit(1);
-      }
+      this.settings = this.getSettingsFromPath(filePath);
     }
 
     return this.settings;
+  }
+
+  getSettingsFromPath(settingsPath) {
+    const filePath = resolvePath(settingsPath);
+    let settings;
+    try {
+      settings = fs.readFileSync(filePath).toString();
+    } catch (e) {
+      console.log(`Unable to load settings.json at ${filePath}`);
+      if (e.code !== 'ENOENT') {
+        console.log(e);
+      } else {
+        [
+          'It does not exist.',
+          '',
+          'You can create the file with "mup init" or add the option',
+          '"--settings path/to/settings.json" to load it from a',
+          'different location.'
+        ].forEach(text => console.log(text));
+      }
+      process.exit(1);
+    }
+    try {
+      settings = parseJson(settings);
+    } catch (e) {
+      console.log('Error parsing settings file:');
+      console.log(e.message);
+
+      process.exit(1);
+    }
+
+    return settings;
   }
 
   setConfig(newConfig) {

@@ -1,8 +1,10 @@
 import { join, resolve } from 'path';
 import { addPluginValidator } from './validate';
+import chalk from 'chalk';
 import debug from 'debug';
 import fs from 'fs';
 import globalModules from 'global-modules';
+import { moduleNotFoundIsPath } from './utils';
 import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { registerPreparer } from './prepare-config';
@@ -77,18 +79,16 @@ export function loadPlugins(plugins) {
 
         return { name, module };
       } catch (e) {
-        const pathPosition = e.message.length - plugin.path.length - 1;
+        console.log(chalk.red(`Unable to load plugin ${plugin.name}`));
 
         // Hides error when plugin cannot be loaded
         // Show the error when a plugin cannot resolve a module
         if (
           e.code !== 'MODULE_NOT_FOUND' ||
-          e.message.indexOf(plugin.path) !== pathPosition
+          !moduleNotFoundIsPath(e, plugin.path)
         ) {
           console.log(e);
         }
-
-        console.log(`Unable to load plugin ${plugin.name}`);
 
         return { name: module.name || plugin.name, failed: true };
       }

@@ -15,6 +15,7 @@ function generateSchema() {
     servers: joi.object(),
     app: joi.object(),
     plugins: joi.array(),
+    _origionalConfig: joi.object(),
     hooks: joi.object().pattern(/.*/, joi.alternatives(joi.object({
       localCommand: joi.string(),
       remoteCommand: joi.string(),
@@ -31,9 +32,12 @@ function generateSchema() {
   return joi.object().keys(topLevelKeys);
 }
 
-function validateAll(config) {
+function validateAll(_config, origionalConfig) {
   let details = [];
   let results;
+  // TODO: the config object created by the plugin api
+  // should always have this property.
+  const config = { ..._config, _origionalConfig: origionalConfig};
 
   results = joi.validate(config, generateSchema(), VALIDATE_OPTIONS);
   details = combineErrorDetails(details, results);
@@ -53,11 +57,11 @@ function validateAll(config) {
   return details.map(improveErrors);
 }
 
-export default function validate(config) {
+export default function validate(config, origionalConfig) {
   const errors = [];
   const depreciations = [];
 
-  validateAll(config).forEach(problem => {
+  validateAll(config, origionalConfig).forEach(problem => {
     if (problem.type === 'depreciation') {
       depreciations.push(problem);
     } else {

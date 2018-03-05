@@ -1,8 +1,8 @@
 import buildApp, { archiveApp } from './build.js';
+import { checkAppStarted, prepareBundleSupported } from './utils';
 import { checkUrls, getInformation } from './status';
 import { map, promisify } from 'bluebird';
 import chalk from 'chalk';
-import { checkAppStarted } from './utils';
 import { cloneDeep } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
@@ -171,32 +171,19 @@ export async function push(api) {
     progressBar: config.enableUploadProgressBar
   });
 
-  const prepareBundleImages = ['abernix/meteord', 'zodern/meteor'];
-
-  let prepareSupported = prepareBundleImages.find(
-    image => config.docker.image.indexOf(image) === 0
-  );
-  if ('prepareBundle' in config.docker) {
-    prepareSupported = config.docker.prepareBundle;
+  if (prepareBundleSupported(config.docker)) {
+    list.executeScript('Prepare Bundle', {
+      script: api.resolvePath(
+        __dirname,
+        'assets/prepare-bundle.sh'
+      ),
+      vars: {
+        appName: config.name,
+        dockerImage: config.docker.image,
+        env: config.env
+      }
+    });
   }
-
-  const supportedScript = api.resolvePath(
-    __dirname,
-    'assets/prepare-bundle.sh'
-  );
-  const unsupportedScript = api.resolvePath(
-    __dirname,
-    'assets/prepare-bundle-unsupported.sh'
-  );
-
-  list.executeScript('Prepare Bundle', {
-    script: prepareSupported ? supportedScript : unsupportedScript,
-    vars: {
-      appName: config.name,
-      dockerImage: config.docker.image,
-      env: config.env
-    }
-  });
 
   const sessions = api.getSessions(['app']);
 
@@ -278,7 +265,16 @@ export function envconfig(api) {
   const hostVars = {};
   Object.keys(config.servers).forEach(key => {
     if (config.servers[key].env) {
-      hostVars[servers[key].host] = {env: config.servers[key].env};
+      hostVars[servers[key].host] = { env: config.servers[key].env };
+    }
+    if (config.servers[key].settings) {
+      const settings = JSON.stringify(api.getSettingsFromPath(
+        config.servers[key].settings));
+      if (hostVars[servers[key].host]) {
+        hostVars[servers[key].host].env.METEOR_SETTINGS = settings;
+      } else {
+        hostVars[servers[key].host] = { env: { METEOR_SETTINGS: settings } };
+      }
     }
   });
 
@@ -303,17 +299,20 @@ export function envconfig(api) {
 export function start(api) {
   log('exec => mup meteor start');
   const config = api.getConfig().app;
+
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
   const list = nodemiral.taskList('Start Meteor');
+  const isDeploy = api.commandHistory.find(({ name }) => name === 'meteor.deploy');
 
   list.executeScript('Start Meteor', {
     script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
     vars: {
-      appName: config.name
+      appName: config.name,
+      removeImage: isDeploy && !prepareBundleSupported(config.docker)
     }
   });
 

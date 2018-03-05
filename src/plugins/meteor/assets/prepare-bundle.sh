@@ -4,11 +4,10 @@ set -e
 
 APP_DIR=/opt/<%= appName %>
 APPNAME=<%= appName %>
-START_SCRIPT=$APP_DIR/config/start.sh
 IMAGE=mup-<%= appName.toLowerCase() %>
 
 build_failed() {
-  sudo docker start $APPNAME || true
+  sudo docker start $APPNAME >/dev/null 2>&1 || true
   exit 2
 }
 
@@ -16,7 +15,7 @@ set +e
 sudo docker pull <%= dockerImage %>
 set -e
 
-sudo docker stop $APPNAME || true
+sudo docker stop $APPNAME >/dev/null 2>&1 || true
 
 cd $APP_DIR/tmp
 
@@ -48,7 +47,7 @@ sudo docker build -t $IMAGE:build . || build_failed
 
 sudo rm -rf bundle
 
-sudo docker start $APPNAME || true
+sudo docker start $APPNAME >/dev/null 2>&1 || true
 
 sudo docker tag $IMAGE:latest $IMAGE:previous || true
 sudo docker tag $IMAGE:build $IMAGE:latest

@@ -26,12 +26,13 @@ export function improveErrors(error) {
 export function addLocation(details, location) {
   return details.map(detail => {
     const detailPath = detail.path instanceof Array ? detail.path.join('.') : detail.path;
+    const pathSeperator = detailPath.length > 0 ? '.' : '';
 
     // removes property name from message since it is
     // already part of detail.path
     detail.message = detail.message.replace(/^".*?"\s+/, '');
 
-    detail.message = `"${location}.${detailPath}" ${detail.message}`;
+    detail.message = `"${location}${pathSeperator}${detailPath}" ${detail.message}`;
 
     return detail;
   });

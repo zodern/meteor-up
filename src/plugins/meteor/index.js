@@ -20,7 +20,7 @@ export const validate = {
 };
 
 export function prepareConfig(config) {
-  if (!config.app) {
+  if (!config.app || config.app.type !== 'meteor') {
     return config;
   }
 
@@ -33,55 +33,36 @@ export function prepareConfig(config) {
 
 function meteorEnabled(api) {
   const config = api.getConfig();
-  if (config.app && config.app.type === 'meteor') {
-    return true;
-  }
 
-  return false;
+  return config.app && config.app.type === 'meteor';
+}
+
+function onlyMeteorEnabled(...commandNames) {
+  return function(api) {
+    let index = 0;
+
+    function thenHandler() {
+      index += 1;
+      if (commandNames.length > index) {
+        return api.runCommand(commandNames[index]).then(thenHandler);
+      }
+    }
+
+    if (meteorEnabled(api)) {
+      return api.runCommand(commandNames[index]).then(thenHandler);
+    }
+  };
 }
 
 export const hooks = {
-  'post.default.setup'(api) {
-    if (meteorEnabled(api)) {
-      return api.runCommand('meteor.setup');
-    }
-  },
-  'post.default.deploy'(api) {
-    if (meteorEnabled(api)) {
-      return api.runCommand('meteor.deploy');
-    }
-  },
-  'post.default.start'(api) {
-    if (meteorEnabled(api)) {
-      return api.runCommand('meteor.start');
-    }
-  },
-  'post.default.stop'(api) {
-    if (meteorEnabled(api)) {
-      return api.runCommand('meteor.stop');
-    }
-  },
-  'post.default.logs'(api) {
-    if (meteorEnabled(api)) {
-      return api.runCommand('meteor.logs');
-    }
-  },
-  'post.default.reconfig'(api) {
-    if (meteorEnabled(api)) {
-      return api.runCommand('meteor.envconfig')
-        .then(() => api.runCommand('meteor.start'));
-    }
-  },
-  'post.default.restart'(api) {
-    if (meteorEnabled(api)) {
-      return api.runCommand('meteor.restart');
-    }
-  },
-  'post.default.status'(api) {
-    if (meteorEnabled(api)) {
-      return api.runCommand('meteor.status');
-    }
-  }
+  'post.default.setup': onlyMeteorEnabled('meteor.setup'),
+  'post.default.deploy': onlyMeteorEnabled('meteor.deploy'),
+  'post.default.start': onlyMeteorEnabled('meteor.start'),
+  'post.default.stop': onlyMeteorEnabled('meteor.stop'),
+  'post.default.logs': onlyMeteorEnabled('meteor.logs'),
+  'post.default.reconfig': onlyMeteorEnabled('meteor.envconfig', 'meteor.start'),
+  'post.default.restart': onlyMeteorEnabled('meteor.restart'),
+  'post.default.status': onlyMeteorEnabled('meteor.status')
 };
 
 export function scrubConfig(config, utils) {
@@ -91,7 +72,7 @@ export function scrubConfig(config, utils) {
 
   if (config.app) {
     // eslint-disable-next-line
-    config.app = traverse(config.app).map(function() {
+    config.app = traverse(config.app).map(function () {
       const path = this.path.join('.');
 
       switch (path) {
