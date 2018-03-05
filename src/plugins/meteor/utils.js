@@ -14,3 +14,15 @@ export function checkAppStarted(list, api) {
 
   return list;
 }
+
+export function prepareBundleSupported(dockerConfig) {
+  const supportedImages = ['abernix/meteord', 'zodern/meteor'];
+
+  if ('prepareBundle' in dockerConfig) {
+    return dockerConfig.prepareBundle;
+  }
+
+  return supportedImages.find(
+    supportedImage => dockerConfig.image.indexOf(supportedImage) === 0
+  ) || false;
+}
