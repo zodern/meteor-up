@@ -1,3 +1,18 @@
+## Next
+- Support different settings.json for different servers (@Farkal)
+- `mup validate` shows message when config is valid
+- Fix crash when the `app` property exists in the config, but `app.path` is missing.
+- The `Prepare Bundle` task is now only shown when `Prepare Bundle` is enabled
+- Hide `No such container` errors in the script for Prepare Bundle since they are normal and could cause confusion on what caused the script to fail
+- Add validation warning when using the built-in mongo and the MONGO_URL looks like it is for an external database
+- Improve error messages when a config or plugin is unable to import a module
+- Fix postinstall script for windows
+
+**Plugins**
+- Improve error message when an executeScript task has an invalid script path
+- The config supplied to validator functions now has a `_origionalConfig` property, with the config before it was normalized or prepared by plugins
+- Fix the meteor plugin preparing the config when the app type isn't `meteor`
+
 ## 1.4.2 - February 21, 2018
 
 - Fix `Start Meteor` task always succeeding despite errors starting the app when using `Prepare Bundle`
