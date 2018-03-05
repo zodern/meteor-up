@@ -12,6 +12,7 @@
 - Improve error message when an executeScript task has an invalid script path
 - The config supplied to validator functions now has a `_origionalConfig` property, with the config before it was normalized or prepared by plugins
 - Fix the meteor plugin preparing the config when the app type isn't `meteor`
+- Fix validator utils `addLocation` ending location with a period when a detail's path is empty
 
 ## 1.4.2 - February 21, 2018
 
