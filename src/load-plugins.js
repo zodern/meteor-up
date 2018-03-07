@@ -1,10 +1,10 @@
 import { join, resolve } from 'path';
+import { moduleNotFoundIsPath, resolvePath } from './utils';
 import { addPluginValidator } from './validate';
 import chalk from 'chalk';
 import debug from 'debug';
 import fs from 'fs';
 import globalModules from 'global-modules';
-import { moduleNotFoundIsPath } from './utils';
 import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { registerPreparer } from './prepare-config';
@@ -32,7 +32,7 @@ export function locatePluginDir(name, configPath, appPath) {
   if (name.indexOf('.') === 0 || name.indexOf('/') === 0 || name.indexOf('~') === 0) {
     log('plugin name is a path to the plugin');
 
-    return name;
+    return resolvePath(configPath, '../', name);
   }
 
   const configLocalPath = resolveFrom.silent(configPath, name);
