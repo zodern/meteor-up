@@ -219,7 +219,8 @@ export default class PluginAPI {
         stdio: 'inherit'
       });
     } catch (e) {
-      // do nothing
+      console.log('Hook failed.');
+      process.exit(1);
     }
   }
   _runHooks = async function(handlers, hookName) {
