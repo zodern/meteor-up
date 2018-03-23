@@ -23,7 +23,7 @@ You do not need to install anything on your servers; mup will set them up for yo
 
 ## Step 1: Initialize your project
 
-In the terminal, run: 
+In the terminal, run:
 ```
 cd path/to/app
 mkdir .deploy && cd .deploy
@@ -56,7 +56,7 @@ mup setup
 If you want to see what the tasks are doing, you can add the `--verbose` flag.
 
 You should run `mup setup` anytime after changing your config. It is safe to run the command as many times as you need.
- 
+
 ## Step 4: Deploy
 
 The deploy process:
@@ -77,6 +77,6 @@ Congratulations! Your app is now running on the server, accessible to your poten
 
 ## Next Steps
 
-- [View logs](docs.html#other-utility-commands)
-- [Setup SSL](docs.html#ssl-support)
-- [View config options](docs.html#example-configs)
+- [View logs]({% link docs.md%}#other-utility-commands)
+- [Setup SSL]({% link docs.md%}#reverse-proxy)
+- [View config options]({% link docs.md%}#example-configs)
