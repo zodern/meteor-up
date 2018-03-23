@@ -45,7 +45,7 @@ module.exports = {
       pem: '~/.ssh/id_rsa'
     }
   },
-  meteor: {
+  app: {
     name: 'Wekan',
     path: '../',
     docker: {
@@ -98,9 +98,12 @@ module.exports = {
     }
   },
 
-  meteor: {
+  // Formerly named 'meteor'. Configuration for deploying the app
+  app: {
     name: 'app',
     path: '../app',
+    // (optional, default is meteor) Plugins can provide additional types
+    type: 'meteor'
 
     // lets you add docker volumes (optional). Can be used to
     // store files between app deploys and restarts.
@@ -178,6 +181,7 @@ module.exports = {
       // If you are using SSL, this needs to start with https
       ROOT_URL: 'http://app.com',
 
+      // When using the built-in mongodb, this is overwritten with the correct url
       MONGO_URL: 'mongodb://localhost/meteor'
 
       // The port you access the app on. (optional, default is 80)
@@ -211,9 +215,9 @@ module.exports = {
     enableUploadProgressBar: true
   },
 
-  // (optional but remove it if you want to use a remote MongoDB!)
+  // (optional) Use built-in mongodb. Remove it to use a remote MongoDB
   mongo: {
-    // (optional), default is 3.4.1
+    // (optional, default is 3.4.1) Version of MongoDB
     version: '3.4.1',
 
     servers: {
@@ -222,7 +226,6 @@ module.exports = {
   }
 };
 ```
-
 
 ## Setting Up a Server
 
@@ -234,11 +237,15 @@ It is safe to run `mup setup` multiple times if needed. After making changes to 
 
 ## Deploying an App
 
-    mup deploy
+```bash
+mup deploy
+```
 
 This will bundle the Meteor project locally and deploy it to the remote server(s). The bundling process is the same as what `meteor deploy` does.
 
-    mup deploy --cached-build
+```bash
+mup deploy --cached-build
+```
 
 The `--cached-build` option will use the build from the last time you deployed the app. This is useful when the previous deploy failed from a network error or from a problem in the config.
 
@@ -269,7 +276,7 @@ You can define Meteor build options in `mup.js` like this:
 
 ```ts
 ...
-meteor: {
+app: {
   buildOptions: {
     // Set to true to disable minification and bundling,
     // and include debugOnly packages
@@ -299,7 +306,7 @@ Meteor Up checks if the deployment is successful or not just after the deploymen
 If you are deploying under a proxy/firewall and need a different port to be checked after deploy, add a variable called `deployCheckPort` with the value of the port you are publishing your application to.
 
 ```ts
-meteor: {
+app: {
  ...
   deployCheckPort: 80
  ...
@@ -360,21 +367,21 @@ Meteor Up uses Docker to run and manage your app. It uses [MeteorD](https://gith
 
 ### Deploy to multiple servers
 
-Add all of the servers to the `servers` object and modify `meteor.servers` to include them.
+Add all of the servers to the `servers` object and modify `app.servers` to include them.
 
 ### Multiple Deployment Environments
 
-To deploy to *different* environments (e.g. staging, production, etc.), use separate Meteor Up configurations in separate directories, with each directory containing separate `mup.js` and `settings.json` files, and set the `meteor.app` field in each config to point back to your app's directory.
+To deploy to *different* environments (e.g. staging, production, etc.), use separate Meteor Up configurations in separate directories, with each directory containing separate `mup.js` and `settings.json` files, and set the `app.path` field in each config to point back to your app's directory.
 
 ### Multiple Deployments
 
-Meteor Up supports multiple deployments to a single server. To route requests to the correct app, use the [reverse proxy](#reverse-proxy)
+Meteor Up supports multiple deployments to a single server. To route requests to the correct app, use the [reverse proxy](#reverse-proxy).
 
 Let's assume we need to deploy production and staging versions of the app to the same server. The production is at myapp.com, and staging is at staging.myapp.com.
 
-We need to have two separate Meteor Up projects. For that, create two directories and initialize Meteor Up and add the necessary configurations.
+We need to have two separate Meteor Up projects. For that, create two directories, initialize Meteor Up, and add the necessary configurations.
 
-In the staging `mup.js`, add a field called `appName` with the value `staging`. You can add any name you prefer instead of `staging`.
+In the staging `mup.js`, change the field `app.name` to have the value `staging`. You can add any name you prefer instead of `staging`.
 
 Next, add the proxy object to both configs. For your production app, it would be:
 
@@ -390,7 +397,7 @@ module.exports = {
 
 For the staging app, `proxy.domains` would be `staging.myapp.com`.
 
-Now set up both projects and deploy the apps.
+Now, set up both projects and deploy the apps.
 
 ## Docker options
 
@@ -399,7 +406,7 @@ Now set up both projects and deploy the apps.
 If you want Docker to listen only on a specific network interface, such as `127.0.0.1`, add a variable called `bind` with the value of the IP address you want to listen to.
 
 ```ts
-meteor: {
+app: {
  ...
  docker: {
   ...
@@ -414,7 +421,7 @@ meteor: {
 If you need to connect your docker container to one or more networks add a variable called `networks` inside the docker configuration. This is an array containing all network names to which it has to connect.
 
 ```ts
-meteor: {
+app: {
  ...
   docker: {
     ...
@@ -432,7 +439,7 @@ meteor: {
 Simply reference the docker image by url in the `meteor.docker.image` setting:
 
 ```
-meteor: {
+app: {
  ...
   docker: {
     ...
@@ -632,9 +639,9 @@ module.exports = {
 ```
 
 
-## Changing `appName`
+## Changing the App's Name
 
-It's pretty okay to change the `appName`. But before you do so, you need to stop the project with older `appName`.
+It's okay to change `app.name`. But before you do so, you need to stop the project with older `appName`. Also, if you use the built-in MongoDB, mup will create a new database with the new name so you will need to migrate the data.
 
 ## Custom configuration and settings files
 
@@ -657,7 +664,7 @@ Meteor UP can enable SSL support for your app. It can either autogenerate the ce
 Meteor Up can use Let's Encrypt to generate certificates for you. Add the following to your `mup.js` file:
 
 ```ts
-meteor: {
+app: {
   ...
   ssl: {
     autogenerate: {
@@ -682,7 +689,7 @@ Then run `mup deploy`. It will automatically create certificates and set up SSL,
 To upload certificates instead of having the server generate them for you, just add the following configuration to your `mup.js` file.
 
 ```ts
-meteor: {
+app: {
   ...
   ssl: {
     crt: './bundle.crt', // this is a bundle of certificates
@@ -709,7 +716,7 @@ To learn more about SSL setup when using your own certificates, refer to the [`m
 If you would like to increase the client upload limits, you can change it by adding:
 ```ts
 
-meteor: {
+app: {
    ...
    nginx: {
      clientUploadLimit: '<desired amount>' // Default is 10M
@@ -899,6 +906,11 @@ If you suddenly can't deploy your app anymore, first use the `mup logs -f` comma
 You can also view logs for:
 - Built-in MongoDB with `mup mongo logs`
 - Reverse proxy with `mup proxy logs`
+- Let's Encrypt with `mup proxy logs-le`
+
+### Run mup status
+
+`mup status` checks the servers for any potential problems, as well as shows you the status of any docker containers or services running on the servers.
 
 ### Docker image
 Make sure that the docker image you are using supports your app's meteor version.
@@ -932,7 +944,7 @@ The `--verbose` flag shows output from commands and scripts run on the server.
 
 ### Verifying Deployment: FAILED
 
-If you do not see `=> Starting meteor app on port` in the logs, your app did not have enough time to start. Try increase `meteor.deployCheckWaitTime`.
+If you do not see `=> Starting meteor app on port` in the logs, your app did not have enough time to start. Try increase `meteor.deployCheckWaitTime`. This only applies if `Prepare Bundle` is disabled.
 
 If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using SSL or not. If that did not fix it, create a new issue with your config and output from `mup deploy --verbose`.
 
