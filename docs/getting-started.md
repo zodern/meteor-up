@@ -40,7 +40,7 @@ For each server:
 - __host__ - Usually is the IP Address of the server
 - __server authentication__ - You can use a `password` or set `pem` to the path to a private key. If neither are set, it uses `ssh-agent`
 
-In the `meteor` section:
+In the `app` section:
 - __name__ - A unique name, with no spaces.
 - __path__ - Path to the meteor app, relative to the config. If your config is in `app/.deploy`, the path would be `../`.
 - __env.ROOT_URL__ - The url your app is accessible at. If you are using ssl, it should start with `https://`; otherwise, it should be `http://`.
