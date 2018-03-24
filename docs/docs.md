@@ -45,7 +45,7 @@ module.exports = {
       pem: '~/.ssh/id_rsa'
     }
   },
-  meteor: {
+  app: {
     name: 'Wekan',
     path: '../',
     docker: {
@@ -98,9 +98,12 @@ module.exports = {
     }
   },
 
-  meteor: {
+  // Formerly named 'meteor'. Configuration for deploying the app
+  app: {
     name: 'app',
     path: '../app',
+    // (optional, default is meteor) Plugins can provide additional types
+    type: 'meteor',
 
     // lets you add docker volumes (optional). Can be used to
     // store files between app deploys and restarts.
@@ -178,6 +181,8 @@ module.exports = {
       // If you are using SSL, this needs to start with https
       ROOT_URL: 'http://app.com',
 
+      // When using the built-in mongodb,
+      // this is overwritten with the correct url
       MONGO_URL: 'mongodb://localhost/meteor'
 
       // The port you access the app on. (optional, default is 80)
@@ -211,9 +216,9 @@ module.exports = {
     enableUploadProgressBar: true
   },
 
-  // (optional but remove it if you want to use a remote MongoDB!)
+  // (optional) Use built-in mongodb. Remove it to use a remote MongoDB
   mongo: {
-    // (optional), default is 3.4.1
+    // (optional, default is 3.4.1) Version of MongoDB
     version: '3.4.1',
 
     servers: {
@@ -222,7 +227,6 @@ module.exports = {
   }
 };
 ```
-
 
 ## Setting Up a Server
 
@@ -234,11 +238,15 @@ It is safe to run `mup setup` multiple times if needed. After making changes to 
 
 ## Deploying an App
 
-    mup deploy
+```bash
+mup deploy
+```
 
 This will bundle the Meteor project locally and deploy it to the remote server(s). The bundling process is the same as what `meteor deploy` does.
 
-    mup deploy --cached-build
+```bash
+mup deploy --cached-build
+```
 
 The `--cached-build` option will use the build from the last time you deployed the app. This is useful when the previous deploy failed from a network error or from a problem in the config.
 
@@ -269,7 +277,7 @@ You can define Meteor build options in `mup.js` like this:
 
 ```ts
 ...
-meteor: {
+app: {
   buildOptions: {
     // Set to true to disable minification and bundling,
     // and include debugOnly packages
@@ -299,7 +307,7 @@ Meteor Up checks if the deployment is successful or not just after the deploymen
 If you are deploying under a proxy/firewall and need a different port to be checked after deploy, add a variable called `deployCheckPort` with the value of the port you are publishing your application to.
 
 ```ts
-meteor: {
+app: {
  ...
   deployCheckPort: 80
  ...
@@ -360,21 +368,21 @@ Meteor Up uses Docker to run and manage your app. It uses [MeteorD](https://gith
 
 ### Deploy to multiple servers
 
-Add all of the servers to the `servers` object and modify `meteor.servers` to include them.
+Add all of the servers to the `servers` object and modify `app.servers` to include them.
 
 ### Multiple Deployment Environments
 
-To deploy to *different* environments (e.g. staging, production, etc.), use separate Meteor Up configurations in separate directories, with each directory containing separate `mup.js` and `settings.json` files, and set the `meteor.app` field in each config to point back to your app's directory.
+To deploy to *different* environments (e.g. staging, production, etc.), use separate Meteor Up configurations in separate directories, with each directory containing separate `mup.js` and `settings.json` files, and set the `app.path` field in each config to point back to your app's directory.
 
 ### Multiple Deployments
 
-Meteor Up supports multiple deployments to a single server. To route requests to the correct app, use the [reverse proxy](#reverse-proxy)
+Meteor Up supports multiple deployments to a single server. To route requests to the correct app, use the [reverse proxy](#reverse-proxy).
 
 Let's assume we need to deploy production and staging versions of the app to the same server. The production is at myapp.com, and staging is at staging.myapp.com.
 
-We need to have two separate Meteor Up projects. For that, create two directories and initialize Meteor Up and add the necessary configurations.
+We need to have two separate Meteor Up projects. For that, create two directories, initialize Meteor Up, and add the necessary configurations.
 
-In the staging `mup.js`, add a field called `appName` with the value `staging`. You can add any name you prefer instead of `staging`.
+In the staging `mup.js`, change the field `app.name` to have the value `staging`. You can add any name you prefer instead of `staging`.
 
 Next, add the proxy object to both configs. For your production app, it would be:
 
@@ -390,7 +398,7 @@ module.exports = {
 
 For the staging app, `proxy.domains` would be `staging.myapp.com`.
 
-Now set up both projects and deploy the apps.
+Now, set up both projects and deploy the apps.
 
 ## Docker options
 
@@ -399,7 +407,7 @@ Now set up both projects and deploy the apps.
 If you want Docker to listen only on a specific network interface, such as `127.0.0.1`, add a variable called `bind` with the value of the IP address you want to listen to.
 
 ```ts
-meteor: {
+app: {
  ...
  docker: {
   ...
@@ -414,7 +422,7 @@ meteor: {
 If you need to connect your docker container to one or more networks add a variable called `networks` inside the docker configuration. This is an array containing all network names to which it has to connect.
 
 ```ts
-meteor: {
+app: {
  ...
   docker: {
     ...
@@ -432,7 +440,7 @@ meteor: {
 Simply reference the docker image by url in the `meteor.docker.image` setting:
 
 ```
-meteor: {
+app: {
  ...
   docker: {
     ...
@@ -468,7 +476,7 @@ module.exports = {
 };
 ```
 
-You need to stop each app deployed to the servers:
+The first time you setup the reverse proxy, you need to stop every app running on the servers:
 ```bash
 mup stop
 ```
@@ -488,12 +496,21 @@ module.exports = {
   proxy: {
     domains: 'website.com,www.website.com',
     ssl: {
-      // Enable let's encrypt to create free certificates
+      // Enable let's encrypt to create free certificates.
+      // The email is used by Let's Encrypt to notify you when the
+      // certificates are close to expiring.
       letsEncryptEmail: 'email@domain.com'
     }
   }
 };
 ```
+
+For Let's Encrypt to work, you also need to:
+1. Make sure `meteor.env.ROOT_URL` starts with `https://`
+2. Setup DNS for each of the domains in `proxy.domains` to point to the server
+3. Open port 80 if it isn't. That port is used to verify that you control the domain.
+
+After changing the config, run `mup setup` and `mup reconfig`. It will automatically create the certificates and setup SSL, which can take up to a few minutes. The certificates will be automatically renewed when they expire within 30 days.
 
 If you are using custom certificates instead, it would look like:
 ```js
@@ -509,6 +526,9 @@ module.exports = {
   }
 };
 ```
+Then run `mup setup`.
+
+You can view the list of certificates and when they expire by running `mup status`.
 
 ### Redirect http to https
 
@@ -580,7 +600,7 @@ module.exports = {
     domains: 'website.com,www.website.com',
 
     // (optional, default=10M) Limit for the size of file uploads.
-    // Setting to 0 disables the limit.
+    // Set to 0 disables the limit.
     clientUploadLimit: '50M'
   }
 };
@@ -632,9 +652,13 @@ module.exports = {
 ```
 
 
-## Changing `appName`
+## Changing the App's Name
 
-It's pretty okay to change the `appName`. But before you do so, you need to stop the project with older `appName`.
+It's okay to change `app.name`. But before you do so, you need to stop the project with older `appName`. Also, if you use the built-in MongoDB, mup will create a new database with the new name so you will need to migrate the data.
+
+1. Run `mup stop`
+2. Change the app name in the config
+3. Run `mup setup` and `mup deploy`
 
 ## Custom configuration and settings files
 
@@ -657,7 +681,7 @@ Meteor UP can enable SSL support for your app. It can either autogenerate the ce
 Meteor Up can use Let's Encrypt to generate certificates for you. Add the following to your `mup.js` file:
 
 ```ts
-meteor: {
+app: {
   ...
   ssl: {
     autogenerate: {
@@ -682,7 +706,7 @@ Then run `mup deploy`. It will automatically create certificates and set up SSL,
 To upload certificates instead of having the server generate them for you, just add the following configuration to your `mup.js` file.
 
 ```ts
-meteor: {
+app: {
   ...
   ssl: {
     crt: './bundle.crt', // this is a bundle of certificates
@@ -709,7 +733,7 @@ To learn more about SSL setup when using your own certificates, refer to the [`m
 If you would like to increase the client upload limits, you can change it by adding:
 ```ts
 
-meteor: {
+app: {
    ...
    nginx: {
      clientUploadLimit: '<desired amount>' // Default is 10M
@@ -899,6 +923,11 @@ If you suddenly can't deploy your app anymore, first use the `mup logs -f` comma
 You can also view logs for:
 - Built-in MongoDB with `mup mongo logs`
 - Reverse proxy with `mup proxy logs`
+- Let's Encrypt with `mup proxy logs-le`
+
+### Run mup status
+
+`mup status` checks the servers for any potential problems, as well as shows you the status of any docker containers or services running on the servers.
 
 ### Docker image
 Make sure that the docker image you are using supports your app's meteor version.
@@ -932,7 +961,7 @@ The `--verbose` flag shows output from commands and scripts run on the server.
 
 ### Verifying Deployment: FAILED
 
-If you do not see `=> Starting meteor app on port` in the logs, your app did not have enough time to start. Try increase `meteor.deployCheckWaitTime`.
+If you do not see `=> Starting meteor app on port` in the logs, your app did not have enough time to start. Try increase `meteor.deployCheckWaitTime`. This only applies if `Prepare Bundle` is disabled.
 
 If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using SSL or not. If that did not fix it, create a new issue with your config and output from `mup deploy --verbose`.
 
@@ -994,294 +1023,4 @@ If present remove nginx container with `docker rm -f meteor-frontend`
 The new config format is different from mupx.
 Run `mup init` to create a new config file.
 Then do `mup setup` and then `mup deploy`.
-
-## Plugins
-
-### Using Plugins
-
-Plugins are npm packages and can be installed with the `npm` tool. You can install them locally to the app or config folders, or globally (locally is recommended since it is easier for mup to find). After the plugin is installed, add a `plugin` array to your config:
-```js
-module.exports = {
-  // ... rest of config
-
-  plugins: ['name-of-plugin', 'name-of-other-plugin']
-};
-```
-
-### List of plugins
-
-- [mup-disk](https://www.npmjs.com/package/mup-disk) Shows disk usage and cleans up old files and docker items
-- [mup-redis](https://www.npmjs.com/package/mup-redis) Set up and manage Redis
-- [mup-fix-bin-paths](https://www.npmjs.com/package/mup-fix-bin-paths) Fix npm bin paths that break deploying from Windows
-- [mup-aws-beanstalk](https://github.com/zodern/mup-aws-beanstalk) Deploy using AWS Elsatic Beanstalk. Supports load balancing, auto scaling, and rolling deploys.
-
-If you have created a plugin, create a pull request to add it to this list.
-
-Meteor Up comes with some built-in plugins. These include:
-- `default` Handles most of the top-level commands, such as `mup setup`, `mup init`, and `mup deploy`
-- `meteor` Adds the `meteor` top-level command and adds meteor specific functionality to the `default` commands
-- `docker` Adds the `docker` top-level command and sets-up docker
-- `mongo` Adds the `mongo` top-level command and manages the MongoDB instance
-
-## Creating a plugin
-
-### Getting started
-Plugins can be used to add functionality to Meteor up. Examples are adding support for non-meteor apps or other databases, add commands, change the server setup, etc.
-
-Plugins are npm packages. At the minimum, they should have:
-1. `package.json` You can use `npm init` to create one
-2. `index.js` Mup loads the plugin config from this file
-
-### Plugin Config
-
-Your plugin's `index.js` file should export an object that follows this structure:
-
-```js
-module.exports = {
-  // (optional) Name of plugin. Defaults to name of package
-  name: 'disk-usage',
-
-  // Description of top-level command, shown in `mup help`
-  description: 'View and manage disk usage on servers',
-  commands: {
-    // Object of commands
-  },
-  hooks: {
-    // Object of hooks that
-  },
-  validators: {
-    // Object of validators to validate the config
-  },
-  // (optional) Called right after the config is loaded
-  prepareConfig(config) {
-    // Normalize config, add env variables, etc
-    return config;
-  },
-  // (optional) Called by api.scrubConfig(),
-  // which is used by `mup validate --show --scrub`
-  scrubConfig(config) {
-    // Replace any senstive information in the config,
-    // such as passwords and ip addresses.
-
-    return config;
-  }
-};
-```
-
-### Commands
-
-Commands serve two purposes:
-
-1. They can be run from the mup CLI
-2. Commands can run other commands from the same plugin or other plugins
-
-Commands can optionally be hidden from the CLI help if they are intended to only be run by other commands.
-
-The command config is:
-```js
-module.exports = {
-  commands: {
-    // key is name of command
-    logs: {
-      description: 'description of command, or set to false to hide it in the help',
-
-      // (optional) A yargs command builder.
-      // Can be used to add options, disable strict mode, etc.
-      // For more help, view http://yargs.js.org/docs/#api-commandmodule
-      builder(yargs) {
-        return yargs.option('follow', {
-          alias: 'f',
-          description: 'Follow log output'
-        })
-          .strict(false);
-      },
-
-      // This is called when the command is run.
-      // If it runs asynchronous tasks, it should return a promise
-      handler(api) {
-        const args = api.getArgs();
-        const sessions = api.getSessions(['meteor']);
-
-        return api.getDockerLogs('mongodb', sessions, args);
-      }
-    }
-  }
-};
-```
-
-You can also set the property `name` for a command, useful when the name has characters not allowed in js variables.
-
-### Hooks
-
-Hooks allow you to run a function before or after commands in other plugins.
-
-A couple examples:
-1. Your plugin needs to set up the servers with `mup setup`
-2. Your plugin deploys non-meteor apps, and needs to run with `mup deploy`
-3. Add environmental variables for the app before `mup reconfig`
-
-```js
-module.exports = {
-  hooks: {
-    'post.deploy'(api) {
-      const config = api.getConfig();
-      if (config.app && config.app.type === 'elixir') {
-        api.runCommand('elixir.deploy');
-      }
-    },
-    'pre.mongo.start'(api) {
-      api.runCommand('elixir.adjustMongoConfig');
-    }
-  }
-};
-```
-
-Hook functions are given the same arguments as command handlers.
-
-You should never directly call a command handler function. Instead, you should use `api.runCommand` to allow for the command's hooks to run.
-
-### Plugin API
-
-#### **getBasePath()**
-Returns a string. Is the folder the config should be in, and all paths are relative to.
-
-#### **getArgs()**
-The arguments that are given to mup, with global options removed (such as verbose, config, settings).
-
-#### **getVerbose()**
-Returns boolean. True if verbose is enabled.
-
-#### **getOptions()**
-Returns object, with the key being the option given to mup, and the value being the option's value.
-
-#### **hasMeteorPackage(packageName)**
-Returns true if the app is using the Meteor package. Returns false if it isn't or if it could not load `appPath/.meteor/versions`.
-
-#### **validateConfig(configPath)**
-Runs the config through all of the plugin's validators. The first time it is run, it shows any errors in the console.
-
-Returns array of errors.
-
-#### **getConfig(validate = true)**
-
-Returns the config, loading it if it hasn't been loaded yet. If validate is true, it will call `api.validateConfig`. Setting `validate` to false also hides errors from not finding the config.
-
-#### **scrubConfig()**
-
-Returns the config after it has been modified by any `scrubConfig` functions from plugins. Most sensitive information should be removed from the config.
-
-#### **getSettings()**
-Returns the Meteor settings file, loading it if it hasn't been yet.
-
-#### **setConfig(configObject)**
-Set a new config object. Plugins can use this to add env variables or make other changes to the config.
-
-#### **runCommand(commandName)**
-Runs the command, and it's pre and post hooks.
-
-`commandName` is in the format of `pluginName.commandName`. For example, `mongo.restart`, `docker.setup`, and `meteor.push` are all valid strings for `commandName`.
-
-It returns a promise.
-
-#### **getSessions(plugins[])**
-Returns array of sessions for the servers listed in the plugin's config, to use in nodemiral.
-
-For example, in the mup config, there are `app.servers` and `mongo.servers`. If your plugin wants to access the servers running mongo, you would call `getSessions(['mongo'])`; If you wanted sessions for all of the servers, you can call `getSessions(['mongo', 'app'])`.
-
-#### **resolvePath(...paths)**
-Same as `path.resolve`, but supports `~`.
-
-#### **runTaskList(list, sessions, options)**
-- list is a nodemiral task list.
-- sessions is an array of sessions from `getSessions`
-- opts is an object of options for the nodemiral task list runner
-
-opts has an additional optional property: `verbose`. If set to true, the stdout and stderr from all tasks run on the server will be shown in the console.
-
-Runs the nodemiral task list, and returns a promise. If any of the tasks fail, it rejects with the error. The error has a property `nodemiralHistory` which gives more details on what failed.
-
-#### **getDockerLogs(imageName, sessions, dockerArgs)**
-
-Returns a promise. Shows the logs to the user, prefixing the host to each line.
-
-#### **commandHistory**
-
-Array of objects. Each object is in the format of `{name: 'plugin.commandName'}`, and shows what commands have already been run and in what order.
-
-#### **runSSHCommand(server, command)**
-server is an object from `servers` in the config
-
-Runs the command on the server. Returns a promise.
-
-### Validation
-
-If plugins add new properties to the config, they can let mup know so it won't show validation errors to the user.
-
-For example, if your plugin alerts the user when certain events happen, your user's config might look like:
-
-```js
-module.exports = {
-  alerts: {
-    email: 'email@domain.com',
-    deployFailed: true,
-    lowDisk: true
-  }
-  // ... rest of config
-};
-```
-
-In your plugin's exported object:
-```ts
-module.exports = {
-  validate: {
-    'alerts'(config, utils) {
-      // return array with validation
-      // errors from validating the alerts object
-
-      // The config has an additional property, config._origionalConfig, which
-      // has the config before it was normalized or prepared by plugins.
-    }
-  }
-};
-```
-
-The validation utils are designed to be used with [joi](https://github.com/hapijs/joi).
-
-### Validation Utils
-
-#### VALIDATE_OPTIONS
-
-Is an object of options that you can pass to `joi.validate`.
-```ts
-{
-  abortEarly: false,
-  convert: true
-}
-```
-
-#### improveErrors(error)
-
-Changes error.message for certain error types to be easier to understand
-
-#### addLocation(details, location)
-- details is an array of errors from `combineErrorDetails`
-
-Usually, the joi errors don't have the full path to the property. This prepends the location to each detail's path and adds the full path to the beginning of the error message.
-
-Returns details
-
-#### combineErrorDetails(details, results)
-- details is an array
-- results is the object returned by joi.validate, or an array of error details
-
-Combines the error details from results with the details array.
-
-Returns details
-
-#### serversExist(serversConfig, serversUsed)
-- serversConfig is the `servers` property in the config
-- serversUsed is the `servers` object used to identify which servers the plugin should use (for example, `meteor.servers`, or `mongo.servers`)
-
-Returns array of error details for the servers that are in `serversUsed`, but missing from `serversConfig`.
-
 
