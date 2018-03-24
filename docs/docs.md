@@ -476,7 +476,7 @@ module.exports = {
 };
 ```
 
-You need to stop each app deployed to the servers:
+The first time you setup the reverse proxy, you need to stop every app running on the servers:
 ```bash
 mup stop
 ```
@@ -496,12 +496,21 @@ module.exports = {
   proxy: {
     domains: 'website.com,www.website.com',
     ssl: {
-      // Enable let's encrypt to create free certificates
+      // Enable let's encrypt to create free certificates.
+      // The email is used by Let's Encrypt to notify you when the 
+      // certificates are close to expiring.
       letsEncryptEmail: 'email@domain.com'
     }
   }
 };
 ```
+
+For Let's Encrypt to work, you also need to:
+1. Make sure `meteor.env.ROOT_URL` starts with `https://`
+2. Setup DNS for each of the domains in `proxy.domains` to point to the server
+3. Open port 80 if it isn't. That port is used to verify that you control the domain.
+
+After changing the config, run `mup setup` and `mup reconfig`. It will automatically create the certificates and setup SSL, which can take up to a few minutes. The certificates will be automatically renewed when they expire within 30 days.
 
 If you are using custom certificates instead, it would look like:
 ```js
@@ -517,6 +526,9 @@ module.exports = {
   }
 };
 ```
+Then run `mup setup`.
+
+You can view the list of certificates and when they expire by running `mup status`.
 
 ### Redirect http to https
 
@@ -588,7 +600,7 @@ module.exports = {
     domains: 'website.com,www.website.com',
 
     // (optional, default=10M) Limit for the size of file uploads.
-    // Setting to 0 disables the limit.
+    // Set to 0 disables the limit.
     clientUploadLimit: '50M'
   }
 };
