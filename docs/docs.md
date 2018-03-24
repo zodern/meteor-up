@@ -656,6 +656,10 @@ module.exports = {
 
 It's okay to change `app.name`. But before you do so, you need to stop the project with older `appName`. Also, if you use the built-in MongoDB, mup will create a new database with the new name so you will need to migrate the data.
 
+1. Run `mup stop`
+2. Change the app name in the config
+3. Run `mup setup` and `mup deploy`
+
 ## Custom configuration and settings files
 
 You can keep multiple configuration and settings files in the same directory and pass them to mup using the command parameters `--settings` and `--config`. For example, to use a file `mup-staging.js` and `staging-settings.json`, add the parameters like this:
