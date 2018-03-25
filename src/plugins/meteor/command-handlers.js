@@ -1,5 +1,5 @@
+import { addStartAppTask, checkAppStarted, prepareBundleSupported } from './utils';
 import buildApp, { archiveApp } from './build.js';
-import { checkAppStarted, prepareBundleSupported } from './utils';
 import { checkUrls, getInformation } from './status';
 import { map, promisify } from 'bluebird';
 import chalk from 'chalk';
@@ -306,16 +306,8 @@ export function start(api) {
   }
 
   const list = nodemiral.taskList('Start Meteor');
-  const isDeploy = api.commandHistory.find(({ name }) => name === 'meteor.deploy');
 
-  list.executeScript('Start Meteor', {
-    script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
-    vars: {
-      appName: config.name,
-      removeImage: isDeploy && !prepareBundleSupported(config.docker)
-    }
-  });
-
+  addStartAppTask(list, api);
   checkAppStarted(list, api);
 
   const sessions = api.getSessions(['app']);
@@ -376,13 +368,7 @@ export function restart(api) {
     }
   });
 
-  list.executeScript('Start Meteor', {
-    script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
-    vars: {
-      appName: config.name
-    }
-  });
-
+  addStartAppTask(list, api);
   checkAppStarted(list, api);
 
   return api.runTaskList(list, sessions, {
