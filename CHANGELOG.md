@@ -1,4 +1,4 @@
-## Next
+## 1.4.3 - March 5, 2018
 - Support different settings.json for different servers (@Farkal)
 - `mup validate` shows message when config is valid
 - Fix crash when the `app` property exists in the config, but `app.path` is missing.
