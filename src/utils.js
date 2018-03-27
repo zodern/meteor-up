@@ -209,27 +209,34 @@ export function moduleNotFoundIsPath(e, modulePath) {
   return e.message.indexOf(modulePath) === pathPosition;
 }
 
+export function argvContains(argvArray, option) {
+  if (argvArray.indexOf(option) > -1) {
+    return true;
+  }
+
+  return argvArray.find(value => value.indexOf(`${option}=`) > -1);
+}
+
+export function createArgv(key) {
+  if (key.length > 1) {
+    return `--${key}`;
+  }
+
+  return `-${key}`;
+}
+
 export function filterArgv(argvArray, argv, unwanted) {
   const result = argv._.slice();
+
   Object.keys(argv).forEach(_key => {
-    let add = false;
-    let key = _key;
+    const key = createArgv(_key);
+
     if (
       unwanted.indexOf(key) === -1 &&
       argv[key] !== false &&
       argv[key] !== undefined
     ) {
-      add = true;
-    }
-
-    if (key.length > 1) {
-      key = `--${key}`;
-    } else {
-      key = `-${key}`;
-    }
-
-    if (add) {
-      if (argvArray.indexOf(key) === -1) {
+      if (!argvContains(argvArray, key)) {
         return;
       }
 
