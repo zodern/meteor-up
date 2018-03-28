@@ -126,6 +126,11 @@ module.exports = {
         '--memory-reservation 200M'
       ],
 
+      // Additional docker build instructions, used during Prepare Bundle
+      buildInstructions: [
+        'RUN apt-get update && apt-get install -y imagemagick'
+      ],
+
       // lets you bind the docker container to a
       // specific network interface (optional)
       bind: '127.0.0.1',
@@ -401,6 +406,31 @@ For the staging app, `proxy.domains` would be `staging.myapp.com`.
 Now, set up both projects and deploy the apps.
 
 ## Docker options
+
+### Customize docker image
+
+During `Prepare Bundle`, mup builds a new docker image that includes your app's code. You can customize this image by adding additional build instructions that are run before adding your app. This can be used to install dependencies your app needs, such as adding `imagemagick` or node-canvas's dependencies.
+
+You can add instructions with `app.docker.buildInstructions`. An example is:
+```js
+module.exports = {
+  app: {
+    name: 'app',
+    path: '../',
+    servers: { one: {} },
+    docker: {
+      buildInstructions: [
+        'RUN apt-get update && apt-get install -y imagemagick'
+      ]
+    }
+  }
+};
+```
+
+Each item is added on a new line in the `Dockerfile`, and should start with `RUN`, `USER`, or another dockerfile instruction.
+If the base docker image runs the app as a non-root user, you might need to switch the user to root for your RUN commands, and back to the non-root user afterwards.
+
+After changing the config, run `mup deploy`.
 
 ### Listening to specific IP address (IP Binding)
 

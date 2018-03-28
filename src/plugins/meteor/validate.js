@@ -28,7 +28,8 @@ const schema = joi.object().keys({
     prepareBundle: joi.bool(),
     networks: joi
       .array()
-      .items(joi.string())
+      .items(joi.string()),
+    buildInstructions: joi.array().items(joi.string())
   }),
   buildOptions: joi.object().keys({
     serverOnly: joi.bool(),

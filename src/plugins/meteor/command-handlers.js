@@ -180,7 +180,8 @@ export async function push(api) {
       vars: {
         appName: config.name,
         dockerImage: config.docker.image,
-        env: config.env
+        env: config.env,
+        buildInstructions: config.docker.buildInstructions || []
       }
     });
   }
