@@ -9,11 +9,15 @@ describe('load-plugins', () => {
 
   describe('locatePluginDir', () => {
     it('should identify paths', () => {
-      const configPath = '/projects/test/mup.js';
+      const configPath = '/projects/a/mup.js';
 
-      expect(locatePluginDir('./test', configPath)).to.equal('/projects/test/test');
-      expect(locatePluginDir('~/test', configPath)).to.contain('/test');
-      expect(locatePluginDir('/test', configPath)).to.equal('/test');
+      function createResult(value) {
+        return locatePluginDir(value, configPath).replace(/\\/g, '/');
+      }
+
+      expect(createResult('./test')).to.contain('/projects/a/test');
+      expect(createResult('~/test')).to.contain('/test');
+      expect(createResult('/test')).to.length.lessThan(10);
     });
   });
 });
