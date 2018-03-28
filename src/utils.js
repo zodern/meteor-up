@@ -217,7 +217,7 @@ export function argvContains(argvArray, option) {
   return argvArray.find(value => value.indexOf(`${option}=`) > -1);
 }
 
-export function createArgv(key) {
+export function createOption(key) {
   if (key.length > 1) {
     return `--${key}`;
   }
@@ -228,22 +228,22 @@ export function createArgv(key) {
 export function filterArgv(argvArray, argv, unwanted) {
   const result = argv._.slice();
 
-  Object.keys(argv).forEach(_key => {
-    const key = createArgv(_key);
+  Object.keys(argv).forEach(key => {
+    const option = createOption(key);
 
     if (
       unwanted.indexOf(key) === -1 &&
       argv[key] !== false &&
       argv[key] !== undefined
     ) {
-      if (!argvContains(argvArray, key)) {
+      if (!argvContains(argvArray, option)) {
         return;
       }
 
-      result.push(key);
+      result.push(option);
 
-      if (typeof argv[_key] !== 'boolean') {
-        result.push(argv[_key]);
+      if (typeof argv[key] !== 'boolean') {
+        result.push(argv[key]);
       }
     }
   });
