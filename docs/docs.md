@@ -965,9 +965,6 @@ Make sure that the docker image you are using supports your app's meteor version
 ### Update Docker
 Some problems are caused by old versions of docker. Since mup 1.3, `mup setup` and `mup docker setup` will update Docker if it is older than 1.13.
 
-### Increase RAM
-Some problems are caused by the server running out of ram.
-
 ### Check if Docker Containers are Restarting
 You can view a list of Docker containers with
 ```bash
@@ -1025,6 +1022,10 @@ You can view the Let's Encrypt logs by running this command on the server:
 docker logs <AppName>-nginx-letsencrypt
 ```
 Replace `<AppName>` with the name of the app.
+
+### Prepare Bundle ends with `Killed`
+
+The server ran out of memory during `npm install`. Try increasing the server's ram or creating a swap file.
 
 ### Unwanted redirects to https
 
