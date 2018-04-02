@@ -15,6 +15,21 @@ export function checkAppStarted(list, api) {
   return list;
 }
 
+export function addStartAppTask(list, api) {
+  const appConfig = api.getConfig().app;
+  const isDeploy = api.commandHistory.find(({ name }) => name === 'meteor.deploy');
+
+  list.executeScript('Start Meteor', {
+    script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
+    vars: {
+      appName: appConfig.name,
+      removeImage: isDeploy && !prepareBundleSupported(appConfig.docker)
+    }
+  });
+
+  return list;
+}
+
 export function prepareBundleSupported(dockerConfig) {
   const supportedImages = ['abernix/meteord', 'zodern/meteor'];
 

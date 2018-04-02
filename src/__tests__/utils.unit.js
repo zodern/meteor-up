@@ -76,4 +76,73 @@ describe('utils', () => {
       assert(result.indexOf('~') === -1);
     });
   });
+
+  describe('createOption', () => {
+    it('should handle long options', () => {
+      const result = utils.createOption('option');
+
+      assert(result === '--option');
+    });
+    it('should handle short options', () => {
+      const result = utils.createOption('o');
+
+      assert(result === '-o');
+    });
+  });
+
+  describe('argvContains', () => {
+    it('should find exact matches', () => {
+      const result = utils.argvContains(['a', 'b'], 'a');
+
+      assert(result);
+    });
+    it('should find matches that contain the value', () => {
+      const result = utils.argvContains(['a', 'b=c'], 'b');
+
+      assert(result);
+    });
+    it('should return false if not found', () => {
+      const result = utils.argvContains(['a', 'b'], 'c');
+
+      assert(!result);
+    });
+  });
+
+  describe('filterArgv', () => {
+    it('should remove unwanted options', () => {
+      const argv = { _: ['logs'], config: './mup.js', tail: true };
+      const argvArray = ['mup', 'logs', '--config=./mup.js', '--tail'];
+      const unwanted = ['_', 'config'];
+      const result = utils.filterArgv(argvArray, argv, unwanted);
+
+      expect(result).to.deep.equal(['logs', '--tail']);
+    });
+    it('should remove undefined and false options', () => {
+      const argv = { _: ['logs'], config: undefined, verbose: true, follow: false};
+      const argvArray = ['mup', 'logs', '--verbose'];
+      const unwanted = ['_'];
+
+      const result = utils.filterArgv(argvArray, argv, unwanted);
+
+      expect(result).to.deep.equal(['logs', '--verbose']);
+    });
+    it('should add non-boolean values', () => {
+      const argv = { _: ['logs'], tail: '10', follow: true };
+      const argvArray = ['mup', 'logs', '--tail=10', '--follow'];
+      const unwanted = ['_'];
+
+      const result = utils.filterArgv(argvArray, argv, unwanted);
+
+      expect(result).to.deep.equal(['logs', '--tail', '10', '--follow']);
+    });
+    it('should remove options not provided by user', () => {
+      const argv = { _: ['logs'], follow: true, tail: '10' };
+      const argvArray = ['mup', 'logs'];
+      const unwanted = ['_'];
+
+      const result = utils.filterArgv(argvArray, argv, unwanted);
+
+      expect(result).to.deep.equal(['logs']);
+    });
+  });
 });

@@ -47,7 +47,10 @@ export default function(config, {
     joi.validate(config.proxy, schema, VALIDATE_OPTIONS)
   );
   if (
-    config.app && config.app.env && config.app.env.PORT
+    config.app &&
+    config.app.env &&
+    config.app.env.PORT &&
+    config.app.env.PORT !== 80
   ) {
     details.push({
       message: 'app.env.PORT is ignored when using the reverse proxy',

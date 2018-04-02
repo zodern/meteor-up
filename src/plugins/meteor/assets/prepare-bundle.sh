@@ -29,10 +29,13 @@ echo "Creating Dockerfile"
 sudo cat <<EOT > Dockerfile
 FROM <%= dockerImage %>
 RUN mkdir /built_app || true
-COPY ./ /built_app
 <% for(var key in env) { %>
 ENV <%- key %>=<%- env[key] %>
 <% } %>
+<% for(var instruction in buildInstructions) { %>
+<%-  buildInstructions[instruction] %>
+<% } %>
+COPY ./ /built_app
 RUN cd  /built_app/programs/server && \
     npm install --unsafe-perm
 EOT

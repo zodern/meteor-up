@@ -23,7 +23,7 @@ You do not need to install anything on your servers; mup will set them up for yo
 
 ## Step 1: Initialize your project
 
-In the terminal, run: 
+In the terminal, run:
 ```
 cd path/to/app
 mkdir .deploy && cd .deploy
@@ -40,7 +40,7 @@ For each server:
 - __host__ - Usually is the IP Address of the server
 - __server authentication__ - You can use a `password` or set `pem` to the path to a private key. If neither are set, it uses `ssh-agent`
 
-In the `meteor` section:
+In the `app` section:
 - __name__ - A unique name, with no spaces.
 - __path__ - Path to the meteor app, relative to the config. If your config is in `app/.deploy`, the path would be `../`.
 - __env.ROOT_URL__ - The url your app is accessible at. If you are using ssl, it should start with `https://`; otherwise, it should be `http://`.
@@ -56,7 +56,7 @@ mup setup
 If you want to see what the tasks are doing, you can add the `--verbose` flag.
 
 You should run `mup setup` anytime after changing your config. It is safe to run the command as many times as you need.
- 
+
 ## Step 4: Deploy
 
 The deploy process:
@@ -77,6 +77,6 @@ Congratulations! Your app is now running on the server, accessible to your poten
 
 ## Next Steps
 
-- [View logs](docs.html#other-utility-commands)
-- [Setup SSL](docs.html#ssl-support)
-- [View config options](docs.html#example-configs)
+- [View logs]({% link docs.md%}#other-utility-commands)
+- [Setup SSL]({% link docs.md%}#reverse-proxy)
+- [View config options]({% link docs.md%}#example-configs)
