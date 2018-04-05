@@ -1,4 +1,20 @@
-## Next
+## 1.4.4 - April 2, 2018
+- Allow customizing the docker image created during Prepare Bundle. For example, this can be used to install packages using apt-get.
+- `mup status` will check if the default shell is bash
+- Mup will exit when a hook script fails
+- Fix running `mup restart`
+- Fix passing arguments to `docker logs` when they are in the format `--option=value` instead of `--option value`
+- Fix the validation error that the port is ignored showing when it shouldn't
+- Fix loading plugins when given the path to the plugin instead of the plugin's name
+
+**Docs**
+- Move plugin documentation to seperate page
+- Improve Let's Encrypt documentation
+- Rename the `meteor` property to `app` in all of the examples
+- Fix links in the getting started tutorial
+- Many small improvements to the content and wording
+
+## 1.4.3 - March 5, 2018
 - Support different settings.json for different servers (@Farkal)
 - `mup validate` shows message when config is valid
 - Fix crash when the `app` property exists in the config, but `app.path` is missing.

@@ -110,11 +110,43 @@ export function validate(api) {
   }
 }
 
+function statusColor(
+  versionCorrect,
+  distributionCorrect,
+  hasAptGet,
+  defaultBash,
+  _overallColor
+) {
+  let color = chalk.green;
+  let overallColor = _overallColor;
+
+  if (!hasAptGet) {
+    color = chalk.red;
+    overallColor = 'red';
+  } else if (!distributionCorrect) {
+    color = chalk.yellow;
+    if (overallColor !== 'red') {
+      overallColor = 'yellow';
+    }
+  } else if (!versionCorrect) {
+    color = chalk.red;
+    overallColor = 'red';
+  } else if (!defaultBash) {
+    color = chalk.red;
+    overallColor = 'red';
+  }
+
+  return {
+    color,
+    overallColor
+  };
+}
+
 export async function status(api) {
   const servers = Object.values(api.getConfig().servers);
   const lines = [];
   let overallColor = 'green';
-  const command = 'lsb_release -r -s || echo "false"; lsb_release -is; apt-get -v &> /dev/null && echo "true" || echo "false"';
+  const command = 'lsb_release -r -s || echo "false"; lsb_release -is; apt-get -v &> /dev/null && echo "true" || echo "false"; echo $BASH';
   const results = await map(
     servers,
     server => api.runSSHCommand(server, command),
@@ -127,29 +159,33 @@ export async function status(api) {
     const [
       version,
       distribution,
-      aptGet
+      aptGet,
+      bash = ''
     ] = output.trim().split('\n');
 
     const versionCorrect = parseInt(version, 10) > 13;
     const distributionCorrect = distribution === 'Ubuntu';
     const hasAptGet = aptGet.trim() === 'true';
+    const defaultBash = bash.trim().length > 0;
 
-    if (!hasAptGet) {
-      color = chalk.red;
-      overallColor = 'red';
-    } else if (!distributionCorrect) {
-      color = chalk.yellow;
-      if (overallColor !== 'red') {
-        overallColor = 'yellow';
-      }
-    } else if (!versionCorrect) {
-      color = chalk.red;
-      overallColor = 'red';
-    }
+    const colors = statusColor(
+      versionCorrect,
+      distributionCorrect,
+      hasAptGet,
+      defaultBash,
+      overallColor
+    );
+
+    color = colors.color;
+    overallColor = colors.overallColor;
 
     text += color(`${distribution} ${version}`);
     if (!hasAptGet) {
       text += chalk.red(' apt-get not available');
+    }
+
+    if (!defaultBash) {
+      text += chalk.red(' Bash is not the default shell');
     }
 
     lines.push(text);
