@@ -1,7 +1,7 @@
 import debug from 'debug';
 import fs from 'fs';
 import { spawn } from 'child_process';
-import tar from 'tar';
+import tar from '@zodern/tar';
 
 const log = debug('mup:module:meteor');
 

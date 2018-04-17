@@ -67,6 +67,7 @@
     "stylelint-config-standard": "^17.0.0"
   },
   "dependencies": {
+    "@zodern/tar": "^4.3.3",
     "async": "^2.6.0",
     "axios": "^0.17.1",
     "babel-polyfill": "^6.26.0",
@@ -86,7 +87,6 @@
     "shelljs": "0.5.3",
     "silent-npm-registry-client": "^3.0.1",
     "ssh2": "0.4.x",
-    "tar": "^4.3.2",
     "traverse": "^0.6.6",
     "uuid": "^3.1.0",
     "yargs": "^8.0.2"
