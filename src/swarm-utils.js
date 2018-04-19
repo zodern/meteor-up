@@ -36,7 +36,6 @@ export function currentManagers(config, serverInfo) {
     }
   });
 
-
   const result = hostsToServer(config, hosts);
 
   log('current managers', result);
