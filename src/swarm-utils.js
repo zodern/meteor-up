@@ -36,11 +36,7 @@ export function currentManagers(config, serverInfo) {
     }
   });
 
-  const result = hostsToServer(config, hosts);
-
-  log('current managers', result);
-
-  return result;
+  return hosts;
 }
 
 export function desiredManagers(config, serverInfo) {
@@ -48,7 +44,7 @@ export function desiredManagers(config, serverInfo) {
   const servers = Object.keys(config.servers);
   let additionalManagers = 0;
 
-  log('requrested managers', managers);
+  log('requested managers', managers);
 
   // Try to get an odd number of managers
   if (managers.length % 2 === 0 && managers.length < servers.length) {
@@ -97,38 +93,31 @@ export function findNodes(config, serverInfo) {
   // TODO: handle nodes that aren't listed in the config.server
   // TODO: handle multiple clusters
 
-  const manager = config.servers[managers[0]].host;
-  const ids = Object.keys(serverInfo).reduce((result, host) => {
-    if (serverInfo[host].swarm) {
-      const id = serverInfo[host].swarm.NodeID;
-      result[id] = host;
+  const manager = managers[0];
+  const ids = Object.keys(serverInfo).reduce((result, serverName) => {
+    if (serverInfo[serverName].swarm) {
+      const id = serverInfo[serverName].swarm.NodeID;
+
+      result[id] = serverName;
     }
 
     return result;
   }, {});
 
-  const nodeHosts = serverInfo[manager].swarmNodes.map(node => ids[node.ID]);
-
-
-  return hostsToServer(config, nodeHosts);
+  return serverInfo[manager].swarmNodes.map(node => ids[node.ID]);
 }
 
 export function nodeIdsToServer(config, serverInfo) {
-  const hostToServer = Object.keys(config.servers).reduce((result, key) => {
-    result[config.servers[key].host] = key;
-
-    return result;
-  }, {});
-
   const allIds = [];
   const result = {};
 
   Object.keys(serverInfo).forEach(host => {
     if (serverInfo[host].swarm) {
-      result[serverInfo[host].swarm.NodeID] = hostToServer[host];
+      result[serverInfo[host].swarm.NodeID] = host;
     }
     if (serverInfo[host].swarmNodes) {
       const nodes = serverInfo[host].swarmNodes;
+
       allIds.push(...nodes.map(node => node.ID));
     }
   });
