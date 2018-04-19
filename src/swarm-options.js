@@ -8,10 +8,10 @@ export function registerSwarmOptions(optionFunction) {
 export function getOptions(config) {
   return _optionFunctions.reduce((result, optionFunction) => {
     const { labels, managers } = optionFunction(config) || {};
+
     if (typeof labels === 'object') {
       Object.keys(labels).forEach(host => {
-        result.labels[host] = result.labels[host] || {};
-        result.labels[host] = merge(result.labels[host], labels[host]);
+        result.labels[host] = merge(result.labels[host] || {}, labels[host]);
       });
     }
 

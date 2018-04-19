@@ -1,4 +1,7 @@
+import debug from 'debug';
 import nodemiral from 'nodemiral';
+
+const log = debug('mup:docker:swarm');
 
 export function initSwarm(managers, host, api) {
   const list = nodemiral.taskList('Setting Up Docker Swarm');
@@ -82,6 +85,8 @@ export function diffLabels(currentLabels, desiredLabels) {
 export function updateLabels(api, manager, toAdd, toRemove) {
   const list = nodemiral.taskList('Update Swarm Labels');
   const session = api.getSessionsForServers([manager]);
+
+  log(`Adding labels ${JSON.stringify(toAdd)}`);
 
   list.executeScript('Update Labels', {
     script: api.resolvePath(__dirname, 'assets/swarm-labels.sh'),

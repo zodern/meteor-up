@@ -356,9 +356,9 @@ export default class PluginAPI {
   }
 
   async getManagerSession() {
-    const managers = await this.currentSwarmManagers();
+    const { currentManagers } = await this.swarmInfo();
 
-    return this.getSessionsForServers(managers)[0];
+    return this.getSessionsForServers(currentManagers)[0];
   }
 
   _pickSessions(plugins = []) {

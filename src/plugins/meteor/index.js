@@ -11,7 +11,7 @@ export const validate = {
   app(config, utils) {
     if (typeof config.meteor === 'object' || (config.app && config.app.type !== 'meteor')) {
       // The meteor validator will check the config
-      // Or the config is telling a different app to handle deployment
+      // Or the config is telling a different plugin to handle deployment
       return [];
     }
 

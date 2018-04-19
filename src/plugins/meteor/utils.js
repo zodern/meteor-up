@@ -30,6 +30,22 @@ export function addStartAppTask(list, api) {
   return list;
 }
 
+export function addStartServiceTask(list, api) {
+  const appConfig = api.getConfig().app;
+
+  list.executeScript('Start Meteor', {
+    script: api.resolvePath(__dirname, 'assets/start-swarm.sh'),
+    vars: {
+      appName: appConfig.name,
+      publishedPort: appConfig.env.PORT || 80,
+      targetPort: 80,
+      replicas: Object.keys(appConfig.servers).length
+    }
+  });
+
+  return list;
+}
+
 export function prepareBundleSupported(dockerConfig) {
   const supportedImages = ['abernix/meteord', 'zodern/meteor'];
 

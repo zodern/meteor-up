@@ -1,4 +1,4 @@
-import { addStartAppTask, checkAppStarted, prepareBundleSupported } from './utils';
+import { addStartAppTask, addStartServiceTask, checkAppStarted, prepareBundleSupported } from './utils';
 import buildApp, { archiveApp } from './build.js';
 import { checkUrls, getInformation } from './status';
 import { map, promisify } from 'bluebird';
@@ -297,9 +297,10 @@ export function envconfig(api) {
   });
 }
 
-export function start(api) {
+export async function start(api) {
   log('exec => mup meteor start');
   const config = api.getConfig().app;
+  const service = api.getConfig().swarm !== undefined;
 
   if (!config) {
     console.error('error: no configs found for meteor');
@@ -308,12 +309,16 @@ export function start(api) {
 
   const list = nodemiral.taskList('Start Meteor');
 
-  addStartAppTask(list, api);
-  checkAppStarted(list, api);
+  if (service) {
+    addStartServiceTask(list, api);
+  } else {
+    addStartAppTask(list, api);
+    checkAppStarted(list, api);
+  }
 
-  const sessions = api.getSessions(['app']);
+  const sessions = service ? await api.getManagerSession() : api.getSessionapi.getSessions(['app']);
 
-  return api.runTaskList(list, sessions, {
+  return api.runTaskList(list, [sessions], {
     series: true,
     verbose: api.verbose
   });

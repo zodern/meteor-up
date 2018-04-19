@@ -16,6 +16,7 @@ const schema = joi.object().keys({
   nginxServerConfig: joi.string(),
   nginxLocationConfig: joi.string(),
   clientUploadLimit: joi.string(),
+  servers: joi.object(),
   shared: joi.object().keys({
     clientUploadLimit: joi.alternatives().try(joi.number(), joi.string()),
     httpPort: joi.number(),
@@ -65,6 +66,13 @@ export default function(config, {
       'Use proxy.clientUploadLimit instead',
       'https://git.io/vN5tn'
     );
+  }
+
+  if (config.swarm && !config.proxy.servers) {
+    details.push({
+      message: 'is required when using Docker Swarm',
+      path: 'servers'
+    });
   }
 
   return addLocation(details, 'proxy');
