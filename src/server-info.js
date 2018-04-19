@@ -128,8 +128,9 @@ export function parseCollectorOutput(name, output, code, collectors) {
   return collectors[name].parser(output, code);
 }
 
-export function createHostResult(collectorData, host, collectors) {
-  const result = { _host: host };
+export function createHostResult(collectorData, host, serverName, collectors) {
+  const result = { _host: host, _serverName: serverName };
+
   collectorData.forEach(data => {
     result[data.name] = parseCollectorOutput(
       data.name,
@@ -151,6 +152,7 @@ export function getServerInfo(server, collectors) {
       const hostResult = createHostResult(
         collectorData,
         server.host,
+        server.name,
         collectors
       );
 
@@ -169,13 +171,12 @@ export default function serverInfo(servers, collectors = _collectors) {
     server => getServerInfo(server, collectors),
     { concurrency: 2 }
   ).then(serverResults => {
-    const result = {};
-    serverResults.forEach(serverResult => {
-      result[serverResult._host] = serverResult;
-    });
-
     log('finished');
 
-    return result;
+    return serverResults.reduce((result, serverResult) => {
+      result[serverResult._serverName] = serverResult;
+
+      return result;
+    }, {});
   });
 }

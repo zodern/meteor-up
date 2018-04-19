@@ -69,6 +69,7 @@ export function setup(api) {
 export async function setupSwarm(api) {
   const config = api.getConfig();
   const swarmConfig = config.swarm;
+
   if (!swarmConfig) {
     return;
   }
@@ -128,6 +129,7 @@ export async function setupSwarm(api) {
     const token = Object.keys(serverInfo)
       .reduce((result, item) => result || serverInfo[item].swarmToken, null);
     const managerIP = config.servers[desiredManagers[0]].host;
+
     await joinNodes(nodesToAdd, token, managerIP, api);
   }
 
@@ -141,6 +143,12 @@ export async function setupSwarm(api) {
 
   // Update tags
   let { toRemove, toAdd } = diffLabels(currentLabels, desiredLabels);
+
+  log('current labels', currentLabels);
+  log('desired labels', desiredLabels);
+  log('adding labels', toAdd);
+  log('removing labels', toRemove);
+
   if (toRemove.length > 0 || toAdd.length > 0) {
     toRemove = toRemove.map(data => {
       data.server = findKey(nodeIDs, partial(isEqual, data.server));
@@ -250,11 +258,11 @@ export async function status(api) {
   const list = [];
 
   currentManagers.forEach(manager => {
-    list.push(`- ${manager} (Manager)`);
+    list.push(` - ${manager} (Manager)`);
   });
 
   difference(nodes, currentManagers).forEach(node => {
-    list.push(`- ${node}`);
+    list.push(` - ${node}`);
   });
 
   if (currentManagers.length === 0) {

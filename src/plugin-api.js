@@ -321,15 +321,21 @@ export default class PluginAPI {
     if (this._cachedServerInfo && !collectors) {
       return this._cachedServerInfo;
     }
+    const serverConfig = this.getConfig().servers;
 
-    const servers = selectedServers ||
-      Object.values(this.getConfig().servers);
+    const servers = (
+      selectedServers || Object.keys(this.getConfig().servers)
+    ).map(serverName => ({
+      ...serverConfig[serverName],
+      name: serverName
+    }));
 
     if (!collectors) {
       console.log('=> Collecting Docker information');
     }
 
     const result = await serverInfo(servers, collectors);
+
     if (!collectors) {
       this._cachedServerInfo = result;
     }
