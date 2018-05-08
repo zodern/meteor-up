@@ -16,6 +16,7 @@ const log = debug('mup:module:meteor');
 function tmpBuildPath(appPath, api) {
   const rand = random.create(appPath);
   const uuidNumbers = [];
+
   for (let i = 0; i < 16; i++) {
     uuidNumbers.push(rand(255));
   }
@@ -29,12 +30,14 @@ function tmpBuildPath(appPath, api) {
 export function logs(api) {
   log('exec => mup meteor logs');
   const config = api.getConfig().app;
+
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
   const args = api.getArgs();
+
   if (args[0] === 'meteor') {
     args.shift();
   }
@@ -47,6 +50,7 @@ export function logs(api) {
 export function setup(api) {
   log('exec => mup meteor setup');
   const config = api.getConfig().app;
+
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -100,6 +104,7 @@ function getBuildOptions(api) {
   const appPath = api.resolvePath(api.getBasePath(), config.path);
 
   const buildOptions = config.buildOptions || {};
+
   buildOptions.buildLocation =
     buildOptions.buildLocation || tmpBuildPath(appPath, api);
 
@@ -150,6 +155,7 @@ export async function push(api) {
   await api.runCommand('meteor.build');
 
   const config = api.getConfig().app;
+
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -235,6 +241,7 @@ export function envconfig(api) {
   }
 
   const list = nodemiral.taskList('Configuring App');
+
   list.copy('Pushing the Startup Script', {
     src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
     dest: `/opt/${config.name}/config/start.sh`,
@@ -252,6 +259,7 @@ export function envconfig(api) {
   });
 
   const env = cloneDeep(config.env);
+
   env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
   // sending PORT to the docker container is useless.
 
@@ -264,6 +272,7 @@ export function envconfig(api) {
   env.PORT = config.docker.imagePort;
 
   const hostVars = {};
+
   Object.keys(config.servers).forEach(key => {
     if (config.servers[key].env) {
       hostVars[servers[key].host] = { env: config.servers[key].env };
@@ -271,6 +280,7 @@ export function envconfig(api) {
     if (config.servers[key].settings) {
       const settings = JSON.stringify(api.getSettingsFromPath(
         config.servers[key].settings));
+
       if (hostVars[servers[key].host]) {
         hostVars[servers[key].host].env.METEOR_SETTINGS = settings;
       } else {
@@ -316,7 +326,7 @@ export async function start(api) {
     checkAppStarted(list, api);
   }
 
-  const sessions = service ? await api.getManagerSession() : api.getSessionapi.getSessions(['app']);
+  const sessions = service ? await api.getManagerSession() : api.getSessions(['app']);
 
   return api.runTaskList(list, [sessions], {
     series: true,
@@ -330,6 +340,7 @@ export function deploy(api) {
   // validate settings and config before starting
   api.getSettings();
   const config = api.getConfig().app;
+
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -343,6 +354,7 @@ export function deploy(api) {
 export function stop(api) {
   log('exec => mup meteor stop');
   const config = api.getConfig().app;
+
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -443,6 +455,7 @@ export async function status(api) {
     }
 
     const urlResult = urlResults[index];
+
     if (result.publishedPorts.length > 0) {
       lines.push(`    App running at http://${result.host}:${result.publishedPorts[0].split('/')[0]}`);
       lines.push(`     - Available in app's docker container: ${urlResult.inDocker}`);
