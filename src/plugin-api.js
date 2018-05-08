@@ -77,7 +77,7 @@ export default class PluginAPI {
     }
   }
 
-  validateConfig(configPath) {
+  validateConfig(configPath, logProblems) {
     // Only print errors once.
     if (this.validationErrors.length > 0) {
       return this.validationErrors;
@@ -89,7 +89,7 @@ export default class PluginAPI {
     } = configValidator(config, this._origionalConfig);
     const problems = [...errors, ...depreciations];
 
-    if (problems.length > 0) {
+    if (problems.length > 0 && logProblems) {
       console.log(`loaded config from ${configPath}`);
       console.log('');
 
@@ -148,9 +148,7 @@ export default class PluginAPI {
       }
       this.config = this._normalizeConfig(this.config);
 
-      if (validate) {
-        this.validateConfig(this.configPath);
-      }
+      this.validateConfig(this.configPath, validate);
     }
 
     return this.config;
@@ -165,6 +163,7 @@ export default class PluginAPI {
   getSettings() {
     if (!this.settings) {
       let filePath;
+
       if (this.settingsPath) {
         filePath = resolvePath(this.settingsPath);
       } else {
@@ -179,6 +178,7 @@ export default class PluginAPI {
   getSettingsFromPath(settingsPath) {
     const filePath = resolvePath(settingsPath);
     let settings;
+
     try {
       settings = fs.readFileSync(filePath).toString();
     } catch (e) {
@@ -225,6 +225,7 @@ export default class PluginAPI {
   }
   _runHooks = async function(handlers, hookName) {
     const messagePrefix = `> Running hook ${hookName}`;
+
     for (const hookHandler of handlers) {
       if (hookHandler.localCommand) {
         console.log(`${messagePrefix} "${hookHandler.localCommand}"`);
@@ -257,6 +258,7 @@ export default class PluginAPI {
 
     if (hookName in hooks) {
       const hookList = hooks[hookName];
+
       await this._runHooks(hookList, name);
     }
   };
@@ -269,6 +271,7 @@ export default class PluginAPI {
 
     if (hookName in hooks) {
       const hookList = hooks[hookName];
+
       await this._runHooks(hookList, hookName);
     }
   };
@@ -302,6 +305,7 @@ export default class PluginAPI {
 
     await this._runPreHooks(name);
     let potentialPromise;
+
     try {
       log('Running command', name);
       potentialPromise = commands[name].handler(this, nodemiral);
@@ -376,6 +380,7 @@ export default class PluginAPI {
 
     plugins.forEach(moduleName => {
       const moduleConfig = this.getConfig()[moduleName];
+
       if (!moduleConfig) {
         return;
       }
@@ -396,6 +401,7 @@ export default class PluginAPI {
 
   _loadSessions() {
     const config = this.getConfig();
+
     this.sessions = {};
 
     // `mup.servers` contains login information for servers
@@ -449,6 +455,7 @@ export default class PluginAPI {
       }
 
       const session = nodemiral.session(info.host, auth, opts);
+
       this.sessions[name] = session;
     }
   }
