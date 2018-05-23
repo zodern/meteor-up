@@ -113,14 +113,14 @@ export function validate(api) {
 function statusColor(
   versionCorrect,
   distributionCorrect,
-  hasAptGet,
+  hasPackageManager,
   defaultBash,
   _overallColor
 ) {
   let color = chalk.green;
   let overallColor = _overallColor;
 
-  if (!hasAptGet) {
+  if (!hasPackageManager) {
     color = chalk.red;
     overallColor = 'red';
   } else if (!distributionCorrect) {
@@ -146,7 +146,7 @@ export async function status(api) {
   const servers = Object.values(api.getConfig().servers);
   const lines = [];
   let overallColor = 'green';
-  const command = 'lsb_release -r -s || echo "false"; lsb_release -is; apt-get -v &> /dev/null && echo "true" || echo "false"; echo $BASH';
+  const command = 'lsb_release -r -s || echo "false"; lsb_release -is; apt-get -v &> /dev/null && echo "true" || echo "false"; yum -h &> /dev/null && echo "true" || echo "false"; echo $BASH';
   const results = await map(
     servers,
     server => api.runSSHCommand(server, command),
@@ -160,18 +160,26 @@ export async function status(api) {
       version,
       distribution,
       aptGet,
+      yum,
       bash = ''
     ] = output.trim().split('\n');
 
-    const versionCorrect = parseInt(version, 10) > 13;
-    const distributionCorrect = distribution === 'Ubuntu';
-    const hasAptGet = aptGet.trim() === 'true';
+    let versionCorrect = false;
+    let distributionCorrect = false;
+    if (distribution === 'CentOS') {
+      distributionCorrect = true;
+      versionCorrect = parseInt(version, 10) >= 7;
+    } else if (distribution === 'Ubuntu') {
+      distributionCorrect = true;
+      versionCorrect = parseInt(version, 10) > 13;
+    }
+    const hasPackageManager = aptGet.trim() === 'true' || yum.trim() === 'true';
     const defaultBash = bash.trim().length > 0;
 
     const colors = statusColor(
       versionCorrect,
       distributionCorrect,
-      hasAptGet,
+      hasPackageManager,
       defaultBash,
       overallColor
     );
@@ -180,8 +188,8 @@ export async function status(api) {
     overallColor = colors.overallColor;
 
     text += color(`${distribution} ${version}`);
-    if (!hasAptGet) {
-      text += chalk.red(' apt-get not available');
+    if (!hasPackageManager) {
+      text += chalk.red(' package manager (yum or apt-get) not available');
     }
 
     if (!defaultBash) {

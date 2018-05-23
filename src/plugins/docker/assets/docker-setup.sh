@@ -5,14 +5,23 @@
 install_docker () {
 # Remove the lock
   set +e
-  sudo rm /var/lib/dpkg/lock > /dev/null
-  sudo rm /var/cache/apt/archives/lock > /dev/null
-  sudo dpkg --configure -a
-  set -e
-
-  # Required to update system
-  sudo apt-get update
-  sudo apt-get -y install wget lxc iptables curl
+  if [lsb_release -is]
+  then
+    # Required to update Ubuntu system
+    sudo rm /var/lib/dpkg/lock > /dev/null
+    sudo rm /var/cache/apt/archives/lock > /dev/null
+    sudo dpkg --configure -a
+    set -e
+    sudo apt-get update
+    sudo apt-get -y install wget lxc iptables curl
+  else
+    # Required to update CentOS system
+    sudo rm -f /var/run/yum.pid > /dev/null
+    sudo yum clean all > /dev/null
+    set -e
+    sudo yum -y update
+    sudo yum -y install wget lxc iptables curl redhat-lsb-core
+  fi
 
   # Install docker
   wget -qO- https://get.docker.com/ | sudo sh
