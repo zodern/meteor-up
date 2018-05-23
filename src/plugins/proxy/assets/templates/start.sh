@@ -54,6 +54,9 @@ sudo docker run \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
   -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
+  <% if (typeof proxyConfig === "object" && typeof proxyConfig.docker === "object" && typeof proxyConfig.docker.args === "object") { %> \
+  <% for (var args in proxyConfig.docker.args) { %> <%- docker.args[args] %> <% } %> \
+  <% } %> \
   jwilder/nginx-proxy
 echo "Ran nginx-proxy as $APPNAME"
 
