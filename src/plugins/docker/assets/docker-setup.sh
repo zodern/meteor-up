@@ -5,7 +5,7 @@
 install_docker () {
 # Remove the lock
   set +e
-  if [lsb_release -is]
+  if lsb_release -is > /dev/null
   then
     # Required to update Ubuntu system
     sudo rm /var/lib/dpkg/lock > /dev/null
