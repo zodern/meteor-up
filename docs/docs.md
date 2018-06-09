@@ -139,7 +139,7 @@ module.exports = {
       // Prepare Bundle to help prevent running out of memory when building
       // the docker image. Set to false to reduce downtime if your server has
       // enough memory or swap.
-      stopAppDuringBuild: true,
+      stopAppDuringPrepareBundle: true,
 
       // lets you bind the docker container to a
       // specific network interface (optional)
