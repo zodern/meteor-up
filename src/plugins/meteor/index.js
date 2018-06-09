@@ -1,5 +1,6 @@
 import * as _commands from './commands';
 import _validator from './validate';
+import { defaultsDeep } from 'lodash';
 import traverse from 'traverse';
 
 export const description = 'Deploy and manage meteor apps';
@@ -24,8 +25,11 @@ export function prepareConfig(config) {
     return config;
   }
 
-  config.app.docker = config.app.docker || {};
-  config.app.docker.image = config.app.docker.image || config.app.dockerImage || 'kadirahq/meteord';
+  config.app.docker = defaultsDeep(config.app.docker, {
+    image: config.app.dockerImage || 'kadirahq/meteord',
+    stopAppDuringPrepareBundle: true
+  });
+
   delete config.app.dockerImage;
 
   return config;

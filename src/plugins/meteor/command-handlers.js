@@ -181,7 +181,8 @@ export async function push(api) {
         appName: config.name,
         dockerImage: config.docker.image,
         env: config.env,
-        buildInstructions: config.docker.buildInstructions || []
+        buildInstructions: config.docker.buildInstructions || [],
+        stopApp: config.docker.stopAppDuringPrepareBundle
       }
     });
   }
