@@ -126,10 +126,20 @@ module.exports = {
         '--memory-reservation 200M'
       ],
 
+      // (optional) It is set to true when using a docker image
+      // that supports it. Builds a new docker image containing the
+      // app's bundle and npm dependencies to start the app faster and
+      // make deploys more reliable and easier to troubleshoot
+      prepareBundle: true,
       // Additional docker build instructions, used during Prepare Bundle
       buildInstructions: [
         'RUN apt-get update && apt-get install -y imagemagick'
       ],
+      // (optional, default is true) If true, the app is stopped during
+      // Prepare Bundle to help prevent running out of memory when building
+      // the docker image. Set to false to reduce downtime if your server has
+      // enough memory or swap.
+      stopAppDuringPrepareBundle: true,
 
       // lets you bind the docker container to a
       // specific network interface (optional)

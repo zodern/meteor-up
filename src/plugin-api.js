@@ -411,17 +411,13 @@ export default class PluginAPI {
         username: info.username
       };
       const opts = {
-        ssh: {}
+        ssh: info.opts || {}
       };
 
       const sshAgent = process.env.SSH_AUTH_SOCK;
 
-      if (info.opts) {
-        opts.ssh = info.opts;
-      }
-
-      opts.ssh.keepaliveInterval = 1000 * 28;
-      opts.ssh.keepaliveCountMax = 12;
+      opts.ssh.keepaliveInterval = opts.ssh.keepaliveInterval || 1000 * 28;
+      opts.ssh.keepaliveCountMax = opts.ssh.keepaliveCountMax || 12;
 
       if (info.pem) {
         try {
