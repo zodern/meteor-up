@@ -252,6 +252,13 @@ export function envconfig(api) {
     }
   });
 
+  if (config.ssl.htpasswd) {
+    list.copy('Pushing htpasswd file', {
+      src: api.resolvePath(api.getBasePath(), config.ssl.htpasswd),
+      dest: `/opt/${config.name}/config/htpasswd/${config.ssl.autogenerate.domains}`
+    });
+  }
+
   const env = cloneDeep(config.env);
   env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
   // sending PORT to the docker container is useless.
