@@ -1,4 +1,5 @@
 import * as swarmUtils from './swarm-utils';
+import * as tasks from './tasks';
 import * as utils from './utils';
 import configValidator, { showDepreciations, showErrors } from './validate/index';
 import { hooks, runRemoteHooks } from './hooks';
@@ -41,6 +42,8 @@ export default class PluginAPI {
     this.getDockerLogs = utils.getDockerLogs;
     this.runSSHCommand = utils.runSSHCommand;
     this._createSSHOptions = utils.createSSHOptions;
+
+    this.tasks = tasks;
   }
 
   getArgs() {
