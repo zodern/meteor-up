@@ -324,7 +324,7 @@ export async function start(api) {
 
   const sessions = service ? [await api.getManagerSession()] : api.getSessions(['app']);
 
-  return api.runTaskList(list, sessions, {
+  return api.runTaskList(list, [sessions], {
     series: true,
     verbose: api.verbose
   });
