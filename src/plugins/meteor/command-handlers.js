@@ -1,9 +1,8 @@
-import { addStartAppTask, addStartServiceTask, checkAppStarted, prepareBundleSupported } from './utils';
+import { addStartAppTask, checkAppStarted, createEnv, prepareBundleSupported } from './utils';
 import buildApp, { archiveApp } from './build.js';
 import { checkUrls, getInformation } from './status';
 import { map, promisify } from 'bluebird';
 import chalk from 'chalk';
-import { cloneDeep } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
 import nodemiral from 'nodemiral';
@@ -258,19 +257,7 @@ export function envconfig(api) {
     }
   });
 
-  const env = cloneDeep(config.env);
-
-  env.METEOR_SETTINGS = JSON.stringify(api.getSettings());
-  // sending PORT to the docker container is useless.
-
-  // setting PORT in the config is used for the publicly accessible
-  // port.
-
-  // docker.imagePort is used for the port exposed from the container.
-  // In case the docker.imagePort is different than the container's
-  // default port, we set the env PORT to docker.imagePort.
-  env.PORT = config.docker.imagePort;
-
+  const env = createEnv(config, api.getSettings());
   const hostVars = {};
 
   Object.keys(config.servers).forEach(key => {
@@ -312,6 +299,8 @@ export async function start(api) {
   const config = api.getConfig().app;
   const service = api.getConfig().swarm !== undefined;
 
+  const currentService = await api.dockerServiceInfo(config.name);
+
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -320,15 +309,22 @@ export async function start(api) {
   const list = nodemiral.taskList('Start Meteor');
 
   if (service) {
-    addStartServiceTask(list, api);
+    api.tasks.addCreateOrUpdateService(list, {
+      image: `mup-${config.name.toLowerCase()}:previous`,
+      name: config.name,
+      publishedPort: config.env.PORT || 80,
+      targetPort: 80,
+      mode: 'global',
+      env: createEnv(config, api.getSettings())
+    }, currentService);
   } else {
     addStartAppTask(list, api);
     checkAppStarted(list, api);
   }
 
-  const sessions = service ? await api.getManagerSession() : api.getSessions(['app']);
+  const sessions = service ? [await api.getManagerSession()] : api.getSessions(['app']);
 
-  return api.runTaskList(list, [sessions], {
+  return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
   });

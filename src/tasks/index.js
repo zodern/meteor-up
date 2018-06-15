@@ -91,7 +91,7 @@ export function addUpdateService(taskList, {
   return taskList;
 }
 
-export function addStartOrCreateService(tasklist, options, currentService) {
+export function addCreateOrUpdateService(tasklist, options, currentService) {
   if (currentService) {
     return addUpdateService(tasklist, options, currentService);
   }

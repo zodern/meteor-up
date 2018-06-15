@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+
 export function checkAppStarted(list, api) {
   const script = api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh');
   const { app } = api.getConfig();
@@ -39,7 +41,7 @@ export function addStartServiceTask(list, api) {
       appName: appConfig.name,
       publishedPort: appConfig.env.PORT || 80,
       targetPort: 80,
-      replicas: Object.keys(appConfig.servers).length
+      mode: 'global'
     }
   });
 
@@ -56,4 +58,19 @@ export function prepareBundleSupported(dockerConfig) {
   return supportedImages.find(
     supportedImage => dockerConfig.image.indexOf(supportedImage) === 0
   ) || false;
+}
+
+export function createEnv(appConfig, settings) {
+  const env = cloneDeep(appConfig.env);
+
+  env.METEOR_SETTINGS = JSON.stringify(settings);
+
+  // setting PORT in the config is used for the publicly accessible
+  // port.
+  // docker.imagePort is used for the port exposed from the container.
+  // In case the docker.imagePort is different than the container's
+  // default port, we set the env PORT to docker.imagePort.
+  env.PORT = appConfig.docker.imagePort || 80;
+
+  return env;
 }
