@@ -45,13 +45,11 @@ rules:
   array-bracket-spacing:
   - 2
   - never
-  arrow-spacing: 2
   block-scoped-var: 2
   brace-style:
   - 2
   - 1tbs
   - allowSingleLine: true
-  callback-return: 2
   camelcase:
   - 2
   - properties: always
@@ -259,6 +257,7 @@ rules:
   keyword-spacing:
   - 2
   - before: true
+    after: true
   space-before-blocks:
   - 2
   - always
