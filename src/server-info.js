@@ -8,6 +8,7 @@ function parseJSONArray(stdout, code) {
   if (code === 0) {
     try {
       let output = stdout.split('\n').join(',');
+
       output = `[${output}]`;
 
       const result = JSON.parse(output);
@@ -94,8 +95,10 @@ function generateVarCommand(name, command) {
 
 function generateScript(collectors) {
   let script = '';
+
   Object.keys(collectors).forEach(key => {
     const collector = collectors[key];
+
     script += generateVarCommand(key, collector.command);
   });
 
@@ -104,6 +107,7 @@ function generateScript(collectors) {
 
 export function seperateCollectors(output) {
   const collectors = output.split(prefix);
+
   collectors.shift();
 
   return collectors.map(collectorOutput => {
@@ -169,7 +173,7 @@ export default function serverInfo(servers, collectors = _collectors) {
   return map(
     servers,
     server => getServerInfo(server, collectors),
-    { concurrency: 2 }
+    { concurrency: 3 }
   ).then(serverResults => {
     log('finished');
 
