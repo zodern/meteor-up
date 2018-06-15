@@ -481,4 +481,18 @@ export default class PluginAPI {
       currentLabels
     };
   }
+
+  async dockerServiceInfo(serviceName) {
+    const manager = await this.getManagerSession();
+    const result = await this.runSSHCommand(manager, `docker service inspect ${serviceName}`);
+    let serviceInfo = null;
+
+    try {
+      [serviceInfo] = JSON.parse(result.output);
+    } catch (e) {
+      // empty
+    }
+
+    return serviceInfo;
+  }
 }
