@@ -349,7 +349,8 @@ export function stop(api) {
   list.executeScript('Stop Meteor', {
     script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
     vars: {
-      appName: config.name
+      appName: config.name,
+      gracefulTimeout: config.gracefulTimeout || 10,
     }
   });
 
@@ -366,7 +367,8 @@ export function restart(api) {
   list.executeScript('Stop Meteor', {
     script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
     vars: {
-      appName: config.name
+      appName: config.name,
+      gracefulTimeout: config.gracefulTimeout || 10,
     }
   });
 

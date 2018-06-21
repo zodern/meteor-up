@@ -1,6 +1,7 @@
 #!/bin/bash
 
 APPNAME=<%= appName %>
+TIMEOUT=<%= gracefulTimeout %>
 CLIENTSIZE=<%= nginxClientUploadLimit %>
 APP_PATH=/opt/$APPNAME
 BUNDLE_PATH=$APP_PATH/current
@@ -28,6 +29,7 @@ echo "Volume" $VOLUME
 >&2 echo "Removing docker containers. Errors about nonexistent endpoints and containers are normal.";
 
 # Remove previous version of the app, if exists
+sudo docker stop -t $TIMEOUT $APPNAME
 sudo docker rm -f $APPNAME
 
 # Remove container network if still exists

@@ -23,6 +23,7 @@ export function addStartAppTask(list, api) {
     script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
     vars: {
       appName: appConfig.name,
+      gracefulTimeout: appConfig.gracefulTimeout || 10,
       removeImage: isDeploy && !prepareBundleSupported(appConfig.docker)
     }
   });
