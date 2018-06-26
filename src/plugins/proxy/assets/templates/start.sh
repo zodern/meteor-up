@@ -41,7 +41,6 @@ NGINX_CONFIG_PATH="/opt/$APPNAME/config/nginx-default.conf"
 if ! grep -q "client_max_body_size" "$NGINX_CONFIG_PATH"; then
   echo $NGINX_CONFIG >> /opt/$APPNAME/config/nginx-default.conf
 fi
-
 sudo docker run \
   -d \
   -p $HTTP_PORT:80 \
@@ -54,6 +53,7 @@ sudo docker run \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
   -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
+  <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %> \
   jwilder/nginx-proxy
 echo "Ran nginx-proxy as $APPNAME"
 

@@ -67,7 +67,8 @@ export function setup(api) {
     dest: `/opt/${PROXY_CONTAINER_NAME}/config/start.sh`,
     vars: {
       appName: PROXY_CONTAINER_NAME,
-      letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null
+      letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null,
+      volumes: config.volumes
     }
   });
 
@@ -212,7 +213,7 @@ export function start(api) {
   list.executeScript('Start proxy', {
     script: api.resolvePath(__dirname, 'assets/proxy-start.sh'),
     vars: {
-      appName: PROXY_CONTAINER_NAME
+      appName: PROXY_CONTAINER_NAME,
     }
   });
 
