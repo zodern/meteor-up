@@ -296,6 +296,8 @@ export default class PluginAPI {
     process.exit(1);
   }
   runCommand = async function(name) {
+    const firstCommand = this.commandHistory.length === 0;
+
     if (!name) {
       throw new Error('Command name is required');
     }
@@ -307,21 +309,20 @@ export default class PluginAPI {
     this.commandHistory.push({ name });
 
     await this._runPreHooks(name);
-    let potentialPromise;
 
     try {
       log('Running command', name);
-      potentialPromise = commands[name].handler(this, nodemiral);
+      await commands[name].handler(this, nodemiral);
     } catch (e) {
       this._commandErrorHandler(e);
     }
 
-    if (potentialPromise && typeof potentialPromise.then === 'function') {
-      return potentialPromise
-        .then(() => this._runPostHooks(name));
-    }
-
-    return await this._runPostHooks(name);
+    await this._runPostHooks(name).then(() => {
+      // The post hooks for the first command should be the last thing run
+      if (firstCommand) {
+        this._cleanupSessions();
+      }
+    });
   }
 
   async getServerInfo(selectedServers, collectors) {
@@ -426,6 +427,7 @@ export default class PluginAPI {
         username: info.username
       };
       const opts = {
+        keepAlive: true,
         ssh: info.opts || {}
       };
 
@@ -461,6 +463,17 @@ export default class PluginAPI {
 
       this.sessions[name] = session;
     }
+  }
+
+  _cleanupSessions() {
+    log('cleaning up sessions');
+    if (!this.sessions) {
+      return;
+    }
+
+    Object.keys(this.sessions).forEach(key => {
+      this.sessions[key].close();
+    });
   }
 
   async swarmInfo() {
