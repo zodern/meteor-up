@@ -98,3 +98,17 @@ export function addCreateOrUpdateService(tasklist, options, currentService) {
 
   return addCreateService(tasklist, options);
 }
+
+  return addCreateService(tasklist, options);
+}
+
+export function addStopService(taskList, { name }) {
+  taskList.executeScript(`Stop ${name}`, {
+    script: resolvePath(__dirname, 'assets/stop-service.sh'),
+    vars: {
+      name
+    }
+  });
+
+  return taskList;
+}
