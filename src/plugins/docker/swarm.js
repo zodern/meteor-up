@@ -3,9 +3,9 @@ import nodemiral from 'nodemiral';
 
 const log = debug('mup:docker:swarm');
 
-export function initSwarm(managers, host, api) {
+export function initSwarm(manager, host, api) {
   const list = nodemiral.taskList('Setting Up Docker Swarm');
-  const sessions = api.getSessionsForServers(managers);
+  const sessions = api.getSessionsForServers([manager]);
 
   list.executeScript('Creating Manager', {
     script: api.resolvePath(__dirname, 'assets/init-swarm.sh'),
@@ -21,6 +21,7 @@ export function promoteNodes(manager, nodeIds, api) {
   const list = nodemiral.taskList('Promoting Nodes to Managers');
   const sessions = api.getSessionsForServers([manager]);
 
+  log('promoting nodes:', nodeIds);
   list.executeScript('Promoting Node', {
     script: api.resolvePath(__dirname, 'assets/swarm-promote.sh'),
     vars: {
