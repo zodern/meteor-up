@@ -84,6 +84,7 @@
     "parse-json": "^4.0.0",
     "random-seed": "0.3.0",
     "resolve-from": "^4.0.0",
+    "shell-escape": "^0.2.0",
     "shelljs": "0.5.3",
     "silent-npm-registry-client": "^3.0.1",
     "ssh2": "0.4.x",

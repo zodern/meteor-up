@@ -299,8 +299,6 @@ export async function start(api) {
   const config = api.getConfig().app;
   const service = api.getConfig().swarm !== undefined;
 
-  const currentService = await api.dockerServiceInfo(config.name);
-
   if (!config) {
     console.error('error: no configs found for meteor');
     process.exit(1);
@@ -309,13 +307,17 @@ export async function start(api) {
   const list = nodemiral.taskList('Start Meteor');
 
   if (service) {
+    const currentService = await api.dockerServiceInfo(config.name);
+
+    // TODO: make it work when the reverse proxy isn't enabled
     api.tasks.addCreateOrUpdateService(list, {
       image: `mup-${config.name.toLowerCase()}:previous`,
       name: config.name,
-      publishedPort: config.env.PORT || 80,
-      targetPort: 80,
       mode: 'global',
-      env: createEnv(config, api.getSettings())
+      env: createEnv(config, api.getSettings()),
+      endpointMode: 'dnsrr',
+      networks: ['mup-proxy'],
+      hostname: `{{.Node.Hostname}}-${config.name}-{{.Task.ID}}`
     }, currentService);
   } else {
     addStartAppTask(list, api);
@@ -324,7 +326,7 @@ export async function start(api) {
 
   const sessions = service ? [await api.getManagerSession()] : api.getSessions(['app']);
 
-  return api.runTaskList(list, [sessions], {
+  return api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
   });
@@ -350,6 +352,7 @@ export function deploy(api) {
 export function stop(api) {
   log('exec => mup meteor stop');
   const config = api.getConfig().app;
+  const swarmEnabled = api.getConfig().swarm !== undefined;
 
   if (!config) {
     console.error('error: no configs found for meteor');
@@ -358,12 +361,18 @@ export function stop(api) {
 
   const list = nodemiral.taskList('Stop Meteor');
 
-  list.executeScript('Stop Meteor', {
-    script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
-    vars: {
-      appName: config.name
-    }
-  });
+  if (swarmEnabled) {
+    api.tasks.addStopService(list, {
+      name: config.name
+    });
+  } else {
+    list.executeScript('Stop Meteor', {
+      script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
+      vars: {
+        appName: config.name
+      }
+    });
+  }
 
   const sessions = api.getSessions(['app']);
 

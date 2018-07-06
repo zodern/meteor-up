@@ -1,4 +1,21 @@
 import { resolvePath } from '../utils';
+import shellEscape from 'shell-escape';
+
+function escapeEnv(env) {
+  if (env instanceof Array) {
+    return env.map(_env => {
+      _env.value = shellEscape([_env.value]);
+
+      return _env;
+    });
+  }
+
+  return Object.keys(env).reduce((result, key) => {
+    result[key] = shellEscape([env[key]]);
+
+    return result;
+  }, {});
+}
 
 export function addCreateService(taskList, {
   image,
@@ -9,12 +26,13 @@ export function addCreateService(taskList, {
   envFile,
   env,
   hostname,
-  mode = 'replicated'
+  mode = 'replicated',
+  endpointMode = 'vip',
+  networks = []
   // bind,
   // log,
   // volumes,
   // docker,
-  // networks,
   // hostLabels
 } = {}) {
   taskList.executeScript(`Start ${name}`, {
@@ -24,11 +42,13 @@ export function addCreateService(taskList, {
       publishedPort,
       targetPort,
       envFile,
-      env,
+      env: escapeEnv(env),
       image,
       replicas,
       hostname,
-      mode
+      mode,
+      endpointMode,
+      networks
     }
   });
 
@@ -68,7 +88,8 @@ function diffEnv(wantedEnv, _currentEnv) {
 export function addUpdateService(taskList, {
   name,
   image,
-  env
+  env,
+  hostname
 }, currentService) {
   const containerSpec = currentService.Spec.TaskTemplate.ContainerSpec;
   const {
@@ -82,7 +103,8 @@ export function addUpdateService(taskList, {
     script: resolvePath(__dirname, 'assets/update-service.sh'),
     vars: {
       image: image !== containerSpec.Image ? image : null,
-      envAdd,
+      hostname: hostname !== containerSpec.Hostname ? hostname : null,
+      envAdd: escapeEnv(envAdd),
       envRemove,
       name
     }
@@ -95,9 +117,6 @@ export function addCreateOrUpdateService(tasklist, options, currentService) {
   if (currentService) {
     return addUpdateService(tasklist, options, currentService);
   }
-
-  return addCreateService(tasklist, options);
-}
 
   return addCreateService(tasklist, options);
 }
