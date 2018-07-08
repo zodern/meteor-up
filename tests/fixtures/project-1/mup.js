@@ -18,7 +18,7 @@ module.exports = {
       MONGO_URL: 'mongodb://mongodb:27017/meteor'
     },
     docker: {
-      image: 'abernix/meteord:node-8.11.3-base'
+      image: 'zodern/meteor:root'
     },
     deployCheckWaitTime: 300
   },

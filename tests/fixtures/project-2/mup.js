@@ -25,7 +25,8 @@ module.exports = {
       driver: 'syslog'
     },
     docker: {
-      image: 'abernix/meteord:node-8.11.3-base'
+      image: 'zodern/meteor',
+      imagePort: 3000
     },
     deployCheckWaitTime: 300
   },

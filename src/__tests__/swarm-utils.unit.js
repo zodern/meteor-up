@@ -16,7 +16,7 @@ function createServerInfo(servers) {
   }, {});
 }
 
-describe.only('swarm-utils', () => {
+describe('swarm-utils', () => {
   describe('currentManagers', () => {
     it('should return active managers', () => {
       const serverInfo = createServerInfo([{
