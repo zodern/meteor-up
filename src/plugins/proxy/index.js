@@ -47,10 +47,7 @@ export const hooks = {
     }
   },
   'post.setup'(api) {
-    // Only run hook on "mup setup"
-    const dockerSetup = api.commandHistory.find(({ name }) => name === 'default.setup');
-
-    if (api.getConfig().proxy && dockerSetup) {
+    if (api.getConfig().proxy) {
       return api.runCommand('proxy.setup');
     }
   },

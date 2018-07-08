@@ -273,8 +273,7 @@ export async function nginxConfig(api) {
 
 export async function status(api) {
   const config = api.getConfig();
-  const servers = Object.keys(config.app.servers)
-    .map(key => config.servers[key]);
+  const servers = Object.keys(config.proxy.servers || config.app.servers);
   const lines = [];
   let overallColor = 'green';
 
