@@ -124,7 +124,6 @@ export async function setupSwarm(api) {
   log('adding nodes', nodesToAdd);
 
   if (nodesToAdd.length > 0) {
-    // TODO: make sure token is for correct cluster
     const token = Object.keys(serverInfo)
       .reduce((result, item) => result || serverInfo[item].swarmToken, null);
     const managerIP = config.servers[desiredManagers[0]].host;

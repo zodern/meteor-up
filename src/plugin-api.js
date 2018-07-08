@@ -484,6 +484,16 @@ export default class PluginAPI {
     const nodeIdsToServer = swarmUtils.nodeIdsToServer(info);
     const desiredLabels = getOptions(this.getConfig()).labels;
     const currentLabels = swarmUtils.currentLabels(info);
+    const clusters = swarmUtils.findClusters(info);
+
+    if (Object.keys(clusters).length > 1) {
+      swarmUtils.showClusters(clusters, nodeIdsToServer);
+
+      const error = new Error('multiple-clusters');
+
+      error.solution = 'The servers in your config are in multiple swarm clusters. Any servers already in a swarm cluster should be in the same cluster. Look above for the list of clusters.';
+      throw error;
+    }
 
     return {
       currentManagers,

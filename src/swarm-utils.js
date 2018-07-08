@@ -7,8 +7,6 @@ const log = debug('mup:swarm-utils');
 export function currentManagers(serverInfo) {
   const hosts = [];
 
-  // TODO: handle managers from multiple clusters.
-
   Object.keys(serverInfo).forEach(key => {
     const server = serverInfo[key];
 
@@ -85,7 +83,6 @@ export function findNodes(serverInfo) {
   }
 
   // TODO: handle nodes that aren't listed in the config.server
-  // TODO: handle multiple clusters
 
   const manager = managers[0];
   const ids = Object.keys(serverInfo).reduce((result, serverName) => {
@@ -146,4 +143,80 @@ export function currentLabels(info) {
   });
 
   return result;
+}
+
+export function findClusters(serverInfo) {
+  const usedNodeIds = [];
+  const clusters = currentManagers(serverInfo).reduce((result, manager) => {
+    const {
+      swarm,
+      swarmNodes
+    } = serverInfo[manager];
+    const clusterId = swarm.Cluster.ID;
+
+    if (!(clusterId in result)) {
+      const managers = swarm.RemoteManagers.map(({NodeID}) => NodeID);
+      const nodes = swarmNodes.map(({ID}) => ID);
+
+      result[clusterId] = {
+        id: clusterId,
+        managers,
+        nodes
+      };
+
+      usedNodeIds.push(...[...managers, ...nodes]);
+    }
+
+    return result;
+  }, {});
+
+  // Nodes not in a swarm cluster have an empty id
+  const nodeIds = Object.keys(nodeIdsToServer(serverInfo))
+    .filter(id => id.length > 0);
+  const unknownClusterNodes = _.difference(nodeIds, usedNodeIds);
+
+  if (unknownClusterNodes.length > 0) {
+    clusters['Unknown cluster(s)'] = {
+      id: 'Unknown cluster(s)',
+      managers: [],
+      nodes: unknownClusterNodes
+    };
+  }
+
+  return clusters;
+}
+
+export function showClusters(clusters, nodeIds) {
+  console.log('');
+  console.log('=> List of Swarm Clusters:');
+
+  Object.keys(clusters).forEach(clusterId => {
+    const cluster = clusters[clusterId];
+    let unknownNodes = 0;
+
+    console.log(` - ID: ${clusterId}`);
+    console.log('  - Nodes:');
+    cluster.managers.forEach(manager => {
+      if (nodeIds[manager]) {
+        console.log(`     ${nodeIds[manager]} (manager)`);
+      } else {
+        unknownNodes += 1;
+      }
+    });
+    cluster.nodes.forEach(node => {
+      if (cluster.managers.indexOf(node) > -1) {
+        return;
+      }
+
+      if (nodeIds[node]) {
+        console.log(`     ${nodeIds[node]}`);
+      } else {
+        unknownNodes = +1;
+      }
+    });
+
+    if (unknownNodes > 0) {
+      console.log(`     Unknown nodes: ${unknownNodes}`);
+    }
+  });
 }
