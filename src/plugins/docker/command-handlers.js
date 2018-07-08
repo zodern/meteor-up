@@ -192,11 +192,11 @@ export function restart(api) {
 }
 
 export function removeSwarm(api) {
-  const list = nodemiral.taskList('Removing swarm');
+  const list = nodemiral.taskList('Destroy Swarm Cluster');
   const servers = Object.keys(api.getConfig().servers);
   const sessions = api.getSessionsForServers(servers);
 
-  list.executeScript('Removing swarm', {
+  list.executeScript('Leave Swarm Cluster', {
     script: api.resolvePath(__dirname, 'assets/swarm-leave.sh')
   });
 
@@ -207,6 +207,7 @@ export function removeSwarm(api) {
 
 export function ps(api) {
   const args = api.getArgs();
+
   args.shift();
   each(uniqueSessions(api), (session, cb) => {
     session.execute(`sudo docker ${args.join(' ')} 2>&1`, (err, code, logs) => {
