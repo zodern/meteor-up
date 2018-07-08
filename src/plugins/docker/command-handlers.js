@@ -159,13 +159,21 @@ export async function setupSwarm(api) {
 
   if (toRemove.length > 0 || toAdd.length > 0) {
     toRemove = toRemove.map(data => {
-      data.server = findKey(nodeIDs, partial(isEqual, data.server));
+      data.node = findKey(nodeIDs, partial(isEqual, data.server));
+
+      if (!data.node) {
+        console.error(`Unable to remove "${data.label}" label for server "${data.server}": Server doesn't have a node id.`);
+      }
 
       return data;
     });
 
     toAdd = toAdd.map(data => {
-      data.server = findKey(nodeIDs, partial(isEqual, data.server));
+      data.node = findKey(nodeIDs, partial(isEqual, data.server));
+
+      if (!data.node) {
+        console.log(`Unable to update "${data.label}" label for server "${data.server}": Server doesn't have a node id.`);
+      }
 
       return data;
     });
