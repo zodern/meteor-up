@@ -4,22 +4,7 @@ import { getOptions } from './swarm-options';
 
 const log = debug('mup:swarm-utils');
 
-export function hostsToServer(config, hosts) {
-  const servers = config.servers;
-  const result = [];
-
-  Object.keys(servers).forEach(key => {
-    const server = servers[key];
-
-    if (hosts.indexOf(server.host) > -1) {
-      result.push(key);
-    }
-  });
-
-  return result;
-}
-
-export function currentManagers(config, serverInfo) {
+export function currentManagers(serverInfo) {
   const hosts = [];
 
   // TODO: handle managers from multiple clusters.
@@ -36,15 +21,15 @@ export function currentManagers(config, serverInfo) {
     }
   });
 
+  log('current managers:', hosts);
+
   return hosts;
 }
 
-export function desiredManagers(config, serverInfo) {
+export function calculateAdditionalManagers(config) {
   const { managers } = getOptions(config);
   const servers = Object.keys(config.servers);
   let additionalManagers = 0;
-
-  log('requested managers', managers);
 
   // Try to get an odd number of managers
   if (managers.length % 2 === 0 && managers.length < servers.length) {
@@ -58,10 +43,18 @@ export function desiredManagers(config, serverInfo) {
     additionalManagers = 3 - managers.length;
   }
 
+  return additionalManagers;
+}
+
+export function desiredManagers(config, serverInfo) {
+  const { managers } = getOptions(config);
+  let additionalManagers = calculateAdditionalManagers(config);
+
+  log('requested managers', managers);
   log('additional managers', additionalManagers);
 
   if (additionalManagers > 0) {
-    const current = currentManagers(config, serverInfo);
+    const current = currentManagers(serverInfo);
     const diff = _.difference(current, managers);
     const managersToAdd = diff.splice(0, additionalManagers);
 
@@ -73,6 +66,7 @@ export function desiredManagers(config, serverInfo) {
   if (additionalManagers > 0) {
     const diff = _.difference(Object.keys(config.servers), managers);
     const managersToAdd = diff.splice(0, additionalManagers);
+
     log('random servers to add', managersToAdd);
     managers.push(...managersToAdd);
   }
@@ -82,9 +76,9 @@ export function desiredManagers(config, serverInfo) {
   return managers;
 }
 
-export function findNodes(config, serverInfo) {
+export function findNodes(serverInfo) {
   const nodes = [];
-  const managers = currentManagers(config, serverInfo);
+  const managers = currentManagers(serverInfo);
 
   if (managers.length === 0) {
     return nodes;
@@ -107,7 +101,7 @@ export function findNodes(config, serverInfo) {
   return serverInfo[manager].swarmNodes.map(node => ids[node.ID]);
 }
 
-export function nodeIdsToServer(config, serverInfo) {
+export function nodeIdsToServer(serverInfo) {
   const allIds = [];
   const result = {};
 
@@ -132,9 +126,9 @@ export function nodeIdsToServer(config, serverInfo) {
   return result;
 }
 
-export function currentLabels(config, info) {
+export function currentLabels(info) {
   const result = {};
-  const idToHost = nodeIdsToServer(config, info);
+  const idToHost = nodeIdsToServer(info);
 
   Object.keys(info).forEach(host => {
     if (info[host].swarmNodes instanceof Array) {

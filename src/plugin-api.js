@@ -478,12 +478,12 @@ export default class PluginAPI {
 
   async swarmInfo() {
     const info = await this.getServerInfo();
-    const currentManagers = swarmUtils.currentManagers(this.getConfig(), info);
+    const currentManagers = swarmUtils.currentManagers(info);
     const desiredManagers = swarmUtils.desiredManagers(this.getConfig(), info);
-    const nodes = swarmUtils.findNodes(this.getConfig(), info);
-    const nodeIdsToServer = swarmUtils.nodeIdsToServer(this.getConfig(), info);
+    const nodes = swarmUtils.findNodes(info);
+    const nodeIdsToServer = swarmUtils.nodeIdsToServer(info);
     const desiredLabels = getOptions(this.getConfig()).labels;
-    const currentLabels = swarmUtils.currentLabels(this.getConfig(), info);
+    const currentLabels = swarmUtils.currentLabels(info);
 
     return {
       currentManagers,
