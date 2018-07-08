@@ -1,7 +1,16 @@
+import {
+  findKey,
+  isEqual,
+  partial
+} from 'lodash';
 import debug from 'debug';
 import nodemiral from 'nodemiral';
 
 const log = debug('mup:docker:swarm');
+
+export function findNodeId(nodeIDs, serverName) {
+  return findKey(nodeIDs, partial(isEqual, serverName));
+}
 
 export function initSwarm(manager, host, api) {
   const list = nodemiral.taskList('Setting Up Docker Swarm');
@@ -22,7 +31,7 @@ export function promoteNodes(manager, nodeIds, api) {
   const sessions = api.getSessionsForServers([manager]);
 
   log('promoting nodes:', nodeIds);
-  list.executeScript('Promoting Node', {
+  list.executeScript('Promoting Nodes', {
     script: api.resolvePath(__dirname, 'assets/swarm-promote.sh'),
     vars: {
       nodeIds
@@ -32,12 +41,17 @@ export function promoteNodes(manager, nodeIds, api) {
   return api.runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
 
-export function removeManagers(managers, api) {
-  const list = nodemiral.taskList('Removing Swarm Managers');
-  const sessions = api.getSessionsForServers(managers);
+export function demoteManagers(manager, nodeIds, api) {
+  const list = nodemiral.taskList('Demoting Swarm Managers');
+  const sessions = api.getSessionsForServers([manager]);
 
-  list.executeScript('Removing Managers', {
-    scripts: api.resolvePath(__dirname, 'assets/swarm-leave.sh')
+  log('demoting nodes:', nodeIds, manager);
+
+  list.executeScript('Demoting Managers', {
+    script: api.resolvePath(__dirname, 'assets/swarm-demote.sh'),
+    vars: {
+      nodeIds
+    }
   });
 
   return api.runTaskList(list, sessions, { verbose: api.getVerbose() });

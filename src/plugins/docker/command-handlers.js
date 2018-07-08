@@ -1,16 +1,15 @@
 import {
+  curry,
   difference,
-  findKey,
-  intersection,
-  isEqual,
-  partial
+  intersection
 } from 'lodash';
 import {
+  demoteManagers,
   diffLabels,
+  findNodeId,
   initSwarm,
   joinNodes,
   promoteNodes,
-  removeManagers,
   updateLabels
 } from './swarm';
 import chalk from 'chalk';
@@ -85,6 +84,9 @@ export async function setupSwarm(api) {
 
   const managersToAdd = difference(desiredManagers, currentManagers);
   const managersToRemove = difference(currentManagers, desiredManagers);
+
+  // These managers are safe to run tasks on that require a manager
+  // This array is modified as managers are added and removed to have
   const managersToKeep = intersection(currentManagers, desiredManagers);
 
   log('managers to add', managersToAdd);
@@ -100,17 +102,14 @@ export async function setupSwarm(api) {
     managersToKeep.push(managersToAdd.shift());
     log('finished creating cluster');
     api.serverInfoStale();
+  } else if (managersToKeep.length === 0) {
+    // We can run tasks on the managers being removed until
+    // the new managers are added
+    managersToKeep.push(managersToRemove[0]);
   }
 
   // refresh server info after updating managers
   serverInfo = await api.getServerInfo();
-
-  // TODO: we should always keep one manager until
-  // after the new managers are added
-  if (managersToRemove.length > 0) {
-    removeManagers(managersToRemove, api);
-    api.serverInfoStale();
-  }
 
   const {
     nodes: currentNodes,
@@ -135,13 +134,30 @@ export async function setupSwarm(api) {
   const {
     nodeIDs
   } = await api.swarmInfo();
+  const curriedFindNodeId = curry(findNodeId)(nodeIDs);
 
   log('remaining managers to add', managersToAdd);
   if (managersToAdd.length > 0) {
     const managerIDs = managersToAdd
-      .map(name => findKey(nodeIDs, partial(isEqual, name)));
+      .map(curriedFindNodeId);
 
     await promoteNodes(managersToKeep[0], managerIDs, api);
+
+    if (managersToKeep[0] === managersToRemove[0]) {
+      // There were no managers being kept, so we were only able
+      // to use the managers that will be removed. We can now use
+      // the newly promoted managers.
+      managersToKeep[0] = managersToAdd[0];
+    }
+  }
+
+  if (managersToRemove.length > 0) {
+    await demoteManagers(
+      managersToKeep[0],
+      managersToRemove.map(curriedFindNodeId),
+      api
+    );
+    api.serverInfoStale();
   }
 
   // Update tags
@@ -154,7 +170,7 @@ export async function setupSwarm(api) {
 
   if (toRemove.length > 0 || toAdd.length > 0) {
     toRemove = toRemove.map(data => {
-      data.node = findKey(nodeIDs, partial(isEqual, data.server));
+      data.node = curriedFindNodeId(data.server);
 
       if (!data.node) {
         console.error(`Unable to remove "${data.label}" label for server "${data.server}": Server doesn't have a node id.`);
@@ -164,7 +180,7 @@ export async function setupSwarm(api) {
     });
 
     toAdd = toAdd.map(data => {
-      data.node = findKey(nodeIDs, partial(isEqual, data.server));
+      data.node = curriedFindNodeId(data.server);
 
       if (!data.node) {
         console.log(`Unable to update "${data.label}" label for server "${data.server}": Server doesn't have a node id.`);
