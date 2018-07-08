@@ -19,7 +19,7 @@ module.exports = {
     },
 
     docker: {
-      image: 'abernix/meteord:base'
+      image: 'abernix/meteord:node-8.11.3-base'
     },
 
     deployCheckWaitTime: 300

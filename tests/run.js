@@ -28,6 +28,7 @@ sh.exec(`docker exec ${containerId} cp /root/.ssh/authorized_keys2 /root/.ssh/au
 
 var watch = argv.watch ? ' --watch' : '';
 var files = argv.path ? argv.path : ' src/**/__tests__/**/*.js';
+
 if (argv.plugin) {
   files = ` src/plugins/${argv.plugin}/__tests__/**/*.js`;
 }
