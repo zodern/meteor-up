@@ -87,10 +87,6 @@ export async function setupSwarm(api) {
   const managersToRemove = difference(currentManagers, desiredManagers);
   const managersToKeep = intersection(currentManagers, desiredManagers);
 
-  // This node will be a manager after the cluster is initialized
-  // and be safe to run tasks on that require a manager
-  const managerForSessions = managersToKeep[0] || managersToAdd[0];
-
   log('managers to add', managersToAdd);
   log('managers to remove', managersToRemove);
   log('managers keeping', managersToKeep);
@@ -99,7 +95,7 @@ export async function setupSwarm(api) {
     log('Creating swarm cluster');
     const host = config.servers[managersToAdd[0]].host;
 
-    await initSwarm(managersToAdd.shift(), host, api);
+    await initSwarm(managersToAdd[0], host, api);
 
     managersToKeep.push(managersToAdd.shift());
     log('finished creating cluster');
@@ -146,7 +142,7 @@ export async function setupSwarm(api) {
     const managerIDs = managersToAdd
       .map(name => findKey(nodeIDs, partial(isEqual, name)));
 
-    await promoteNodes(managerForSessions, managerIDs, api);
+    await promoteNodes(managersToKeep[0], managerIDs, api);
   }
 
   // Update tags
@@ -178,7 +174,7 @@ export async function setupSwarm(api) {
       return data;
     });
 
-    await updateLabels(api, managerForSessions, toAdd, toRemove);
+    await updateLabels(api, managersToKeep[0], toAdd, toRemove);
   }
 }
 
