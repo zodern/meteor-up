@@ -902,8 +902,9 @@ There are some requirements and restrictions. We plan to remove as many of these
 1. The servers should be able to access each other using the values from `server.<servername>.host` in your config.
 2. TCP port 2377, UDP port 4789, and TCP and UDP port 7946 need to be open to allow the servers to communicate among themselves.
 3. Docker recommends having the servers in the same region when using swarm.
-4. Meteor apps must have prepare bundle enabled
-5. A number of features do not work with swarm:
+4. Servers should have at least 1 GB of ram. 
+5. Meteor apps must have prepare bundle enabled
+6. A number of features do not work with swarm:
    1. server specific env variables and settings.json
    2. `app.docker.args`
    3. Depreciated `app.ssl`. The new reverse proxy should be used instead, and is required for load balancing and zero downtime deploys to work.
