@@ -498,8 +498,8 @@ module.exports = {
   // ... rest of config
 
   proxy: {
-    // (Required when using swarm) Servers to run the reverse proxy on. When using Let's Encrypt,
-    // DNS needs to be setup for these servers.
+    // (Required when using swarm) Servers to run the reverse proxy on.
+    // When using Let's Encrypt, DNS needs to be setup for these servers.
     servers: {
       one: {}
     },
