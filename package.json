@@ -68,7 +68,6 @@
   },
   "dependencies": {
     "@zodern/tar": "^4.3.3",
-    "async": "^2.6.0",
     "axios": "^0.17.1",
     "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.0",
