@@ -498,6 +498,11 @@ module.exports = {
   // ... rest of config
 
   proxy: {
+    // (Required when using swarm) Servers to run the reverse proxy on. When using Let's Encrypt,
+    // DNS needs to be setup for these servers.
+    servers: {
+      one: {}
+    },
     // comma-separated list of domains your website
     // will be accessed at.
     // You will need to configure your DNS for each one.
@@ -681,6 +686,9 @@ module.exports = {
 };
 ```
 
+## Load Balancing
+
+Mup is able to setup load balancing for your app with sticky sessions It is automatically enabled when using the [Reverse Proxy](#reverse-proxy) and [Docker Swarm](#swarm).
 
 ## Changing the App's Name
 
@@ -882,6 +890,74 @@ If you have deployed to the server, it involves a couple more steps.
 2. Follow the directions listed there. You can access the MongoDB console by running `docker exec -it mongodb mongo` on the server.
 3. During the steps for install or replace binaries or restarting MongoDB, instead change the version in your `mup.js` and run `mup setup`.
 4. To verify that it worked, run `docker ps` to check if MongoDB keeps restarting. If it is, you can see what the problem is with `docker logs mongodb`
+
+## Swarm
+
+Mup can setup and manage a Docker Swarm cluster. This is required for some features, such as load balancing and zero downtime deploys.
+
+*This feature is experimental.* There could be backwards breaking changes and a larger number of bugs and problems. At this time, it is not recommended to use in production.
+
+There are some requirements and restrictions. We plan to remove as many of these as possible over time.
+
+1. The servers should be able to access each other using the values from `server.<servername>.host` in your config.
+2. TCP port 2377, UDP port 4789, and TCP and UDP port 7946 need to be open to allow the servers to communicate among themselves.
+3. Docker recommends having the servers in the same region when using swarm.
+4. Meteor apps must have prepare bundle enabled
+5. A number of features do not work with swarm:
+   1. server specific env variables and settings.json
+   2. `app.docker.args`
+   3. Depreciated `app.ssl`. The new reverse proxy should be used instead, and is required for load balancing and zero downtime deploys to work.
+   4. Built-in MongoDB does not work when the app is run on multiple servers
+
+To enable, first stop the app with `mup stop` and add `swarm.enabled` in your config:
+
+```js
+module.exports = {
+  swarm: {
+    enabled: true
+  }
+};
+```
+
+Then run `mup setup` and `mup deploy`.
+
+For the reverse proxy to work correctly, set `proxy.servers`. Learn more [here]().
+
+If you encounter problems with swarm, please create an issue. `mup docker setup` should fix most problems. If necessary, you can run `mup docker destroy-cluster`, `mup setup`, and `mup start`to recreate the swarm cluster, services, and networks, excluding any that you manually created.
+
+If multiple apps are using swarm and sharing servers, their `servers` object should have the same servers. Since a config is a javascript file, you can have a separate file with the servers imported by the configs.
+
+### Swarm internals
+
+You only need to read this section if you are planning to use a tool or manually make changes to the cluster (adding/removing nodes, managers, networks, services, labels, etc).
+
+#### Nodes
+
+It is okay to add a node to the cluster. Instead of adding it to the swarm cluster manually, you can add it to the `servers` object in your config and run `mup docker setup`.
+
+It is also okay to remove nodes. Make sure they are not being used in the config before removing them.
+
+#### Managers
+
+Mup manages which servers are managers. It is not recommended to manually promote nodes since Mup will revert the changes the next time `mup setup` is run. This is how mup decides which servers to make managers:
+
+1. Plugins can provide a list of servers that need to be managers. For example, The Proxy plugin needs the servers in `proxy.servers` to be managers
+2. If there are 3 or more servers, mup will make at least 3 of them managers for high availability.
+3. If there is an even number of managers specified by plugins and there are enough servers, mup will add an additional manager to make the number odd.
+
+When adding more managers than listed by plugins, mup will try to keep existing managers.
+
+#### Networks
+
+It is okay to add networks. Some plugins create overlay networks. If you need those networks to have different settings, it is safe to recreate them with the same name.
+
+#### Services
+
+You can create additional services. If you remove or update services created by mup, it will recreate them or revert the changes.
+
+#### Labels
+
+Plugins can provide a list of labels for mup to manage. Any changes to these labels (setting it for additional nodes, removing it, or changing it's value) will be reverted. You can add or modify any other label.
 
 ## Hooks
 
