@@ -15,16 +15,18 @@ import {
 import chalk from 'chalk';
 import { checkVersion } from './utils';
 import debug from 'debug';
-import {
-  each
-} from 'async';
 import { map } from 'bluebird';
 import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:docker');
 
 function uniqueSessions(api) {
+  const {servers, swarm} = api.getConfig().servers;
   const sessions = api.getSessions(['app', 'mongo', 'proxy']);
+
+  if (swarm) {
+    return api.getSessionsForServers(Object.keys(servers));
+  }
 
   return sessions.reduce(
     (prev, curr) => {
@@ -86,7 +88,7 @@ export async function setupSwarm(api) {
   const managersToRemove = difference(currentManagers, desiredManagers);
 
   // These managers are safe to run tasks on that require a manager
-  // This array is modified as managers are added and removed to have
+  // This array is modified as managers are added and removed
   const managersToKeep = intersection(currentManagers, desiredManagers);
 
   log('managers to add', managersToAdd);
@@ -221,17 +223,18 @@ export function removeSwarm(api) {
   });
 }
 
-export function ps(api) {
+export async function ps(api) {
   const args = api.getArgs();
 
   args.shift();
-  each(uniqueSessions(api), (session, cb) => {
-    session.execute(`sudo docker ${args.join(' ')} 2>&1`, (err, code, logs) => {
-      console.log(chalk.magenta(`[${session._host}]`) + chalk.blue(` docker ${args.join(' ')}`));
-      console.log(logs.stdout);
-      cb();
+  const sessions = uniqueSessions(api);
+
+  for (const session of sessions) {
+    await api.runSSHCommand(session, `sudo docker ${args.join(' ')} 2>&1`).then(({output, host}) => {
+      console.log(chalk.magenta(`[${host}]`) + chalk.blue(` docker ${args.join(' ')}`));
+      console.log(output);
     });
-  });
+  }
 }
 
 export async function status(api) {
