@@ -7,7 +7,7 @@ START_SCRIPT=$APP_PATH/config/start.sh
 DEPLOY_CHECK_WAIT_TIME=<%= deployCheckWaitTime %>
 
 # Check if using host network.
-$(docker inspect $APPNAME --format "{{(index .NetworkSettings.Networks)}}" | grep -q '\[host')
+$(sudo docker inspect $APPNAME --format "{{(index .NetworkSettings.Networks)}}" | grep -q '\[host')
 HOST_NETWORK=$?
 
 cd $APP_PATH
@@ -57,7 +57,7 @@ while [[ true ]]; do
   if [[ $HOST_NETWORK == 0 ]]; then
     CONTAINER_IP="localhost"
   else
-    CONTAINER_IP=$(docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
+    CONTAINER_IP=$(sudo docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
   fi
 
   if [[ -z $CONTAINER_IP ]]; then
