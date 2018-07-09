@@ -75,9 +75,10 @@ describe('module - mongo', function() {
       sh.exec('mup docker setup && mup mongo setup && mup mongo start');
 
       const out = sh.exec('mup mongo stop');
+
       expect(out.code).to.be.equal(0);
 
-      expect(countOccurences('stop mongo: SUCCESS', out.output)).to.be.equal(1);
+      expect(countOccurences('Stop Mongo: SUCCESS', out.output)).to.be.equal(1);
       expect(
         (await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code
       ).to.be.equal(1);

@@ -96,7 +96,7 @@ export function stop(api) {
   log('exec => mup mongo stop');
   const list = nodemiral.taskList('Stop Mongo');
 
-  list.executeScript('stop mongo', {
+  list.executeScript('Stop Mongo', {
     script: api.resolvePath(__dirname, 'assets/mongo-stop.sh')
   });
 
