@@ -27,19 +27,22 @@ describe('module - mongo', function() {
   describe('setup', () => {
     it('should setup mongodb on "mongo" vm', async () => {
       const serverInfo = servers.mymongo;
+
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
 
       const out = sh.exec('mup mongo setup');
+
       expect(out.code).to.be.equal(0);
 
       expect(
         countOccurences('Setup Environment: SUCCESS', out.output)
       ).to.be.equal(1);
       expect(
-        countOccurences('Copying mongodb.conf: SUCCESS', out.output)
+        countOccurences('Copying Mongo Config: SUCCESS', out.output)
       ).to.be.equal(1);
 
       const sshOut = await runSSHCommand(serverInfo, 'tree -pufi /opt');
+
       expect(sshOut.code).to.be.equal(0);
       expect(countOccurences('mongodb.conf', sshOut.output)).to.be.equal(1);
     });
