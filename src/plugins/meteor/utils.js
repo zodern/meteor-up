@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash';
+import fs from 'fs';
 
 export function checkAppStarted(list, api) {
   const script = api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh');
@@ -57,4 +58,14 @@ export function createEnv(appConfig, settings) {
   env.PORT = appConfig.docker.imagePort;
 
   return env;
+}
+
+export function getNodeVersion(api, bundlePath) {
+  let star = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/star.json')).toString();
+  let nodeVersion = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/.node_version.txt')).toString();
+
+  star = JSON.parse(star);
+  nodeVersion = nodeVersion.substr(1);
+
+  return star.nodeVersion || nodeVersion;
 }

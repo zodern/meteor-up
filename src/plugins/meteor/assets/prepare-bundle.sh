@@ -46,7 +46,10 @@ sudo chmod 777 ./Dockerfile
 
 echo "Building image"
 
-sudo docker build -t $IMAGE:build . || build_failed
+sudo docker build \
+  -t $IMAGE:build \
+  --build-arg NODE_VERSION=<%- nodeVersion %>  \
+  . || build_failed
 
 sudo rm -rf bundle
 
