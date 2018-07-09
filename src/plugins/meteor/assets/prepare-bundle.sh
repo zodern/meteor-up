@@ -29,8 +29,8 @@ echo "Creating Dockerfile"
 sudo cat <<EOT > Dockerfile
 FROM <%= dockerImage %>
 RUN mkdir /built_app || true
-<% for(var key in env) { %>
-ENV <%- key %>=<%- env[key] %>
+ENV <% for(var key in env) { %> \
+  <%- key %>=<%- env[key] %> \
 <% } %>
 <% for(var instruction in buildInstructions) { %>
 <%-  buildInstructions[instruction] %>
