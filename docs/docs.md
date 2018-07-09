@@ -483,7 +483,7 @@ And then add a docker setup hook to login to your private registry on the server
 
 ### Image Port
 
-You can set `meteor.docker.imagePort` to the port to expose from the container. This does not affect the port the app is accessed on, only the port the app runs on inside the docker container.
+You can set `meteor.docker.imagePort` to the port to expose from the container. This does not affect the port the app is accessed on, only the port the app runs on inside the docker container. It defaults to 3000.
 
 ## Reverse Proxy
 

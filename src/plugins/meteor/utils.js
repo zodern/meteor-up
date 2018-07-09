@@ -70,7 +70,7 @@ export function createEnv(appConfig, settings) {
   // docker.imagePort is used for the port exposed from the container.
   // In case the docker.imagePort is different than the container's
   // default port, we set the env PORT to docker.imagePort.
-  env.PORT = appConfig.docker.imagePort || 80;
+  env.PORT = appConfig.docker.imagePort;
 
   return env;
 }

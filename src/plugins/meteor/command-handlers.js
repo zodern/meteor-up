@@ -231,10 +231,6 @@ export function envconfig(api) {
     config.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
   }
 
-  // If imagePort is not set, go with port 80 which was the traditional
-  // port used by kadirahq/meteord and meteorhacks/meteord
-  config.docker.imagePort = config.docker.imagePort || 80;
-
   if (config.ssl) {
     config.ssl.port = config.ssl.port || 443;
   }

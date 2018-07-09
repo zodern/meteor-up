@@ -19,7 +19,7 @@ module.exports = {
     },
 
     docker: {
-      image: 'zodern/meteor:root'
+      image: 'zodern/meteor'
     },
 
     deployCheckWaitTime: 300
