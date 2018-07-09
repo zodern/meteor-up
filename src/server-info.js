@@ -70,10 +70,6 @@ export const _collectors = {
       return null;
     }
   },
-  swarmServices: {
-    command: 'docker service ls --format \'{{json .}}\'',
-    parser: parseJSONArray
-  },
   images: {
     command: 'docker images --format \'{{json .}}\'',
     parser: parseJSONArray
