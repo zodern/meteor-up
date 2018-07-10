@@ -18,8 +18,9 @@ export function logs(api) {
 
 export function setup(api) {
   log('exec => mup mongo setup');
+  const mongoConfig = api.getConfig().mongo;
 
-  if (!api.getConfig().mongo) {
+  if (!mongoConfig) {
     // could happen when running "mup mongo setup"
     console.log(
       'Not setting up built-in mongodb since there is no mongo config'
@@ -51,9 +52,13 @@ export function setup(api) {
     script: api.resolvePath(__dirname, 'assets/mongo-setup.sh')
   });
 
-  list.copy('Copying mongodb.conf', {
-    src: api.resolvePath(__dirname, 'assets/mongodb.conf'),
-    dest: '/opt/mongodb/mongodb.conf'
+  list.copy('Copying Mongo Config', {
+    src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
+    dest: '/opt/mongodb/mongo-start-new.sh',
+    vars: {
+      mongoVersion: mongoConfig.version,
+      mongoDbDir: '/var/lib/mongodb'
+    }
   });
 
   const sessions = api.getSessions(['mongo']);
@@ -66,7 +71,6 @@ export function start(api) {
 
   const mongoSessions = api.getSessions(['mongo']);
   const meteorSessions = api.getSessions(['app']);
-  const config = api.getConfig().mongo;
 
   if (
     meteorSessions.length !== 1 ||
@@ -80,11 +84,7 @@ export function start(api) {
   const list = nodemiral.taskList('Start Mongo');
 
   list.executeScript('Start Mongo', {
-    script: api.resolvePath(__dirname, 'assets/mongo-start.sh'),
-    vars: {
-      mongoVersion: config.version || '3.4.1',
-      mongoDbDir: '/var/lib/mongodb'
-    }
+    script: api.resolvePath(__dirname, 'assets/mongo-start.sh')
   });
 
   const sessions = api.getSessions(['mongo']);
@@ -96,7 +96,7 @@ export function stop(api) {
   log('exec => mup mongo stop');
   const list = nodemiral.taskList('Stop Mongo');
 
-  list.executeScript('stop mongo', {
+  list.executeScript('Stop Mongo', {
     script: api.resolvePath(__dirname, 'assets/mongo-stop.sh')
   });
 

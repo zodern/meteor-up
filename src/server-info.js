@@ -8,6 +8,7 @@ function parseJSONArray(stdout, code) {
   if (code === 0) {
     try {
       let output = stdout.split('\n').join(',');
+
       output = `[${output}]`;
 
       const result = JSON.parse(output);
@@ -69,10 +70,6 @@ export const _collectors = {
       return null;
     }
   },
-  swarmServices: {
-    command: 'docker service ls --format \'{{json .}}\'',
-    parser: parseJSONArray
-  },
   images: {
     command: 'docker images --format \'{{json .}}\'',
     parser: parseJSONArray
@@ -94,8 +91,10 @@ function generateVarCommand(name, command) {
 
 function generateScript(collectors) {
   let script = '';
+
   Object.keys(collectors).forEach(key => {
     const collector = collectors[key];
+
     script += generateVarCommand(key, collector.command);
   });
 
@@ -104,6 +103,7 @@ function generateScript(collectors) {
 
 export function seperateCollectors(output) {
   const collectors = output.split(prefix);
+
   collectors.shift();
 
   return collectors.map(collectorOutput => {
@@ -128,8 +128,9 @@ export function parseCollectorOutput(name, output, code, collectors) {
   return collectors[name].parser(output, code);
 }
 
-export function createHostResult(collectorData, host, collectors) {
-  const result = { _host: host };
+export function createHostResult(collectorData, host, serverName, collectors) {
+  const result = { _host: host, _serverName: serverName };
+
   collectorData.forEach(data => {
     result[data.name] = parseCollectorOutput(
       data.name,
@@ -151,6 +152,7 @@ export function getServerInfo(server, collectors) {
       const hostResult = createHostResult(
         collectorData,
         server.host,
+        server.name,
         collectors
       );
 
@@ -167,15 +169,14 @@ export default function serverInfo(servers, collectors = _collectors) {
   return map(
     servers,
     server => getServerInfo(server, collectors),
-    { concurrency: 2 }
+    { concurrency: 3 }
   ).then(serverResults => {
-    const result = {};
-    serverResults.forEach(serverResult => {
-      result[serverResult._host] = serverResult;
-    });
-
     log('finished');
 
-    return result;
+    return serverResults.reduce((result, serverResult) => {
+      result[serverResult._serverName] = serverResult;
+
+      return result;
+    }, {});
   });
 }

@@ -1,3 +1,6 @@
+import { cloneDeep } from 'lodash';
+import fs from 'fs';
+
 export function checkAppStarted(list, api) {
   const script = api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh');
   const { app } = api.getConfig();
@@ -40,4 +43,30 @@ export function prepareBundleSupported(dockerConfig) {
   return supportedImages.find(
     supportedImage => dockerConfig.image.indexOf(supportedImage) === 0
   ) || false;
+}
+
+export function createEnv(appConfig, settings) {
+  const env = cloneDeep(appConfig.env);
+
+  env.METEOR_SETTINGS = JSON.stringify(settings);
+
+  // setting PORT in the config is used for the publicly accessible
+  // port.
+  // docker.imagePort is used for the port exposed from the container.
+  // In case the docker.imagePort is different than the container's
+  // default port, we set the env PORT to docker.imagePort.
+  env.PORT = appConfig.docker.imagePort;
+
+  return env;
+}
+
+export function getNodeVersion(api, bundlePath) {
+  let star = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/star.json')).toString();
+  let nodeVersion = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/.node_version.txt')).toString().trim();
+
+  star = JSON.parse(star);
+  // Remove leading 'v'
+  nodeVersion = nodeVersion.substr(1);
+
+  return star.nodeVersion || nodeVersion;
 }

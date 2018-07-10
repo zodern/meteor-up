@@ -3,7 +3,7 @@
 // try to install even if it is the wrong architecture.
 
 var fs = require('fs');
-var toRemove = ['fsevents'];
+var toRemove = ['fsevents', 'nan'];
 var shrinkwrap = JSON.parse(fs.readFileSync('../npm-shrinkwrap.json'));
 
 function cleanRequires(requires) {
