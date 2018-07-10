@@ -28,6 +28,7 @@ describe('hooks', () => {
 
   it('should add missing plugin name to hooks for default commands', () => {
     const target = { localScript: 'test' };
+
     registerHook('pre.setup', target);
 
     assert(hooks['pre.default.setup'][0] === target);
@@ -36,7 +37,6 @@ describe('hooks', () => {
     const target = function() {};
 
     registerHook('pre.setup', target);
-    console.dir(hooks);
 
     assert(hooks['pre.default.setup'][0].method === target);
   });

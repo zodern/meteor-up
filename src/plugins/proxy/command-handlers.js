@@ -1,3 +1,4 @@
+import { addProxyEnv, getSessions } from './utils';
 import chalk from 'chalk';
 import { clone } from 'lodash';
 import debug from 'debug';
@@ -17,7 +18,7 @@ export function logs(api) {
   }
 
   const args = api.getArgs().slice(1);
-  const sessions = api.getSessions(['app']);
+  const sessions = getSessions(api);
 
   return api.getDockerLogs(PROXY_CONTAINER_NAME, sessions, args);
 }
@@ -32,6 +33,7 @@ export function leLogs(api) {
   }
 
   const args = api.getArgs().slice(1);
+
   args[0] = 'logs';
   const sessions = api.getSessions(['app']);
 
@@ -52,6 +54,7 @@ export function setup(api) {
     process.exit(1);
   }
 
+  const sessions = getSessions(api);
   const list = nodemiral.taskList('Setup proxy');
   const domains = config.domains.split(',');
 
@@ -67,11 +70,18 @@ export function setup(api) {
     dest: `/opt/${PROXY_CONTAINER_NAME}/config/start.sh`,
     vars: {
       appName: PROXY_CONTAINER_NAME,
-      letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null
+      letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null,
+      swarmEnabled: api.getConfig().swarm
     }
   });
 
+  list.copy('Pushing Nginx Config Template', {
+    src: api.resolvePath(__dirname, 'assets/nginx.tmpl'),
+    dest: `/opt/${PROXY_CONTAINER_NAME}/config/nginx.tmpl`
+  });
+
   let nginxServerConfig = '';
+
   if (config.nginxServerConfig) {
     nginxServerConfig = fs.readFileSync(
       api.resolvePath(api.getBasePath(), config.nginxServerConfig)
@@ -79,6 +89,7 @@ export function setup(api) {
   }
 
   let nginxLocationConfig = '';
+
   if (config.nginxLocationConfig) {
     nginxLocationConfig = fs.readFileSync(
       api.resolvePath(api.getBasePath(), config.nginxLocationConfig)
@@ -129,8 +140,6 @@ export function setup(api) {
       }
     });
   }
-
-  const sessions = api.getSessions(['app']);
 
   return api.runTaskList(list, sessions, {
     series: true,
@@ -186,12 +195,13 @@ export function reconfigShared(api) {
   });
 
   const sharedNginxConfig = shared.nginxConfig || api.resolvePath(__dirname, 'assets/proxy.conf');
+
   list.copy('Sending nginx config', {
     src: sharedNginxConfig,
     dest: `/opt/${PROXY_CONTAINER_NAME}/config/nginx-default.conf`
   });
 
-  const sessions = api.getSessions(['app']);
+  const sessions = getSessions(api);
 
   return api.runTaskList(list, sessions, {
     series: true,
@@ -202,11 +212,13 @@ export function reconfigShared(api) {
 export function start(api) {
   log('exec => mup proxy start');
   const config = api.getConfig().proxy;
+
   if (!config) {
     console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
+  const sessions = getSessions(api);
   const list = nodemiral.taskList('Start proxy');
 
   list.executeScript('Start proxy', {
@@ -216,7 +228,6 @@ export function start(api) {
     }
   });
 
-  const sessions = api.getSessions(['app']);
 
   return api.runTaskList(list, sessions, {
     series: true,
@@ -245,14 +256,12 @@ export async function nginxConfig(api) {
   log('exec => mup proxy nginx-config');
 
   const command = `docker exec ${PROXY_CONTAINER_NAME} cat /etc/nginx/conf.d/default.conf`;
-  const { servers, app } = api.getConfig();
-  const serverObjects = Object.keys(app.servers)
-    .map(serverName => servers[serverName]);
+  const sessions = getSessions(api);
 
 
   await Promise.all(
-    serverObjects.map(server =>
-      api.runSSHCommand(server, command)
+    sessions.map(session =>
+      api.runSSHCommand(session, command)
     )
   ).then(results => {
     results.forEach(({ host, output }) => {
@@ -264,8 +273,7 @@ export async function nginxConfig(api) {
 
 export async function status(api) {
   const config = api.getConfig();
-  const servers = Object.keys(config.app.servers)
-    .map(key => config.servers[key]);
+  const servers = Object.keys(config.proxy.servers || config.app.servers);
   const lines = [];
   let overallColor = 'green';
 
@@ -336,4 +344,24 @@ export async function status(api) {
 
   console.log(chalk[overallColor]('\n=> Reverse Proxy Status'));
   console.log(lines.join('\n'));
+}
+
+export function updateProxyForService(api) {
+  const config = api.getConfig();
+  const sessions = getSessions(api);
+  const list = nodemiral.taskList('Configure Proxy for Service');
+
+  list.executeScript('Configure Proxy', {
+    script: api.resolvePath(__dirname, 'assets/service-configure.sh'),
+    vars: {
+      appName: config.app.name,
+      imagePort: config.app.docker.imagePort,
+      env: addProxyEnv(config, {})
+    }
+  });
+
+  return api.runTaskList(list, sessions, {
+    series: true,
+    verbose: api.getVerbose()
+  });
 }

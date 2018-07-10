@@ -12,6 +12,13 @@ source $APP_PATH/config/shared-config.sh
 ENV_FILE=$APP_PATH/config/env.list
 ENV_FILE_LETSENCRYPT=$APP_PATH/config/env_letsencrypt.list
 
+MUP_PROXY_NETWORK=""
+
+if docker network inspect mup-proxy ; then
+  MUP_PROXY_NETWORK="--network mup-proxy"
+fi
+
+
 # Remove previous version of the app, if exists
 sudo docker rm -f $APPNAME
 sudo docker network disconnect bridge -f $APPNAME
@@ -48,7 +55,10 @@ sudo docker run \
   -p $HTTPS_PORT:443 \
   --name $APPNAME \
   --env-file=$ENV_FILE \
-  --restart=always\
+  --restart=always \
+  --network bridge \
+  $MUP_PROXY_NETWORK \
+  -v /opt/$APPNAME/config/nginx.tmpl:/app/nginx.tmpl:ro \
   -v /opt/$APPNAME/mounted-certs:/etc/nginx/certs \
   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
@@ -58,7 +68,8 @@ sudo docker run \
 echo "Ran nginx-proxy as $APPNAME"
 
 sleep 2s
-sudo docker run -d \
+sudo docker run \
+  -d \
   --name $APPNAME-letsencrypt \
   --env-file=$ENV_FILE_LETSENCRYPT \
   --restart=always \
@@ -66,3 +77,16 @@ sudo docker run -d \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
   jrcs/letsencrypt-nginx-proxy-companion
 echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
+
+<% if (swarmEnabled) { %>
+  docker rm -f $APPNAME-swarm-upstream || true
+  docker pull zodern/nginx-proxy-swarm-upstream
+  docker run \
+    -d \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    --network mup-proxy \
+    --volumes-from $APPNAME \
+    --name $APPNAME-swarm-upstream \
+    --env NGINX_PROXY_CONTAINER="$APPNAME" \
+    zodern/nginx-proxy-swarm-upstream
+<% } %>

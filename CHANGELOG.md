@@ -1,3 +1,44 @@
+## Next
+
+**Load Balancing, Zero Downtime Deploys, and Swarm**
+
+Meteor Up can now manage a docker swarm cluster. When swarm and the reverse proxy are both enabled, the reverse proxy can load balance apps and avoid downtime during deploys. Sticky sessions are enabled.
+
+**Other Changes**
+- `proxy.servers` has been added to list which servers to run the reverse proxy on. It is required when using docker swarm.
+- When prepare bundle is enabled, mup waits 12 fewer seconds after starting the app and before verifying the deployment
+- SSH sessions are reused to improve performance
+- `mup mongo start` only starts/restarts the container if it isn't running or the start script has changed. This can greatly speed up `mup setup` since starting MongoDB was one of the slower tasks
+- Combined `ENV` build instructions in Prepare Bundle to improve performance
+- `app.docker.imagePort` defaults to 3000 instead of 80. This change is backwards compatible with the common docker images, and simplifies using images that run the app with a non-root user
+- The `NODE_VERSION` build arg is set when building the image during Prepare Bundle with the correct node version for the Meteor version the app is using
+- Fix verifying deployment with non-root user
+- Reverse Proxy uses an overlay network when swarm is enabled
+- The app is deployed as a swarm service when swarm is enabled
+- Update Stop Mongo task name to use title case
+- The update check can be disabled by setting the environment variable `MUP_SKIP_UPDATE_CHECK=false`
+
+**Plugin API**
+- `tasks` has functions that can add reusable tasks to task lists. The functions are:
+  - `addCreateService`
+  - `addUpdateService`
+  - `addCreateOrUpdateService`
+- `runSSHCommand` can also accept a session instead of a server object. It is recommended to use sessions since mup now reuses them
+- `validateConfig` has an additional parameter `logProblems` to enable showing validation errors
+- `validationErrors` has errors even when `getConfig(false)` was used
+
+**Plugins**
+- `VALIDATE_OPTIONS` has `noDefaults: true` set.
+
+## 1.4.5 - June 9, 2018
+- Add option to keep the app running during Prepare Bundle
+- Add `app.docker.prepareBundle` to example config
+- Update node-tar to fix deploying from Windows
+- Fix mongo container starting when stopped with `docker stop` and docker daemon is restarted (@pravdomil)
+- Fix verifying deployment when using user defined network
+- Fix proxy.clientUploadLimit being ignored when not using proxy.nginxServerConfig
+- Improve messages shown when container has no ip address
+
 ## 1.4.4 - April 2, 2018
 - Allow customizing the docker image created during Prepare Bundle. For example, this can be used to install packages using apt-get.
 - `mup status` will check if the default shell is bash

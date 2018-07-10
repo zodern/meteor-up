@@ -203,10 +203,10 @@ describe('module - default', function() {
         serverInfo,
         'sudo tail -n 100 /var/log/syslog'
       );
-      expect(out.code).to.be.equal(0);
 
+      expect(out.code).to.be.equal(0);
       expect(
-        countOccurences('=> Starting meteor app on port:80', out.output)
+        countOccurences('=> Starting meteor app on port 3000', out.output)
       ).gte(1);
     });
   });

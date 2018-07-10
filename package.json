@@ -1,6 +1,6 @@
 {
   "name": "mup",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Production Quality Meteor Deployments",
   "main": "lib/index.js",
   "repository": {
@@ -67,7 +67,6 @@
     "stylelint-config-standard": "^17.0.0"
   },
   "dependencies": {
-    "async": "^2.6.0",
     "axios": "^0.17.1",
     "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.0",
@@ -83,6 +82,7 @@
     "parse-json": "^4.0.0",
     "random-seed": "0.3.0",
     "resolve-from": "^4.0.0",
+    "shell-escape": "^0.2.0",
     "shelljs": "0.5.3",
     "silent-npm-registry-client": "^3.0.1",
     "ssh2": "0.4.x",

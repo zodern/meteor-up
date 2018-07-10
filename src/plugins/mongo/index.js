@@ -12,6 +12,8 @@ export function prepareConfig(config) {
     return config;
   }
 
+  config.mongo.version = config.mongo.version || '3.4.1';
+
   config.app.env = config.app.env || {};
   config.app.env.MONGO_URL = `mongodb://mongodb:27017/${config.app.name.split('.').join('')}`;
 
@@ -31,12 +33,14 @@ export function prepareConfig(config) {
 export const hooks = {
   'post.default.setup'(api) {
     const config = api.getConfig();
+
     if (config.mongo) {
       return api.runCommand('mongo.setup').then(() => api.runCommand('mongo.start'));
     }
   },
   'post.default.status'(api) {
     const config = api.getConfig();
+
     if (config.mongo) {
       return api.runCommand('mongo.status');
     }

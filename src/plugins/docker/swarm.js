@@ -1,8 +1,20 @@
+import {
+  findKey,
+  isEqual,
+  partial
+} from 'lodash';
+import debug from 'debug';
 import nodemiral from 'nodemiral';
 
-export function initSwarm(managers, host, api) {
+const log = debug('mup:docker:swarm');
+
+export function findNodeId(nodeIDs, serverName) {
+  return findKey(nodeIDs, partial(isEqual, serverName));
+}
+
+export function initSwarm(manager, host, api) {
   const list = nodemiral.taskList('Setting Up Docker Swarm');
-  const sessions = api.getSessionsForServers(managers);
+  const sessions = api.getSessionsForServers([manager]);
 
   list.executeScript('Creating Manager', {
     script: api.resolvePath(__dirname, 'assets/init-swarm.sh'),
@@ -18,7 +30,8 @@ export function promoteNodes(manager, nodeIds, api) {
   const list = nodemiral.taskList('Promoting Nodes to Managers');
   const sessions = api.getSessionsForServers([manager]);
 
-  list.executeScript('Promoting Node', {
+  log('promoting nodes:', nodeIds);
+  list.executeScript('Promoting Nodes', {
     script: api.resolvePath(__dirname, 'assets/swarm-promote.sh'),
     vars: {
       nodeIds
@@ -28,12 +41,17 @@ export function promoteNodes(manager, nodeIds, api) {
   return api.runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
 
-export function removeManagers(managers, api) {
-  const list = nodemiral.taskList('Removing Swarm Managers');
-  const sessions = api.getSessionsForServers(managers);
+export function demoteManagers(manager, nodeIds, api) {
+  const list = nodemiral.taskList('Demoting Swarm Managers');
+  const sessions = api.getSessionsForServers([manager]);
 
-  list.executeScript('Removing Managers', {
-    scripts: api.resolvePath(__dirname, 'assets/swarm-leave.sh')
+  log('demoting nodes:', nodeIds, manager);
+
+  list.executeScript('Demoting Managers', {
+    script: api.resolvePath(__dirname, 'assets/swarm-demote.sh'),
+    vars: {
+      nodeIds
+    }
   });
 
   return api.runTaskList(list, sessions, { verbose: api.getVerbose() });
@@ -82,6 +100,8 @@ export function diffLabels(currentLabels, desiredLabels) {
 export function updateLabels(api, manager, toAdd, toRemove) {
   const list = nodemiral.taskList('Update Swarm Labels');
   const session = api.getSessionsForServers([manager]);
+
+  log(`Adding labels ${JSON.stringify(toAdd)}`);
 
   list.executeScript('Update Labels', {
     script: api.resolvePath(__dirname, 'assets/swarm-labels.sh'),
