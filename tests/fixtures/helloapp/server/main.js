@@ -1,15 +1,5 @@
-import { Meteor } from "meteor/meteor";
-import { onPageLoad } from "meteor/server-render";
+import { Meteor } from 'meteor/meteor';
 
 Meteor.startup(() => {
-  // Code to run on server startup.
-  console.log(`Greetings from ${module.id}!`);
-});
-
-onPageLoad(sink => {
-  // Code to run on every request.
-  sink.renderIntoElementById(
-    "server-render-target",
-    `Server time: ${new Date}`
-  );
+  // code to run on server at startup
 });

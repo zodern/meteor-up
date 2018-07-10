@@ -14,7 +14,6 @@ if (process.platform !== 'win32') {
     'command -v docker >/dev/null 2>&1 || { curl https://get.docker.com/ |  sh && echo \'DOCKER_OPTS="--storage-driver=devicemapper"\' |  tee --append /etc/default/docker >/dev/null &&  service docker start ||  service docker restart; }',
     'command -v meteor >/dev/null 2>&1 || { curl https://install.meteor.com/ | sh; }'
   ];
-
   installCommands.forEach(command => {
     sh.exec(command);
   });
@@ -51,7 +50,6 @@ if (containers.output.length > 0) {
 sh.cd(path.resolve(mupDir, 'tests/fixtures'));
 
 var images = sh.exec('docker images -aq mup-tests-server');
-
 if (images.output.length === 0) {
   sh.exec('docker build -t mup-tests-server .');
 }
@@ -72,10 +70,8 @@ if (images.output.length === 0 && !argv.skipPull) {
     'docker commit mup-tests-server-docker-setup mup-tests-server-docker',
     'docker rm -f mup-tests-server-docker-setup'
   ];
-
   commands.forEach(command => {
     var code = sh.exec(command).code;
-
     if (code > 0) {
       process.exit(code);
     }
@@ -83,7 +79,6 @@ if (images.output.length === 0 && !argv.skipPull) {
 }
 
 var location = path.resolve(mupDir, 'tests/fixtures/ssh/new');
-
 if (!fs.existsSync(location)) {
   sh.cd(path.resolve(mupDir, 'tests/fixtures'));
 

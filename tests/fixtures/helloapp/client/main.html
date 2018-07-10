@@ -1,16 +1,20 @@
 <head>
-  <title>Minimal Meteor app</title>
+  <title>helloapp-new</title>
 </head>
 
 <body>
-  <h1>Minimal Meteor app</h1>
-  <p>
-    This Meteor app uses as few Meteor packages as possible, to keep the
-    client JavaScript bundle as small as possible.
-  </p>
+  <h1>Welcome to Meteor!</h1>
 
-  <em id="server-render-target"></em>
+  {{> hello}}
+  {{> info}}
+</body>
 
+<template name="hello">
+  <button>Click Me</button>
+  <p>You've pressed the button {{counter}} times.</p>
+</template>
+
+<template name="info">
   <h2>Learn Meteor!</h2>
   <ul>
     <li><a href="https://www.meteor.com/try" target="_blank">Do the Tutorial</a></li>
@@ -18,4 +22,4 @@
     <li><a href="https://docs.meteor.com" target="_blank">Read the Docs</a></li>
     <li><a href="https://forums.meteor.com" target="_blank">Discussions</a></li>
   </ul>
-</body>
+</template>
