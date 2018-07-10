@@ -62,9 +62,10 @@ export function createEnv(appConfig, settings) {
 
 export function getNodeVersion(api, bundlePath) {
   let star = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/star.json')).toString();
-  let nodeVersion = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/.node_version.txt')).toString();
+  let nodeVersion = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/.node_version.txt')).toString().trim();
 
   star = JSON.parse(star);
+  // Remove leading 'v'
   nodeVersion = nodeVersion.substr(1);
 
   return star.nodeVersion || nodeVersion;
