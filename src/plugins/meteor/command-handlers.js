@@ -193,7 +193,8 @@ export async function push(api) {
         dockerImage: config.docker.image,
         env: config.env,
         buildInstructions: config.docker.buildInstructions || [],
-        nodeVersion: getNodeVersion(api, buildOptions.buildLocation)
+        nodeVersion: getNodeVersion(api, buildOptions.buildLocation),
+        stopApp: config.docker.stopAppDuringPrepareBundle
       }
     });
   }

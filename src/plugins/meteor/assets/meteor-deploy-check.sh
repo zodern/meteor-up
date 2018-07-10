@@ -57,15 +57,15 @@ while [[ true ]]; do
   if [[ $HOST_NETWORK == 0 ]]; then
     CONTAINER_IP="localhost"
   else
-    CONTAINER_IP=$(sudo docker inspect $APPNAME --format "{{.NetworkSettings.IPAddress}}")
+    CONTAINER_IP=$(sudo docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $APPNAME)
   fi
 
   if [[ -z $CONTAINER_IP ]]; then
-    echo "Container has no IP Address, likely from it restarting."
+    echo "Container has no IP Address, likely from the app crashing."
     noIPCount=$((noIPCount+1))
 
     if [ "$noIPCount" "==" "$MAX_NO_IP_COUNT" ]; then
-      echo "Too much time spent restarting." 1>&2
+      echo "Container spent too much time restarting." 1>&2
       revert_app
       exit 1
     fi

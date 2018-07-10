@@ -7,7 +7,9 @@ APPNAME=<%= appName %>
 IMAGE=mup-<%= appName.toLowerCase() %>
 
 build_failed() {
+  <% if (stopApp) { %>
   sudo docker start $APPNAME >/dev/null 2>&1 || true
+  <% } %>
   exit 2
 }
 
@@ -15,7 +17,9 @@ set +e
 sudo docker pull <%= dockerImage %>
 set -e
 
+<% if (stopApp) { %>
 sudo docker stop $APPNAME >/dev/null 2>&1 || true
+<% } %>
 
 cd $APP_DIR/tmp
 
@@ -53,7 +57,9 @@ sudo docker build \
 
 sudo rm -rf bundle
 
+<% if (stopApp) { %>
 sudo docker start $APPNAME >/dev/null 2>&1 || true
+<% } %>
 
 sudo docker tag $IMAGE:latest $IMAGE:previous || true
 sudo docker tag $IMAGE:build $IMAGE:latest

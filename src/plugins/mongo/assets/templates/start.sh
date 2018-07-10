@@ -24,7 +24,7 @@ echo "Running mongo:<%= mongoVersion %>"
 
 sudo docker run \
   -d \
-  --restart=always \
+  --restart=unless-stopped \
   --publish=127.0.0.1:27017:27017 \
   --volume=<%= mongoDbDir %>:/data/db \
   --volume=/opt/mongodb/mongodb.conf:/mongodb.conf \
