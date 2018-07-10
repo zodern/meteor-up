@@ -19,6 +19,7 @@ docker run \
   -d \
   --restart="always" \
   -e "SWARM_SERVICE=<%= appName %>" \
+  -e "VIRTUAL_PORT=<%= imagePort %>" \
   <%- Object.keys(env).map(key => `-e "${key}=${env[key]}"`).join(' ') %> \
   busybox:1.28.4 tail -f /dev/null
 CONFIG_EOT

@@ -355,6 +355,7 @@ export function updateProxyForService(api) {
     script: api.resolvePath(__dirname, 'assets/service-configure.sh'),
     vars: {
       appName: config.app.name,
+      imagePort: config.app.docker.imagePort,
       env: addProxyEnv(config, {})
     }
   });
