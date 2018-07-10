@@ -14,11 +14,12 @@ Meteor Up can now manage a docker swarm cluster. When swarm and the reverse prox
 - The `NODE_VERSION` build arg is set when building the image during Prepare Bundle with the correct node version for the Meteor version the app is using
 - Fix verifying deployment with non-root user
 - Reverse Proxy uses an overlay network when swarm is enabled
-- Fix stop mongo task name to use title case
+- The app is deployed as a swarm service when swarm is enabled
+- Update Stop Mongo task name to use title case
 - The update check can be disabled by setting the environment variable `MUP_SKIP_UPDATE_CHECK=false`
 
 **Plugin API**
-- `tasks` has reusable tasks to add to task lists. The tasks are:
+- `tasks` has functions that can add reusable tasks to task lists. The functions are:
   - `addCreateService`
   - `addUpdateService`
   - `addCreateOrUpdateService`
