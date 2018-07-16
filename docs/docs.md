@@ -348,7 +348,7 @@ Here's the process:
 
 **If your username is `root` or you're using AWS EC2, you don't need to follow these steps**
 
-Please ensure your key file (pem) is not protected by a passphrase. This setup process will require NOPASSWD access to sudo. (Since Meteor needs port 80, sudo access is required.)
+Please ensure your key file (pem) is not protected by a passphrase. This setup process will require NOPASSWD access to sudo.
 
 Make sure you also add your ssh key to the `/YOUR_USERNAME/.ssh/authorized_keys` list.
 
