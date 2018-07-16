@@ -21,7 +21,7 @@ import nodemiral from 'nodemiral';
 const log = debug('mup:module:docker');
 
 function uniqueSessions(api) {
-  const {servers, swarm} = api.getConfig().servers;
+  const {servers, swarm} = api.getConfig();
   const sessions = api.getSessions(['app', 'mongo', 'proxy']);
 
   if (swarm) {
