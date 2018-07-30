@@ -34,6 +34,7 @@ describe('PluginAPI', () => {
   describe('base', () => {
     it('should prefer config path', () => {
       const _api = new PluginAPI(base, filteredArgs, { config: '~/project2/.deploy/mup.js' });
+
       expect(_api.base).to.equal('~/project2/.deploy');
     });
 
@@ -134,6 +135,7 @@ describe('PluginAPI', () => {
     let validatorStub;
     let totalConsoleOutput = '';
     let consoleStub;
+
     beforeEach(() => {
       totalConsoleOutput = '';
       validatorStub = sinon.stub(validate, 'default').returns(errors);
@@ -167,7 +169,7 @@ describe('PluginAPI', () => {
 
   describe('_normalizeConfig', () => {
     it('should copy meteor object to app', () => {
-      const expected = { meteor: { path: '../' }, app: { type: 'meteor', path: '../', docker: { image: 'kadirahq/meteord', stopAppDuringPrepareBundle: true } } };
+      const expected = { meteor: { path: '../' }, app: { type: 'meteor', path: '../', docker: { image: 'kadirahq/meteord', imagePort: 3000, stopAppDuringPrepareBundle: true } } };
       const config = { meteor: { path: '../' } };
       const result = api._normalizeConfig(config);
 
@@ -178,6 +180,7 @@ describe('PluginAPI', () => {
   describe('setConfig', () => {
     it('should update the old config', () => {
       const newConfig = { servers: { two: 0 } };
+
       api.setConfig(newConfig);
 
       expect(api.getConfig()).to.deep.equal(newConfig);
@@ -257,6 +260,7 @@ describe('PluginAPI', () => {
   describe('getSessions', () => {
     it('should return sessions for plugins', () => {
       const sessions = api.getSessions(['meteor', 'mongo']);
+
       expect(sessions).to.have.length(2);
     });
   });
@@ -271,6 +275,7 @@ describe('PluginAPI', () => {
   describe('_pickSessions', () => {
     it('should return sessions for each plugin', () => {
       const result = api._pickSessions(['meteor', 'mongo']);
+
       expect(result).to.have.keys('one', 'two');
     });
   });

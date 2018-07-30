@@ -1,6 +1,7 @@
 export const VALIDATE_OPTIONS = {
   abortEarly: false,
-  convert: false
+  convert: false,
+  noDefaults: true
 };
 
 export function improveErrors(error) {
