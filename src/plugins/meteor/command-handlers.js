@@ -320,7 +320,7 @@ export async function start(api) {
       mode: 'global',
       env: createEnv(config, api.getSettings()),
       endpointMode: 'dnsrr',
-      networks: ['mup-proxy'],
+      networks: config.docker.networks,
       hostname: `{{.Node.Hostname}}-${config.name}-{{.Task.ID}}`
     }, currentService);
   } else {

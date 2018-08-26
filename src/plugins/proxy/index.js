@@ -27,6 +27,11 @@ export function prepareConfig(config) {
   config.app.env.HTTP_FORWARDED_COUNT =
     config.app.env.HTTP_FORWARDED_COUNT || 1;
 
+  config.app.docker = config.app.docker || {};
+  config.app.docker.networks = config.app.docker.networks || [];
+
+  config.app.docker.networks.push('mup-proxy');
+
   return config;
 }
 
