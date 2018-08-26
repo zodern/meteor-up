@@ -97,7 +97,6 @@ export function addUpdateService(taskList, {
     envRemove
   } = diffEnv(env, containerSpec.Env);
 
-  // TODO: use Start instead of Update in task name when the image is the same
   // TODO: skip running the script if there is nothing to update
   taskList.executeScript(`Update ${name}`, {
     script: resolvePath(__dirname, 'assets/update-service.sh'),
