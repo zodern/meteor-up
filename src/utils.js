@@ -83,14 +83,14 @@ class Callback2Stream extends stream.Readable {
   }
 }
 
-export function getDockerLogs(name, sessions, args) {
+export function getDockerLogs(name, sessions, args, showHost = true) {
   const command = `sudo docker ${args.join(' ')} ${name} 2>&1`;
 
   log(`getDockerLogs command: ${command}`);
 
   const promises = sessions.map(session => {
     const input = new Callback2Stream();
-    const host = `[${session._host}]`;
+    const host = showHost ? `[${session._host}]` : '';
     const lineSeperator = readline.createInterface({
       input,
       terminal: true

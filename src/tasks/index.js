@@ -130,3 +130,12 @@ export function addStopService(taskList, { name }) {
 
   return taskList;
 }
+
+export function addRestartService(taskList, { name }) {
+  taskList.executeScript(`Restart ${name}`, {
+    script: resolvePath(__dirname, 'assets/restart-service.sh'),
+    vars: {
+      name
+    }
+  });
+}

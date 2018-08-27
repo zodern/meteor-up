@@ -2,41 +2,30 @@ import {
   addStartAppTask,
   checkAppStarted,
   createEnv,
+  createServiceConfig,
+  getBuildOptions,
   getNodeVersion,
-  prepareBundleSupported
+  prepareBundleSupported,
+  shouldRebuild
 } from './utils';
 import buildApp, { archiveApp } from './build.js';
 import { checkUrls, getInformation } from './status';
 import { map, promisify } from 'bluebird';
 import chalk from 'chalk';
 import debug from 'debug';
-import fs from 'fs';
 import nodemiral from 'nodemiral';
-import os from 'os';
-import random from 'random-seed';
-import uuid from 'uuid';
+
 
 const log = debug('mup:module:meteor');
 
-function tmpBuildPath(appPath, api) {
-  const rand = random.create(appPath);
-  const uuidNumbers = [];
-
-  for (let i = 0; i < 16; i++) {
-    uuidNumbers.push(rand(255));
-  }
-
-  return api.resolvePath(
-    os.tmpdir(),
-    `mup-meteor-${uuid.v4({ random: uuidNumbers })}`
-  );
-}
-
 export function logs(api) {
   log('exec => mup meteor logs');
-  const config = api.getConfig().app;
+  const {
+    app,
+    swarm
+  } = api.getConfig();
 
-  if (!config) {
+  if (!app) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
@@ -46,10 +35,13 @@ export function logs(api) {
   if (args[0] === 'meteor') {
     args.shift();
   }
+  if (swarm) {
+    args.unshift('service');
+  }
 
   const sessions = api.getSessions(['app']);
 
-  return api.getDockerLogs(config.name, sessions, args);
+  return api.getDockerLogs(app.name, sessions, args, !swarm);
 }
 
 export function setup(api) {
@@ -96,42 +88,13 @@ export function setup(api) {
       vars: {
         name: config.name
       }
+
     });
   }
 
   const sessions = api.getSessions(['app']);
 
   return api.runTaskList(list, sessions, { verbose: api.verbose });
-}
-
-function getBuildOptions(api) {
-  const config = api.getConfig().app;
-  const appPath = api.resolvePath(api.getBasePath(), config.path);
-
-  const buildOptions = config.buildOptions || {};
-
-  buildOptions.buildLocation =
-    buildOptions.buildLocation || tmpBuildPath(appPath, api);
-
-  return buildOptions;
-}
-
-function shouldRebuild(api) {
-  let rebuild = true;
-  const { buildLocation } = getBuildOptions(api);
-  const bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
-
-  if (api.getOptions()['cached-build']) {
-    const buildCached = fs.existsSync(bundlePath);
-
-    // If build is not cached, rebuild is true
-    // even though the --cached-build flag was used
-    if (buildCached) {
-      rebuild = false;
-    }
-  }
-
-  return rebuild;
 }
 
 export async function build(api) {
@@ -209,68 +172,78 @@ export async function push(api) {
 
 export function envconfig(api) {
   log('exec => mup meteor envconfig');
+  const {
+    servers,
+    swarm,
+    app,
+    proxy
+  } = api.getConfig();
 
-  const config = api.getConfig().app;
-  const servers = api.getConfig().servers;
+  if (swarm) {
+    // The `start` command handles updating the environment
+    // when swarm is enabled
+    return;
+  }
+
   let bindAddress = '0.0.0.0';
 
-  if (!config) {
+  if (!app) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
 
-  config.log = config.log || {
+  app.log = app.log || {
     opts: {
       'max-size': '100m',
       'max-file': 10
     }
   };
 
-  config.nginx = config.nginx || {};
+  app.nginx = app.nginx || {};
 
-  if (config.docker && config.docker.bind) {
-    bindAddress = config.docker.bind;
+  if (app.docker && app.docker.bind) {
+    bindAddress = app.docker.bind;
   }
 
-  if (config.dockerImageFrontendServer) {
-    config.docker.imageFrontendServer = config.dockerImageFrontendServer;
+  if (app.dockerImageFrontendServer) {
+    app.docker.imageFrontendServer = app.dockerImageFrontendServer;
   }
-  if (!config.docker.imageFrontendServer) {
-    config.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
+  if (!app.docker.imageFrontendServer) {
+    app.docker.imageFrontendServer = 'meteorhacks/mup-frontend-server';
   }
 
-  if (config.ssl) {
-    config.ssl.port = config.ssl.port || 443;
+  if (app.ssl) {
+    app.ssl.port = app.ssl.port || 443;
   }
 
   const list = nodemiral.taskList('Configuring App');
 
   list.copy('Pushing the Startup Script', {
     src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
-    dest: `/opt/${config.name}/config/start.sh`,
+    dest: `/opt/${app.name}/config/start.sh`,
     vars: {
-      appName: config.name,
-      port: config.env.PORT || 80,
+      appName: app.name,
+      port: app.env.PORT || 80,
       bind: bindAddress,
-      sslConfig: config.ssl,
-      logConfig: config.log,
-      volumes: config.volumes,
-      docker: config.docker,
-      proxyConfig: api.getConfig().proxy,
-      nginxClientUploadLimit: config.nginx.clientUploadLimit || '10M'
+      sslConfig: app.ssl,
+      logConfig: app.log,
+      volumes: app.volumes,
+      docker: app.docker,
+      proxyConfig: proxy,
+      nginxClientUploadLimit: app.nginx.clientUploadLimit || '10M'
     }
   });
 
-  const env = createEnv(config, api.getSettings());
+  const env = createEnv(app, api.getSettings());
   const hostVars = {};
 
-  Object.keys(config.servers).forEach(key => {
-    if (config.servers[key].env) {
-      hostVars[servers[key].host] = { env: config.servers[key].env };
+  Object.keys(app.servers).forEach(key => {
+    if (app.servers[key].env) {
+      hostVars[servers[key].host] = { env: app.servers[key].env };
     }
-    if (config.servers[key].settings) {
+    if (app.servers[key].settings) {
       const settings = JSON.stringify(api.getSettingsFromPath(
-        config.servers[key].settings));
+        app.servers[key].settings));
 
       if (hostVars[servers[key].host]) {
         hostVars[servers[key].host].env.METEOR_SETTINGS = settings;
@@ -282,11 +255,11 @@ export function envconfig(api) {
 
   list.copy('Sending Environment Variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),
-    dest: `/opt/${config.name}/config/env.list`,
+    dest: `/opt/${app.name}/config/env.list`,
     hostVars,
     vars: {
       env: env || {},
-      appName: config.name
+      appName: app.name
     }
   });
 
@@ -314,15 +287,11 @@ export async function start(api) {
     const currentService = await api.dockerServiceInfo(config.name);
 
     // TODO: make it work when the reverse proxy isn't enabled
-    api.tasks.addCreateOrUpdateService(list, {
-      image: `mup-${config.name.toLowerCase()}:previous`,
-      name: config.name,
-      mode: 'global',
-      env: createEnv(config, api.getSettings()),
-      endpointMode: 'dnsrr',
-      networks: config.docker.networks,
-      hostname: `{{.Node.Hostname}}-${config.name}-{{.Task.ID}}`
-    }, currentService);
+    api.tasks.addCreateOrUpdateService(
+      list,
+      createServiceConfig(api),
+      currentService
+    );
   } else {
     addStartAppTask(list, api);
     checkAppStarted(list, api);
@@ -386,17 +355,24 @@ export function stop(api) {
 export function restart(api) {
   const list = nodemiral.taskList('Restart Meteor');
   const sessions = api.getSessions(['app']);
-  const config = api.getConfig().app;
+  const {
+    app: appConfig,
+    swarm
+  } = api.getConfig();
 
-  list.executeScript('Stop Meteor', {
-    script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
-    vars: {
-      appName: config.name
-    }
-  });
+  if (swarm) {
+    api.tasks.addRestartService(list, { name: appConfig.name });
+  } else {
+    list.executeScript('Stop Meteor', {
+      script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
+      vars: {
+        appName: appConfig.name
+      }
+    });
+    addStartAppTask(list, api);
+    checkAppStarted(list, api);
+  }
 
-  addStartAppTask(list, api);
-  checkAppStarted(list, api);
 
   return api.runTaskList(list, sessions, {
     series: true,
