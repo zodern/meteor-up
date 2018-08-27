@@ -89,9 +89,14 @@ export function addUpdateService(taskList, {
   name,
   image,
   env,
-  hostname
+  hostname,
+  endpointMode
 }, currentService) {
-  const containerSpec = currentService.Spec.TaskTemplate.ContainerSpec;
+  const {
+    EndpointSpec,
+    TaskTemplate
+  } = currentService.Spec;
+  const containerSpec = TaskTemplate.ContainerSpec;
   const {
     envAdd,
     envRemove
@@ -105,7 +110,8 @@ export function addUpdateService(taskList, {
       hostname: hostname !== containerSpec.Hostname ? hostname : null,
       envAdd: escapeEnv(envAdd),
       envRemove,
-      name
+      name,
+      endpointMode: EndpointSpec.mode !== endpointMode ? endpointMode : null
     }
   });
 
