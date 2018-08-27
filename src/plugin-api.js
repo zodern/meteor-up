@@ -339,6 +339,7 @@ export default class PluginAPI {
     }));
 
     if (!collectors) {
+      console.log('');
       console.log('=> Collecting Docker information');
     }
 
