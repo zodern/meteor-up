@@ -71,6 +71,7 @@ export function setup(api) {
     vars: {
       appName: PROXY_CONTAINER_NAME,
       letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null,
+      volumes: config.volumes,
       swarmEnabled: api.getConfig().swarm
     }
   });

@@ -14,6 +14,7 @@ const schema = joi.object().keys({
     .or('letsEncryptEmail', 'crt', 'forceSSL'),
   domains: joi.string().required(),
   nginxServerConfig: joi.string(),
+  volumes: joi.object(),
   nginxLocationConfig: joi.string(),
   clientUploadLimit: joi.string(),
   servers: joi.object(),
