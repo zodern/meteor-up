@@ -247,7 +247,7 @@ export function stop(api) {
     }
   });
 
-  const sessions = api.getSessions(['app']);
+  const sessions = getSessions(api);
 
   return api.runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
