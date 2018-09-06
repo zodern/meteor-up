@@ -5,6 +5,7 @@ import {
   createServiceConfig,
   getBuildOptions,
   getNodeVersion,
+  getSessions,
   prepareBundleSupported,
   shouldRebuild
 } from './utils';
@@ -18,7 +19,7 @@ import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:meteor');
 
-export function logs(api) {
+export async function logs(api) {
   log('exec => mup meteor logs');
   const {
     app,
@@ -39,7 +40,7 @@ export function logs(api) {
     args.unshift('service');
   }
 
-  const sessions = api.getSessions(['app']);
+  const sessions = getSessions(api);
 
   return api.getDockerLogs(app.name, sessions, args, !swarm);
 }
@@ -297,7 +298,7 @@ export async function start(api) {
     checkAppStarted(list, api);
   }
 
-  const sessions = service ? [await api.getManagerSession()] : api.getSessions(['app']);
+  const sessions = await getSessions(api);
 
   return api.runTaskList(list, sessions, {
     series: true,
@@ -322,7 +323,7 @@ export function deploy(api) {
     .then(() => api.runCommand('default.reconfig'));
 }
 
-export function stop(api) {
+export async function stop(api) {
   log('exec => mup meteor stop');
   const config = api.getConfig().app;
   const swarmEnabled = api.getConfig().swarm !== undefined;
@@ -347,18 +348,18 @@ export function stop(api) {
     });
   }
 
-  const sessions = api.getSessions(['app']);
+  const sessions = await getSessions(api);
 
   return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
-export function restart(api) {
+export async function restart(api) {
   const list = nodemiral.taskList('Restart Meteor');
-  const sessions = api.getSessions(['app']);
   const {
     app: appConfig,
     swarm
   } = api.getConfig();
+  const sessions = await getSessions(api);
 
   if (swarm) {
     api.tasks.addRestartService(list, { name: appConfig.name });
