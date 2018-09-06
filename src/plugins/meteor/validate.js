@@ -5,7 +5,7 @@ const schema = joi.object().keys({
   path: joi.string().min(1).required(),
   port: joi.number(),
   type: joi.string(),
-  servers: joi.object().required().pattern(
+  servers: joi.object().min(1).required().pattern(
     /[/s/S]*/,
     joi.object().keys({
       env: joi.object().pattern(
@@ -93,6 +93,7 @@ export default function(
   }
 ) {
   let details = [];
+
   details = combineErrorDetails(
     details,
     joi.validate(config.app, schema, VALIDATE_OPTIONS)
