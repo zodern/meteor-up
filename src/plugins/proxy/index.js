@@ -19,15 +19,15 @@ export function prepareConfig(config) {
   const swarmEnabled = config.swarm === true;
 
   config.app.env = config.app.env || {};
+  config.app.docker = config.app.docker || {};
 
   if (!swarmEnabled) {
     config.app.env = addProxyEnv(config, config.app.env);
+    config.app.env.VIRTUAL_PORT = config.app.docker.imagePort || 3000;
   }
 
   config.app.env.HTTP_FORWARDED_COUNT =
-    config.app.env.HTTP_FORWARDED_COUNT || 1;
-
-  config.app.docker = config.app.docker || {};
+  config.app.env.HTTP_FORWARDED_COUNT || 1;
 
   if (swarmEnabled) {
     config.app.docker.networks = config.app.docker.networks || [];
