@@ -508,6 +508,14 @@ export default class PluginAPI {
 
   async dockerServiceInfo(serviceName) {
     const manager = await this.getManagerSession();
+
+    if (!manager) {
+      const error = new Error('no-manager');
+
+      error.solution = 'Enable swarm in your config and run "mup setup"';
+      throw error;
+    }
+
     const result = await this.runSSHCommand(manager, `docker service inspect ${serviceName}`);
     let serviceInfo = null;
 
