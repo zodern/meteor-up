@@ -40,7 +40,7 @@ export async function logs(api) {
     args.unshift('service');
   }
 
-  const sessions = getSessions(api);
+  const sessions = await getSessions(api);
 
   return api.getDockerLogs(app.name, sessions, args, !swarm);
 }
