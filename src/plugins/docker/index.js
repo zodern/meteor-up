@@ -1,4 +1,6 @@
 import * as _commands from './commands';
+import validator from './validate';
+
 export const description = 'Setup and manage docker';
 export const commands = _commands;
 
@@ -9,8 +11,5 @@ export const hooks = {
 };
 
 export const validate = {
-  'swarm'() {
-    // There currently isn't any options in the object
-    return [];
-  }
+  swarm: validator
 };

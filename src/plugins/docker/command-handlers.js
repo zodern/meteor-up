@@ -21,10 +21,10 @@ import nodemiral from 'nodemiral';
 const log = debug('mup:module:docker');
 
 function uniqueSessions(api) {
-  const {servers, swarm} = api.getConfig();
+  const {servers} = api.getConfig();
   const sessions = api.getSessions(['app', 'mongo', 'proxy']);
 
-  if (swarm) {
+  if (api.swarmEnabled()) {
     return api.getSessionsForServers(Object.keys(servers));
   }
 
@@ -42,7 +42,7 @@ function uniqueSessions(api) {
 export function setup(api) {
   log('exec => mup docker setup');
   const config = api.getConfig();
-  const swarmEnabled = config.swarm;
+  const swarmEnabled = api.swarmEnabled();
   const servers = Object.keys(config.servers);
 
   const list = nodemiral.taskList('Setup Docker');
@@ -69,9 +69,8 @@ export function setup(api) {
 
 export async function setupSwarm(api) {
   const config = api.getConfig();
-  const swarmConfig = config.swarm;
 
-  if (!swarmConfig) {
+  if (!api.swarmEnabled()) {
     return;
   }
 
@@ -239,6 +238,7 @@ export async function ps(api) {
 
 export async function status(api) {
   const config = api.getConfig();
+  const swarmEnabled = api.swarmEnabled();
 
   if (!config.servers) {
     return;
@@ -281,7 +281,7 @@ export async function status(api) {
   console.log(overallColor('\n=> Docker Status'));
   console.log(lines.join('\n'));
 
-  if (!config.swarm) {
+  if (!swarmEnabled ) {
     return;
   }
 

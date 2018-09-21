@@ -43,6 +43,7 @@ export default function(config, {
   addLocation
 }) {
   let details = [];
+
   details = combineErrorDetails(
     details,
     joi.validate(config.proxy, schema, VALIDATE_OPTIONS)
@@ -68,7 +69,7 @@ export default function(config, {
     );
   }
 
-  if (config.swarm && !config.proxy.servers) {
+  if (config.swarm && config.swarm.enabled && !config.proxy.servers) {
     details.push({
       message: 'is required when using Docker Swarm',
       path: 'servers'

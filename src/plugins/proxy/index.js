@@ -16,7 +16,7 @@ export function prepareConfig(config) {
     return config;
   }
 
-  const swarmEnabled = config.swarm === true;
+  const swarmEnabled = config.swarm && config.swarm.enabled;
 
   config.app.env = config.app.env || {};
   config.app.docker = config.app.docker || {};
@@ -42,7 +42,7 @@ export function prepareConfig(config) {
 function configureServiceHook(api) {
   const config = api.getConfig();
 
-  if (config.proxy && config.swarm) {
+  if (config.proxy && api.swarmEnabled()) {
     return updateProxyForService(api);
   }
 }

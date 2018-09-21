@@ -95,6 +95,16 @@ export function getNodeVersion(api, bundlePath) {
   return star.nodeVersion || nodeVersion;
 }
 
+export async function getSessions(api) {
+  if (api.swarmEnabled()) {
+    return [
+      await api.getManagerSession()
+    ];
+  }
+
+  return api.getSessions(['app']);
+}
+
 export function tmpBuildPath(appPath, api) {
   const rand = random.create(appPath);
   const uuidNumbers = [];

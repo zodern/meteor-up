@@ -22,9 +22,9 @@ const log = debug('mup:module:meteor');
 export async function logs(api) {
   log('exec => mup meteor logs');
   const {
-    app,
-    swarm
+    app
   } = api.getConfig();
+  const swarmEnabled = api.swarmEnabled();
 
   if (!app) {
     console.error('error: no configs found for meteor');
@@ -36,13 +36,13 @@ export async function logs(api) {
   if (args[0] === 'meteor') {
     args.shift();
   }
-  if (swarm) {
+  if (swarmEnabled) {
     args.unshift('service');
   }
 
   const sessions = await getSessions(api);
 
-  return api.getDockerLogs(app.name, sessions, args, !swarm);
+  return api.getDockerLogs(app.name, sessions, args, !swarmEnabled);
 }
 
 export function setup(api) {
@@ -175,12 +175,11 @@ export function envconfig(api) {
   log('exec => mup meteor envconfig');
   const {
     servers,
-    swarm,
     app,
     proxy
   } = api.getConfig();
 
-  if (swarm) {
+  if (api.swarmEnabled()) {
     // The `start` command handles updating the environment
     // when swarm is enabled
     return;
@@ -275,7 +274,7 @@ export function envconfig(api) {
 export async function start(api) {
   log('exec => mup meteor start');
   const config = api.getConfig().app;
-  const service = api.getConfig().swarm !== undefined;
+  const swarmEnabled = api.swarmEnabled();
 
   if (!config) {
     console.error('error: no configs found for meteor');
@@ -284,7 +283,7 @@ export async function start(api) {
 
   const list = nodemiral.taskList('Start Meteor');
 
-  if (service) {
+  if (swarmEnabled) {
     const currentService = await api.dockerServiceInfo(config.name);
 
     // TODO: make it work when the reverse proxy isn't enabled
@@ -326,7 +325,7 @@ export function deploy(api) {
 export async function stop(api) {
   log('exec => mup meteor stop');
   const config = api.getConfig().app;
-  const swarmEnabled = api.getConfig().swarm !== undefined;
+  const swarmEnabled = api.swarmEnabled();
 
   if (!config) {
     console.error('error: no configs found for meteor');
@@ -356,12 +355,11 @@ export async function stop(api) {
 export async function restart(api) {
   const list = nodemiral.taskList('Restart Meteor');
   const {
-    app: appConfig,
-    swarm
+    app: appConfig
   } = api.getConfig();
   const sessions = await getSessions(api);
 
-  if (swarm) {
+  if (api.swarmEnabled()) {
     api.tasks.addRestartService(list, { name: appConfig.name });
   } else {
     list.executeScript('Stop Meteor', {
