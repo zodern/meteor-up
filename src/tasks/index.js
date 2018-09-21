@@ -28,7 +28,9 @@ export function addCreateService(taskList, {
   hostname,
   mode = 'replicated',
   endpointMode = 'vip',
-  networks = []
+  networks = [],
+  updateFailureAction = 'rollback',
+  updateParallelism = 0
   // bind,
   // log,
   // volumes,
@@ -48,7 +50,9 @@ export function addCreateService(taskList, {
       hostname,
       mode,
       endpointMode,
-      networks
+      networks,
+      updateFailureAction,
+      updateParallelism
     }
   });
 
@@ -85,16 +89,27 @@ function diffEnv(wantedEnv, _currentEnv) {
   };
 }
 
+function ifChanged(current, newValue) {
+  if (current !== newValue) {
+    return newValue;
+  }
+
+  return null;
+}
+
 export function addUpdateService(taskList, {
   name,
   image,
   env,
   hostname,
-  endpointMode
+  endpointMode,
+  updateFailureAction,
+  updateParallelism
 }, currentService) {
   const {
     EndpointSpec,
-    TaskTemplate
+    TaskTemplate,
+    UpdateConfig
   } = currentService.Spec;
   const containerSpec = TaskTemplate.ContainerSpec;
   const {
@@ -106,12 +121,16 @@ export function addUpdateService(taskList, {
   taskList.executeScript(`Update ${name}`, {
     script: resolvePath(__dirname, 'assets/update-service.sh'),
     vars: {
-      image: image !== containerSpec.Image ? image : null,
-      hostname: hostname !== containerSpec.Hostname ? hostname : null,
+      image: ifChanged(containerSpec.Image, image),
+      hostname: ifChanged(containerSpec.Hostname, hostname),
       envAdd: escapeEnv(envAdd),
       envRemove,
       name,
-      endpointMode: EndpointSpec.mode !== endpointMode ? endpointMode : null
+      endpointMode: ifChanged(EndpointSpec.Mode, endpointMode),
+      updateFailureAction: ifChanged(
+        UpdateConfig.FailureAction, updateFailureAction
+      ),
+      updateParallelism: ifChanged(UpdateConfig.Parallelism, updateParallelism)
     }
   });
 

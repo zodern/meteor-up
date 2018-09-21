@@ -477,6 +477,12 @@ export default class PluginAPI {
     });
   }
 
+  swarmEnabled() {
+    const config = this.getConfig();
+
+    return config.swarm && config.swarm.enabled;
+  }
+
   async swarmInfo() {
     const info = await this.getServerInfo();
     const currentManagers = swarmUtils.currentManagers(info);

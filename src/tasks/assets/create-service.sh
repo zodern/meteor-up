@@ -11,6 +11,8 @@ IMAGE=<%= image %>
 HOSTNAME=<%= hostname %>
 IMAGE=<%= image %>
 ENDPOINT_MODE=<%= endpointMode %>
+UPDATE_FAILURE_ACTION=<%= updateFailureAction %>
+UPDATE_PARALLELISM=<%= updateParallelism %>
 
 docker service create \
   <%- endpointMode !== 'dnsrr' ? '--publish=$PUBLISHED_PORT:$TARGET_PORT' : '' %> \
@@ -21,4 +23,6 @@ docker service create \
   <%- hostname ? '--hostname=' + hostname : '' %> \
   <%- mode === 'replicated' ? '--replicas=' + replicas : '--mode=global' %> \
   --endpoint-mode $ENDPOINT_MODE \
+  --update-failure-action $UPDATE_FAILURE_ACTION \
+  --update-parallelism $UPDATE_PARALLELISM \
   $IMAGE

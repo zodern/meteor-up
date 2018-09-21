@@ -11,4 +11,6 @@ docker service update \
   <%- envRemove.length ? envRemove.map(env => `--env-rm=${env.name}`).join(' ') : '' %> \
   <%- hostname ? `--hostname="${hostname}"` : '' %> \
   <%- endpointMode ? `--endpoint-mode=${endpointMode}` : '' %> \
+  <%- updateFailureAction ? `--update-failure-action=${updateFailureAction}` : '' %> \
+  <%- updateParallelism ? `--update-parallelism=${updateParallelism}` : '' %> \
   $NAME

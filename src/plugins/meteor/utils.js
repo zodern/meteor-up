@@ -78,7 +78,9 @@ export function createServiceConfig(api) {
     networks: app.docker.networks,
     hostname: `{{.Node.Hostname}}-${app.name}-{{.Task.ID}}`,
     publishedPort: proxy ? null : app.env.PORT || 80,
-    targetPort: proxy ? null : app.docker.imagePort
+    targetPort: proxy ? null : app.docker.imagePort,
+    updateFailureAction: 'rollback',
+    updateParallelism: Math.ceil(Object.keys(app.servers).length / 3)
   };
 }
 
