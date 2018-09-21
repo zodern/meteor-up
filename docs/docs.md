@@ -553,7 +553,8 @@ module.exports = {
 For Let's Encrypt to work, you also need to:
 1. Make sure `meteor.env.ROOT_URL` starts with `https://`
 2. Setup DNS for each of the domains in `proxy.domains` to point to the server
-3. Open port 80 if it isn't. That port is used to verify that you control the domain.
+3. Open port 80 if it isn't. That port is used to verify that you control the domain
+4. If you are using Cloudflare, change the SSL setting under Crypto to `Full` or `Full (strict)`
 
 After changing the config, run `mup setup` and `mup reconfig`. It will automatically create the certificates and setup SSL, which can take up to a few minutes. The certificates will be automatically renewed when they expire within 30 days.
 
