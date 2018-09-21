@@ -89,4 +89,6 @@ echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
     --name $APPNAME-swarm-upstream \
     --env NGINX_PROXY_CONTAINER="$APPNAME" \
     zodern/nginx-proxy-swarm-upstream
+
+  echo "Ran zodern/nginx-proxy-swarm-upstream"
 <% } %>
