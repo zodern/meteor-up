@@ -19,7 +19,7 @@
   },
   "homepage": "http://meteor-up.com/",
   "bin": {
-    "mup": "./index.js"
+    "mup": "bin/run"
   },
   "scripts": {
     "prepublish": "npm run build -s",
