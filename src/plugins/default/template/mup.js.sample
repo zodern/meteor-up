@@ -33,7 +33,8 @@ module.exports = {
 
     docker: {
       // abernix/meteord:node-8.11.2-base works with Meteor 1.8
-      // If you are using a different version of Meteor, refer to the docs for the correct image to use.
+      // If you are using a different version of Meteor,
+      // refer to the docs for the correct image to use.
       image: 'abernix/meteord:node-8.11.2-base',
     },
 
