@@ -51,6 +51,33 @@ For example:
 npm test -- --watch
 ```
 
+## Updating the Docs
+
+The `/docs` directory contains the docs hosted at [meteor-up.com](http://meteor-up.com). To run the docs website locally:
+
+##### 1 - Install NPM dependencies
+
+```
+npm install
+```
+
+##### 2 - Set-up Jekyll
+Follow the [official docs](https://jekyllrb.com/docs/installation/) for instruction on how to set-up Jekyll on your system.
+
+
+##### 3 - Install Gems
+```
+cd docs
+bundle install
+```
+
+##### 4 - Build and serve the website
+```
+cd ..
+npm run docs
+```
+
+The webiste will now be running at [http://localhost:8080/](http://localhost:8080/). 
 
 ## Financial contributions
 
