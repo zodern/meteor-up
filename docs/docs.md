@@ -679,7 +679,7 @@ module.exports = {
       },
       // additional docker arguments (e.g.: additional ports)
       dockerArgs: [
-        "-p 8080:8080"
+        '-p 8080:8080'
       ],
       // env for the jrcs/letsencrypt-nginx-proxy-companion container
       envLetsEncrypt: {
