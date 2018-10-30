@@ -12,3 +12,13 @@ sudo touch /opt/<%= name %>/config/env.list
 sudo touch /opt/<%= name %>/config/env_letsencrypt.list
 
 sudo chown ${USER} /opt/<%= name %> -R
+
+if docker network inspect mup-proxy ; then
+    echo "Network already exists"
+else
+    # this only works when using swarm
+    docker network create \
+      --attachable \
+      --driver overlay \
+      mup-proxy || true
+fi

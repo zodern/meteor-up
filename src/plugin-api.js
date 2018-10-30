@@ -1,4 +1,5 @@
 import * as swarmUtils from './swarm-utils';
+import * as tasks from './tasks';
 import * as utils from './utils';
 import configValidator, { showDepreciations, showErrors } from './validate/index';
 import { hooks, runRemoteHooks } from './hooks';
@@ -41,6 +42,8 @@ export default class PluginAPI {
     this.getDockerLogs = utils.getDockerLogs;
     this.runSSHCommand = utils.runSSHCommand;
     this._createSSHOptions = utils.createSSHOptions;
+
+    this.tasks = tasks;
   }
 
   getArgs() {
@@ -77,7 +80,7 @@ export default class PluginAPI {
     }
   }
 
-  validateConfig(configPath) {
+  validateConfig(configPath, logProblems) {
     // Only print errors once.
     if (this.validationErrors.length > 0) {
       return this.validationErrors;
@@ -89,7 +92,7 @@ export default class PluginAPI {
     } = configValidator(config, this._origionalConfig);
     const problems = [...errors, ...depreciations];
 
-    if (problems.length > 0) {
+    if (problems.length > 0 && logProblems) {
       console.log(`loaded config from ${configPath}`);
       console.log('');
 
@@ -148,9 +151,7 @@ export default class PluginAPI {
       }
       this.config = this._normalizeConfig(this.config);
 
-      if (validate) {
-        this.validateConfig(this.configPath);
-      }
+      this.validateConfig(this.configPath, validate);
     }
 
     return this.config;
@@ -165,6 +166,7 @@ export default class PluginAPI {
   getSettings() {
     if (!this.settings) {
       let filePath;
+
       if (this.settingsPath) {
         filePath = resolvePath(this.settingsPath);
       } else {
@@ -179,6 +181,7 @@ export default class PluginAPI {
   getSettingsFromPath(settingsPath) {
     const filePath = resolvePath(settingsPath);
     let settings;
+
     try {
       settings = fs.readFileSync(filePath).toString();
     } catch (e) {
@@ -225,6 +228,7 @@ export default class PluginAPI {
   }
   _runHooks = async function(handlers, hookName) {
     const messagePrefix = `> Running hook ${hookName}`;
+
     for (const hookHandler of handlers) {
       if (hookHandler.localCommand) {
         console.log(`${messagePrefix} "${hookHandler.localCommand}"`);
@@ -257,6 +261,7 @@ export default class PluginAPI {
 
     if (hookName in hooks) {
       const hookList = hooks[hookName];
+
       await this._runHooks(hookList, name);
     }
   };
@@ -269,6 +274,7 @@ export default class PluginAPI {
 
     if (hookName in hooks) {
       const hookList = hooks[hookName];
+
       await this._runHooks(hookList, hookName);
     }
   };
@@ -290,6 +296,8 @@ export default class PluginAPI {
     process.exit(1);
   }
   runCommand = async function(name) {
+    const firstCommand = this.commandHistory.length === 0;
+
     if (!name) {
       throw new Error('Command name is required');
     }
@@ -301,35 +309,42 @@ export default class PluginAPI {
     this.commandHistory.push({ name });
 
     await this._runPreHooks(name);
-    let potentialPromise;
+
     try {
       log('Running command', name);
-      potentialPromise = commands[name].handler(this, nodemiral);
+      await commands[name].handler(this, nodemiral);
     } catch (e) {
       this._commandErrorHandler(e);
     }
 
-    if (potentialPromise && typeof potentialPromise.then === 'function') {
-      return potentialPromise
-        .then(() => this._runPostHooks(name));
-    }
-
-    return await this._runPostHooks(name);
+    await this._runPostHooks(name).then(() => {
+      // The post hooks for the first command should be the last thing run
+      if (firstCommand) {
+        this._cleanupSessions();
+      }
+    });
   }
 
   async getServerInfo(selectedServers, collectors) {
     if (this._cachedServerInfo && !collectors) {
       return this._cachedServerInfo;
     }
+    const serverConfig = this.getConfig().servers;
 
-    const servers = selectedServers ||
-      Object.values(this.getConfig().servers);
+    const servers = (
+      selectedServers || Object.keys(this.getConfig().servers)
+    ).map(serverName => ({
+      ...serverConfig[serverName],
+      name: serverName
+    }));
 
     if (!collectors) {
+      console.log('');
       console.log('=> Collecting Docker information');
     }
 
     const result = await serverInfo(servers, collectors);
+
     if (!collectors) {
       this._cachedServerInfo = result;
     }
@@ -356,9 +371,9 @@ export default class PluginAPI {
   }
 
   async getManagerSession() {
-    const managers = await this.currentSwarmManagers();
+    const { currentManagers } = await this.swarmInfo();
 
-    return this.getSessionsForServers(managers)[0];
+    return this.getSessionsForServers(currentManagers)[0];
   }
 
   _pickSessions(plugins = []) {
@@ -370,6 +385,7 @@ export default class PluginAPI {
 
     plugins.forEach(moduleName => {
       const moduleConfig = this.getConfig()[moduleName];
+
       if (!moduleConfig) {
         return;
       }
@@ -390,6 +406,7 @@ export default class PluginAPI {
 
   _loadSessions() {
     const config = this.getConfig();
+
     this.sessions = {};
 
     // `mup.servers` contains login information for servers
@@ -411,6 +428,7 @@ export default class PluginAPI {
         username: info.username
       };
       const opts = {
+        keepAlive: true,
         ssh: info.opts || {}
       };
 
@@ -443,18 +461,46 @@ export default class PluginAPI {
       }
 
       const session = nodemiral.session(info.host, auth, opts);
+
       this.sessions[name] = session;
     }
   }
 
+  _cleanupSessions() {
+    log('cleaning up sessions');
+    if (!this.sessions) {
+      return;
+    }
+
+    Object.keys(this.sessions).forEach(key => {
+      this.sessions[key].close();
+    });
+  }
+
+  swarmEnabled() {
+    const config = this.getConfig();
+
+    return config.swarm && config.swarm.enabled;
+  }
+
   async swarmInfo() {
     const info = await this.getServerInfo();
-    const currentManagers = swarmUtils.currentManagers(this.getConfig(), info);
+    const currentManagers = swarmUtils.currentManagers(info);
     const desiredManagers = swarmUtils.desiredManagers(this.getConfig(), info);
-    const nodes = swarmUtils.findNodes(this.getConfig(), info);
-    const nodeIdsToServer = swarmUtils.nodeIdsToServer(this.getConfig(), info);
+    const nodes = swarmUtils.findNodes(info);
+    const nodeIdsToServer = swarmUtils.nodeIdsToServer(info);
     const desiredLabels = getOptions(this.getConfig()).labels;
-    const currentLabels = swarmUtils.currentLabels(this.getConfig(), info);
+    const currentLabels = swarmUtils.currentLabels(info);
+    const clusters = swarmUtils.findClusters(info);
+
+    if (Object.keys(clusters).length > 1) {
+      swarmUtils.showClusters(clusters, nodeIdsToServer);
+
+      const error = new Error('multiple-clusters');
+
+      error.solution = 'The servers in your config are in multiple swarm clusters. Any servers already in a swarm cluster should be in the same cluster. Look above for the list of clusters.';
+      throw error;
+    }
 
     return {
       currentManagers,
@@ -464,5 +510,27 @@ export default class PluginAPI {
       desiredLabels,
       currentLabels
     };
+  }
+
+  async dockerServiceInfo(serviceName) {
+    const manager = await this.getManagerSession();
+
+    if (!manager) {
+      const error = new Error('no-manager');
+
+      error.solution = 'Enable swarm in your config and run "mup setup"';
+      throw error;
+    }
+
+    const result = await this.runSSHCommand(manager, `docker service inspect ${serviceName}`);
+    let serviceInfo = null;
+
+    try {
+      [serviceInfo] = JSON.parse(result.output);
+    } catch (e) {
+      // empty
+    }
+
+    return serviceInfo;
   }
 }

@@ -84,7 +84,14 @@ sudo docker run \
   --name=$APPNAME \
   $IMAGE
 echo "Ran <%= docker.image %>"
-sleep 15s
+
+if [[ $VOLUME == "" ]]; then
+  # The app starts much faster when prepare bundle is enabled,
+  # so we do not need to wait as long
+  sleep 3s
+else
+  sleep 15s
+fi
 
 <% if(typeof sslConfig === "object") { %>
    <% if(typeof sslConfig.autogenerate === "object")  { %>

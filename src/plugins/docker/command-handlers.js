@@ -1,31 +1,32 @@
 import {
+  curry,
   difference,
-  findKey,
-  intersection,
-  isEqual,
-  partial
+  intersection
 } from 'lodash';
 import {
+  demoteManagers,
   diffLabels,
+  findNodeId,
   initSwarm,
   joinNodes,
   promoteNodes,
-  removeManagers,
   updateLabels
 } from './swarm';
 import chalk from 'chalk';
 import { checkVersion } from './utils';
 import debug from 'debug';
-import {
-  each
-} from 'async';
 import { map } from 'bluebird';
 import nodemiral from 'nodemiral';
 
 const log = debug('mup:module:docker');
 
 function uniqueSessions(api) {
+  const {servers} = api.getConfig();
   const sessions = api.getSessions(['app', 'mongo', 'proxy']);
+
+  if (api.swarmEnabled()) {
+    return api.getSessionsForServers(Object.keys(servers));
+  }
 
   return sessions.reduce(
     (prev, curr) => {
@@ -41,7 +42,7 @@ function uniqueSessions(api) {
 export function setup(api) {
   log('exec => mup docker setup');
   const config = api.getConfig();
-  const swarmEnabled = config.swarm;
+  const swarmEnabled = api.swarmEnabled();
   const servers = Object.keys(config.servers);
 
   const list = nodemiral.taskList('Setup Docker');
@@ -68,8 +69,8 @@ export function setup(api) {
 
 export async function setupSwarm(api) {
   const config = api.getConfig();
-  const swarmConfig = config.swarm;
-  if (!swarmConfig) {
+
+  if (!api.swarmEnabled()) {
     return;
   }
 
@@ -84,6 +85,9 @@ export async function setupSwarm(api) {
 
   const managersToAdd = difference(desiredManagers, currentManagers);
   const managersToRemove = difference(currentManagers, desiredManagers);
+
+  // These managers are safe to run tasks on that require a manager
+  // This array is modified as managers are added and removed
   const managersToKeep = intersection(currentManagers, desiredManagers);
 
   log('managers to add', managersToAdd);
@@ -94,26 +98,22 @@ export async function setupSwarm(api) {
     log('Creating swarm cluster');
     const host = config.servers[managersToAdd[0]].host;
 
-    await initSwarm(managersToAdd, host, api);
+    await initSwarm(managersToAdd[0], host, api);
 
     managersToKeep.push(managersToAdd.shift());
     log('finished creating cluster');
     api.serverInfoStale();
+  } else if (managersToKeep.length === 0) {
+    // We can run tasks on the managers being removed until
+    // the new managers are added
+    managersToKeep.push(managersToRemove[0]);
   }
 
   // refresh server info after updating managers
   serverInfo = await api.getServerInfo();
 
-  // TODO: we should always keep one manager until
-  // after the new managers are added
-  if (managersToRemove.length > 0) {
-    removeManagers(managersToRemove, api);
-    api.serverInfoStale();
-  }
-
   const {
     nodes: currentNodes,
-    nodeIDs,
     currentLabels,
     desiredLabels
   } = await api.swarmInfo();
@@ -124,37 +124,73 @@ export async function setupSwarm(api) {
   log('adding nodes', nodesToAdd);
 
   if (nodesToAdd.length > 0) {
-    // TODO: make sure token is for correct cluster
     const token = Object.keys(serverInfo)
       .reduce((result, item) => result || serverInfo[item].swarmToken, null);
     const managerIP = config.servers[desiredManagers[0]].host;
+
     await joinNodes(nodesToAdd, token, managerIP, api);
+    api.serverInfoStale();
   }
+
+  const {
+    nodeIDs
+  } = await api.swarmInfo();
+  const curriedFindNodeId = curry(findNodeId)(nodeIDs);
 
   log('remaining managers to add', managersToAdd);
   if (managersToAdd.length > 0) {
     const managerIDs = managersToAdd
-      .map(name => findKey(nodeIDs, partial(isEqual, name)));
+      .map(curriedFindNodeId);
 
     await promoteNodes(managersToKeep[0], managerIDs, api);
+
+    if (managersToKeep[0] === managersToRemove[0]) {
+      // There were no managers being kept, so we were only able
+      // to use the managers that will be removed. We can now use
+      // the newly promoted managers.
+      managersToKeep[0] = managersToAdd[0];
+    }
+  }
+
+  if (managersToRemove.length > 0) {
+    await demoteManagers(
+      managersToKeep[0],
+      managersToRemove.map(curriedFindNodeId),
+      api
+    );
+    api.serverInfoStale();
   }
 
   // Update tags
   let { toRemove, toAdd } = diffLabels(currentLabels, desiredLabels);
+
+  log('current labels', currentLabels);
+  log('desired labels', desiredLabels);
+  log('adding labels', toAdd);
+  log('removing labels', toRemove);
+
   if (toRemove.length > 0 || toAdd.length > 0) {
     toRemove = toRemove.map(data => {
-      data.server = findKey(nodeIDs, partial(isEqual, data.server));
+      data.node = curriedFindNodeId(data.server);
+
+      if (!data.node) {
+        console.error(`Unable to remove "${data.label}" label for server "${data.server}": Server doesn't have a node id.`);
+      }
 
       return data;
     });
 
     toAdd = toAdd.map(data => {
-      data.server = findKey(nodeIDs, partial(isEqual, data.server));
+      data.node = curriedFindNodeId(data.server);
+
+      if (!data.node) {
+        console.log(`Unable to update "${data.label}" label for server "${data.server}": Server doesn't have a node id.`);
+      }
 
       return data;
     });
 
-    await updateLabels(api, currentManagers[0], toAdd, toRemove);
+    await updateLabels(api, managersToKeep[0], toAdd, toRemove);
   }
 }
 
@@ -173,11 +209,11 @@ export function restart(api) {
 }
 
 export function removeSwarm(api) {
-  const list = nodemiral.taskList('Removing swarm');
+  const list = nodemiral.taskList('Destroy Swarm Cluster');
   const servers = Object.keys(api.getConfig().servers);
   const sessions = api.getSessionsForServers(servers);
 
-  list.executeScript('Removing swarm', {
+  list.executeScript('Leave Swarm Cluster', {
     script: api.resolvePath(__dirname, 'assets/swarm-leave.sh')
   });
 
@@ -186,20 +222,23 @@ export function removeSwarm(api) {
   });
 }
 
-export function ps(api) {
+export async function ps(api) {
   const args = api.getArgs();
+
   args.shift();
-  each(uniqueSessions(api), (session, cb) => {
-    session.execute(`sudo docker ${args.join(' ')} 2>&1`, (err, code, logs) => {
-      console.log(chalk.magenta(`[${session._host}]`) + chalk.blue(` docker ${args.join(' ')}`));
-      console.log(logs.stdout);
-      cb();
+  const sessions = uniqueSessions(api);
+
+  for (const session of sessions) {
+    await api.runSSHCommand(session, `sudo docker ${args.join(' ')} 2>&1`).then(({output, host}) => {
+      console.log(chalk.magenta(`[${host}]`) + chalk.blue(` docker ${args.join(' ')}`));
+      console.log(output);
     });
-  });
+  }
 }
 
 export async function status(api) {
   const config = api.getConfig();
+  const swarmEnabled = api.swarmEnabled();
 
   if (!config.servers) {
     return;
@@ -242,7 +281,7 @@ export async function status(api) {
   console.log(overallColor('\n=> Docker Status'));
   console.log(lines.join('\n'));
 
-  if (!config.swarm) {
+  if (!swarmEnabled ) {
     return;
   }
 
@@ -250,11 +289,11 @@ export async function status(api) {
   const list = [];
 
   currentManagers.forEach(manager => {
-    list.push(`- ${manager} (Manager)`);
+    list.push(` - ${manager} (Manager)`);
   });
 
   difference(nodes, currentManagers).forEach(node => {
-    list.push(`- ${node}`);
+    list.push(` - ${node || 'Unknown server'}`);
   });
 
   if (currentManagers.length === 0) {
@@ -263,7 +302,7 @@ export async function status(api) {
     return;
   }
 
-  // TODO show swarm health:
+  // TODO: show swarm health:
   // https://docs.docker.com/engine/swarm/admin_guide/#monitor-swarm-health
 
   console.log(`Swarm Nodes: ${nodes.length}`);

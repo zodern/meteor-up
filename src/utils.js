@@ -2,6 +2,7 @@ import { Client } from 'ssh2';
 import debug from 'debug';
 import expandTilde from 'expand-tilde';
 import fs from 'fs';
+import nodemiral from 'nodemiral';
 import path from 'path';
 import { promisify } from 'bluebird';
 import readline from 'readline';
@@ -36,8 +37,10 @@ export function runTaskList(list, sessions, opts) {
       for (const host in summaryMap) {
         if (summaryMap.hasOwnProperty(host)) {
           const summary = summaryMap[host];
+
           if (summary.error) {
             const error = summary.error;
+
             error.nodemiralHistory = summary.history;
             reject(error);
 
@@ -72,6 +75,7 @@ class Callback2Stream extends stream.Readable {
     this.reading = true;
     this.data.forEach(() => {
       const shouldContinue = this.reading && this.push(this.data.shift());
+
       if (!shouldContinue) {
         this.reading = false;
       }
@@ -79,18 +83,19 @@ class Callback2Stream extends stream.Readable {
   }
 }
 
-export function getDockerLogs(name, sessions, args) {
+export function getDockerLogs(name, sessions, args, showHost = true) {
   const command = `sudo docker ${args.join(' ')} ${name} 2>&1`;
 
   log(`getDockerLogs command: ${command}`);
 
   const promises = sessions.map(session => {
     const input = new Callback2Stream();
-    const host = `[${session._host}]`;
+    const host = showHost ? `[${session._host}]` : '';
     const lineSeperator = readline.createInterface({
       input,
       terminal: true
     });
+
     lineSeperator.on('line', data => {
       console.log(host + data);
     });
@@ -129,27 +134,50 @@ export function createSSHOptions(server) {
   return ssh;
 }
 
-// Maybe we should create a new npm package
-// for this one. Something like 'sshelljs'.
-export function runSSHCommand(info, command) {
+function runSessionCommand(session, command) {
   return new Promise((resolve, reject) => {
+    let client;
+    let done;
+
+    // callback is called synchronously
+    session._withSshClient((_client, _done) => {
+      client = _client;
+      done = _done;
+    });
+
+    let output = '';
+
+    client.execute(command, {
+      onStderr: data => { output += data; },
+      onStdout: data => { output += data; }
+    }, (err, result) => {
+      // eslint-disable-next-line callback-return
+      done();
+
+      if (err) {
+        return reject(err);
+      }
+
+      resolve({
+        code: result.code,
+        output,
+        host: session._host
+      });
+    });
+  });
+}
+
+// info can either be an object from the server object in the config
+// or it can be a nodemiral session
+export function runSSHCommand(info, command) {
+  if (info instanceof nodemiral.session) {
+    return runSessionCommand(info, command);
+  }
+
+  return new Promise((resolve, reject) => {
+    const ssh = createSSHOptions(info);
     const conn = new Client();
 
-    // TODO better if we can extract SSH agent info from original session
-    const sshAgent = process.env.SSH_AUTH_SOCK;
-    const ssh = {
-      host: info.host,
-      port: (info.opts && info.opts.port) || 22,
-      username: info.username
-    };
-
-    if (info.pem) {
-      ssh.privateKey = fs.readFileSync(resolvePath(info.pem), 'utf8');
-    } else if (info.password) {
-      ssh.password = info.password;
-    } else if (sshAgent && fs.existsSync(sshAgent)) {
-      ssh.agent = sshAgent;
-    }
     conn.connect(ssh);
 
     conn.once('error', err => {

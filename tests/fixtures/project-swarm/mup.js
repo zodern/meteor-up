@@ -6,9 +6,11 @@ var serverFile = path.resolve('..', 'servers');
 var servers = require(serverFile);
 
 module.exports = {
-  servers: servers,
+  servers: {
+    mymeteor: servers.mymeteor
+  },
   meteor: {
-    name: 'myapp',
+    name: 'myapp-service',
     path: meteorPath,
     servers: {
       mymeteor: {}
@@ -22,9 +24,12 @@ module.exports = {
     },
     deployCheckWaitTime: 300
   },
+  swarm: {
+    enabled: true
+  },
   mongo: {
     servers: {
-      mymongo: {}
+      mymeteor: {}
     }
   }
 };

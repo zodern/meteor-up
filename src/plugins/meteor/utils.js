@@ -1,3 +1,9 @@
+import { cloneDeep } from 'lodash';
+import fs from 'fs';
+import os from 'os';
+import random from 'random-seed';
+import uuid from 'uuid';
+
 export function checkAppStarted(list, api) {
   const script = api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh');
   const { app } = api.getConfig();
@@ -40,4 +46,105 @@ export function prepareBundleSupported(dockerConfig) {
   return supportedImages.find(
     supportedImage => dockerConfig.image.indexOf(supportedImage) === 0
   ) || false;
+}
+
+export function createEnv(appConfig, settings) {
+  const env = cloneDeep(appConfig.env);
+
+  env.METEOR_SETTINGS = JSON.stringify(settings);
+
+  // setting PORT in the config is used for the publicly accessible
+  // port.
+  // docker.imagePort is used for the port exposed from the container.
+  // In case the docker.imagePort is different than the container's
+  // default port, we set the env PORT to docker.imagePort.
+  env.PORT = appConfig.docker.imagePort;
+
+  return env;
+}
+
+export function createServiceConfig(api) {
+  const {
+    app,
+    proxy
+  } = api.getConfig();
+
+  return {
+    image: `mup-${app.name.toLowerCase()}:latest`,
+    name: app.name,
+    mode: 'global',
+    env: createEnv(app, api.getSettings()),
+    endpointMode: proxy ? 'dnsrr' : 'vip',
+    networks: app.docker.networks,
+    hostname: `{{.Node.Hostname}}-${app.name}-{{.Task.ID}}`,
+    publishedPort: proxy ? null : app.env.PORT || 80,
+    targetPort: proxy ? null : app.docker.imagePort,
+    updateFailureAction: 'rollback',
+    updateParallelism: Math.ceil(Object.keys(app.servers).length / 3)
+  };
+}
+
+export function getNodeVersion(api, bundlePath) {
+  let star = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/star.json')).toString();
+  let nodeVersion = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/.node_version.txt')).toString().trim();
+
+  star = JSON.parse(star);
+  // Remove leading 'v'
+  nodeVersion = nodeVersion.substr(1);
+
+  return star.nodeVersion || nodeVersion;
+}
+
+export async function getSessions(api) {
+  if (api.swarmEnabled()) {
+    return [
+      await api.getManagerSession()
+    ];
+  }
+
+  return api.getSessions(['app']);
+}
+
+export function tmpBuildPath(appPath, api) {
+  const rand = random.create(appPath);
+  const uuidNumbers = [];
+
+  for (let i = 0; i < 16; i++) {
+    uuidNumbers.push(rand(255));
+  }
+
+  return api.resolvePath(
+    os.tmpdir(),
+    `mup-meteor-${uuid.v4({ random: uuidNumbers })}`
+  );
+}
+
+export function getBuildOptions(api) {
+  const config = api.getConfig().app;
+  const appPath = api.resolvePath(api.getBasePath(), config.path);
+
+  const buildOptions = config.buildOptions || {};
+
+  buildOptions.buildLocation =
+    buildOptions.buildLocation || tmpBuildPath(appPath, api);
+
+  return buildOptions;
+}
+
+export function shouldRebuild(api) {
+  let rebuild = true;
+  const { buildLocation } = getBuildOptions(api);
+  const bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
+
+  if (api.getOptions()['cached-build']) {
+    const buildCached = fs.existsSync(bundlePath);
+
+    // If build is not cached, rebuild is true
+    // even though the --cached-build flag was used
+    if (buildCached) {
+      rebuild = false;
+    }
+  }
+
+  return rebuild;
 }

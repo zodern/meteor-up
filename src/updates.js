@@ -5,11 +5,18 @@ import Npm from 'silent-npm-registry-client';
 import pkg from '../package.json';
 
 const log = debug('mup:updates');
+const SKIP_CHECK_UPDATE = process.env.MUP_SKIP_UPDATE_CHECK === 'false';
 
 export default function() {
   log('checking for updates');
 
   return new Promise(resolve => {
+    if (SKIP_CHECK_UPDATE) {
+      log('skipping update check');
+
+      return resolve();
+    }
+
     const params = {
       timeout: 1000,
       package: pkg.name,
@@ -18,6 +25,7 @@ export default function() {
 
     const npm = new Npm();
     const uri = 'https://registry.npmjs.org/npm';
+
     npm.distTags.fetch(uri, params, (err, res) => {
       if (err) {
         resolve();
@@ -34,6 +42,7 @@ export default function() {
         .map(n => Number(n.split('-')[0]));
       const remote = npmVersion.split('.').map(n => Number(n.split('-')[0]));
       const next = nextVersion.split('.').map(n => Number(n.split('-')[0]));
+
       next.push(nextVersion.split('.')[2].split('beta')[1]);
 
       const beta = pkg.version.split('.')[2].split('-').length > 1;
@@ -63,6 +72,7 @@ export default function() {
         const command = showStable ? 'npm i -g mup' : 'npm i -g mup@next';
 
         let text = `update available ${pkg.version} => ${version}`;
+
         text += `\nTo update, run ${chalk.green(command)}`;
         console.log(
           boxen(text, {
