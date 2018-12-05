@@ -8,10 +8,16 @@ export default function(
   config,
   {
     addLocation,
-    VALIDATE_OPTIONS
+    VALIDATE_OPTIONS,
+    combineErrorDetails
   }
 ) {
-  const validationErrors = joi.validate(config.swarm, schema, VALIDATE_OPTIONS);
+  let details = [];
 
-  return addLocation(validationErrors, 'swarm');
+  details = combineErrorDetails(
+    details,
+    joi.validate(config.swarm, schema, VALIDATE_OPTIONS)
+  );
+
+  return addLocation(details, 'swarm');
 }
