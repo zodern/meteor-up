@@ -48,7 +48,9 @@ sudo docker run \
   -p $HTTPS_PORT:443 \
   --name $APPNAME \
   --env-file=$ENV_FILE \
-  --restart=always\
+  --restart=always \
+  --log-opt max-size=100m \
+  --log-opt max-file=7 \
   -v /opt/$APPNAME/mounted-certs:/etc/nginx/certs \
   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
@@ -63,6 +65,8 @@ sudo docker run -d \
   --env-file=$ENV_FILE_LETSENCRYPT \
   --restart=always \
   --volumes-from $APPNAME \
+  --log-opt max-size=100m \
+  --log-opt max-file=3 \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
   jrcs/letsencrypt-nginx-proxy-companion
 echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
