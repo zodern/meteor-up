@@ -23,24 +23,20 @@ sudo docker stop $APPNAME >/dev/null 2>&1 || true
 
 cd $APP_DIR/tmp
 
-sudo rm -rf bundle
-sudo tar -xzf bundle.tar.gz
-sudo chmod 777 ./ -R
-echo "Finished Extracting"
-cd bundle
-
 echo "Creating Dockerfile"
 sudo cat <<EOT > Dockerfile
 FROM <%= dockerImage %>
-RUN mkdir /built_app || true
+RUN mkdir /_built_app || true && \
+    rm -r /built_app
 ENV <% for(var key in env) { %> \
   <%- key %>=<%- env[key] %> \
 <% } %>
 <% for(var instruction in buildInstructions) { %>
 <%-  buildInstructions[instruction] %>
 <% } %>
-COPY ./ /built_app
-RUN cd  /built_app/programs/server && \
+ADD ./bundle2.tar.gz /_built_app
+RUN ln -s /_built_app /built_app && \
+    cd /built_app/programs/server && \
     npm install --unsafe-perm
 EOT
 
