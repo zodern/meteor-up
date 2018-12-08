@@ -40,17 +40,18 @@ revert_app () {
   echo ""
 }
 
-elaspsed=0
+START_TIME=$(date +%s)
+END_AT=$((START_TIME + $DEPLOY_CHECK_WAIT_TIME))
 noIPCount=0
 MAX_NO_IP_COUNT=10
+
 while [[ true ]]; do
-  if [ "$elaspsed" "==" "$DEPLOY_CHECK_WAIT_TIME" ]; then
+  if [ $(date +%s) -ge "$END_AT" ]; then
     revert_app
     exit 1
   fi
 
   sleep 1
-  elaspsed=$((elaspsed+1))
 
   # If the container restarted, the ip address would have changed
   # Get the current ip address right before it is used
