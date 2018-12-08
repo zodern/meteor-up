@@ -81,7 +81,7 @@ while [[ true ]]; do
   #
   # --insecure Without this, it would sometimes fail when ssl is set up
   curl \
-    --max-time 10 \
+    --max-time 25 \
     --insecure \
     $DEPLOY_CHECK_URL \
     && exit 0
