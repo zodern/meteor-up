@@ -34,8 +34,8 @@ ENV <% for(var key in env) { %> \
 <% for(var instruction in buildInstructions) { %>
 <%-  buildInstructions[instruction] %>
 <% } %>
-ADD ./bundle2.tar.gz /_built_app
-RUN ln -s /_built_app /built_app && \
+ADD ./bundle.tar.gz /_built_app
+RUN ln -s /_built_app/bundle /built_app && \
     cd /built_app/programs/server && \
     npm install --unsafe-perm
 EOT
