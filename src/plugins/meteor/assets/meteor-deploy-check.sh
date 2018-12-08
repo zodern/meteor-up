@@ -15,7 +15,7 @@ cd $APP_PATH
 revert_app () {
   echo "=> Container status:"
   sudo docker inspect $APPNAME --format "restarted: {{.RestartCount}} times {{json .NetworkSettings}} {{json .State}}"
-  echo "=> Logs:"
+  echo "=> Logs:" 1>&2
   sudo docker logs --tail=100 $APPNAME 1>&2
 
   if sudo docker image inspect $IMAGE:previous >/dev/null 2>&1; then
