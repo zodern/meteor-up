@@ -1,5 +1,5 @@
 import * as _commands from './commands';
-import { addProxyEnv } from './utils';
+import { addProxyEnv, normalizeUrl } from './utils';
 import { updateProxyForService } from './command-handlers';
 import validator from './validate';
 
@@ -33,6 +33,8 @@ export function prepareConfig(config) {
     config.app.docker.networks = config.app.docker.networks || [];
     config.app.docker.networks.push('mup-proxy');
   }
+
+  config.app.env.ROOT_URL = normalizeUrl(config, config.app.env);
 
   return config;
 }

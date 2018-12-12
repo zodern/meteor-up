@@ -21,3 +21,18 @@ export function addProxyEnv(config, env) {
 
   return env;
 }
+
+export function normalizeUrl(config, env) {
+  const _config = config;
+  const sslConfig = config.proxy.ssl;
+  const isHttpUrl = new RegExp('^(http)://', 'i').test(env.ROOT_URL);
+
+  if (sslConfig && isHttpUrl) {
+    const urlArray = _config.app.env.ROOT_URL.split(':');
+
+    urlArray[0] = `${urlArray[0]}s:`;
+    _config.app.env.ROOT_URL = urlArray.join('');
+  }
+
+  return _config.app.env.ROOT_URL;
+}
