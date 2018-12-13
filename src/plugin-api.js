@@ -126,7 +126,7 @@ export default class PluginAPI {
       config.app.type = 'meteor';
     }
 
-    if (config.app.env.MAIL_URL) {
+    if (utils.configHasMailUrl(config)) {
       config.app.env.MAIL_URL = encodeURIComponent(config.app.env.MAIL_URL);
     }
 

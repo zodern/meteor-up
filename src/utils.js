@@ -278,3 +278,7 @@ export function filterArgv(argvArray, argv, unwanted) {
 
   return result;
 }
+
+export function configHasMailUrl(config) {
+  return config && config.app && config.app.env && config.app.env.MAIL_URL;
+}
