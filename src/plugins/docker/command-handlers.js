@@ -12,8 +12,9 @@ import {
   promoteNodes,
   updateLabels
 } from './swarm';
+import { checkVersion, shouldShowDockerWarning } from './utils';
+
 import chalk from 'chalk';
-import { checkVersion } from './utils';
 import debug from 'debug';
 import { map } from 'bluebird';
 import nodemiral from 'nodemiral';
@@ -246,11 +247,12 @@ export async function status(api) {
 
   const results = await map(
     Object.values(config.servers),
-    server => api.runSSHCommand(server, 'sudo docker version --format "{{.Server.Version}}"'),
+    server => api.runSSHCommand(server, 'sudo docker version --format "{{.Server.Version}}'),
     { concurrency: 2 }
   );
 
   const lines = [];
+  const versions = [];
   let overallColor = chalk.green;
 
   results.forEach(result => {
@@ -275,10 +277,19 @@ export async function status(api) {
       versionColor = chalk.red;
     }
 
+    versions.push({
+      version,
+      host: result.host
+    });
+
     lines.push(` - ${result.host}: ${versionColor(version)} ${chalk[color](dockerStatus)}`);
   });
 
+
   console.log(overallColor('\n=> Docker Status'));
+  if (shouldShowDockerWarning(versions)) {
+    console.log(` - ${chalk.yellow('All Dockers don\'t have the same version')}`);
+  }
   console.log(lines.join('\n'));
 
   if (!swarmEnabled ) {
