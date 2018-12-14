@@ -1,3 +1,4 @@
+import { checkVersion, shouldShowDockerWarning } from './utils';
 import {
   curry,
   difference,
@@ -12,7 +13,6 @@ import {
   promoteNodes,
   updateLabels
 } from './swarm';
-import { checkVersion, shouldShowDockerWarning } from './utils';
 
 import chalk from 'chalk';
 import debug from 'debug';
