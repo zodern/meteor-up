@@ -127,7 +127,15 @@ export default class PluginAPI {
     }
 
     if (utils.configHasMailUrl(config)) {
-      config.app.env.MAIL_URL = encodeURIComponent(config.app.env.MAIL_URL);
+      const mailUrl = config.app.env.MAIL_URL;
+
+      config.app.env.MAIL_URL = utils.normalizeMailUrl(mailUrl);
+    }
+
+    if (utils.configHasMongoUrl(config)) {
+      const mongoUrl = config.app.env.MONGO_URL;
+
+      config.app.env.MONGO_URL = utils.normalizeMongoUrl(mongoUrl);
     }
 
     return runConfigPreps(config);

@@ -147,23 +147,31 @@ function runSessionCommand(session, command) {
 
     let output = '';
 
-    client.execute(command, {
-      onStderr: data => { output += data; },
-      onStdout: data => { output += data; }
-    }, (err, result) => {
-      // eslint-disable-next-line callback-return
-      done();
+    client.execute(
+      command,
+      {
+        onStderr: data => {
+          output += data;
+        },
+        onStdout: data => {
+          output += data;
+        }
+      },
+      (err, result) => {
+        // eslint-disable-next-line callback-return
+        done();
 
-      if (err) {
-        return reject(err);
+        if (err) {
+          return reject(err);
+        }
+
+        resolve({
+          code: result.code,
+          output,
+          host: session._host
+        });
       }
-
-      resolve({
-        code: result.code,
-        output,
-        host: session._host
-      });
-    });
+    );
   });
 }
 
@@ -281,4 +289,52 @@ export function filterArgv(argvArray, argv, unwanted) {
 
 export function configHasMailUrl(config) {
   return config && config.app && config.app.env && config.app.env.MAIL_URL;
+}
+
+export function configHasMongoUrl(config) {
+  return config && config.app && config.app.env && config.app.env.MONGO_URL;
+}
+
+export function normalizeMailUrl(mailUrl) {
+  let url = mailUrl;
+
+  // Regex get everything what's between mongodb:// and the last @
+  const re = /^(smtp|smtps):\/\/(.*)@/g.exec(url);
+
+  if (re && re.length > 0) {
+    const arr = re[2].split(':');
+
+    // Username is returned by .shift() if needed
+    arr.shift();
+
+    // Use arr.join('') because user might have more that one : in the pass
+    const fullpassword = arr.join('');
+    const encodedPassword = encodeURIComponent(fullpassword);
+
+    url = url.replace(fullpassword, encodedPassword);
+  }
+
+  return url;
+}
+
+export function normalizeMongoUrl(mongoUrl) {
+  let url = mongoUrl;
+
+  // Regex get everything what's between mongodb:// and the last @
+  const re = /mongodb:\/\/(.*)@/g.exec(url);
+
+  if (re && re.length > 0) {
+    const arr = re[2].split(':');
+
+    // Username is returned by .shift() if needed
+    arr.shift();
+
+    // Use arr.join('') because user might have more that one : in the pass
+    const fullpassword = arr.join('');
+    const encodedPassword = encodeURIComponent(fullpassword);
+
+    url = url.replace(fullpassword, encodedPassword);
+  }
+
+  return url;
 }

@@ -25,6 +25,7 @@ else
   echo "Different start script"
   rm mongo-start-current.sh || true
   cp mongo-start-new.sh mongo-start-current.sh
+  cat mongo-start-current.sh
   bash mongo-start-current.sh
 fi
 
