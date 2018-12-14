@@ -298,7 +298,7 @@ export function configHasMongoUrl(config) {
 export function normalizeMailUrl(mailUrl) {
   let url = mailUrl;
 
-  // Regex get everything what's between mongodb:// and the last @
+  // Regex get everything what's between smtp|smtps:// and the last @
   const re = /^(smtp|smtps):\/\/(.*)@/g.exec(url);
 
   if (re && re.length > 0) {
