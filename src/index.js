@@ -2,12 +2,12 @@ import './node-version';
 import './nodemiral';
 import modules, { loadPlugins, locatePluginDir } from './load-plugins';
 import chalk from 'chalk';
-import checkUpdates from './updates';
 import { filterArgv } from './utils';
 import MupAPI from './plugin-api';
 import pkg from '../package.json';
 import { registerHook } from './hooks';
 import yargs from 'yargs';
+const updateNotifier = require('update-notifier');
 
 const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help', 'servers'];
 
@@ -27,26 +27,21 @@ function addModuleCommands(builder, module, moduleName) {
 
 function commandWrapper(pluginName, commandName) {
   return function() {
-    checkUpdates()
-      .then(() => {
-        const rawArgv = process.argv.slice(2);
-        const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
-        const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
-        let potentialPromise;
+    updateNotifier({pkg}).notify();
+    const rawArgv = process.argv.slice(2);
+    const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
+    const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
+    let potentialPromise;
 
-        try {
-          potentialPromise = api.runCommand(`${pluginName}.${commandName}`);
-        } catch (e) {
-          api._commandErrorHandler(e);
-        }
+    try {
+      potentialPromise = api.runCommand(`${pluginName}.${commandName}`);
+    } catch (e) {
+      api._commandErrorHandler(e);
+    }
 
-        if (potentialPromise && typeof potentialPromise.then === 'function') {
-          potentialPromise.catch(api._commandErrorHandler);
-        }
-      })
-      .catch(e => {
-        console.error(e);
-      });
+    if (potentialPromise && typeof potentialPromise.then === 'function') {
+      potentialPromise.catch(api._commandErrorHandler);
+    }
   };
 }
 
