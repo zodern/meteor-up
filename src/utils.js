@@ -324,7 +324,7 @@ export function normalizeMongoUrl(mongoUrl) {
   const re = /mongodb:\/\/(.*)@/g.exec(url);
 
   if (re && re.length > 0) {
-    const arr = re[2].split(':');
+    const arr = re[1].split(':');
 
     // Username is returned by .shift() if needed
     arr.shift();
