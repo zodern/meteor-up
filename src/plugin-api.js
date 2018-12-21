@@ -126,18 +126,6 @@ export default class PluginAPI {
       config.app.type = 'meteor';
     }
 
-    if (utils.configHasMailUrl(config)) {
-      const mailUrl = config.app.env.MAIL_URL;
-
-      config.app.env.MAIL_URL = utils.normalizeMailUrl(mailUrl);
-    }
-
-    if (utils.configHasMongoUrl(config)) {
-      const mongoUrl = config.app.env.MONGO_URL;
-
-      config.app.env.MONGO_URL = utils.normalizeMongoUrl(mongoUrl);
-    }
-
     return runConfigPreps(config);
   }
   getConfig(validate = true) {

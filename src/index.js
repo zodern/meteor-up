@@ -104,6 +104,7 @@ let program = yargs
     boolean: true
   })
   .strict(true)
+  .scriptName('mup')
   .alias('h', 'help')
   .epilogue(
     'For more information, read the docs at http://meteor-up.com/docs.html'
