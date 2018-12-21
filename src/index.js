@@ -39,12 +39,12 @@ function commandWrapper(pluginName, commandName) {
 function addModuleCommands(builder, module, moduleName) {
   Object.keys(module.commands).forEach(commandName => {
     const command = module.commands[commandName];
+    const name = command.name || commandName;
 
     command.builder = command.builder || {};
-
     builder.command(
-      command.name || commandName,
-      command.description,
+      name,
+      command.description.length === 0 ? false : command.description,
       command.builder,
       commandWrapper(moduleName, commandName)
     );
