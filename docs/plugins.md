@@ -5,6 +5,9 @@ title: 'Plugins'
 ## List of plugins
   
   - [mup-aws-beanstalk](https://github.com/zodern/mup-aws-beanstalk) Deploy using AWS Elastic Beanstalk. Supports load balancing, auto scaling, and rolling deploys
+  - [mup-node](https://github.com/zodern/mup-node) Deploy node apps with Meteor Up
+  - [mup-docker-deploy](https://github.com/zodern/mup-docker-deploy) Use a custom Dockerfile to deploy any type of app
+  - [mup-cloud-front](https://github.com/zodern/mup-cloud-front) Setup and use CloudFlare, with support for rolling deploys
   - [mup-disk](https://www.npmjs.com/package/mup-disk) Shows disk usage and cleans up old files and docker items
   - [mup-redis](https://www.npmjs.com/package/mup-redis) Set up and manage Redis
   - [mup-fix-bin-paths](https://www.npmjs.com/package/mup-fix-bin-paths) Fix npm bin paths that break deploying from Windows
