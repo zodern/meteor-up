@@ -2,6 +2,7 @@ import { cloneDeep } from 'lodash';
 import fs from 'fs';
 import os from 'os';
 import random from 'random-seed';
+import url from 'url';
 import uuid from 'uuid';
 
 export function checkAppStarted(list, api) {
@@ -23,7 +24,9 @@ export function checkAppStarted(list, api) {
 
 export function addStartAppTask(list, api) {
   const appConfig = api.getConfig().app;
-  const isDeploy = api.commandHistory.find(({ name }) => name === 'meteor.deploy');
+  const isDeploy = api.commandHistory.find(
+    ({ name }) => name === 'meteor.deploy'
+  );
 
   list.executeScript('Start Meteor', {
     script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
@@ -43,9 +46,11 @@ export function prepareBundleSupported(dockerConfig) {
     return dockerConfig.prepareBundle;
   }
 
-  return supportedImages.find(
-    supportedImage => dockerConfig.image.indexOf(supportedImage) === 0
-  ) || false;
+  return (
+    supportedImages.find(
+      supportedImage => dockerConfig.image.indexOf(supportedImage) === 0
+    ) || false
+  );
 }
 
 export function createEnv(appConfig, settings) {
@@ -64,10 +69,7 @@ export function createEnv(appConfig, settings) {
 }
 
 export function createServiceConfig(api) {
-  const {
-    app,
-    proxy
-  } = api.getConfig();
+  const { app, proxy } = api.getConfig();
 
   return {
     image: `mup-${app.name.toLowerCase()}:latest`,
@@ -85,8 +87,13 @@ export function createServiceConfig(api) {
 }
 
 export function getNodeVersion(api, bundlePath) {
-  let star = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/star.json')).toString();
-  let nodeVersion = fs.readFileSync(api.resolvePath(bundlePath, 'bundle/.node_version.txt')).toString().trim();
+  let star = fs
+    .readFileSync(api.resolvePath(bundlePath, 'bundle/star.json'))
+    .toString();
+  let nodeVersion = fs
+    .readFileSync(api.resolvePath(bundlePath, 'bundle/.node_version.txt'))
+    .toString()
+    .trim();
 
   star = JSON.parse(star);
   // Remove leading 'v'
@@ -97,9 +104,7 @@ export function getNodeVersion(api, bundlePath) {
 
 export async function getSessions(api) {
   if (api.swarmEnabled()) {
-    return [
-      await api.getManagerSession()
-    ];
+    return [await api.getManagerSession()];
   }
 
   return api.getSessions(['app']);
@@ -157,45 +162,11 @@ export function configHasMongoUrl(config) {
   return config && config.app && config.app.env && config.app.env.MONGO_URL;
 }
 
-export function normalizeMailUrl(mailUrl) {
-  let url = mailUrl;
+export function normalizeUrl(configUrl) {
+  const parsedUrl = url.parse(configUrl);
 
-  // Regex get everything what's between smtp|smtps:// and the last @
-  const re = /^(smtp|smtps):\/\/(.*)@/g.exec(url);
-
-  if (re && re.length > 0) {
-    const arr = re[2].split(':');
-
-    // Username is returned by .shift() if needed
-    arr.shift();
-
-    // Use arr.join('') because user might have more that one : in the pass
-    const fullpassword = arr.join('');
-    const encodedPassword = encodeURIComponent(fullpassword);
-
-    url = url.replace(fullpassword, encodedPassword);
-  }
-
-  return url;
-}
-
-export function normalizeMongoUrl(mongoUrl) {
-  let url = mongoUrl;
-
-  // Regex get everything what's between mongodb:// and the last @
-  const re = /mongodb:\/\/(.*)@/g.exec(url);
-
-  if (re && re.length > 0) {
-    const arr = re[1].split(':');
-
-    // Username is returned by .shift() if needed
-    arr.shift();
-
-    // Use arr.join('') because user might have more that one : in the pass
-    const fullpassword = arr.join('');
-    const encodedPassword = encodeURIComponent(fullpassword);
-
-    url = url.replace(fullpassword, encodedPassword);
+  if (parsedUrl.hasOwnProperty('href')) {
+    return parsedUrl.href;
   }
 
   return url;
