@@ -169,5 +169,5 @@ export function normalizeUrl(configUrl) {
     return parsedUrl.href;
   }
 
-  return url;
+  return configUrl;
 }
