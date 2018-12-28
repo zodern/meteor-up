@@ -105,7 +105,6 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
   log(`Build Path: ${appPath}`);
   log(`Build Command:  ${executable} ${args.join(' ')}`);
 
-  console.log('<rolljee> commandline', executable, args, options);
   const meteor = spawn(executable, args, options);
 
   meteor.on('error', e => {
