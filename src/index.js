@@ -51,6 +51,9 @@ function addModuleCommands(builder, module, moduleName) {
   });
 }
 
+// Prevent yargs from exiting the process before plugins are loaded
+yargs.help(false);
+
 // Load config before creating commands
 const preAPI = new MupAPI(process.cwd(), process.argv, yargs.argv);
 const config = preAPI.getConfig(false);
