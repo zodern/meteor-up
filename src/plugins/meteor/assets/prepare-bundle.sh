@@ -23,6 +23,12 @@ sudo docker stop $APPNAME >/dev/null 2>&1 || true
 
 cd $APP_DIR/tmp
 
+sudo rm -rf bundle
+sudo tar -xzf bundle.tar.gz
+sudo chmod 777 ./ -R
+echo "Finished Extracting"
+cd bundle
+
 echo "Creating Dockerfile"
 sudo cat <<"EOT" > Dockerfile
 FROM <%= dockerImage %>
@@ -33,13 +39,9 @@ ARG <%- key %>=<%- env[key] %>
 <% for(var instruction in buildInstructions) { %>
 <%-  buildInstructions[instruction] %>
 <% } %> 
-ADD ./bundle.tar.gz /_built_app
 
-# In non-root images, we are not able to directly symlink
-# /built_app to the bundle, so we instead symlink it's contents
-RUN for filename in /_built_app/bundle/*; do \
-        ln -s "$filename" "/built_app/$(basename "$filename")"; \
-    done
+COPY ./ /built_app
+
 RUN cd /built_app/programs/server && \
     npm install --unsafe-perm
 EOT
