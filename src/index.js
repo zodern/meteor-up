@@ -13,26 +13,23 @@ const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-na
 
 function commandWrapper(pluginName, commandName) {
   return function() {
-    checkUpdates()
-      .then(() => {
-        const rawArgv = process.argv.slice(2);
-        const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
-        const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
-        let potentialPromise;
+    // Runs in parallel with command
+    checkUpdates();
 
-        try {
-          potentialPromise = api.runCommand(`${pluginName}.${commandName}`);
-        } catch (e) {
-          api._commandErrorHandler(e);
-        }
+    const rawArgv = process.argv.slice(2);
+    const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
+    const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
+    let potentialPromise;
 
-        if (potentialPromise && typeof potentialPromise.then === 'function') {
-          potentialPromise.catch(api._commandErrorHandler);
-        }
-      })
-      .catch(e => {
-        console.error(e);
-      });
+    try {
+      potentialPromise = api.runCommand(`${pluginName}.${commandName}`);
+    } catch (e) {
+      api._commandErrorHandler(e);
+    }
+
+    if (potentialPromise && typeof potentialPromise.then === 'function') {
+      potentialPromise.catch(api._commandErrorHandler);
+    }
   };
 }
 
