@@ -1,3 +1,50 @@
+## Next
+
+**Load Balancing, Zero Downtime Deploys, and Swarm**
+
+Meteor Up can now manage a docker swarm cluster. When swarm and the reverse proxy are both enabled, the reverse proxy can load balance apps and avoid downtime during deploys. Sticky sessions are enabled.
+
+Mup automatically handles setting up the swarm cluster, and making sure it is configured correctly for your app and any Meteor Up plugins you use. In the rare situation there is an error and you have to take manual action to resolve, mup tries to give a solution with the error.
+
+**Other Changes**
+- `proxy.servers` has been added to list which servers to run the reverse proxy on. It is required when using docker swarm.
+- When prepare bundle is enabled, mup waits 12 fewer seconds after starting the app and before verifying the deployment
+- SSH sessions are reused to improve performance
+- `mup mongo start` only starts/restarts the container if it isn't running or the start script has changed. This can greatly speed up `mup setup` since starting MongoDB was one of the slower tasks
+- Fix `mup reconfig` not able to remove environment variables that were set during the last deploy
+- Automatically fix the `ROOT_URL` environment variable when using the reverse proxy and SSL (@rolljee)
+- Automatically encode special characters in the password in `MAIL_URL` and `MONGO_URL` environment variables (@rolljee)
+- `mup docker status` shows warning when the servers do not have the same docker version (@rolljee)
+- `app.docker.imagePort` defaults to 3000 instead of 80. This change is backwards compatible with the common docker images, and simplifies using images that run the app with a non-root user.
+- The `NODE_VERSION` build arg is set when building the image during Prepare Bundle with the correct node version for the Meteor version the app is using
+- Fix verifying deployment with non-root user
+- Reverse Proxy uses an overlay network when swarm is enabled
+- The app is deployed as a swarm service when swarm is enabled
+- Validation error shown when `app.servers` is empty
+- Fix Verifying Deployment taking longer than the value in `app.deployCheckWaitTime`
+- Verifying Deployment now waits up to 25 seconds for each request to succeed, instead of 10
+- Replace `opencollective` with `opencollective-postinstall` for smaller message and fewer dependencies (@rolljee)
+- Update Stop Mongo task name to use title case
+- The update check can be disabled by setting the environment variable `MUP_SKIP_UPDATE_CHECK=false`
+- When using the reverse proxy, the `VIRTUAL_PORT` environment variable is set to the same value as `app.docker.imagePort`
+
+**Docs**
+- Update docs and default config for Meteor 1.8 (@ninjaPixel)
+- Add instructions for using Cloudflare with Let's Encrypt
+
+**Plugin API**
+- `tasks` has functions that can add reusable tasks to task lists. The functions are:
+  - `addCreateService`
+  - `addUpdateService`
+  - `addCreateOrUpdateService`
+- Yargs has been updated to 12.0.5. For backwards compatibility, commands with an empty description continue to be hidden. (rolljee)
+- `runSSHCommand` can also accept a session instead of a server object. It is recommended to use sessions since mup now reuses them
+- `validateConfig` has an additional parameter `logProblems` to enable showing validation errors
+- `validationErrors` has errors even when `getConfig(false)` was used
+
+**Plugins**
+- `VALIDATE_OPTIONS` has `noDefaults: true` set.
+
 ## 1.4.5 - June 9, 2018
 - Add option to keep the app running during Prepare Bundle
 - Add `app.docker.prepareBundle` to example config

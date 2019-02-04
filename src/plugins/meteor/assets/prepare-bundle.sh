@@ -30,17 +30,19 @@ echo "Finished Extracting"
 cd bundle
 
 echo "Creating Dockerfile"
-sudo cat <<EOT > Dockerfile
+sudo cat <<"EOT" > Dockerfile
 FROM <%= dockerImage %>
 RUN mkdir /built_app || true
 <% for(var key in env) { %>
-ENV <%- key %>=<%- env[key] %>
+ARG <%- key %>=<%- env[key] %>
 <% } %>
 <% for(var instruction in buildInstructions) { %>
 <%-  buildInstructions[instruction] %>
-<% } %>
+<% } %> 
+
 COPY ./ /built_app
-RUN cd  /built_app/programs/server && \
+
+RUN cd /built_app/programs/server && \
     npm install --unsafe-perm
 EOT
 
@@ -50,7 +52,10 @@ sudo chmod 777 ./Dockerfile
 
 echo "Building image"
 
-sudo docker build -t $IMAGE:build . || build_failed
+sudo docker build \
+  -t $IMAGE:build \
+  --build-arg "NODE_VERSION=<%- nodeVersion %>" \
+  . || build_failed
 
 sudo rm -rf bundle
 

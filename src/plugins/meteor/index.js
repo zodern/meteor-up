@@ -1,4 +1,10 @@
 import * as _commands from './commands';
+import {
+  configHasMailUrl,
+  configHasMongoUrl,
+  normalizeMailUrl,
+  normalizeMongoUrl
+} from './utils';
 import _validator from './validate';
 import { defaultsDeep } from 'lodash';
 import traverse from 'traverse';
@@ -12,7 +18,7 @@ export const validate = {
   app(config, utils) {
     if (typeof config.meteor === 'object' || (config.app && config.app.type !== 'meteor')) {
       // The meteor validator will check the config
-      // Or the config is telling a different app to handle deployment
+      // Or the config is telling a different plugin to handle deployment
       return [];
     }
 
@@ -31,6 +37,25 @@ export function prepareConfig(config) {
   });
 
   delete config.app.dockerImage;
+
+  // If imagePort is not set, use port 3000 to simplify using
+  // images that run the app with a non-root user.
+  // Port 80 was the traditional port used by kadirahq/meteord
+  // and meteorhacks/meteord, but they allow the PORT env
+  // variable to override it.
+  config.app.docker.imagePort = config.app.docker.imagePort || 3000;
+
+  if (configHasMailUrl(config)) {
+    const mailUrl = config.app.env.MAIL_URL;
+
+    config.app.env.MAIL_URL = normalizeMailUrl(mailUrl);
+  }
+
+  if (configHasMongoUrl(config)) {
+    const mongoUrl = config.app.env.MONGO_URL;
+
+    config.app.env.MONGO_URL = normalizeMongoUrl(mongoUrl);
+  }
 
   return config;
 }
@@ -91,6 +116,7 @@ export function scrubConfig(config, utils) {
         case 'env.MONGO_URL':
           if (config.mongo) {
             const url = this.node.split('/');
+
             url.pop();
             url.push('my-app');
 
@@ -109,14 +135,14 @@ export function scrubConfig(config, utils) {
 
 export function swarmOptions(config) {
   if (config && config.app && config.app.type === 'meteor') {
-    return {
-      labels: Object.keys(config.app.servers).reduce((result, server) => {
-        result[server] = {
-          [`mup-app-${config.app.name}`]: 'true'
-        };
+    const label = {
+      name: `mup-app-${config.app.name}`,
+      value: 'true',
+      servers: Object.keys(config.app.servers)
+    };
 
-        return result;
-      }, {})
+    return {
+      labels: [label]
     };
   }
 }

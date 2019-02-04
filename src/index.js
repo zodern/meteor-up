@@ -11,20 +11,6 @@ import yargs from 'yargs';
 
 const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help', 'servers'];
 
-function addModuleCommands(builder, module, moduleName) {
-  Object.keys(module.commands).forEach(commandName => {
-    const command = module.commands[commandName];
-    command.builder = command.builder || {};
-
-    builder.command(
-      command.name || commandName,
-      command.description,
-      command.builder,
-      commandWrapper(moduleName, commandName)
-    );
-  });
-}
-
 function commandWrapper(pluginName, commandName) {
   return function() {
     checkUpdates()
@@ -49,6 +35,24 @@ function commandWrapper(pluginName, commandName) {
       });
   };
 }
+
+function addModuleCommands(builder, module, moduleName) {
+  Object.keys(module.commands).forEach(commandName => {
+    const command = module.commands[commandName];
+    const name = command.name || commandName;
+
+    command.builder = command.builder || {};
+    builder.command(
+      name,
+      command.description.length === 0 ? false : command.description,
+      command.builder,
+      commandWrapper(moduleName, commandName)
+    );
+  });
+}
+
+// Prevent yargs from exiting the process before plugins are loaded
+yargs.help(false);
 
 // Load config before creating commands
 const preAPI = new MupAPI(process.cwd(), process.argv, yargs.argv);
@@ -77,7 +81,7 @@ if (config.hooks) {
 let program = yargs
   .usage(`\nUsage: ${chalk.yellow('mup')} <command> [args]`)
   .version(pkg.version)
-  .alias('version', 'V')
+  .alias('v', 'version')
   .global('version', false)
   .option('settings', {
     description: 'Path to Meteor settings file',
@@ -103,7 +107,8 @@ let program = yargs
     boolean: true
   })
   .strict(true)
-  .alias('help', 'h')
+  .scriptName('mup')
+  .alias('h', 'help')
   .epilogue(
     'For more information, read the docs at http://meteor-up.com/docs.html'
   )
