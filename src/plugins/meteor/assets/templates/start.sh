@@ -82,6 +82,7 @@ sudo docker run \
     -e "HTTPS_METHOD=noredirect" \
   <% } %> \
   --name=$APPNAME \
+  <% if(docker.privileged === true) { %>--privileged<% } %> \
   $IMAGE
 echo "Ran <%= docker.image %>"
 sleep 15s
