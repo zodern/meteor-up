@@ -74,7 +74,7 @@ sudo docker run \
   <% if(logConfig && logConfig.driver)  { %>--log-driver=<%= logConfig.driver %> <% } %> \
   <% for(var option in logConfig.opts) { %>--log-opt <%= option %>=<%= logConfig.opts[option] %> <% } %> \
   <% for(var volume in volumes) { %>-v <%= volume %>:<%= volumes[volume] %> <% } %> \
-  <% for(var args in docker.args) { %> <%- docker.args[args] %> <% } %> \
+  <% for(var args in docker.args) { %> <%= docker.args[args] %> <% } %> \
   <% if(sslConfig && typeof sslConfig.autogenerate === "object")  { %> \
     -e "VIRTUAL_HOST=<%= sslConfig.autogenerate.domains %>" \
     -e "LETSENCRYPT_HOST=<%= sslConfig.autogenerate.domains %>" \
@@ -82,7 +82,6 @@ sudo docker run \
     -e "HTTPS_METHOD=noredirect" \
   <% } %> \
   --name=$APPNAME \
-  <% if(docker.privileged === true) { %>--privileged<% } %> \
   $IMAGE
 echo "Ran <%= docker.image %>"
 sleep 15s
