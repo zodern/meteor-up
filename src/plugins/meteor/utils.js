@@ -80,7 +80,8 @@ export function createServiceConfig(api) {
     publishedPort: proxy ? null : app.env.PORT || 80,
     targetPort: proxy ? null : app.docker.imagePort,
     updateFailureAction: 'rollback',
-    updateParallelism: Math.ceil(Object.keys(app.servers).length / 3)
+    updateParallelism: Math.ceil(Object.keys(app.servers).length / 3),
+    updateDelay: 20 * 1000
   };
 }
 

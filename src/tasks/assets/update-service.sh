@@ -13,4 +13,5 @@ docker service update \
   <%- endpointMode ? `--endpoint-mode=${endpointMode}` : '' %> \
   <%- updateFailureAction ? `--update-failure-action=${updateFailureAction}` : '' %> \
   <%- updateParallelism ? `--update-parallelism=${updateParallelism}` : '' %> \
+  <%- updateDelay ? `--update-delay=${updateDelay}` : '' %> \
   $NAME
