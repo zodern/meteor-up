@@ -319,3 +319,24 @@ export async function status(api) {
   console.log(`Swarm Nodes: ${nodes.length}`);
   console.log(list.join('\n'));
 }
+
+export async function update(api) {
+  const config = api.getConfig();
+  const swarmEnabled = api.swarmEnabled();
+  const servers = Object.keys(config.servers);
+
+  const list = nodemiral.taskList('Update Docker');
+
+  list.executeScript('Update Docker', {
+    script: api.resolvePath(__dirname, 'assets/docker-update.sh')
+  });
+
+  const sessions = swarmEnabled ?
+    api.getSessionsForServers(servers) :
+    uniqueSessions(api);
+
+  return api.runTaskList(list, sessions, {
+    verbose: api.verbose
+  })
+    .then(() => setupSwarm(api));
+}

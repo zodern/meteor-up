@@ -84,3 +84,18 @@ function createCallback(cb, varsMapper) {
 
 nodemiral.registerTask('copy', copy);
 nodemiral.registerTask('executeScript', executeScript);
+
+const oldApplyTemplate = nodemiral.session.prototype._applyTemplate;
+// Adds support for using include with ejs
+nodemiral.session.prototype._applyTemplate = function(file, vars, callback) {
+  const ejsOptions = this._options.ejs || {};
+
+  this._options.ejs = {
+    ...ejsOptions,
+    filename: file
+  };
+  oldApplyTemplate.call(this, file, vars, (...args) => {
+    this._options.ejs = ejsOptions;
+    callback(...args);
+  });
+};
