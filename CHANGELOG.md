@@ -1,3 +1,7 @@
+## 1.4.6 - April 27, 2019
+- Mongo and nginx logs are now rotated and limited to 700mb
+- Fix error when running `mup setup` without a `servers` object in the config.
+
 ## 1.4.5 - June 9, 2018
 - Add option to keep the app running during Prepare Bundle
 - Add `app.docker.prepareBundle` to example config

@@ -25,6 +25,8 @@ sudo docker run \
   --volume=<%= mongoDbDir %>:/data/db \
   --volume=/opt/mongodb/mongodb.conf:/mongodb.conf \
   --name=mongodb \
+  --log-opt max-size=100m \
+  --log-opt max-file=7 \
   mongo:$MONGO_VERSION mongod -f /mongodb.conf
 
 
