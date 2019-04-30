@@ -457,7 +457,7 @@ module.exports = {
       '/opt/images': '/images'
     }
   }
-}
+};
 ```
 
 Any files stored in `/images` by the app inside the docker container will persist between restarts and deploys. The files will also be available on the server at `/opt/images`.
