@@ -4,15 +4,20 @@ export function getInformation(server, appName, api) {
   return api.runSSHCommand(server, `docker inspect ${appName} --format "{{json .}}"`)
     .then(({ host, output }) => {
       let info;
+      const stoppedResult = {
+        statusColor: 'red',
+        status: 'Stopped',
+        host: server.host
+      };
 
       try {
         info = JSON.parse(output.trim());
       } catch (e) {
-        return {
-          statusColor: 'red',
-          status: 'Stopped',
-          host: server.host
-        };
+        return stoppedResult;
+      }
+
+      if (!info.State) {
+        return stoppedResult;
       }
 
       let statusColor = 'green';
@@ -24,19 +29,23 @@ export function getInformation(server, appName, api) {
 
       const publishedPorts = [];
       const exposedPorts = [];
-      Object.keys(info.NetworkSettings.Ports || {}).forEach(key => {
-        if (info.NetworkSettings.Ports[key]) {
-          publishedPorts.push(`${key} => ${info.NetworkSettings.Ports[key][0].HostPort}`);
-        } else {
-          exposedPorts.push(key);
-        }
-      });
+      if (info.NetworkSettings) {
+        Object.keys(info.NetworkSettings.Ports || {}).forEach(key => {
+          if (info.NetworkSettings.Ports[key]) {
+            publishedPorts.push(`${key} => ${info.NetworkSettings.Ports[key][0].HostPort}`);
+          } else {
+            exposedPorts.push(key);
+          }
+        });
+      }
 
       const env = {};
-      info.Config.Env.forEach(envVariable => {
-        const name = envVariable.split('=')[0];
-        env[name] = envVariable;
-      });
+      if (info.Config && info.Config.Env) {
+        info.Config.Env.forEach(envVariable => {
+          const name = envVariable.split('=')[0];
+          env[name] = envVariable;
+        });
+      }
 
       const restartCount = info.RestartCount;
       let restartColor = 'green';
