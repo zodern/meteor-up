@@ -3,6 +3,7 @@ import {
   checkAppStarted,
   createEnv,
   createServiceConfig,
+  currentImageTag,
   getBuildOptions,
   getNodeVersion,
   getSessions,
@@ -147,6 +148,13 @@ export async function push(api) {
   });
 
   if (prepareBundleSupported(config.docker)) {
+    let tag = 'latest';
+
+    if (api.swarmEnabled()) {
+      const data = await api.getServerInfo();
+      tag = currentImageTag(data, config.name) + 1;
+    }
+
     list.executeScript('Prepare Bundle', {
       script: api.resolvePath(
         __dirname,
@@ -158,9 +166,13 @@ export async function push(api) {
         env: config.env,
         buildInstructions: config.docker.buildInstructions || [],
         nodeVersion: getNodeVersion(api, buildOptions.buildLocation),
-        stopApp: config.docker.stopAppDuringPrepareBundle
+        stopApp: config.docker.stopAppDuringPrepareBundle,
+        tag
       }
     });
+
+    // After running Prepare Bundle, the list of images is out of date
+    api.serverInfoStale();
   }
 
   const sessions = api.getSessions(['app']);
@@ -285,11 +297,13 @@ export async function start(api) {
 
   if (swarmEnabled) {
     const currentService = await api.dockerServiceInfo(config.name);
+    const serverInfo = await api.getServerInfo();
+    const imageTag = currentImageTag(serverInfo, config.name);
 
     // TODO: make it work when the reverse proxy isn't enabled
     api.tasks.addCreateOrUpdateService(
       list,
-      createServiceConfig(api),
+      createServiceConfig(api, imageTag),
       currentService
     );
   } else {

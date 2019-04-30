@@ -44,17 +44,7 @@ export const builtInParsers = {
 export const _collectors = {
   swarm: {
     command: 'docker info --format \'{{json .Swarm}}\'',
-    parser(stdout, code) {
-      if (code === 0) {
-        try {
-          return JSON.parse(stdout);
-        } catch (e) {
-          return null;
-        }
-      }
-
-      return null;
-    }
+    parser: builtInParsers.json
   },
   swarmNodes: {
     command: 'docker node inspect $(docker node ls -q) --format \'{{json .}}\'',

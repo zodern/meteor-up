@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import { cloneDeep, flatMap } from 'lodash';
 import fs from 'fs';
 import os from 'os';
 import random from 'random-seed';
@@ -63,16 +63,15 @@ export function createEnv(appConfig, settings) {
   return env;
 }
 
-export function createServiceConfig(api) {
+export function createServiceConfig(api, tag) {
   const {
     app,
     proxy
   } = api.getConfig();
 
   return {
-    image: `mup-${app.name.toLowerCase()}:latest`,
+    image: `mup-${app.name.toLowerCase()}:${tag || 'latest'}`,
     name: app.name,
-    mode: 'global',
     env: createEnv(app, api.getSettings()),
     endpointMode: proxy ? 'dnsrr' : 'vip',
     networks: app.docker.networks,
@@ -200,4 +199,16 @@ export function normalizeMongoUrl(mongoUrl) {
   }
 
   return url;
+}
+export function currentImageTag(serverInfo, appName) {
+  const result = flatMap(
+    Object.values(serverInfo),
+    ({images}) => images || []
+  )
+    .filter(image => image.Repository === `mup-${appName}`)
+    .map(image => parseInt(image.Tag, 10))
+    .filter(tag => !isNaN(tag))
+    .sort((a, b) => b - a);
+
+  return result[0] || 0;
 }
