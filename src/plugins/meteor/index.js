@@ -2,8 +2,7 @@ import * as _commands from './commands';
 import {
   configHasMailUrl,
   configHasMongoUrl,
-  normalizeMailUrl,
-  normalizeMongoUrl
+  normalizeUrl
 } from './utils';
 import _validator from './validate';
 import { defaultsDeep } from 'lodash';
@@ -48,13 +47,13 @@ export function prepareConfig(config) {
   if (configHasMailUrl(config)) {
     const mailUrl = config.app.env.MAIL_URL;
 
-    config.app.env.MAIL_URL = normalizeMailUrl(mailUrl);
+    config.app.env.MAIL_URL = normalizeUrl(mailUrl);
   }
 
   if (configHasMongoUrl(config)) {
     const mongoUrl = config.app.env.MONGO_URL;
 
-    config.app.env.MONGO_URL = normalizeMongoUrl(mongoUrl);
+    config.app.env.MONGO_URL = normalizeUrl(mongoUrl);
   }
 
   return config;
