@@ -73,6 +73,7 @@ export function createServiceConfig(api, tag) {
     image: `mup-${app.name.toLowerCase()}:${tag || 'latest'}`,
     name: app.name,
     env: createEnv(app, api.getSettings()),
+    replicas: Object.keys(app.servers).length,
     endpointMode: proxy ? 'dnsrr' : 'vip',
     networks: app.docker.networks,
     hostname: `{{.Node.Hostname}}-${app.name}-{{.Task.ID}}`,
@@ -80,7 +81,10 @@ export function createServiceConfig(api, tag) {
     targetPort: proxy ? null : app.docker.imagePort,
     updateFailureAction: 'rollback',
     updateParallelism: Math.ceil(Object.keys(app.servers).length / 3),
-    updateDelay: 20 * 1000
+    updateDelay: 20 * 1000,
+    constraints: [
+      `node.labels.mup-app-${app.name}==true`
+    ]
   };
 }
 

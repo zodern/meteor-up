@@ -22,11 +22,12 @@ export function addCreateService(taskList, {
   name,
   publishedPort,
   targetPort,
-  replicas,
   envFile,
   env,
   hostname,
   mode = 'replicated',
+  replicas,
+  constraints = [],
   endpointMode = 'vip',
   networks = [],
   updateFailureAction = 'rollback',
@@ -54,7 +55,8 @@ export function addCreateService(taskList, {
       networks,
       updateFailureAction,
       updateParallelism,
-      updateDelay: `${updateDelay / 1000}s`
+      updateDelay: `${updateDelay / 1000}s`,
+      constraints
     }
   });
 

@@ -22,6 +22,7 @@ docker service create \
   <%- networks.length ? networks.map(network => `--network ${network}`).join (' ') : '' %> \
   <%- hostname ? '--hostname=' + hostname : '' %> \
   <%- mode === 'replicated' ? '--replicas=' + replicas : '--mode=global' %> \
+  <%- constraints ? constraints.map(constraint => `--constraint '${constraint}'`).join(' ') : '' %> \
   --name $NAME \
   --endpoint-mode $ENDPOINT_MODE \
   --update-failure-action $UPDATE_FAILURE_ACTION \
