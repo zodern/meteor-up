@@ -112,7 +112,7 @@ describe('module - meteor swarm', function() {
         'mup meteor logs --tail 2'
       );
 
-      expect(out.output).to.have.entriesCount('=> Starting meteor app on port 3000', 1);
+      expect(out.output.indexOf('=> Staring meteor app on port 3000')).to.be.greaterThan(-1);
     });
   });
 });

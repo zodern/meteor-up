@@ -443,6 +443,25 @@ If the base docker image runs the app as a non-root user, you might need to swit
 
 After changing the config, run `mup deploy`.
 
+### Volumes
+
+All files created inside of the app's docker container are lost when the app crashes, is deployed, or restarted. To persist certain folders, you can use the `app.volumes` option. For example:
+
+```js
+module.exports = {
+  app: {
+    name: 'app',
+    path: '../',
+    servers: { one: {} },
+    volumes: {
+      '/opt/images': '/images'
+    }
+  }
+}
+```
+
+Any files stored in `/images` by the app inside the docker container will persist between restarts and deploys. The files will also be available on the server at `/opt/images`.
+
 ### Listening to specific IP address (IP Binding)
 
 If you want Docker to listen only on a specific network interface, such as `127.0.0.1`, add a variable called `bind` with the value of the IP address you want to listen to.
@@ -1143,4 +1162,3 @@ If present remove nginx container with `docker rm -f meteor-frontend`
 The new config format is different from mupx.
 Run `mup init` to create a new config file.
 Then do `mup setup` and then `mup deploy`.
-

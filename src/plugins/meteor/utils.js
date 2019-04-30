@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import { cloneDeep, flatMap } from 'lodash';
 import fs from 'fs';
 import os from 'os';
 import random from 'random-seed';
@@ -68,21 +68,28 @@ export function createEnv(appConfig, settings) {
   return env;
 }
 
-export function createServiceConfig(api) {
-  const { app, proxy } = api.getConfig();
+export function createServiceConfig(api, tag) {
+  const {
+    app,
+    proxy
+  } = api.getConfig();
 
   return {
-    image: `mup-${app.name.toLowerCase()}:latest`,
+    image: `mup-${app.name.toLowerCase()}:${tag || 'latest'}`,
     name: app.name,
-    mode: 'global',
     env: createEnv(app, api.getSettings()),
+    replicas: Object.keys(app.servers).length,
     endpointMode: proxy ? 'dnsrr' : 'vip',
     networks: app.docker.networks,
     hostname: `{{.Node.Hostname}}-${app.name}-{{.Task.ID}}`,
     publishedPort: proxy ? null : app.env.PORT || 80,
     targetPort: proxy ? null : app.docker.imagePort,
     updateFailureAction: 'rollback',
-    updateParallelism: Math.ceil(Object.keys(app.servers).length / 3)
+    updateParallelism: Math.ceil(Object.keys(app.servers).length / 3),
+    updateDelay: 20 * 1000,
+    constraints: [
+      `node.labels.mup-app-${app.name}==true`
+    ]
   };
 }
 
@@ -170,4 +177,16 @@ export function normalizeUrl(configUrl) {
   }
 
   return configUrl;
+}
+export function currentImageTag(serverInfo, appName) {
+  const result = flatMap(
+    Object.values(serverInfo),
+    ({images}) => images || []
+  )
+    .filter(image => image.Repository === `mup-${appName}`)
+    .map(image => parseInt(image.Tag, 10))
+    .filter(tag => !isNaN(tag))
+    .sort((a, b) => b - a);
+
+  return result[0] || 0;
 }

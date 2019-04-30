@@ -64,5 +64,6 @@ sudo docker start $APPNAME >/dev/null 2>&1 || true
 <% } %>
 
 sudo docker tag $IMAGE:latest $IMAGE:previous || true
-sudo docker tag $IMAGE:build $IMAGE:latest
+sudo docker tag $IMAGE:build $IMAGE:<%= tag %>
+echo "Tagging <%= tag %>"
 sudo docker image prune -f

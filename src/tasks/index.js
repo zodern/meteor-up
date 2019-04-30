@@ -22,15 +22,17 @@ export function addCreateService(taskList, {
   name,
   publishedPort,
   targetPort,
-  replicas,
   envFile,
   env,
   hostname,
   mode = 'replicated',
+  replicas,
+  constraints = [],
   endpointMode = 'vip',
   networks = [],
   updateFailureAction = 'rollback',
-  updateParallelism = 0
+  updateParallelism = 0,
+  updateDelay = 0
   // bind,
   // log,
   // volumes,
@@ -52,7 +54,9 @@ export function addCreateService(taskList, {
       endpointMode,
       networks,
       updateFailureAction,
-      updateParallelism
+      updateParallelism,
+      updateDelay: `${updateDelay / 1000}s`,
+      constraints
     }
   });
 
@@ -89,9 +93,11 @@ function diffEnv(wantedEnv, _currentEnv) {
   };
 }
 
-function ifChanged(current, newValue) {
-  if (current !== newValue) {
-    return newValue;
+function ifChanged(current, compareValue, newValue) {
+  if (current !== compareValue) {
+    console.log(current, compareValue, newValue);
+
+    return typeof newValue === 'undefined' ? compareValue : newValue;
   }
 
   return null;
@@ -104,7 +110,8 @@ export function addUpdateService(taskList, {
   hostname,
   endpointMode,
   updateFailureAction,
-  updateParallelism
+  updateParallelism,
+  updateDelay
 }, currentService) {
   const {
     EndpointSpec,
@@ -129,6 +136,9 @@ export function addUpdateService(taskList, {
       endpointMode: ifChanged(EndpointSpec.Mode, endpointMode),
       updateFailureAction: ifChanged(
         UpdateConfig.FailureAction, updateFailureAction
+      ),
+      updateDelay: ifChanged(
+        UpdateConfig.Delay, updateDelay * 1000000, updateDelay
       ),
       updateParallelism: ifChanged(UpdateConfig.Parallelism, updateParallelism)
     }
