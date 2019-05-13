@@ -273,10 +273,18 @@ export async function nginxConfig(api) {
 
 export async function status(api) {
   const config = api.getConfig();
-  const servers = Object.keys(config.proxy.servers || config.app.servers);
   const lines = [];
   let overallColor = 'green';
 
+  if (!config.proxy) {
+    if (config.swarm && config.app && config.app.type === 'meteor') {
+      console.log(chalk.yellow('Proxy should be enabled when using swarm for load balancing to work.'));
+    }
+
+    return;
+  }
+
+  const servers = Object.keys(config.proxy.servers || config.app.servers);
   const collectorConfig = {
     nginxDocker: {
       command: `docker inspect ${PROXY_CONTAINER_NAME} --format "{{json .}}"`,
