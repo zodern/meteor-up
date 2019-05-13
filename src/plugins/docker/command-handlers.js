@@ -44,7 +44,7 @@ export function setup(api) {
   log('exec => mup docker setup');
   const config = api.getConfig();
   const swarmEnabled = api.swarmEnabled();
-  const servers = Object.keys(config.servers);
+  const servers = Object.keys(config.servers || {});
 
   const list = nodemiral.taskList('Setup Docker');
 

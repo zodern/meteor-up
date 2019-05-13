@@ -56,6 +56,8 @@ sudo docker run \
   --name $APPNAME \
   --env-file=$ENV_FILE \
   --restart=always \
+  --log-opt max-size=100m \
+  --log-opt max-file=7 \
   --network bridge \
   $MUP_PROXY_NETWORK \
   -v /opt/$APPNAME/config/nginx.tmpl:/app/nginx.tmpl:ro \
@@ -74,6 +76,8 @@ sudo docker run \
   --env-file=$ENV_FILE_LETSENCRYPT \
   --restart=always \
   --volumes-from $APPNAME \
+  --log-opt max-size=100m \
+  --log-opt max-file=3 \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
   jrcs/letsencrypt-nginx-proxy-companion
 echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
