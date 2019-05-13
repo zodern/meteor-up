@@ -2,35 +2,50 @@
 
 **Load Balancing, Zero Downtime Deploys, and Swarm**
 
-Meteor Up can now manage a docker swarm cluster. When swarm and the reverse proxy are both enabled, the reverse proxy can load balance apps and avoid downtime during deploys. Sticky sessions are enabled.
+Meteor Up can now manage a docker swarm cluster. When swarm is enabled in the config, Meteor up sets up a swarm cluster on all of the servers listed in the config. During `mup setup`, it diffs the config given to it by plugins and the mup config with the current cluster state and carefully makes any needed adjustments to avoid unnecessarily disrupting running swarm services. Mup uses Docker Swarm instead of Kubernetes since it is simpler and uses fewer resources.
 
-Mup automatically handles setting up the swarm cluster, and making sure it is configured correctly for your app and any Meteor Up plugins you use. In the rare situation there is an error and you have to take manual action to resolve, mup tries to give a solution with the error.
+By using swarm, we are able to enable:
 
-**Other Changes**
-- `proxy.servers` has been added to list which servers to run the reverse proxy on. It is required when using docker swarm.
-- When prepare bundle is enabled, mup waits 12 fewer seconds after starting the app and before verifying the deployment
-- SSH sessions are reused to improve performance
-- `mup mongo start` only starts/restarts the container if it isn't running or the start script has changed. This can greatly speed up `mup setup` since starting MongoDB was one of the slower tasks
-- Fix `mup reconfig` not able to remove environment variables that were set during the last deploy
-- Automatically fix the `ROOT_URL` environment variable when using the reverse proxy and SSL (@rolljee)
-- Automatically encode special characters in the password in `MAIL_URL` and `MONGO_URL` environment variables (@rolljee)
-- `mup docker status` shows warning when the servers do not have the same docker version (@rolljee)
-- `app.docker.imagePort` defaults to 3000 instead of 80. This change is backwards compatible with the common docker images, and simplifies using images that run the app with a non-root user.
-- The `NODE_VERSION` build arg is set when building the image during Prepare Bundle with the correct node version for the Meteor version the app is using
-- Fix verifying deployment with non-root user
-- Reverse Proxy uses an overlay network when swarm is enabled
+1) Rolling deploys with zero down time
+2) Load balancing with sticky sessions
+
+We have tried to make using swarm with Metoer Up as simple and reliable as possible. In the rare situation there is an error and you have to take manual action to resolve, in many cases mup gives a solution with the error.
+
 - The app is deployed as a swarm service when swarm is enabled
-- Validation error shown when `app.servers` is empty
+- Reverse Proxy uses an overlay network when swarm is enabled
+- `proxy.servers` has been added to list which servers to run the reverse proxy on. It is required when using docker swarm.
+- `mup docker status` shows warning when the servers do not have the same docker version (@rolljee)
+- When using swarm, the docker images created for the app use numerical tags (`1`, `2`, `3`) instead of `previous` and `current`. This is needed for swarm to correctly roll back failed deploys, but it will also give us more control over how many old versions to keep and allow manually rolling back.
+
+**Performance**
+- When prepare bundle is enabled, mup waits 12 fewer seconds after starting the app and before verifying the deployment
+- SSH sessions are reused between task lists to improve performance
+- `mup mongo start` only starts/restarts the container if it isn't running or the start script has changed. This can greatly speed up `mup setup` since starting MongoDB was one of the slower tasks
+- The update check no longer delays starting the cli and can be disabled with  setting the environment variale `MUP_SKIP_UPDATE_CHECK=false`
+- Replace `opencollective` with `opencollective-postinstall` for smaller message and fewer dependencies (@rolljee)
+
+**Verifying Deployment**
 - Fix Verifying Deployment taking longer than the value in `app.deployCheckWaitTime`
 - Verifying Deployment now waits up to 25 seconds for each request to succeed, instead of 10
-- Replace `opencollective` with `opencollective-postinstall` for smaller message and fewer dependencies (@rolljee)
-- Update Stop Mongo task name to use title case
-- The update check can be disabled by setting the environment variable `MUP_SKIP_UPDATE_CHECK=false`
-- When using the reverse proxy, the `VIRTUAL_PORT` environment variable is set to the same value as `app.docker.imagePort`
+- Fix verifying deployment with non-root user
+
+**Reduce common problems**
+
+- Change `http` to `https` in the `ROOT_URL` environment variable when using the reverse proxy and SSL (@rolljee)
+- URL Encode special characters in the password in `MAIL_URL` and `MONGO_URL` environment variables. For example, `mongodb://user:pass@word@host.com` is converted to `mongodb://user:pass%20word@host.com` (@rolljee)
+- `app.docker.imagePort` defaults to 3000 instead of 80. This change is backwards compatible with the common docker images, and simplifies using images that run the app with a non-root user.
+- Validation error shown when `app.servers` is empty
 
 **Docs**
 - Update docs and default config for Meteor 1.8 (@ninjaPixel)
 - Add instructions for using Cloudflare with Let's Encrypt
+
+**Bugs Fixed**
+- The `NODE_VERSION` build arg is set when building the image during Prepare Bundle with the correct node version for the Meteor version the app is using
+- Fix `mup reconfig` not able to remove environment variables that were set during the last deploy
+- When using the reverse proxy, the `VIRTUAL_PORT` environment variable is set to the same value as `app.docker.imagePort`
+- Update Stop Mongo task name to use title case
+
 
 **Plugin API**
 - `tasks` has functions that can add reusable tasks to task lists. The functions are:
@@ -41,8 +56,6 @@ Mup automatically handles setting up the swarm cluster, and making sure it is co
 - `runSSHCommand` can also accept a session instead of a server object. It is recommended to use sessions since mup now reuses them
 - `validateConfig` has an additional parameter `logProblems` to enable showing validation errors
 - `validationErrors` has errors even when `getConfig(false)` was used
-
-**Plugins**
 - `VALIDATE_OPTIONS` has `noDefaults: true` set.
 
 ## 1.4.6 - April 27, 2019
