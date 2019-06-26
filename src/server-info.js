@@ -159,7 +159,7 @@ export default function serverInfo(servers, collectors = _collectors) {
   return map(
     servers,
     server => getServerInfo(server, collectors),
-    { concurrency: 3 }
+    { concurrency: Object.keys(servers).length }
   ).then(serverResults => {
     log('finished');
 
