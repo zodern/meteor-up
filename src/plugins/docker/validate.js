@@ -1,7 +1,12 @@
 import joi from 'joi';
 
 const schema = joi.object().keys({
-  enabled: joi.bool().required()
+  enabled: joi.bool().required(),
+  labels: joi.array().items(joi.object().keys({
+    name: joi.string().required(),
+    value: joi.string().required(),
+    servers: joi.array().items(joi.string())
+  }))
 });
 
 export default function(

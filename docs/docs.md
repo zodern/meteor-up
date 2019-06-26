@@ -959,6 +959,27 @@ If you encounter problems with swarm, please create an issue. `mup docker setup`
 
 If multiple apps are using swarm and sharing servers, their `servers` object should have the same servers. Since a config is a javascript file, you can have a separate file with the servers imported by the configs.
 
+### All Swarm Options
+
+```js
+module.exports = {
+  swarm: {
+    enabled: true,
+
+    // Array of labels for mup to manage, default is `[]`
+    labels: [
+      {
+        name: 'label-name',
+        value: 'label-value',
+        servers: [
+          'one'
+        ]
+      }
+    ]
+  }
+};
+```
+
 ### Swarm internals
 
 You only need to read this section if you are planning to use a tool or manually make changes to the cluster (adding/removing nodes, managers, networks, services, labels, etc).
@@ -989,7 +1010,9 @@ You can create additional services. If you remove or update services created by 
 
 #### Labels
 
-Plugins can provide a list of labels for mup to manage. Any changes to these labels (setting it for additional nodes, removing it, or changing it's value) will be reverted. You can add or modify any other label.
+Plugins and `swarm.laels` in the config can provide a list of labels for mup to manage. Any changes to these labels (setting it for additional nodes, removing it, or changing it's value) will be reverted. You can add or modify any other label.
+
+Mup does not remove labels that plugins no longer use.
 
 ## Hooks
 

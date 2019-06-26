@@ -13,3 +13,11 @@ export const hooks = {
 export const validate = {
   swarm: validator
 };
+
+export function swarmOptions(config) {
+  if (config && config.swarm) {
+    return {
+      labels: config.swarm.labels || []
+    };
+  }
+}
