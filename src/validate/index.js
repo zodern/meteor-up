@@ -7,7 +7,8 @@ import validateServer from './servers';
 export const _pluginValidators = {};
 
 export function addPluginValidator(rootPath, handler) {
-  _pluginValidators[rootPath] = handler;
+  _pluginValidators[rootPath] = _pluginValidators[rootPath] || [];
+  _pluginValidators[rootPath].push(handler);
 }
 
 function generateSchema() {
@@ -37,7 +38,7 @@ function validateAll(_config, origionalConfig) {
   let results;
   // TODO: the config object created by the plugin api
   // should always have this property.
-  const config = { ..._config, _origionalConfig: origionalConfig};
+  const config = { ..._config, _origionalConfig: origionalConfig };
 
   results = joi.validate(config, generateSchema(), VALIDATE_OPTIONS);
   details = combineErrorDetails(details, results);
@@ -47,10 +48,13 @@ function validateAll(_config, origionalConfig) {
     details = combineErrorDetails(details, results);
   }
 
-  for (const [property, validator] of Object.entries(_pluginValidators)) {
+  for (const [property, validators] of Object.entries(_pluginValidators)) {
     if (config[property] !== undefined) {
-      results = validator(config, utils);
-      details = combineErrorDetails(details, results);
+      // eslint-disable-next-line no-loop-func
+      validators.forEach(validator => {
+        results = validator(config, utils);
+        details = combineErrorDetails(details, results);
+      });
     }
   }
 
