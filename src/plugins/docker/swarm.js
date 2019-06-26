@@ -89,6 +89,11 @@ export function joinNodes(servers, token, managerIP, api) {
 export function diffLabels(currentLabels, desiredLabels) {
   const toRemove = [];
   const toAdd = [];
+  const knownLabels = Object.values(desiredLabels).reduce((result, labels) => {
+    result.push(...Object.keys(labels));
+
+    return result;
+  }, []);
 
   // check for labels to add or update
   Object.keys(desiredLabels).forEach(server => {
@@ -102,6 +107,10 @@ export function diffLabels(currentLabels, desiredLabels) {
   // check for labels no longer used
   Object.keys(currentLabels).forEach(server => {
     for (const [label] of Object.entries(currentLabels[server])) {
+      if (!knownLabels.includes(label)) {
+        // Only remove labels that mup knows about from plugins
+        continue;
+      }
       if (!desiredLabels[server] || !(label in desiredLabels[server])) {
         toRemove.push({ server, label });
       }
