@@ -10,7 +10,7 @@ import { commands } from './commands';
 import debug from 'debug';
 import fs from 'fs';
 import { getOptions } from './swarm-options';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
 import { runConfigPreps } from './prepare-config';

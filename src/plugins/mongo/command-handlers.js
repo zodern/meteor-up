@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import debug from 'debug';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 
 const log = debug('mup:module:mongo');
 

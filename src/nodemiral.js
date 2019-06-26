@@ -1,5 +1,5 @@
 import { clone, merge } from 'lodash';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 
 function copy(session, _options, callback) {
   const options = clone(_options);

@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import { clone } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 
 const log = debug('mup:module:proxy');
 const PROXY_CONTAINER_NAME = 'mup-nginx-proxy';

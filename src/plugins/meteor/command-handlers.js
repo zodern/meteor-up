@@ -15,7 +15,7 @@ import { checkUrls, getInformation } from './status';
 import { map, promisify } from 'bluebird';
 import chalk from 'chalk';
 import debug from 'debug';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 
 
 const log = debug('mup:module:meteor');

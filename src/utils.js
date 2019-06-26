@@ -2,7 +2,7 @@ import { Client } from 'ssh2';
 import debug from 'debug';
 import expandTilde from 'expand-tilde';
 import fs from 'fs';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 import path from 'path';
 import { promisify } from 'bluebird';
 import readline from 'readline';

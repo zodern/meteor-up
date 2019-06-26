@@ -4,7 +4,7 @@ import {
   partial
 } from 'lodash';
 import debug from 'debug';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 
 const log = debug('mup:docker:swarm');
 

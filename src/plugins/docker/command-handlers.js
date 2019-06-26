@@ -17,12 +17,12 @@ import {
 import chalk from 'chalk';
 import debug from 'debug';
 import { map } from 'bluebird';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 
 const log = debug('mup:module:docker');
 
 function uniqueSessions(api) {
-  const {servers} = api.getConfig();
+  const { servers } = api.getConfig();
   const sessions = api.getSessions(['app', 'mongo', 'proxy']);
 
   if (api.swarmEnabled()) {
@@ -230,7 +230,7 @@ export async function ps(api) {
   const sessions = uniqueSessions(api);
 
   for (const session of sessions) {
-    await api.runSSHCommand(session, `sudo docker ${args.join(' ')} 2>&1`).then(({output, host}) => {
+    await api.runSSHCommand(session, `sudo docker ${args.join(' ')} 2>&1`).then(({ output, host }) => {
       console.log(chalk.magenta(`[${host}]`) + chalk.blue(` docker ${args.join(' ')}`));
       console.log(output);
     });
@@ -292,7 +292,7 @@ export async function status(api) {
   }
   console.log(lines.join('\n'));
 
-  if (!swarmEnabled ) {
+  if (!swarmEnabled) {
     return;
   }
 
