@@ -697,6 +697,10 @@ module.exports = {
       env: {
         DEFAULT_HOST: 'foo.bar.com'
       },
+      // additional docker arguments (e.g.: additional ports)
+      dockerArgs: [
+        '-p 8080:8080'
+      ],
       // env for the jrcs/letsencrypt-nginx-proxy-companion container
       envLetsEncrypt: {
         // Directory URI for the CA ACME API endpoint

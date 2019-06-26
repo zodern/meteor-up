@@ -201,6 +201,16 @@ export function reconfigShared(api) {
     dest: `/opt/${PROXY_CONTAINER_NAME}/config/nginx-default.conf`
   });
 
+  const sharedDockerArgs = shared.dockerArgs || [];
+
+  list.copy('Sending docker args', {
+    src: api.resolvePath(__dirname, 'assets/templates/docker-args.sh'),
+    dest: `/opt/${PROXY_CONTAINER_NAME}/config/docker-args.sh`,
+    vars: {
+      dockerArgs: sharedDockerArgs
+    }
+  });
+
   const sessions = getSessions(api);
 
   return api.runTaskList(list, sessions, {
