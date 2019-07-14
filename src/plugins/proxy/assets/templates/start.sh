@@ -12,12 +12,6 @@ source $APP_PATH/config/shared-config.sh
 ENV_FILE=$APP_PATH/config/env.list
 ENV_FILE_LETSENCRYPT=$APP_PATH/config/env_letsencrypt.list
 
-MUP_PROXY_NETWORK=""
-
-if docker network inspect mup-proxy ; then
-  MUP_PROXY_NETWORK="--network mup-proxy"
-fi
-
 
 # Remove previous version of the app, if exists
 sudo docker rm -f $APPNAME
@@ -75,6 +69,11 @@ sudo docker run \
 echo "Ran nginx-proxy as $APPNAME"
 
 sleep 2s
+
+if docker network inspect mup-proxy ; then
+  docker network connect mup-proxy $APPNAME
+fi
+
 sudo docker run \
   -d \
   --name $APPNAME-letsencrypt \

@@ -6,6 +6,13 @@ CONTAINER_NAME=mup-proxy-configure-<%= appName %>
 
 cd $APP_PATH/config
 
+if [ ! "$(docker service inspect <%= appName %>)" ]; then
+  echo "No service"
+  docker rm -f $CONTAINER_NAME || true
+
+  exit 0
+fi
+
 NEW_CONTENT="$(cat <<-CONFIG_EOT
 #!/bin/bash
 # VERSION=1
