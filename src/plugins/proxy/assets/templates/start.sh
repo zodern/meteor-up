@@ -49,6 +49,12 @@ if ! grep -q "client_max_body_size" "$NGINX_CONFIG_PATH"; then
   echo $NGINX_CONFIG >> /opt/$APPNAME/config/nginx-default.conf
 fi
 
+TEMPLATE_PATH=/opt/$APPNAME/config/nginx.tmpl
+SHARED_TEMPLATE=/opt/$APPNAME/config/nginx-shared.tmpl
+if [ -e $SHARED_TEMPLATE ]; then
+  TEMPLATE_PATH=$SHARED_TEMPLATE
+fi
+
 sudo docker run \
   -d \
   -p $HTTP_PORT:80 \
@@ -59,8 +65,7 @@ sudo docker run \
   --log-opt max-size=100m \
   --log-opt max-file=7 \
   --network bridge \
-  $MUP_PROXY_NETWORK \
-  -v /opt/$APPNAME/config/nginx.tmpl:/app/nginx.tmpl:ro \
+  -v $TEMPLATE_PATH:/app/nginx.tmpl:ro \
   -v /opt/$APPNAME/mounted-certs:/etc/nginx/certs \
   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \

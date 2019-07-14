@@ -22,6 +22,7 @@ const schema = joi.object().keys({
     httpPort: joi.number(),
     httpsPort: joi.number(),
     nginxConfig: joi.string(),
+    nginxTemplate: joi.string(),
     env: joi
       .object()
       .pattern(/[\s\S]*/, [joi.string(), joi.number(), joi.boolean()]),

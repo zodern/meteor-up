@@ -194,12 +194,27 @@ export function reconfigShared(api) {
     }
   });
 
-  const sharedNginxConfig = shared.nginxConfig || api.resolvePath(__dirname, 'assets/proxy.conf');
 
   list.copy('Sending nginx config', {
-    src: sharedNginxConfig,
+    src: shared.sharedNginxConfig,
     dest: `/opt/${PROXY_CONTAINER_NAME}/config/nginx-default.conf`
   });
+
+  if (shared.templatePath) {
+    const templatePath = shared.templatePath;
+    list.copy('Pushing Nginx Config Template', {
+      src: templatePath,
+      dest: `/opt/${PROXY_CONTAINER_NAME}/config/nginx-shared.tmpl`
+    });
+  } else {
+    list.executeScript('Cleanup Template', {
+      script: api.resolvePath(__dirname, 'assets/cleanup-template.sh'),
+      vars: {
+        appName: PROXY_CONTAINER_NAME
+      }
+    });
+  }
+
 
   const sessions = getSessions(api);
 
