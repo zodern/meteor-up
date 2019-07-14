@@ -20,9 +20,9 @@ export function prepareConfig(config) {
 
   config.app.env = config.app.env || {};
   config.app.docker = config.app.docker || {};
+  config.app.env = addProxyEnv(config, config.app.env);
 
   if (!swarmEnabled) {
-    config.app.env = addProxyEnv(config, config.app.env);
     config.app.env.VIRTUAL_PORT = config.app.docker.imagePort || 3000;
   }
 
