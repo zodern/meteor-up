@@ -10,7 +10,8 @@ BIND=<%= bind %>
 NGINX_PROXY_VERSION=latest
 LETS_ENCRYPT_VERSION=latest
 APP_IMAGE=mup-<%= appName.toLowerCase() %>
-IMAGE=$APP_IMAGE:latest
+IMAGE=<% if(docker.remoteImage){ %><%= docker.remoteImage %>
+  <% } else { %>$APP_IMAGE:latest <% } %>
 VOLUME="--volume=$BUNDLE_PATH:/bundle"
 LOCAL_IMAGE=false
 
@@ -52,8 +53,8 @@ sudo docker network disconnect bridge -f $APPNAME-nginx-proxy
 # We don't need to fail the deployment because of a docker hub downtime
 if [ $LOCAL_IMAGE == "false" ]; then
   set +e
-  sudo docker pull <%= docker.image %>
-  echo "Pulled <%= docker.image %>"
+  sudo docker pull $IMAGE
+  echo "Pulled "$IMAGE
   set -e
 
 else
@@ -83,7 +84,7 @@ sudo docker run \
   <% } %> \
   --name=$APPNAME \
   $IMAGE
-echo "Ran <%= docker.image %>"
+echo "Ran" $IMAGE
 sleep 15s
 
 <% if(typeof sslConfig === "object") { %>
