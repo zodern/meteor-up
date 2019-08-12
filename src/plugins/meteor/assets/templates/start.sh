@@ -15,9 +15,8 @@ IMAGE=<% if(docker.remoteImage){ %><%= docker.remoteImage %>
 VOLUME="--volume=$BUNDLE_PATH:/bundle"
 LOCAL_IMAGE=false
 
-sudo docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
-
-if [ $IMAGE == $APP_IMAGE:latest  ]; then
+# sudo docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
+if sudo docker image inspect $IMAGE >/dev/null; then
   VOLUME=""
   LOCAL_IMAGE=true
 fi
