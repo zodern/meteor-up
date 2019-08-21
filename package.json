@@ -5,7 +5,10 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zodern/meteor-up.git"
+    "url": "git://github.com/nudger-labs/meteor-up.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "keywords": [
     "meteor",
