@@ -3,6 +3,15 @@
 set -e
 
 APP_DIR=/opt/<%=appName %>
+
+<% if(docker.remoteImage){ %>
+  echo "Running docker with remote Image" <%= docker.remoteImage %>
+  cd $APP_DIR
+  # start app
+  sudo bash config/start.sh
+
+<% } else {  %>
+
 IMAGE=mup-<%= appName.toLowerCase() %>
 
 <% if (removeImage) { %>
@@ -17,7 +26,7 @@ docker images
 # save the last known version
 cd $APP_DIR
 if sudo docker image inspect $IMAGE:latest >/dev/null; then
-  echo "using image"
+  echo "using image HI"
   sudo rm -rf current || true
 else
   echo "using bundle"
@@ -38,3 +47,4 @@ fi
 
 # start app
 sudo bash config/start.sh
+<% } %>

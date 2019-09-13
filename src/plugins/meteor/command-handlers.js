@@ -197,7 +197,7 @@ export async function push(api) {
 
 export function envconfig(api) {
   log('exec => mup meteor envconfig');
-
+  
   const config = api.getConfig().app;
   const servers = api.getConfig().servers;
   let bindAddress = '0.0.0.0';

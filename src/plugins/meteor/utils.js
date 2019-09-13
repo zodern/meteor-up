@@ -22,6 +22,7 @@ export function addStartAppTask(list, api) {
   list.executeScript('Start Meteor', {
     script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
     vars: {
+      docker: appConfig.docker,
       appName: appConfig.name,
       removeImage: isDeploy && !prepareBundleSupported(appConfig.docker)
     }
