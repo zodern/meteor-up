@@ -210,6 +210,10 @@ export function runSSHCommand(info, command) {
           output += data;
         });
 
+        outputStream.stderr.on('data', data => {
+          output += data;
+        });
+
         outputStream.once('close', code => {
           conn.end();
           resolve({ code, output, host: info.host });
