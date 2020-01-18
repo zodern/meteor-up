@@ -1,8 +1,14 @@
 #!/bin/bash
-
 APPNAME=<%= appName %>
 
-sudo docker rm -f $APPNAME || :
-sudo docker network disconnect bridge -f $APPNAME || :
+# Remove nginx
+sudo docker rm -f $APPNAME
+sudo docker network disconnect bridge -f $APPNAME
+sudo docker network disconnect mup-proxy -f $APPNAME
+echo "Removed $APPNAME"
 
-sudo docker rm -f $APPNAME-letsencrypt || :
+# Remove let's encrypt containers if exists
+sudo docker rm -f $APPNAME-letsencrypt
+sudo docker network disconnect bridge -f $APPNAME-letsencrypt
+sudo docker network disconnect mup-proxy -f $APPNAME-letsencrypt
+echo "Removed $APPNAME-letsencrypt"
