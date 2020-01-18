@@ -23,7 +23,7 @@
   },
   "scripts": {
     "prepublish": "npm run build -s",
-    "build": "babel src --out-dir lib --sourceRoot=./ --copy-files --source-maps",
+    "build": "babel src --out-dir lib --copy-files --source-maps",
     "build:watch": "npm run build -s -- -w",
     "pretest": "npm run lint",
     "test": "node ./tests/run.js",
