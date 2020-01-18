@@ -8,8 +8,8 @@ if (typeof Buffer.alloc === 'undefined') {
 // eslint-disable-next-line no-var
 var version = parseInt(process.versions.node.split('.')[0], 10);
 
-if (version < 4) {
+if (version < 8) {
   // eslint-disable-next-line
-  console.log('Meteor Up requires node v4 or newer. You are using ' + process.version);
+  console.log('Meteor Up requires node 8 or newer. You are using ' + process.version);
   process.exit(1);
 }
