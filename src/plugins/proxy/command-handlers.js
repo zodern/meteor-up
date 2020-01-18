@@ -379,7 +379,9 @@ export function updateProxyForService(api) {
     vars: {
       appName: config.app.name,
       imagePort: config.app.docker.imagePort,
-      env: addProxyEnv(config, {})
+      env: addProxyEnv(config, {}),
+      domains: config.proxy.domains.split(','),
+      proxyName: PROXY_CONTAINER_NAME
     }
   });
 

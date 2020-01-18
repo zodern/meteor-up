@@ -3,12 +3,14 @@ set -e
 
 APP_PATH=/opt/<%= appName %>
 CONTAINER_NAME=mup-proxy-configure-<%= appName %>
+PROXY_PATH=/opt/<%= proxyName %>
 
 cd $APP_PATH/config
 
-if [ ! "$(docker service inspect <%= appName %>)" ]; then
+if ! docker service inspect <%= appName %>; then
   echo "No service"
   docker rm -f $CONTAINER_NAME || true
+  <%- domains.map(domain => `rm $PROXY_PATH/config/vhost.d/${domain}_upstream || true`).join('\n') %>
 
   exit 0
 fi
@@ -38,6 +40,7 @@ CURRENT_CONTENT=`cat proxy-config-container.sh || true`
 if [ "$CURRENT_CONTENT" == "$NEW_CONTENT" ]; then
   echo "SAME CONTENT"
   if [ ! "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+    echo "Config container not running. Starting container."
     bash proxy-config-container.sh
   fi
 else
