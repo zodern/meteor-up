@@ -28,7 +28,7 @@ export default class PluginAPI {
     this.config = null;
     this.settings = null;
     this.sessions = null;
-    this._enabledSessions = program.servers ? program.servers.split(',') : [];
+    this._enabledSessions = program.servers ? program.servers.split(' ') : [];
     this.configPath = program.config ? resolvePath(program.config) : path.join(this.base, 'mup.js');
     this.settingsPath = program.settings;
     this.verbose = program.verbose;
