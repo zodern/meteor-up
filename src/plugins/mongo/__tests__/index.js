@@ -65,6 +65,17 @@ describe('module - mongo', function() {
         (await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code
       ).to.be.equal(0);
     });
+
+    it('should allow configuring db name', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
+      const out = sh.exec('mup --config mup.db-name.js validate --show');
+
+      expect(out.code).to.be.equal(0);
+
+      expect(countOccurences('mongodb://mongodb:27017/test-db', out.output)).to.be.equal(
+        1
+      );
+    });
   });
 
   describe('stop', () => {

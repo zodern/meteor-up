@@ -15,7 +15,8 @@ export function prepareConfig(config) {
   config.mongo.version = config.mongo.version || '3.4.1';
 
   config.app.env = config.app.env || {};
-  config.app.env.MONGO_URL = `mongodb://mongodb:27017/${config.app.name.split('.').join('')}`;
+  config.mongo.dbName = config.mongo.dbName || config.app.name.split('.').join('');
+  config.app.env.MONGO_URL = `mongodb://mongodb:27017/${config.mongo.dbName}`;
 
   if (!config.app.docker) {
     config.app.docker = {};

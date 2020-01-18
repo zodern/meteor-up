@@ -7,7 +7,7 @@ var servers = require(serverFile);
 
 module.exports = {
   servers: servers,
-  meteor: {
+  app: {
     name: 'myapp',
     path: meteorPath,
     servers: {
