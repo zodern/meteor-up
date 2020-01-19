@@ -1,4 +1,4 @@
-import { addProxyEnv, getSessions } from './utils';
+import { addProxyEnv, getServerHostnames, getSessions } from './utils';
 import chalk from 'chalk';
 import { clone } from 'lodash';
 import debug from 'debug';
@@ -47,7 +47,9 @@ export function leLogs(api) {
 export function setup(api) {
   log('exec => mup proxy setup');
   const config = api.getConfig().proxy;
-  const appName = api.getConfig().app.name;
+  const serverConfig = api.getConfig().servers;
+  const appConfig = api.getConfig().app;
+  const appName = appConfig.name;
 
   if (!config) {
     console.error('error: no configs found for proxy');
@@ -140,6 +142,23 @@ export function setup(api) {
       }
     });
   }
+
+  const hostnames = getServerHostnames(
+    serverConfig,
+    Object.keys(appConfig.servers)
+  );
+
+  list.executeScript('Configure Nginx Upstream', {
+    script: api.resolvePath(__dirname, 'assets/upstream.sh'),
+    vars: {
+      domains,
+      name: appName,
+      setUpstream: !api.swarmEnabled(),
+      proxyName: PROXY_CONTAINER_NAME,
+      port: appConfig.env.PORT,
+      hostnames
+    }
+  });
 
   return api.runTaskList(list, sessions, {
     series: true,
