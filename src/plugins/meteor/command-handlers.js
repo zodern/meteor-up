@@ -426,7 +426,7 @@ export async function status(api) {
 
     lines.push(` - ${result.host}: ${chalk[result.statusColor](result.status)} `);
 
-    if (result.status === 'Stopped' || !result.status) {
+    if (result.status === 'Stopped' || !result.status || api.getOptions().overview) {
       return;
     }
 
