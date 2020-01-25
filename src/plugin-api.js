@@ -16,6 +16,7 @@ import path from 'path';
 import { runConfigPreps } from './prepare-config';
 import { scrubConfig } from './scrub-config';
 import serverInfo from './server-info';
+import { parseDockerInfo, StatusDisplay } from './status';
 
 const { resolvePath, moduleNotFoundIsPath } = utils;
 const log = debug('mup:api');
@@ -42,6 +43,11 @@ export default class PluginAPI {
     this.getDockerLogs = utils.getDockerLogs;
     this.runSSHCommand = utils.runSSHCommand;
     this._createSSHOptions = utils.createSSHOptions;
+
+    this.statusHelpers = {
+      StatusDisplay,
+      parseDockerInfo
+    };
 
     this.tasks = tasks;
   }

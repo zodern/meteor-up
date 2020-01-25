@@ -11,9 +11,8 @@ import {
   shouldRebuild
 } from './utils';
 import buildApp, { archiveApp } from './build.js';
-import { checkUrls, getInformation } from './status';
+import { checkUrls, createPortInfoLines, displayAvailability, getInformation, withColor } from './status';
 import { map, promisify } from 'bluebird';
-import chalk from 'chalk';
 import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
 
@@ -395,7 +394,10 @@ export async function restart(api) {
 
 export async function status(api) {
   const config = api.getConfig();
-  const lines = [];
+  const {
+    StatusDisplay
+  } = api.statusHelpers;
+  const overview = api.getOptions().overview;
   const servers = Object.keys(config.app.servers)
     .map(key => config.servers[key]);
 
@@ -410,61 +412,25 @@ export async function status(api) {
     { concurrency: 2 }
   );
 
-  let overallColor = 'green';
-
-  function updateColor(color) {
-    if (color === 'yellow' && overallColor !== 'red') {
-      overallColor = color;
-    } else if (color === 'red') {
-      overallColor = color;
-    }
-  }
+  const display = new StatusDisplay(`Meteor Status - ${config.app.name}`);
 
   results.forEach((result, index) => {
-    updateColor(result.statusColor);
-    updateColor(result.restartColor);
+    const urlResult = urlResults[index] || {};
+    const section = display.addLine(`- ${result.host}: ${withColor(result.statusColor, result.status)}`, result.statusColor);
 
-    lines.push(` - ${result.host}: ${chalk[result.statusColor](result.status)} `);
+    section.addLine(`Created at ${result.created}`);
+    section.addLine(`Restarted ${result.restartCount} times`, result.restartColor);
 
-    if (result.status === 'Stopped' || !result.status || api.getOptions().overview) {
-      return;
-    }
-
-    lines.push(`    Created at ${result.created}`);
-    lines.push(chalk[result.restartColor](`    Restarted ${result.restartCount} times`));
-
-    lines.push('    ENV: ');
-    result.env.forEach(envVar => {
-      lines.push(`     - ${envVar}`);
-    });
-
-    if (result.exposedPorts.length > 0) {
-      lines.push('    Exposed Ports:');
-      result.exposedPorts.forEach(port => {
-        lines.push(`     - ${port}`);
+    if (result.env) {
+      const envSection = section.addLine('ENV:');
+      result.env.forEach(envVar => {
+        envSection.addLine(`- ${envVar}`);
       });
     }
 
-    if (result.publishedPorts.length > 0) {
-      lines.push('    Published Ports:');
-      result.publishedPorts.forEach(port => {
-        lines.push(`     - ${port}`);
-      });
-    }
-
-    const urlResult = urlResults[index];
-
-    if (result.publishedPorts.length > 0) {
-      lines.push(`    App running at http://${result.host}:${result.publishedPorts[0].split('/')[0]}`);
-      lines.push(`     - Available in app's docker container: ${urlResult.inDocker}`);
-      lines.push(`     - Available on server: ${urlResult.remote}`);
-      lines.push(`     - Available on local computer: ${urlResult.local}`);
-    } else {
-      lines.push('    App available through reverse proxy');
-      lines.push(`     - Available in app's docker container: ${urlResult.inDocker}`);
-    }
+    createPortInfoLines(result.exposedPorts, result.publishedPorts, section);
+    displayAvailability(result, urlResult, section);
   });
 
-  console.log(chalk[overallColor]('\n=> Meteor Status'));
-  console.log(lines.join('\n'));
+  display.show(overview);
 }

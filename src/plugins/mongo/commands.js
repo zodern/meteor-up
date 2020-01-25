@@ -25,5 +25,11 @@ export const stop = {
 
 export const status = {
   description: 'View MongoDB status',
-  handler: commandHandlers.status
+  handler: commandHandlers.status,
+  builder(yargs) {
+    return yargs.option('overview', {
+      description: 'Simplified report to quickly see the status of mongo',
+      bool: true
+    });
+  }
 };
