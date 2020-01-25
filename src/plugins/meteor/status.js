@@ -112,64 +112,23 @@ export async function checkUrls(server, appConfig, api) {
 export function createPortInfoLines(
   exposedPorts = [], publishedPorts = [], statusDisplay
 ) {
-  const result = [];
   if (exposedPorts.length > 0) {
-    result.push('    Exposed Ports:');
     const exposedSection = statusDisplay.addLine('Exposed Ports:');
     exposedPorts.forEach(port => {
-      result.push(`     - ${port}`);
       exposedSection.addLine(`- ${port}`);
     });
   }
 
   if (publishedPorts.length > 0) {
-    result.push('    Published Ports:');
     const publisehdSection = statusDisplay.addLine('Published Ports:');
     publishedPorts.forEach(port => {
       publisehdSection.addLine(`- ${port}`);
-      result.push(`     - ${port}`);
     });
   }
-
-  return result;
-}
-
-export function pickWorseColor(...colors) {
-  if (colors.includes('red')) {
-    return 'red';
-  }
-  if (colors.includes('yellow')) {
-    return 'yellow';
-  }
-
-  return 'green';
 }
 
 export function withColor(color, text) {
   return chalk[color](text);
-}
-
-export function createAvailabilityLines(result, urlResult) {
-  const lines = [];
-  let sectionColor;
-  if (result.publishedPorts && result.publishedPorts.length > 0) {
-    sectionColor = pickWorseColor(
-      urlResult.inDockerColor, urlResult.remoteColor, urlResult.localColor
-    );
-    lines.push(withColor(sectionColor, `    App running at http://${result.host}:${result.publishedPorts[0].split('/')[0]}`));
-    lines.push(withColor(urlResult.inDockerColor, `     - Available in app's docker container: ${urlResult.inDocker}`));
-    lines.push(withColor(urlResult.remoteColor, `     - Available on server: ${urlResult.remote}`));
-    lines.push(withColor(urlResult.localColor, `     - Available on local computer: ${urlResult.local}`));
-  } else {
-    sectionColor = urlResult.inDockerColor;
-    lines.push(withColor(sectionColor, '    App available through reverse proxy'));
-    lines.push(withColor(sectionColor, `     - Available in app's docker container: ${urlResult.inDocker}`));
-  }
-
-  return {
-    lines,
-    sectionColor
-  };
 }
 
 export function displayAvailability(result, urlResult, statusDisplay) {
