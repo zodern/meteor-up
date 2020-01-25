@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
 
@@ -135,6 +134,7 @@ export async function status(api) {
     );
     display.addLine(' Stopped', 'red');
     display.show();
+
     return;
   }
 
@@ -142,12 +142,11 @@ export async function status(api) {
   const connections = mongoStatus.connections.current;
   const storageEngine = mongoStatus.storageEngine.name;
 
-  let containerStatus;
+  const containerStatus = dockerStatus.State.Status;
   let statusColor = 'green';
-  let createdTime;
-  let restartCount = 0;
+  const createdTime = dockerStatus.Created;
+  const restartCount = dockerStatus.RestartCount;
   let restartCountColor = 'green';
-  containerStatus = dockerStatus.State.Status;
 
   if (dockerStatus.State.Restarting) {
     statusColor = 'yellow';
@@ -156,10 +155,8 @@ export async function status(api) {
   }
 
   const hour = 1000 * 60 * 60;
-  createdTime = dockerStatus.Created;
   const upTime = new Date(dockerStatus.State.FinishedAt).getTime() -
      new Date(dockerStatus.Created).getTime();
-  restartCount = dockerStatus.RestartCount;
 
   if (restartCount > 0 && upTime / hour <= restartCount) {
     restartCountColor = 'red';
@@ -169,10 +166,10 @@ export async function status(api) {
 
   const display = new api.statusHelpers.StatusDisplay('Mongo Status');
   display.addLine(`${containerStatus} on server ${server.host}`, statusColor);
-  display.addLine(`Restarted ${restartCount} times`, restartCountColor)
+  display.addLine(`Restarted ${restartCount} times`, restartCountColor);
   display.addLine(`Running since ${createdTime}`);
   display.addLine(`Version ${mongoVersion}`);
   display.addLine(`Connections: ${connections}`);
   display.addLine(`Storage Engine: ${storageEngine}`);
-  display.show(api.getOptions().overview)
+  display.show(api.getOptions().overview);
 }
