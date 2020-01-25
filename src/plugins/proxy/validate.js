@@ -17,6 +17,7 @@ const schema = joi.object().keys({
   nginxLocationConfig: joi.string(),
   clientUploadLimit: joi.string(),
   servers: joi.object(),
+  loadBalancing: joi.bool(),
   shared: joi.object().keys({
     clientUploadLimit: joi.alternatives().try(joi.number(), joi.string()),
     httpPort: joi.number(),

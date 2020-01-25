@@ -1,3 +1,5 @@
+import random from 'random-seed';
+
 export function getSessions(api) {
   const proxyConfig = api.getConfig().proxy;
 
@@ -19,6 +21,11 @@ export function addProxyEnv(config, env) {
     config.app.env.LETSENCRYPT_EMAIL = sslConfig.letsEncryptEmail;
   }
 
+  if (config.proxy.loadBalancing) {
+    const randomPort = random.create(config.app.name).intBetween(10000, 20000);
+    env.PORT = env.PORT || randomPort;
+  }
+
   return env;
 }
 
@@ -35,4 +42,8 @@ export function normalizeUrl(config, env) {
   }
 
   return _config.app.env.ROOT_URL;
+}
+
+export function getServerHostnames(serverConfig, serverNames) {
+  return serverNames.map(name => serverConfig[name].host);
 }
