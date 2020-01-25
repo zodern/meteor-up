@@ -15,6 +15,7 @@ find . -xtype l -delete
 
 # Recreate them for the current domains
 <% if(setUpstream) { %>
+echo "Storing upstream"
 cat <<"EOT" > /opt/$PROXYNAME/upstream/$APPNAME
 ip_hash;
 <% for(var index in hostnames) { %>

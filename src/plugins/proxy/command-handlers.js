@@ -153,7 +153,7 @@ export function setup(api) {
     vars: {
       domains,
       name: appName,
-      setUpstream: !api.swarmEnabled(),
+      setUpstream: !api.swarmEnabled() && config.loadBalancing,
       proxyName: PROXY_CONTAINER_NAME,
       port: appConfig.env.PORT,
       hostnames
