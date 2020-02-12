@@ -13,7 +13,8 @@ const schema = joi.object().keys().pattern(/.*/, {
   password: joi.string(),
   opts: joi.object().keys({
     port: joi.number()
-  })
+  }),
+  privateIp: joi.string()
 });
 
 export default function validateServers(servers) {

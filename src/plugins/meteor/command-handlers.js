@@ -228,11 +228,21 @@ export function envconfig(api) {
     app.ssl.port = app.ssl.port || 443;
   }
 
+  const startHostVars = {};
+
+  Object.keys(app.servers).forEach(serverName => {
+    const host = servers[serverName].host;
+    if (app.servers[serverName].bind) {
+      startHostVars[host] = { bind: app.servers[serverName].bind };
+    }
+  });
+
   const list = nodemiral.taskList('Configuring App');
 
   list.copy('Pushing the Startup Script', {
     src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
     dest: `/opt/${app.name}/config/start.sh`,
+    hostVars: startHostVars,
     vars: {
       appName: app.name,
       port: app.env.PORT || 80,
@@ -250,17 +260,18 @@ export function envconfig(api) {
   const hostVars = {};
 
   Object.keys(app.servers).forEach(key => {
+    const host = servers[key].host;
     if (app.servers[key].env) {
-      hostVars[servers[key].host] = { env: app.servers[key].env };
+      hostVars[host] = { env: app.servers[key].env };
     }
     if (app.servers[key].settings) {
       const settings = JSON.stringify(api.getSettingsFromPath(
         app.servers[key].settings));
 
-      if (hostVars[servers[key].host]) {
-        hostVars[servers[key].host].env.METEOR_SETTINGS = settings;
+      if (hostVars[host]) {
+        hostVars[host].env.METEOR_SETTINGS = settings;
       } else {
-        hostVars[servers[key].host] = { env: { METEOR_SETTINGS: settings } };
+        hostVars[host] = { env: { METEOR_SETTINGS: settings } };
       }
     }
   });
