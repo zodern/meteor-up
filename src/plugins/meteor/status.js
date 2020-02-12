@@ -13,7 +13,9 @@ export function getInformation(server, appName, api) {
       };
 
       try {
-        info = JSON.parse(output.trim());
+        // Sometimes there are warnings shown before the JSON output
+        const jsonOutput = output.slice(output.indexOf('{'));
+        info = JSON.parse(jsonOutput.trim());
       } catch (e) {
         return stoppedResult;
       }
