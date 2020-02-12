@@ -80,5 +80,11 @@ export const envconfig = {
 
 export const status = {
   description: 'View the app\'s status',
-  handler: commandHandlers.status
+  handler: commandHandlers.status,
+  builder(yargs) {
+    return yargs.option('overview', {
+      description: 'Simplified report to quickly see the status of each component',
+      bool: true
+    });
+  }
 };
