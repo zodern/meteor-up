@@ -228,11 +228,21 @@ export function envconfig(api) {
     app.ssl.port = app.ssl.port || 443;
   }
 
+  const startHostVars = {};
+
+  Object.keys(app.servers).forEach(serverName => {
+    const host = servers[serverName].host;
+    if (app.servers[serverName].bind) {
+      startHostVars[host] = { bind: app.servers[serverName].bind };
+    }
+  });
+
   const list = nodemiral.taskList('Configuring App');
 
   list.copy('Pushing the Startup Script', {
     src: api.resolvePath(__dirname, 'assets/templates/start.sh'),
     dest: `/opt/${app.name}/config/start.sh`,
+    hostVars: startHostVars,
     vars: {
       appName: app.name,
       port: app.env.PORT || 80,
@@ -250,17 +260,18 @@ export function envconfig(api) {
   const hostVars = {};
 
   Object.keys(app.servers).forEach(key => {
+    const host = servers[key].host;
     if (app.servers[key].env) {
-      hostVars[servers[key].host] = { env: app.servers[key].env };
+      hostVars[host] = { env: app.servers[key].env };
     }
     if (app.servers[key].settings) {
       const settings = JSON.stringify(api.getSettingsFromPath(
         app.servers[key].settings));
 
-      if (hostVars[servers[key].host]) {
-        hostVars[servers[key].host].env.METEOR_SETTINGS = settings;
+      if (hostVars[host]) {
+        hostVars[host].env.METEOR_SETTINGS = settings;
       } else {
-        hostVars[servers[key].host] = { env: { METEOR_SETTINGS: settings } };
+        hostVars[host] = { env: { METEOR_SETTINGS: settings } };
       }
     }
   });
@@ -386,6 +397,48 @@ export async function restart(api) {
     checkAppStarted(list, api);
   }
 
+
+  return api.runTaskList(list, sessions, {
+    series: true,
+    verbose: api.verbose
+  });
+}
+
+export async function destroy(api) {
+  const config = api.getConfig();
+  const options = api.getOptions();
+
+  if (!options.force) {
+    console.error('The destroy command completely removes the app from the server');
+    console.error('If you are sure you want to continue, use the `--force` option');
+    process.exit(1);
+  } else {
+    console.log('The app will be completely removed from the server.');
+    console.log('Waiting 5 seconds in case you want to cancel by pressing ctr + c');
+    await new Promise(resolve => setTimeout(resolve, 1000 * 5));
+  }
+
+  const list = nodemiral.taskList('Destroy App');
+  const sessions = await getSessions(api);
+
+  if (api.swarmEnabled()) {
+    console.error('Destroying app when using swarm is not implemented');
+    process.exit(1);
+  }
+
+  list.executeScript('Stop App', {
+    script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
+    vars: {
+      appName: config.app.name
+    }
+  });
+
+  list.executeScript('Destroy App', {
+    script: api.resolvePath(__dirname, 'assets/meteor-destroy.sh'),
+    vars: {
+      name: config.app.name
+    }
+  });
 
   return api.runTaskList(list, sessions, {
     series: true,

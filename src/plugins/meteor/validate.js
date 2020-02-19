@@ -12,6 +12,7 @@ const schema = joi.object().keys({
         /[/s/S]*/,
         [joi.string(), joi.number(), joi.bool()]
       ),
+      bind: joi.string(),
       settings: joi.string()
     })
   ),

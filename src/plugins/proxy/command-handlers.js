@@ -1,4 +1,4 @@
-import { addProxyEnv, getServerHostnames, getSessions } from './utils';
+import { addProxyEnv, getLoadBalancingHosts, getSessions } from './utils';
 import chalk from 'chalk';
 import { clone } from 'lodash';
 import debug from 'debug';
@@ -143,7 +143,7 @@ export function setup(api) {
     });
   }
 
-  const hostnames = getServerHostnames(
+  const hostnames = getLoadBalancingHosts(
     serverConfig,
     Object.keys(appConfig.servers)
   );

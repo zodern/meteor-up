@@ -16,6 +16,17 @@ export const deploy = {
   handler: commandHandlers.deploy
 };
 
+export const destroy = {
+  description: 'Stop and completely remove app from server',
+  handler: commandHandlers.destroy,
+  builder(subYargs) {
+    return subYargs.option('force', {
+      description: 'forces app to be removed',
+      boolean: true
+    });
+  }
+};
+
 export const logs = {
   description: 'View meteor app\'s logs',
   builder(yargs) {

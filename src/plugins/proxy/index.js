@@ -22,6 +22,15 @@ export function prepareConfig(config) {
   config.app.docker = config.app.docker || {};
   config.app.env = addProxyEnv(config, config.app.env);
 
+  if (config.app.servers && config.proxy.loadBalancing) {
+    Object.keys(config.app.servers).forEach(key => {
+      const privateIp = config.servers[key].privateIp;
+      if (privateIp) {
+        config.app.servers[key].bind = privateIp;
+      }
+    });
+  }
+
   if (!swarmEnabled) {
     config.app.env.VIRTUAL_PORT = config.app.docker.imagePort || 3000;
   }
