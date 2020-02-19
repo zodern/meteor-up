@@ -34,4 +34,6 @@ else
   sudo service docker start || true
 fi
 
-# TODO make sure docker works as expected
+<% if (privateRegistry) { %>
+  sudo docker login --password '<%- privateRegistry.password %>' --username '<%- privateRegistry.username %>' <%- privateRegistry.host %>
+<% } %>

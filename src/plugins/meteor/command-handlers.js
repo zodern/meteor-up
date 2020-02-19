@@ -5,6 +5,7 @@ import {
   createServiceConfig,
   currentImageTag,
   getBuildOptions,
+  getImagePrefix,
   getNodeVersion,
   getSessions,
   prepareBundleSupported,
@@ -122,10 +123,12 @@ export async function push(api) {
   log('exec => mup meteor push');
 
   await api.runCommand('meteor.build');
+  const {
+    app: appConfig,
+    privateDockerRegistry
+  } = api.getConfig();
 
-  const config = api.getConfig().app;
-
-  if (!config) {
+  if (!appConfig) {
     console.error('error: no configs found for meteor');
     process.exit(1);
   }
@@ -142,16 +145,16 @@ export async function push(api) {
 
   list.copy('Pushing Meteor App Bundle to the Server', {
     src: bundlePath,
-    dest: `/opt/${config.name}/tmp/bundle.tar.gz`,
-    progressBar: config.enableUploadProgressBar
+    dest: `/opt/${appConfig.name}/tmp/bundle.tar.gz`,
+    progressBar: appConfig.enableUploadProgressBar
   });
 
-  if (prepareBundleSupported(config.docker)) {
+  if (prepareBundleSupported(appConfig.docker)) {
     let tag = 'latest';
 
     if (api.swarmEnabled()) {
       const data = await api.getServerInfo();
-      tag = currentImageTag(data, config.name) + 1;
+      tag = currentImageTag(data, appConfig.name) + 1;
     }
 
     list.executeScript('Prepare Bundle', {
@@ -160,14 +163,16 @@ export async function push(api) {
         'assets/prepare-bundle.sh'
       ),
       vars: {
-        appName: config.name,
-        dockerImage: config.docker.image,
-        env: config.env,
-        buildInstructions: config.docker.buildInstructions || [],
+        appName: appConfig.name,
+        dockerImage: appConfig.docker.image,
+        env: appConfig.env,
+        buildInstructions: appConfig.docker.buildInstructions || [],
         nodeVersion: getNodeVersion(api, buildOptions.buildLocation),
-        stopApp: config.docker.stopAppDuringPrepareBundle,
-        useBuildKit: config.docker.useBuildKit,
-        tag
+        stopApp: appConfig.docker.stopAppDuringPrepareBundle,
+        useBuildKit: appConfig.docker.useBuildKit,
+        tag,
+        privateRegistry: privateDockerRegistry,
+        imagePrefix: getImagePrefix(privateDockerRegistry)
       }
     });
 
@@ -188,7 +193,8 @@ export function envconfig(api) {
   const {
     servers,
     app,
-    proxy
+    proxy,
+    privateDockerRegistry
   } = api.getConfig();
 
   if (api.swarmEnabled()) {
@@ -244,6 +250,7 @@ export function envconfig(api) {
     dest: `/opt/${app.name}/config/start.sh`,
     hostVars: startHostVars,
     vars: {
+      imagePrefix: getImagePrefix(privateDockerRegistry),
       appName: app.name,
       port: app.env.PORT || 80,
       bind: bindAddress,

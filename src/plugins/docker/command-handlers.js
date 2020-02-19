@@ -49,7 +49,10 @@ export function setup(api) {
   const list = nodemiral.taskList('Setup Docker');
 
   list.executeScript('Setup Docker', {
-    script: api.resolvePath(__dirname, 'assets/docker-setup.sh')
+    script: api.resolvePath(__dirname, 'assets/docker-setup.sh'),
+    vars: {
+      privateRegistry: config.privateDockerRegistry
+    }
   });
 
   const sessions = swarmEnabled ?

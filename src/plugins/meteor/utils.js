@@ -151,7 +151,7 @@ export function shouldRebuild(api) {
   if (api.getOptions()['cached-build']) {
     const buildCached = fs.existsSync(bundlePath);
 
-    // If build is not cached, rebuild is true
+    // If build is not cached, rebuild remains true
     // even though the --cached-build flag was used
     if (buildCached) {
       rebuild = false;
@@ -178,6 +178,15 @@ export function normalizeUrl(configUrl) {
 
   return configUrl;
 }
+
+export function getImagePrefix(privateRegistry) {
+  if (privateRegistry && privateRegistry.imagePrefix) {
+    return `${privateRegistry.imagePrefix}/mup-`;
+  }
+
+  return 'mup-';
+}
+
 export function currentImageTag(serverInfo, appName) {
   const result = flatMap(
     Object.values(serverInfo),

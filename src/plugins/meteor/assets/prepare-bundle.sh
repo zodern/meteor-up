@@ -4,7 +4,8 @@ set -e
 
 APP_DIR=/opt/<%= appName %>
 APPNAME=<%= appName %>
-IMAGE=mup-<%= appName.toLowerCase() %>
+IMAGE_PREFIX=<%- imagePrefix %>
+IMAGE=$IMAGE_PREFIX'<%= appName.toLowerCase() %>'
 USE_BUILDKIT=<%= useBuildKit ? 1 : 0 %>
 
 build_failed() {
@@ -78,5 +79,14 @@ sudo docker start $APPNAME >/dev/null 2>&1 || true
 
 sudo docker tag $IMAGE:latest $IMAGE:previous || true
 sudo docker tag $IMAGE:build $IMAGE:<%= tag %>
+
+<% if (privateRegistry) { %>
+  echo "Pushing images to private registry"
+  # Fails if the previous tag doesn't exist (such as during the initial deploy)
+  sudo docker push $IMAGE:previous || true
+
+  sudo docker push $IMAGE:latest
+<% } %>
+
 echo "Tagging <%= tag %>"
 sudo docker image prune -f
