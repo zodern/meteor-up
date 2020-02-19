@@ -166,6 +166,7 @@ export async function push(api) {
         buildInstructions: config.docker.buildInstructions || [],
         nodeVersion: getNodeVersion(api, buildOptions.buildLocation),
         stopApp: config.docker.stopAppDuringPrepareBundle,
+        useBuildKit: config.docker.useBuildKit,
         tag
       }
     });
