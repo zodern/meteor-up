@@ -161,7 +161,7 @@ export function setup(api) {
   });
 
   return api.runTaskList(list, sessions, {
-    series: true,
+    series: false,
     verbose: api.getVerbose()
   }).then(() => api.runCommand('proxy.start'));
 }
