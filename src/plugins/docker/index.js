@@ -1,5 +1,5 @@
 import * as _commands from './commands';
-import validator from './validate';
+import { validateRegistry, validateSwarm } from './validate';
 
 export const description = 'Setup and manage docker';
 export const commands = _commands;
@@ -11,7 +11,8 @@ export const hooks = {
 };
 
 export const validate = {
-  swarm: validator
+  swarm: validateSwarm,
+  privateDockerRegistry: validateRegistry
 };
 
 export function swarmOptions(config) {

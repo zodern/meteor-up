@@ -14,12 +14,22 @@ IMAGE=$APP_IMAGE:latest
 VOLUME="--volume=$BUNDLE_PATH:/bundle"
 LOCAL_IMAGE=false
 
+<% if (!privateRegistry) { %>
 sudo docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
 
 if [ $IMAGE == $APP_IMAGE:latest  ]; then
   VOLUME=""
   LOCAL_IMAGE=true
 fi
+<% } else { %>
+  VOLUME=""
+  LOCAL_IMAGE=true
+  # We want this pull to fail on error since
+  # otherwise we might try to run an old version of the app
+  set -e
+  docker pull $IMAGE
+  set +e
+<% } %>
 
 echo "Image" $IMAGE
 echo "Volume" $VOLUME

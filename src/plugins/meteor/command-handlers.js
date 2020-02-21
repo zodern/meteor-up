@@ -180,7 +180,14 @@ export async function push(api) {
     api.serverInfoStale();
   }
 
-  const sessions = api.getSessions(['app']);
+  let sessions = api.getSessions(['app']);
+
+  // If we are using a private registry,
+  // we only need to build it once. All of the other servers
+  // can pull the image from the registry instead of rebuilding it
+  if (privateDockerRegistry) {
+    sessions = sessions.slice(0, 1);
+  }
 
   return api.runTaskList(list, sessions, {
     series: true,
@@ -259,7 +266,8 @@ export function envconfig(api) {
       volumes: app.volumes,
       docker: app.docker,
       proxyConfig: proxy,
-      nginxClientUploadLimit: app.nginx.clientUploadLimit || '10M'
+      nginxClientUploadLimit: app.nginx.clientUploadLimit || '10M',
+      privateRegistry: privateDockerRegistry
     }
   });
 

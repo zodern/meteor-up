@@ -7,7 +7,7 @@ import uuid from 'uuid';
 
 export function checkAppStarted(list, api) {
   const script = api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh');
-  const { app } = api.getConfig();
+  const { app, privateDockerRegistry } = api.getConfig();
   const publishedPort = app.docker.imagePort || 80;
 
   list.executeScript('Verifying Deployment', {
@@ -15,7 +15,9 @@ export function checkAppStarted(list, api) {
     vars: {
       deployCheckWaitTime: app.deployCheckWaitTime || 60,
       appName: app.name,
-      deployCheckPort: publishedPort
+      deployCheckPort: publishedPort,
+      privateRegistry: privateDockerRegistry,
+      imagePrefix: getImagePrefix(privateDockerRegistry)
     }
   });
 
@@ -23,7 +25,10 @@ export function checkAppStarted(list, api) {
 }
 
 export function addStartAppTask(list, api) {
-  const appConfig = api.getConfig().app;
+  const {
+    app: appConfig,
+    privateDockerRegistry
+  } = api.getConfig();
   const isDeploy = api.commandHistory.find(
     ({ name }) => name === 'meteor.deploy'
   );
@@ -32,7 +37,8 @@ export function addStartAppTask(list, api) {
     script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
     vars: {
       appName: appConfig.name,
-      removeImage: isDeploy && !prepareBundleSupported(appConfig.docker)
+      removeImage: isDeploy && !prepareBundleSupported(appConfig.docker),
+      privateRegistry: privateDockerRegistry
     }
   });
 

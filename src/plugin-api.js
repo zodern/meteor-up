@@ -3,6 +3,7 @@ import * as tasks from './tasks';
 import * as utils from './utils';
 import configValidator, { showDepreciations, showErrors } from './validate/index';
 import { hooks, runRemoteHooks } from './hooks';
+import { parseDockerInfo, StatusDisplay } from './status';
 import chalk from 'chalk';
 import childProcess from 'child_process';
 import { cloneDeep } from 'lodash';
@@ -16,7 +17,6 @@ import path from 'path';
 import { runConfigPreps } from './prepare-config';
 import { scrubConfig } from './scrub-config';
 import serverInfo from './server-info';
-import { parseDockerInfo, StatusDisplay } from './status';
 
 const { resolvePath, moduleNotFoundIsPath } = utils;
 const log = debug('mup:api');
