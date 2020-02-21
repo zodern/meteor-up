@@ -55,7 +55,8 @@ export default function(config, {
     config.app &&
     config.app.env &&
     config.app.env.PORT &&
-    config.app.env.PORT !== 80
+    config.app.env.PORT !== 80 &&
+    !config.proxy.loadBalancing
   ) {
     details.push({
       message: 'app.env.PORT is ignored when using the reverse proxy',
