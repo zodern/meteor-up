@@ -283,6 +283,7 @@ Mup supports Meteor 1.2 and newer, though you might need to change the docker im
 | 1.4 - 1.5 | `abernix/meteord:base` | true |  |
 | 1.6 | `abernix/meteord:node-8.4.0-base` | true | |
 | 1.2 - 1.6 | `zodern/meteor:root` | true | Automatically uses the correct node version. |
+| 1.9 | `abernix/meteord:node-12-base` | true | |
 
 When using an image that supports `Prepare Bundle`, deployments are easier to debug and more reliable.
 
