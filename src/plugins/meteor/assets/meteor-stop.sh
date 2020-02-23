@@ -1,6 +1,10 @@
 #!/bin/bash
 
 APPNAME=<%= appName %>
+TIMEOUT=<%= gracefulTimeout %>
+
+# Gracefully stopping the meteor application
+sudo docker stop -t $TIMEOUT $APPNAME || :
 
 sudo docker rm -f $APPNAME || :
 sudo docker rm -f $APPNAME-frontend || :
