@@ -10,3 +10,5 @@ coverage
 tests/ssh/
 .nyc_output/
 tests/validate-tmp
+.history
+.cache/

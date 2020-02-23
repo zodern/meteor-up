@@ -1,11 +1,14 @@
 {
-  "name": "mup",
-  "version": "1.4.6",
+  "name": "@nudger-labs/mup",
+  "version": "1.4.8",
   "description": "Production Quality Meteor Deployments",
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zodern/meteor-up.git"
+    "url": "git://github.com/nudger-labs/meteor-up.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "keywords": [
     "meteor",

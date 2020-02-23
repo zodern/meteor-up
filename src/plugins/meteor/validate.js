@@ -23,6 +23,7 @@ const schema = joi.object().keys({
     image: joi.string().trim(),
     imagePort: joi.number(),
     imageFrontendServer: joi.string(),
+    remoteImage: joi.string(),
     args: joi.array().items(joi.string()),
     bind: joi.string().trim(),
     prepareBundle: joi.bool(),
