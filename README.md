@@ -4,7 +4,7 @@
 
 Meteor Up is a command line tool that allows you to deploy any [Meteor](http://meteor.com) app to your own server.
 
-You can install and use Meteor Up on Linux, Mac and Windows. It can deploy to servers running Ubuntu 14 or newer.
+You can install and use Meteor Up on Linux, Mac and Windows. It can deploy to servers running Ubuntu 14 or newer and CentOS 7 or newer.
 
 This version of Meteor Up is powered by [Docker](http://www.docker.com/), making deployment easy to manage and reducing server specific errors.
 
@@ -86,5 +86,3 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/meteor-up/sponsor/7/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/meteor-up/sponsor/8/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/meteor-up/sponsor/9/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/9/avatar.svg"></a>
-
-
