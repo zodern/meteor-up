@@ -140,7 +140,7 @@ module.exports = {
 
       // (optional, default is false) Uses the new docker image builder during Prepare bundle
       // When enabled, Prepare Bundle is much faster
-      useBuildKit: true
+      useBuildKit: true,
 
       // Additional docker build instructions, used during Prepare Bundle
       buildInstructions: [
