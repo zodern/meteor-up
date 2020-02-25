@@ -89,7 +89,8 @@ module.exports = {
         port: 22
       },
       // IP Address on a private network (optional)
-      // Used by some features (for example, load balancing) for communication between the servers
+      // Used by some features (for example, load balancing)
+      // for communication between the servers
       privateIp: '2.3.4.5'
     },
     two: {
@@ -138,8 +139,9 @@ module.exports = {
       // make deploys more reliable and easier to troubleshoot
       prepareBundle: true,
 
-      // (optional, default is false) Uses the new docker image builder during Prepare bundle
-      // When enabled, Prepare Bundle is much faster
+      // (optional, default is false) Uses the new docker image builder
+      // during Prepare bundle. When enabled,
+      // Prepare Bundle is much faster
       useBuildKit: true,
 
       // Additional docker build instructions, used during Prepare Bundle
@@ -493,9 +495,9 @@ module.exports = {
     password: 'password',
 
     // (optional) The image name will start with this value.
-    imagePrefix: 'image-name-prefix-',
+    imagePrefix: 'image-name-prefix-'
   }
-}
+};
 ```
 
 Some registries, such as Gitlab's or Google Cloud's, require image names to start with a certain string. For example, the prefix for Google Cloud would be `eu.gcr.io/<project id>`, and for GitLab it would be `registry.gitlab.com/<group name>/<project name>`.
@@ -950,7 +952,7 @@ module.exports = {
       one: {}
     }
   }
-}
+};
 ```
 
 ### Accessing the Database
