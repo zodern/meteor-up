@@ -83,6 +83,7 @@ export function start(api) {
     script: api.resolvePath(__dirname, 'assets/mongo-start.sh'),
     vars: {
       mongoVersion: config.version || '3.4.1',
+      mongoBindIp: config.bindIp || '127.0.0.1',
       mongoDbDir: '/var/lib/mongodb'
     }
   });
@@ -136,6 +137,7 @@ export async function status(api) {
   }
 
   const mongoVersion = mongoStatus.version;
+  const mongoBindIp = mongoStatus.bindIp;
   const connections = mongoStatus.connections.current;
   const storageEngine = mongoStatus.storageEngine.name;
 
@@ -188,6 +190,7 @@ export async function status(api) {
   console.log(chalk[restartCountColor](`  Restarted ${restartCount} times`));
   console.log(`  Running since ${createdTime}`);
   console.log(`  Version: ${mongoVersion}`);
+  console.log(`  BindIP: ${mongoBindIp}`);
   console.log(`  Connections: ${connections}`);
   console.log(`  Storage Engine: ${storageEngine}`);
 }

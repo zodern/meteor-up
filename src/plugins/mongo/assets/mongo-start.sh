@@ -1,6 +1,7 @@
 #!/bin/bash
 
 MONGO_VERSION=<%= mongoVersion %>
+MONGO_BINDIP=<%= mongoBindIp %>
 
 set -e
 
@@ -21,7 +22,7 @@ echo "Running mongo:<%= mongoVersion %>"
 sudo docker run \
   -d \
   --restart=unless-stopped \
-  --publish=127.0.0.1:27017:27017 \
+  --publish=<%= mongoBindIp %>:27017:27017 \
   --volume=<%= mongoDbDir %>:/data/db \
   --volume=/opt/mongodb/mongodb.conf:/mongodb.conf \
   --name=mongodb \
