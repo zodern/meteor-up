@@ -17,7 +17,7 @@ sudo docker rm -f mongodb
 
 set -e
 
-echo "Running mongo:<%= mongoVersion %>"
+echo "Running mongo:<%= mongoVersion %> on <%= mongoBindIp %>"
 
 sudo docker run \
   -d \
