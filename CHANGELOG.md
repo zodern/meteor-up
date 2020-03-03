@@ -16,6 +16,10 @@ How it works:
 2. To avoid conflicts with other apps, it uses a random port between 10,000 and 20,000. The random number generator uses the app's name as a string.
 3. When `mup setup` or `mup proxy setup` is run, a Nginx config is generated with a list of the server's private IP's, or, if that isn't available, their `host`.
 
+**Private Docker Registry**
+
+Mup can be configured to use a private docker registry, which allows it to deploy to multiple servers much faster. Instead of uploading the bundle and running Prepare Bundle task on every server, it can do that one a single server, store the image in the registry, and use that image on all of the other servers.
+
 **Swarm**
 
 Meteor Up can now manage a docker swarm cluster. When swarm is enabled in the config, Meteor up sets up a swarm cluster on all of the servers listed in the config. During `mup setup`, it diffs the config given to it by plugins and the mup config with the current cluster state and carefully makes any needed adjustments to avoid unnecessarily disrupting running swarm services. Mup uses Docker Swarm instead of Kubernetes since it is simpler and uses fewer resources.
@@ -31,7 +35,9 @@ We have tried to make using swarm with Meteor Up as simple and reliable as possi
 - When using swarm, the docker images created for the app use numerical tags (`1`, `2`, `3`) instead of `previous` and `current`. This is needed for swarm to correctly roll back failed deploys, but it will also give us more control over how many old versions to keep and allow manually rolling back
 
 **Performance**
+- Add `app.docker.useBuildKit` option. When enabled, it uses the new docker image builder which reduces time spent by Prepare Bundle by 60%
 - When prepare bundle is enabled, mup waits 12 fewer seconds after starting the app and before verifying the deployment
+- Tasks to configure the proxy are no longer run in serial, improving completion speed when there are many servers
 - SSH sessions are reused between task lists to improve performance
 - `mup mongo start` only starts/restarts the container if it isn't running or the start script has changed. This can greatly speed up `mup setup` since starting MongoDB was one of the slower tasks
 - The update check no longer delays starting the cli and can be disabled by  setting the environment variale `MUP_SKIP_UPDATE_CHECK=false`

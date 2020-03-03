@@ -2,8 +2,8 @@ sudo: required
 
 language: node_js
 node_js:
-  - "4"
   - "8"
+  - "12"
 
 env:
   - TEST_PLUGIN='default'

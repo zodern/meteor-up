@@ -15,20 +15,23 @@ title: 'Documentation'
 
     npm install -g mup
 
-`mup` should be installed on the computer you are deploying from.
+`mup` should be installed on the computer you are deploying from. Node 8 or newer is required.
 
 ## Creating a Meteor Up Project
-    cd my-app-folder
-    mkdir .deploy
-    cd .deploy
-    mup init
 
-***WARNING: Windows users need to use `mup.cmd` instead, as `mup` will result in unexpected behavior.***
+```shell
+cd my-app-folder
+mkdir .deploy
+cd .deploy
+mup init
+```
+
+***WARNING: Windows users need to use `mup.cmd` instead in Command Prompt, as `mup` will result in unexpected behavior.***
 
 This will create two files in your Meteor Up project directory:
 
-  * `mup.js` - Meteor Up configuration file
-  * `settings.json` - Settings for Meteor's [settings API](http://docs.meteor.com/#meteor_settings)
+* `mup.js` - Meteor Up configuration file
+* `settings.json` - Settings for Meteor's [settings API](http://docs.meteor.com/#meteor_settings)
 
 ## Example Configs
 <!-- eslint comma-dangle: 0 -->
@@ -84,7 +87,11 @@ module.exports = {
       // or leave blank to authenticate using ssh-agent
       opts: {
         port: 22
-      }
+      },
+      // IP Address on a private network (optional)
+      // Used by some features (for example, load balancing)
+      // for communication between the servers
+      privateIp: '2.3.4.5'
     },
     two: {
       host: '5.6.7.8',
@@ -122,15 +129,21 @@ module.exports = {
       args: [
         // linking example
         '--link=myCustomMongoDB:myCustomMongoDB',
-        // memory resvevation example
+        // memory reservation example
         '--memory-reservation 200M'
       ],
 
       // (optional) It is set to true when using a docker image
-      // that supports it. Builds a new docker image containing the
+      // that is known to support it. Builds a new docker image containing the
       // app's bundle and npm dependencies to start the app faster and
       // make deploys more reliable and easier to troubleshoot
       prepareBundle: true,
+
+      // (optional, default is false) Uses the new docker image builder
+      // during Prepare bundle. When enabled,
+      // Prepare Bundle is much faster
+      useBuildKit: true,
+
       // Additional docker build instructions, used during Prepare Bundle
       buildInstructions: [
         'RUN apt-get update && apt-get install -y imagemagick'
@@ -462,6 +475,33 @@ module.exports = {
 
 Any files stored in `/images` by the app inside the docker container will persist between restarts and deploys. The files will also be available on the server at `/opt/images`.
 
+### Private Docker Registry
+
+Mup uploads the app's bundle and builds a docker image (when prepare bundle is enabled) on each server, which is slow when there are many servers. When using a private docker registry, it is much faster:
+
+1. Mup uploads the bundle to a single server, and builds the image there.
+2. The image is stored in the private registry
+3. On the other servers, mup will use the image from the private registry
+
+To use a private registry, add the `dockerPrivateRegistry` option to your config:
+
+```js
+module.exports = {
+  // ... rest of config
+
+  privateDockerRegistry: {
+    host: 'registry.domain.com',
+    username: 'username',
+    password: 'password',
+
+    // (optional) The image name will start with this value.
+    imagePrefix: 'image-name-prefix-'
+  }
+};
+```
+
+Some registries, such as Gitlab's or Google Cloud's, require image names to start with a certain string. For example, the prefix for Google Cloud would be `eu.gcr.io/<project id>`, and for GitLab it would be `registry.gitlab.com/<group name>/<project name>`.
+
 ### Listening to specific IP address (IP Binding)
 
 If you want Docker to listen only on a specific network interface, such as `127.0.0.1`, add a variable called `bind` with the value of the IP address you want to listen to.
@@ -495,7 +535,7 @@ app: {
 }
 ```
 
-### Custom Docker Registry
+### Base Image from a Private Docker Registry
 
 Simply reference the docker image by url in the `meteor.docker.image` setting:
 
@@ -551,6 +591,32 @@ Then, run
 mup setup
 mup reconfig
 ```
+
+### Load Balancing
+
+Mup is able to load balance your app across multiple servers with sticky sessions.
+Set `proxy.loadBalancing` to true in your config:
+
+```js
+module.exports = {
+  // ... rest of config
+
+  proxy: {
+    domains: 'website.com',
+    loadBalancing: true
+  }
+};
+```
+
+Then run `mup setup` and `mup reconfig`.
+
+#### Load Balancing Details
+
+So nginx can access the app on other servers, the app will be publicly accessible on a random port between 10,000 and 20,000. If you set the `privateIp` for the servers, it will only be accessible on the private network.
+
+The random port does not change across deploys. It will always be the same port for an app with the same name. If you use a firewall to whitelist open ports, run `mup validate --show` and look at `app.env.PORT` to see which port to open.
+
+In the future, mup will be able to configure a firewall so only the servers running nginx can access the app.
 
 ### SSL
 Add an `ssl` object to your `proxy` config:
@@ -654,6 +720,24 @@ mup proxy nginx-config
 
 There will be `include` statements for each custom config.
 
+### High availability
+
+Due to planned reasons or unexpected problems, the reverse proxy or a server might be stopped or go down. To prevent this from causing downtime, you want other servers to handle serving requests.
+
+This is not solved in `mup`, and we welcome ideas or pull requests to improve it.
+
+#### Lets Encrypt
+
+When using lets encrypt, mup is currently not able to set it up for high availability due to the challenge of domain verification and updating certificates when there are multiple servers.
+
+#### No SSL or custom certificates
+
+When not using SSL or when using custom certificates, you can run the reverse proxy on multiple servers with no problems.
+
+To use a healthy instance to serve requests, you have two options
+1. Use DNS load balancing. You use multiple ip addressess or CNAMES for the DNS. The web browser will then try to find a healthy one to serve the request. This is the simplest option, but it isn't universally supported. For example, if you provide a REST API that is used in node.js servers, node.js will pick a random server to send the request to without trying to identify one that is up.
+2. Use a floating IP address. You use the IP address in the dns settings, and assign it to one of the servers running the reverse proxy. Using [keepalived](https://www.keepalived.org/), the floating IP address can be transferred from the server if it ever goes down to a healthy server. There are a few seconds of downtime while it detects that the server is unhealthy and moves the floating IP address.
+
 ### Advanced configuration
 
 These are additional options that can be used to customize the reverse proxy. The defaults are compatible with most apps.
@@ -717,13 +801,9 @@ module.exports = {
 };
 ```
 
-## Load Balancing
-
-Mup is able to setup load balancing for your app with sticky sessions It is automatically enabled when using the [Reverse Proxy](#reverse-proxy) and [Docker Swarm](#swarm).
-
 ## Changing the App's Name
 
-It's okay to change `app.name`. But before you do so, you need to stop the project with older `appName`. Also, if you use the built-in MongoDB, mup will create a new database with the new name so you will need to migrate the data.
+It's okay to change `app.name`. But before you do so, you need to stop the project with the older `appName`. Also, if you use the built-in MongoDB, mup will create a new database with the new name so you will need to migrate the data.
 
 1. Run `mup stop`
 2. Change the app name in the config
@@ -858,23 +938,21 @@ mup deploy
 ```
 
 ### Multiple apps use the same database
-It is possible for two apps to use the same database from the built-in MongoDB instance.
 
-In the config for one of the apps, follow the instructions for [Built-in Database](#built-in-database).
+All apps on a server share the same Mongo instance, but by default each app uses a different database, named after the app's name.
 
-For the other apps:
-1. Make sure the `mongo` object is not in the config
-2. Change `env.MONGO_URL` to `mongodb://mongodb:27017/<app1 name>`
-3. Change `meteor.docker.args` to `[ '--link=mongodb:mongodb' ]`. `meteor.docker` will look similar to:
+For multiple apps to use the same database, use the `mongo.dbName` option. All apps using this database should have the exact same mongo config.
 
-```ts
-    docker: {
-      // change to 'kadirahq/meteord' if your app is using Meteor 1.3 or older
-      image: 'abernix/meteord:base',
-      args: [
-        '--link=mongodb:mongodb'
-      ]
+```js
+module.exports = {
+  mongo: {
+    version: '3.4.1',
+    dbName: 'staging',
+    servers: {
+      one: {}
     }
+  }
+};
 ```
 
 ### Accessing the Database
@@ -933,7 +1011,7 @@ There are some requirements and restrictions. We plan to remove as many of these
 1. The servers should be able to access each other using the values from `server.<servername>.host` in your config.
 2. TCP port 2377, UDP port 4789, and TCP and UDP port 7946 need to be open to allow the servers to communicate among themselves.
 3. Docker recommends having the servers in the same region when using swarm.
-4. Servers should have at least 1 GB of ram. 
+4. Servers should have at least 1 GB of ram
 5. Meteor apps must have prepare bundle enabled
 6. A number of features do not work with swarm:
    1. server specific env variables and settings.json
@@ -953,7 +1031,7 @@ module.exports = {
 
 Then run `mup setup` and `mup deploy`.
 
-For the reverse proxy to work correctly, set `proxy.servers`. Learn more [here]().
+For the reverse proxy to work correctly, set `proxy.servers`.
 
 If you encounter problems with swarm, please create an issue. `mup docker setup` should fix most problems. If necessary, you can run `mup docker destroy-cluster`, `mup setup`, and `mup start`to recreate the swarm cluster, services, and networks, excluding any that you manually created.
 
@@ -966,7 +1044,7 @@ module.exports = {
   swarm: {
     enabled: true,
 
-    // Array of labels for mup to manage, default is `[]`
+    // Array of labels for mup to manage
     labels: [
       {
         name: 'label-name',
@@ -992,7 +1070,7 @@ It is also okay to remove nodes. Make sure they are not being used in the config
 
 #### Managers
 
-Mup manages which servers are managers. It is not recommended to manually promote nodes since Mup will revert the changes the next time `mup setup` is run. This is how mup decides which servers to make managers:
+Mup manages which servers are managers. It is not recommended to manually promote nodes since Mup might revert the changes the next time `mup setup` is run. This is how mup decides which servers to make managers:
 
 1. Plugins can provide a list of servers that need to be managers. For example, The Proxy plugin needs the servers in `proxy.servers` to be managers
 2. If there are 3 or more servers, mup will make at least 3 of them managers for high availability.
@@ -1010,7 +1088,7 @@ You can create additional services. If you remove or update services created by 
 
 #### Labels
 
-Plugins and `swarm.laels` in the config can provide a list of labels for mup to manage. Any changes to these labels (setting it for additional nodes, removing it, or changing it's value) will be reverted. You can add or modify any other label.
+Plugins and `swarm.labels` in the config can provide a list of labels for mup to manage. Any changes to these labels (setting it for additional nodes, removing it, or changing its value) will be reverted. You can add, modify, or remove any other label.
 
 Mup does not remove labels that plugins no longer use.
 
@@ -1067,7 +1145,6 @@ The hook name format is `{pre or post}.topLevelCommand.subCommand`. For example,
 
 Some CLI commands run other CLI commands. For example, `mup setup` runs `mup docker setup` and `mup mongo setup`. To see all of the available hooks while a command runs, use the `--show-hook-names` option.
 
-
 ## Updating Mup
 
 To update `mup` to the latest version, just type:
@@ -1075,6 +1152,8 @@ To update `mup` to the latest version, just type:
     npm install -g mup
 
 mup usually will let you know when there is an update available. You should try and keep `mup` up to date in order to keep up with the latest Meteor changes.
+
+After updating, run `mup setup` for all of your apps.
 
 ## Troubleshooting
 
@@ -1137,7 +1216,7 @@ This error happens when your config gets bundled with the app. Try moving it and
 
 ### Mup silently fails, mup.js file opens instead, or you get a Windows script error
 
-If you are using Windows, make sure you run commands with `mup.cmd <command>` instead of `mup <command>`, or use PowerShell.
+If you are using Command Prompt on Windows, make sure you run commands with `mup.cmd <command>` instead of `mup <command>`, or use PowerShell.
 If it silently fails for a different reason, please create an issue.
 
 ### Error: spawn meteor ENOENT
