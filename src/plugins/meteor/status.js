@@ -76,8 +76,22 @@ export function getInformation(server, appName, api) {
 async function checkUrlLocally(server, appConfig) {
   let result;
 
+  let portString = `:${appConfig.env.PORT}`;
+  let domain = server.host;
+  if (appConfig.env.VIRTUAL_HOST) {
+    domain = appConfig.env.VIRTUAL_HOST.split(',')[0];
+    // TODO: this should use the proxy's port if the user changed it
+    portString = '';
+  }
+
+  let protocol = 'http://';
+
+  if (appConfig.env.ROOT_URL.startsWith('https://')) {
+    protocol = 'https://';
+  }
+
   try {
-    result = await axios.head(`http://${server.host}:${appConfig.env.PORT}`, {
+    result = await axios.head(`${protocol}${domain}${portString}`, {
       timeout: 5000
     });
   } catch (e) {
@@ -87,13 +101,29 @@ async function checkUrlLocally(server, appConfig) {
   return result;
 }
 
+function getCheckAddress(server, appConfig) {
+  if (
+    appConfig.servers &&
+    appConfig.servers[server.name] &&
+    appConfig.servers[server.name].bind
+  ) {
+    return appConfig.servers[server.name].bind;
+  }
+
+  if (appConfig.docker && appConfig.docker.bind) {
+    return appConfig.docker.bind;
+  }
+
+  return '127.0.0.1';
+}
+
 export async function checkUrls(server, appConfig, api) {
   const [
     remote,
     inDocker,
     local
   ] = await Promise.all([
-    api.runSSHCommand(server, `curl 127.0.0.1:${appConfig.env.PORT}`),
+    api.runSSHCommand(server, `curl ${getCheckAddress(server, appConfig)}:${appConfig.env.PORT}`),
     api.runSSHCommand(server, `docker exec ${appConfig.name} curl http://localhost:${appConfig.docker.imagePort}`),
     checkUrlLocally(server, appConfig)
   ]);
