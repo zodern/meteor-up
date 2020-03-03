@@ -30,7 +30,11 @@ export const builtInParsers = {
   json(stdout, code) {
     if (code === 0) {
       try {
-        return JSON.parse(stdout);
+        // Some commands, such as Docker, will sometimes show some
+        // messages before the JSON
+        const jsonOutput = stdout.slice(stdout.indexOf('{'));
+
+        return JSON.parse(jsonOutput);
       } catch (e) {
         return null;
       }
