@@ -11,7 +11,9 @@ PROXYNAME=<%= proxyName%>
 # Remove upstream config for all of app's domains
 rm /opt/$PROXYNAME/upstream/$APPNAME
 cd /opt/$PROXYNAME/config/vhost.d
-find . -xtype l -delete
+# We have to run the cleanup command in the docker container
+# because the valid symlinks are only valid in the container
+docker exec -w /etc/nginx/vhost.d/ mup-nginx-proxy find . -xtype l -delete
 
 # Recreate them for the current domains
 <% if(setUpstream) { %>
