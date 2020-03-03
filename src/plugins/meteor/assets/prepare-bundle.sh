@@ -88,5 +88,7 @@ sudo docker tag $IMAGE:build $IMAGE:<%= tag %>
   sudo docker push $IMAGE:latest
 <% } %>
 
-echo "Tagging <%= tag %>"
-sudo docker image prune -f
+echo "Tagged <%= tag %>"
+
+# Can fail if multiple Prepare Bundle apps are run concurrently for different apps
+sudo docker image prune -f || true
