@@ -1,6 +1,6 @@
 import * as _commands from './commands';
 import { addProxyEnv, normalizeUrl } from './utils';
-import { updateProxyForService } from './command-handlers';
+import { updateProxyForLoadBalancing } from './command-handlers';
 import validator from './validate';
 
 export const description = 'Setup and manage reverse proxy and ssl';
@@ -53,8 +53,8 @@ export function prepareConfig(config) {
 function configureServiceHook(api) {
   const config = api.getConfig();
 
-  if (config.proxy && api.swarmEnabled()) {
-    return updateProxyForService(api);
+  if (config.proxy && (api.swarmEnabled() || config.proxy.loadBalancing)) {
+    return updateProxyForLoadBalancing(api);
   }
 }
 

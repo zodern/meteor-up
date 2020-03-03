@@ -468,7 +468,10 @@ export async function status(api) {
   } = api.statusHelpers;
   const overview = api.getOptions().overview;
   const servers = Object.keys(config.app.servers)
-    .map(key => config.servers[key]);
+    .map(key => ({
+      ...config.servers[key],
+      name: key
+    }));
 
   const results = await map(
     servers,

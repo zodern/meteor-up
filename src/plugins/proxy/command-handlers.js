@@ -388,7 +388,7 @@ export async function status(api) {
   console.log(lines.join('\n'));
 }
 
-export function updateProxyForService(api) {
+export function updateProxyForLoadBalancing(api) {
   const config = api.getConfig();
   const sessions = getSessions(api);
   const list = nodemiral.taskList('Configure Proxy for Service');
@@ -400,7 +400,8 @@ export function updateProxyForService(api) {
       imagePort: config.app.docker.imagePort,
       env: addProxyEnv(config, {}),
       domains: config.proxy.domains.split(','),
-      proxyName: PROXY_CONTAINER_NAME
+      proxyName: PROXY_CONTAINER_NAME,
+      swarmEnabled: api.swarmEnabled()
     }
   });
 
