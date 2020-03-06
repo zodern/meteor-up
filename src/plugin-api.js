@@ -42,6 +42,7 @@ export default class PluginAPI {
     this.runTaskList = utils.runTaskList;
     this.getDockerLogs = utils.getDockerLogs;
     this.runSSHCommand = utils.runSSHCommand;
+    this.forwardPort = utils.forwardPort;
     this._createSSHOptions = utils.createSSHOptions;
 
     this.statusHelpers = {

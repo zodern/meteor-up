@@ -61,6 +61,23 @@ export const restart = {
   handler: commandHandlers.restart
 };
 
+export const status = {
+  description: 'View the app\'s status',
+  handler: commandHandlers.status,
+  builder(yargs) {
+    return yargs.option('overview', {
+      description: 'Simplified report to quickly see the status of each component',
+      bool: true
+    });
+  }
+};
+
+export const debug = {
+  name: 'debug [server]',
+  description: 'Debug the meteor app',
+  handler: commandHandlers.debugApp
+};
+
 // Hidden commands
 export const build = {
   description: false,
@@ -87,15 +104,4 @@ export const push = {
 export const envconfig = {
   description: false,
   handler: commandHandlers.envconfig
-};
-
-export const status = {
-  description: 'View the app\'s status',
-  handler: commandHandlers.status,
-  builder(yargs) {
-    return yargs.option('overview', {
-      description: 'Simplified report to quickly see the status of each component',
-      bool: true
-    });
-  }
 };

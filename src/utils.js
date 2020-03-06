@@ -2,6 +2,7 @@ import { Client } from 'ssh2';
 import debug from 'debug';
 import expandTilde from 'expand-tilde';
 import fs from 'fs';
+import net from 'net';
 import nodemiral from '@zodern/nodemiral';
 import path from 'path';
 import { promisify } from 'bluebird';
@@ -220,6 +221,45 @@ export function runSSHCommand(info, command) {
         });
       });
     });
+  });
+}
+
+export function forwardPort({
+  server,
+  localAddress,
+  localPort,
+  remoteAddress,
+  remotePort,
+  onReady,
+  onError
+}) {
+  const sshOptions = createSSHOptions(server);
+  const netServer = net.createServer(netConnection => {
+    const sshConnection = new Client();
+    sshConnection.on('ready', () => {
+      sshConnection.forwardOut(
+        localAddress,
+        localPort,
+        remoteAddress,
+        remotePort,
+        (err, sshStream) => {
+          if (err) {
+            return onError(err);
+          }
+
+          netConnection.pipe(sshStream);
+          sshStream.pipe(netConnection);
+        }
+      );
+    }).connect(sshOptions);
+  });
+
+  netServer.listen(localPort, localAddress, error => {
+    if (error) {
+      onError(error);
+    } else {
+      onReady();
+    }
   });
 }
 
