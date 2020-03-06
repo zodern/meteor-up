@@ -20,6 +20,10 @@ How it works:
 
 Mup can be configured to use a private docker registry, which allows it to deploy to multiple servers much faster. Instead of uploading the bundle and running Prepare Bundle task on every server, it can do that one a single server, store the image in the registry, and use that image on all of the other servers.
 
+**Production Debugging of Meteor Server**
+
+Run `mup meteor debug` to debug your Meteor app in production. It will enable debugging in your app and forward the port to your computer so you can use Chrome's DevTools for Node, Visual Studio Code, or another debugger for node. Requires Meteor 1.6 or newer.
+
 **Swarm**
 
 Meteor Up can now manage a docker swarm cluster. When swarm is enabled in the config, Meteor up sets up a swarm cluster on all of the servers listed in the config. During `mup setup`, it diffs the config given to it by plugins and the mup config with the current cluster state and carefully makes any needed adjustments to avoid unnecessarily disrupting running swarm services. Mup uses Docker Swarm instead of Kubernetes since it is simpler and uses fewer resources.
