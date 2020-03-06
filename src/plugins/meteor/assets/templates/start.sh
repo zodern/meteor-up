@@ -95,6 +95,14 @@ sudo docker run \
   $IMAGE
 echo "Ran <%= docker.image %>"
 
+# When using a private docker registry, the cleanup run in 
+# Prepare Bundle is only done on one server, so we also
+# cleanup here so the other servers don't run out of disk space
+<% if (privateRegistry) { %>
+  echo "pruning images"
+  sudo docker image prune -f || true
+<% } %>
+
 if [[ $VOLUME == "" ]]; then
   # The app starts much faster when prepare bundle is enabled,
   # so we do not need to wait as long
