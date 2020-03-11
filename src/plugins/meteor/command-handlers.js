@@ -459,7 +459,7 @@ export async function debugApp(api) {
 
   const {
     output: startOutput
-  } = await api.runSSHCommand(server, `sudo docker rm -f meteor-debug && sudo docker run -d --name meteor-debug --network=container:${app.name} alpine/socat TCP-LISTEN:9228,fork TCP:127.0.0.1:9229`);
+  } = await api.runSSHCommand(server, `sudo docker rm -f meteor-debug; sudo docker run -d --name meteor-debug --network=container:${app.name} alpine/socat TCP-LISTEN:9228,fork TCP:127.0.0.1:9229`);
   if (api.getVerbose()) {
     console.log('output from starting meteor-debug', startOutput);
   }
