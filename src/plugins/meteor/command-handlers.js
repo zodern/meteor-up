@@ -480,9 +480,11 @@ export async function debugApp(api) {
     console.log('output from starting meteor-debug-2', startOutput2);
   }
 
+  let loggedConnection = false;
+
   api.forwardPort({
     server,
-    localAddress: '127.0.0.1',
+    localAddress: '0.0.0.0',
     localPort: 9229,
     remoteAddress: '127.0.0.1',
     remotePort: 9227,
@@ -491,13 +493,30 @@ export async function debugApp(api) {
     },
     onReady() {
       console.log('Connected to server');
+      console.log('');
       console.log('Debugger listening on ws://127.0.0.1:9229');
+      console.log('');
+      console.log('To debug:');
+      console.log('1. Open chrome://inspect in Chrome');
+      console.log('2. Select "Open dedicated DevTools for Node"');
+      console.log('3. Wait a minute while it connects and loads the app.');
+      console.log('   When it is ready, the app\'s files will appear in the Sources tab');
+      console.log('');
       console.log('Warning: Do not use breakpoints when debugging a production server.');
       console.log('They will pause your server when hit, causing it to not handle methods or subscriptions.');
       console.log('Use logpoints or something else that does not pause the server');
       console.log('');
       console.log('The debugger will be enabled until the next time the app is restarted,');
       console.log('though only accessible while this command is running');
+    },
+    onConnection() {
+      if (!loggedConnection) {
+        // It isn't guaranteed the debugger is connected, but not many
+        // other tools will try to connect to port 9229.
+        console.log('');
+        console.log('Detected by debugger');
+        loggedConnection = true;
+      }
     }
   });
 }

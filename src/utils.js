@@ -231,7 +231,8 @@ export function forwardPort({
   remoteAddress,
   remotePort,
   onReady,
-  onError
+  onError,
+  onConnection = () => {}
 }) {
   const sshOptions = createSSHOptions(server);
   const netServer = net.createServer(netConnection => {
@@ -246,7 +247,7 @@ export function forwardPort({
           if (err) {
             return onError(err);
           }
-
+          onConnection();
           netConnection.pipe(sshStream);
           sshStream.pipe(netConnection);
         }
