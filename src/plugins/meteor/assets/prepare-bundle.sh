@@ -86,9 +86,17 @@ sudo docker tag $IMAGE:build $IMAGE:<%= tag %>
   sudo docker push $IMAGE:previous || true
 
   sudo docker push $IMAGE:latest
+  
 <% } %>
 
 echo "Tagged <%= tag %>"
 
 # Can fail if multiple Prepare Bundle apps are run concurrently for different apps
 sudo docker image prune -f || true
+
+<% if (useBuildKit) { %>
+# Pruning buildkit cache doesn't keep cache entries used for local
+# images, so we keep 2GB of cache, which should be enough for most
+# apps to reuse cache from previous builds
+sudo docker builder prune --keep-storage 2gb --force
+<% } %>
