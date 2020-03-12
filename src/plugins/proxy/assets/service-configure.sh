@@ -8,9 +8,9 @@ PROXY_PATH=/opt/<%= proxyName %>
 cd $APP_PATH/config
 
 <% if (swarmEnabled) { %>
-if ! docker service inspect <%= appName %>; then
+if ! sudo docker service inspect <%= appName %>; then
   echo "No service"
-  docker rm -f $CONTAINER_NAME || true
+  sudo docker rm -f $CONTAINER_NAME || true
   <%- domains.map(domain => `rm $PROXY_PATH/config/vhost.d/${domain}_upstream || true`).join('\n') %>
 
   exit 0
@@ -24,9 +24,9 @@ NEW_CONTENT="$(cat <<-CONFIG_EOT
 
 set -e
 
-docker rm -f mup-proxy-configure-<%= appName %> || true
+sudo docker rm -f mup-proxy-configure-<%= appName %> || true
 
-docker run \
+sudo docker run \
   --name mup-proxy-configure-<%= appName %> \
   -d \
   --restart="always" \
