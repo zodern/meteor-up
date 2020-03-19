@@ -42,7 +42,7 @@ CURRENT_CONTENT=`cat proxy-config-container.sh || true`
 
 if [ "$CURRENT_CONTENT" == "$NEW_CONTENT" ]; then
   echo "SAME CONTENT"
-  if [ ! "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+  if [ ! "$(sudo docker ps -q -f name=$CONTAINER_NAME)" ]; then
     echo "Config container not running. Starting container."
     bash proxy-config-container.sh
   fi
