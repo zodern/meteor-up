@@ -40,7 +40,7 @@ while [[ true ]]; do
   sleep 1
   elaspsed=$((elaspsed+1))
   sudo docker exec mongodb mongo --eval \
-    'rs.initiate({_id: "meteor", members: [{_id: 0, host: "127.0.0.1:27017"}]});' \
+    'rs.initiate({_id: "meteor", members: [{_id: 0, host: "<%= mongoBindIp %>:27017"}]});' \
     && exit 0
   
   if [ "$elaspsed" "==" "$limit" ]; then
