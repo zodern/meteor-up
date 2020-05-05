@@ -12,7 +12,11 @@ sudo touch /opt/<%= name %>/config/shared-config.sh
 sudo touch /opt/<%= name %>/config/env.list
 sudo touch /opt/<%= name %>/config/env_letsencrypt.list
 
+# Custom Certificates expect the app's folder to already exist
+sudo mkdir -p /opt/<%= appName %>/config
+
 sudo chown ${USER} /opt/<%= name %> -R
+sudo chown ${USER} /opt/<%= appName %> -R
 
 if docker network inspect mup-proxy ; then
     echo "Network already exists"

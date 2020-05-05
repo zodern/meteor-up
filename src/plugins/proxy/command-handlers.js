@@ -63,7 +63,8 @@ export function setup(api) {
   list.executeScript('Setup Environment', {
     script: api.resolvePath(__dirname, 'assets/proxy-setup.sh'),
     vars: {
-      name: PROXY_CONTAINER_NAME
+      name: PROXY_CONTAINER_NAME,
+      appName
     }
   });
 
