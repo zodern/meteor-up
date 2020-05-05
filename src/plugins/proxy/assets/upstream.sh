@@ -19,7 +19,9 @@ docker exec -w /etc/nginx/vhost.d/ mup-nginx-proxy find . -xtype l -delete
 <% if(setUpstream) { %>
 echo "Storing upstream"
 cat <<"EOT" > /opt/$PROXYNAME/upstream/$APPNAME
+<% if (stickySessions) { %>
 ip_hash;
+<% } %>
 <% for(var index in hostnames) { %>
 server <%= hostnames[index] %>:<%= port %>;
 <% } %>

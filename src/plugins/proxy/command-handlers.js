@@ -155,6 +155,7 @@ export function setup(api) {
       domains,
       name: appName,
       setUpstream: !api.swarmEnabled() && config.loadBalancing,
+      stickySessions: config.stickySessions !== false,
       proxyName: PROXY_CONTAINER_NAME,
       port: appConfig.env.PORT,
       hostnames
