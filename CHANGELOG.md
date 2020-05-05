@@ -62,7 +62,6 @@ We have tried to make using swarm with Meteor Up as simple and reliable as possi
 **Reduce common problems**
 
 - Change `http` to `https` in the `ROOT_URL` environment variable when using the reverse proxy and SSL (@rolljee)
-- URL Encode special characters in the password in `MAIL_URL` and `MONGO_URL` environment variables. For example, `mongodb://user:pass@word@host.com` is converted to `mongodb://user:pass%20word@host.com` (@rolljee)
 - `app.docker.imagePort` defaults to 3000 instead of 80. This change is backwards compatible with the common docker images, and simplifies using images that run the app with a non-root user
 - Validation error shown when `app.servers` is empty
 

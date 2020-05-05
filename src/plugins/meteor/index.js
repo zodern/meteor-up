@@ -1,9 +1,4 @@
 import * as _commands from './commands';
-import {
-  configHasMailUrl,
-  configHasMongoUrl,
-  normalizeUrl
-} from './utils';
 import _validator from './validate';
 import { defaultsDeep } from 'lodash';
 import traverse from 'traverse';
@@ -43,18 +38,6 @@ export function prepareConfig(config) {
   // and meteorhacks/meteord, but they allow the PORT env
   // variable to override it.
   config.app.docker.imagePort = config.app.docker.imagePort || 3000;
-
-  if (configHasMailUrl(config)) {
-    const mailUrl = config.app.env.MAIL_URL;
-
-    config.app.env.MAIL_URL = normalizeUrl(mailUrl);
-  }
-
-  if (configHasMongoUrl(config)) {
-    const mongoUrl = config.app.env.MONGO_URL;
-
-    config.app.env.MONGO_URL = normalizeUrl(mongoUrl);
-  }
 
   return config;
 }

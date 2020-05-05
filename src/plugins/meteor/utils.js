@@ -2,7 +2,6 @@ import { cloneDeep, flatMap } from 'lodash';
 import fs from 'fs';
 import os from 'os';
 import random from 'random-seed';
-import url from 'url';
 import uuid from 'uuid';
 
 export function checkAppStarted(list, api) {
@@ -165,24 +164,6 @@ export function shouldRebuild(api) {
   }
 
   return rebuild;
-}
-
-export function configHasMailUrl(config) {
-  return config && config.app && config.app.env && config.app.env.MAIL_URL;
-}
-
-export function configHasMongoUrl(config) {
-  return config && config.app && config.app.env && config.app.env.MONGO_URL;
-}
-
-export function normalizeUrl(configUrl) {
-  const parsedUrl = url.parse(configUrl);
-
-  if (parsedUrl.hasOwnProperty('href')) {
-    return parsedUrl.href;
-  }
-
-  return configUrl;
 }
 
 export function getImagePrefix(privateRegistry) {
