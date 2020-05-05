@@ -7,6 +7,7 @@ sudo mkdir -p /opt/<%= name %>/upstream
 sudo mkdir -p /opt/<%= name %>/config
 sudo mkdir -p /opt/<%= name %>/config/vhost.d
 sudo mkdir -p /opt/<%= name %>/config/html
+sudo mkdir -p /opt/<%= name %>/config/htpasswd
 
 sudo touch /opt/<%= name %>/config/shared-config.sh
 sudo touch /opt/<%= name %>/config/env.list

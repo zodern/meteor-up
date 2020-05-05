@@ -54,6 +54,7 @@ sudo docker run \
   -v /opt/$APPNAME/mounted-certs:/etc/nginx/certs \
   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
+  -v /opt/$APPNAME/config/htpasswd:/etc/nginx/htpasswd  \
   -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
   -v /opt/$APPNAME/upstream:/etc/nginx/upstream \
