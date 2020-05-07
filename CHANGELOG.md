@@ -16,6 +16,8 @@ How it works:
 2. To avoid conflicts with other apps, it uses a random port between 10,000 and 20,000. The random number generator uses the app's name as a string.
 3. When `mup setup` or `mup proxy setup` is run, a Nginx config is generated with a list of the server's private IP's, or, if that isn't available, their `host`.
 
+Sticky sessions can be disabled for apps that do not need it.
+
 **Private Docker Registry**
 
 Mup can be configured to use a private docker registry, which allows it to deploy to multiple servers much faster. Instead of uploading the bundle and running Prepare Bundle task on every server, it can do that one a single server, store the image in the registry, and use that image on all of the other servers.
@@ -79,7 +81,7 @@ We have tried to make using swarm with Meteor Up as simple and reliable as possi
 - Update Stop Mongo task name to use title case
 - Fix some problems with stopping the proxy
 - Fix `meteor status` when docker logs warnings
-
+- Fix uploading custom certificates before app was set up
 
 **Plugin API**
 - `tasks` has functions that can add reusable tasks to task lists. The functions are:
