@@ -16,6 +16,7 @@ const schema = joi.object().keys({
   nginxServerConfig: joi.string(),
   nginxLocationConfig: joi.string(),
   clientUploadLimit: joi.string(),
+  volumes: joi.object(),
   shared: joi.object().keys({
     clientUploadLimit: joi.alternatives().try(joi.number(), joi.string()),
     httpPort: joi.number(),

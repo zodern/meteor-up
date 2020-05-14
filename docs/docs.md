@@ -642,7 +642,14 @@ module.exports = {
 
     // (optional, default=10M) Limit for the size of file uploads.
     // Set to 0 disables the limit.
-    clientUploadLimit: '50M'
+    clientUploadLimit: '50M',
+
+    // lets you add docker volumes to Nginx (optional)
+    // Can be used to serve static files
+    volumes: {
+      // passed as '-v /host/path:/container/path:ro' to the docker run command
+      '/host/path': '/container/path:ro'    
+    }
   }
 };
 ```
