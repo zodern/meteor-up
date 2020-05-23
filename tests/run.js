@@ -13,7 +13,7 @@ sh.env.PROD_SERVER_USER = 'root';
 sh.env.PROD_SERVER = '127.0.0.1';
 sh.env.PROD_SERVER_PORT = '3500';
 sh.env.PROD_SERVER_PEM = path.resolve(mupDir, 'tests/fixtures/ssh/new');
-sh.env.MUP_SKIP_UPDATE_CHECK = 'false';
+sh.env.MUP_SKIP_UPDATE_CHECK = 'true';
 
 var volume = `-v ${keyPath}:/root/.ssh/authorized_keys2`;
 var publish = '-p 127.0.0.1:3500:22';

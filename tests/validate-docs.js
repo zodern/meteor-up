@@ -36,7 +36,7 @@ var servers = {
 var failed = 0;
 var success = 0;
 
-process.env.MUP_SKIP_UPDATE_CHECK = 'false';
+process.env.MUP_SKIP_UPDATE_CHECK = 'true';
 
 validConfigs.forEach(config => {
   fs.writeFileSync(tmpConfig, config.code);

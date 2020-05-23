@@ -9,7 +9,7 @@ import Npm from 'silent-npm-registry-client';
 import pkg from '../package.json';
 
 const log = debug('mup:updates');
-const SKIP_CHECK_UPDATE = process.env.MUP_SKIP_UPDATE_CHECK === 'false';
+const SKIP_CHECK_UPDATE = process.env.MUP_SKIP_UPDATE_CHECK === 'true';
 
 function parseVersion(version) {
   return flatMap(version.split('.'), n => n.split('-beta').map(Number));
