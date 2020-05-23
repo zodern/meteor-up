@@ -1,44 +1,47 @@
 <!DOCTYPE html>
 <html>
+
 {% include head.html %}
 
 <body>
-    {% include header.html %}
-    <div id="docs-head" class="intro">
-        <h1>{{page.title}}</h1>
-    </div>
-    <div class="js-toc"></div>
-    <div>
-        <div class="col-sm-9 col-sm-push-3 docs-content">
-              <div class="show-menu visible-xs-block">Docs Menu</div>
-            {{ content }}
-        </div>
-        <div class="docs-nav-wrapper">
-            <div class="close hidden-xs hidden-sm hidden-md hidden-lg">&times;</div>
-            {% include docs_nav.html %}
-        </div>
-    </div>
-    <script src="{{ site.baseurl }}/scripts/tocbot.min.js"></script>
-    <script>
-        document.querySelector('.docs-nav-wrapper .close').addEventListener('click', () => {
-            document.querySelector('.docs-nav').className += ' hidden-xs';
-            document.querySelector('.docs-nav-wrapper .close').className += ' hidden-xs';
-        });
+  {% include header.html %}
+  <div id="docs-head" class="intro">
+    <h1>{{page.title}}</h1>
+  </div>
 
-        document.querySelector('.docs-content .show-menu').addEventListener('click', () => {
-            document.querySelector('.docs-nav').classList.remove('hidden-xs');
-            document.querySelector('.docs-nav-wrapper .close').classList.remove('hidden-xs');
-        });
-        tocbot.init({
-            // Where to render the table of contents.
-            tocSelector: '.docs-nav',
-            // Where to grab the headings to build the table of contents.
-            contentSelector: '.docs-content',
-            // Which headings to grab inside of the contentSelector element.
-            headingSelector: 'h1, h2, h3',
-            positionFixedSelector: '.docs-nav'
-        });
-    </script>
+  <div class="docs-wrapper">
+    <div class="docs-content">
+      <div class="show-menu">Show Menu</div>
+      {{ content }}
+    </div>
+    <div class="docs-nav-wrapper">
+      <div class="docs-nav"></div>
+      <div class="close">&times;</div>
+    </div>
+  </div>
+
+  <script src="{{ site.baseurl }}/scripts/tocbot.min.js"></script>
+  <script>
+    document.querySelector('.docs-nav-wrapper .close').addEventListener('click', () => {
+      document.querySelector('.docs-nav').classList.remove('show');
+      document.querySelector('.docs-nav-wrapper .close').classList.remove('show');
+    });
+
+    document.querySelector('.docs-content .show-menu').addEventListener('click', () => {
+      document.querySelector('.docs-nav').classList.add('show');
+      document.querySelector('.docs-nav-wrapper .close').classList.add('show');
+    });
+
+    tocbot.init({
+      // Where to render the table of contents.
+      tocSelector: '.docs-nav',
+      // Where to grab the headings to build the table of contents.
+      contentSelector: '.docs-content',
+      // Which headings to grab inside of the contentSelector element.
+      headingSelector: 'h1, h2, h3',
+      positionFixedSelector: '.docs-nav'
+    });
+  </script>
 </body>
 
 </html>
