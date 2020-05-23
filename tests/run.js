@@ -15,12 +15,13 @@ sh.env.PROD_SERVER_PORT = '3500';
 sh.env.PROD_SERVER_PEM = path.resolve(mupDir, 'tests/fixtures/ssh/new');
 sh.env.MUP_SKIP_UPDATE_CHECK = 'true';
 
-var volume = `-v ${keyPath}:/root/.ssh/authorized_keys2`;
+var keyVolume = `-v ${keyPath}:/root/.ssh/authorized_keys2`;
 var publish = '-p 127.0.0.1:3500:22';
-var image = argv.skipPull ? 'mup-tests-server' : 'mup-tests-server-docker';
+var image = 'mup-tests-server';
+var dockerVolume = '-v ./docker-tests:/var/lib/docker';
 
 var containerId = sh.exec(
-  `docker run ${volume} ${publish} --privileged -d -t ${image} /sbin/my_init`
+  `docker run ${keyVolume} ${publish} ${dockerVolume} --privileged -d -t ${image} /sbin/my_init`
 ).output.trim();
 
 sh.exec(`docker exec ${containerId} sudo service docker start`);
