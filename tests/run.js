@@ -4,6 +4,7 @@ var sh = require('shelljs');
 var path = require('path');
 var argv = require('yargs').argv;
 
+console.log('=> Setting up for tests');
 require('./setup.js');
 
 var mupDir = process.cwd();
@@ -17,9 +18,23 @@ sh.env.MUP_SKIP_UPDATE_CHECK = 'true';
 
 var keyVolume = `-v ${keyPath}:/root/.ssh/authorized_keys2`;
 var publish = '-p 127.0.0.1:3500:22';
-var image = 'mup-tests-server';
-var dockerVolume = '-v ./docker-tests:/var/lib/docker';
+var image = 'mup-tests-server-docker';
+var dockerVolume = '-v mup-test-docker-data:/var/lib/docker';
 
+console.log('=> Cleaning cache');
+var cleaningContainerId = sh.exec(
+  `docker run ${keyVolume} ${publish} ${dockerVolume} --privileged -d -t ${image} /sbin/my_init`
+).output.trim();
+sh.exec(`docker exec ${cleaningContainerId} sudo service docker start`);
+
+// Stop all running containers
+sh.exec(`docker exec ${cleaningContainerId} bash -c "docker rm -f $(docker ps -a -q)"`);
+// Exit the container. We use a new container to discard any
+// changes docker made for running containers, such as creating
+// missing directories for volumes.
+sh.exec(`docker rm -f ${cleaningContainerId}`);
+
+console.log('=> Starting Ubuntu Container');
 var containerId = sh.exec(
   `docker run ${keyVolume} ${publish} ${dockerVolume} --privileged -d -t ${image} /sbin/my_init`
 ).output.trim();
