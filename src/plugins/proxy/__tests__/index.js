@@ -13,10 +13,17 @@ sh.config.silent = false;
 
 describe('module - proxy', function() {
   this.timeout(60000000);
+  const serverInfo = servers.mymeteor;
+
+  before(async () => {
+    await runSSHCommand(
+      serverInfo,
+      'docker rm -f $(docker ps -a -q)'
+    );
+  });
 
   describe('setup', () => {
     it('should setup proxy on "meteor" vm', async () => {
-      const serverInfo = servers.mymeteor;
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-3'));
       let out = sh.exec('mup setup');
 
@@ -31,10 +38,11 @@ describe('module - proxy', function() {
       expect(out.output).to.have.entriesCount('mup-nginx-proxy-letsencrypt', 1);
 
       out = await runSSHCommand(serverInfo, 'du --max-depth=2 /opt');
-      expect(out.output).to.have.entriesCount('/opt/mup-nginx-proxy', 4);
+      expect(out.output).to.have.entriesCount('/opt/mup-nginx-proxy', 5);
       expect(out.output).to.have.entriesCount('/opt/mup-nginx-proxy/certs', 1);
       expect(out.output).to.have.entriesCount('/opt/mup-nginx-proxy/mounted-certs', 1);
       expect(out.output).to.have.entriesCount('/opt/mup-nginx-proxy/config', 1);
+      expect(out.output).to.have.entriesCount('/opt/mup-nginx-proxy/upstream', 1);
 
       out = await runSSHCommand(serverInfo, 'ls /opt/mup-nginx-proxy/config');
       expect(out.output).to.have.entriesCount('shared-config.sh', 1);
@@ -45,7 +53,6 @@ describe('module - proxy', function() {
 
   describe('reconfig-shared', () => {
     it('it should update shared settings', async () => {
-      const serverInfo = servers.mymeteor;
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-3'));
       sh.exec('mup setup');
 
