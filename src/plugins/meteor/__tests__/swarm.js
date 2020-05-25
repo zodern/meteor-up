@@ -35,7 +35,7 @@ async function checkRunning() {
   // expect(sshOut.code).to.equal(0);
 }
 
-describe.only('module - meteor swarm', function() {
+describe('module - meteor swarm', function() {
   this.timeout(600000);
 
   this.afterAll(() => {
