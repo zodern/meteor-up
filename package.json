@@ -68,7 +68,6 @@
   "dependencies": {
     "@zodern/nodemiral": "^1.2.1",
     "axios": "^0.19.2",
-    "babel-polyfill": "^6.26.0",
     "bluebird": "^3.7.2",
     "boxen": "^4.2.0",
     "chalk": "^3.0.0",
