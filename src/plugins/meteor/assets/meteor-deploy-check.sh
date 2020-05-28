@@ -68,9 +68,22 @@ while [[ true ]]; do
   if [[ $HOST_NETWORK == 0 ]]; then
     CONTAINER_IP="localhost"
   else
-    CONTAINER_IP=$(sudo docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}
-  {{end}}' $APPNAME | head -n 1)
+    # Only works when the container is connected to the bridge network
+    # We had tried only using .NetworkSettings.Networks.IpAddress, but
+    # for some apps it would provide an IP address that the app did not
+    # load on (see issue #1110)
+    CONTAINER_IP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' $APPNAME )
+
+    # If the container is not on the bridge network,
+    # check for an IP Address on other networks
+    if [ -z "$CONTAINER_IP" ]; then
+      echo "CONTAINER IP EMPTRY"
+      CONTAINER_IP=$(sudo docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}
+{{end}}' $APPNAME | head -n 1)
+    fi
   fi
+
+  echo "IP: $CONTAINER_IP"
 
   if [[ -z $CONTAINER_IP ]]; then
     echo "Container has no IP Address, likely from the app crashing."
