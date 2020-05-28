@@ -22,7 +22,7 @@
     "mup": "./index.js"
   },
   "scripts": {
-    "prepublish": "npm run build -s",
+    "prepublishOnly": "npm run build -s",
     "build": "babel src --out-dir lib --copy-files --source-maps",
     "build:watch": "npm run build -s -- -w",
     "test": "node ./tests/run.js",
