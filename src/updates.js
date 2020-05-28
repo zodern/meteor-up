@@ -2,10 +2,10 @@ import {
   flatMap,
   isEqual
 } from 'lodash';
+import axios from 'axios';
 import boxen from 'boxen';
 import chalk from 'chalk';
 import debug from 'debug';
-import Npm from 'silent-npm-registry-client';
 import pkg from '../package.json';
 
 const log = debug('mup:updates');
@@ -74,32 +74,21 @@ function showUpdateOnExit(version, isStable) {
 export default function() {
   log('checking for updates');
 
-  return new Promise(resolve => {
     if (SKIP_CHECK_UPDATE) {
       log('skipping update check');
 
-      return resolve();
+    return;
     }
 
-    const params = {
-      package: pkg.name,
-      auth: {}
-    };
 
-    const npm = new Npm();
-    const uri = 'https://registry.npmjs.org/npm';
-
-    npm.distTags.fetch(uri, params, (err, res) => {
-      if (err) {
-        return resolve();
-      }
-
-      const npmVersion = res.latest;
-      const nextVersion = res.next;
+  return axios.get(`https://registry.npmjs.org/-/package/${pkg.name}/dist-tags`)
+    .then(({ data }) => {
+      const npmVersion = data.latest;
+      const nextVersion = data.next;
 
       const local = parseVersion(pkg.version);
-      const remote = parseVersion(res.latest);
-      const next = parseVersion(res.next);
+      const remote = parseVersion(data.latest);
+      const next = parseVersion(data.next);
 
       const {
         available,
@@ -110,8 +99,7 @@ export default function() {
       if (available) {
         showUpdateOnExit(isStable ? npmVersion : nextVersion, isStable);
       }
-
-      resolve();
-    });
+    }).catch(() => {
+      // It is okay if this fails
   });
 }

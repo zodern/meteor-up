@@ -83,7 +83,6 @@
     "resolve-from": "^5.0.0",
     "shell-escape": "^0.2.0",
     "shelljs": "0.5.3",
-    "silent-npm-registry-client": "^3.0.1",
     "ssh2": "^0.8.9",
     "tar": "^6.0.2",
     "traverse": "^0.6.6",
