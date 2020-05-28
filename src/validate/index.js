@@ -1,7 +1,7 @@
 import * as utils from './utils';
 const { combineErrorDetails, VALIDATE_OPTIONS, improveErrors } = utils;
 import chalk from 'chalk';
-import joi from 'joi';
+import joi from '@hapi/joi';
 import validateServer from './servers';
 
 export const _pluginValidators = {};
