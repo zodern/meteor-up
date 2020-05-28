@@ -12,7 +12,9 @@ const log = debug('mup:updates');
 const SKIP_CHECK_UPDATE = process.env.MUP_SKIP_UPDATE_CHECK === 'true';
 
 function parseVersion(version) {
-  return flatMap(version.split('.'), n => n.split('-beta').map(Number));
+  return flatMap(version.split('.'), n =>
+    n.split('-beta').filter(segment => segment.length > 0).map(Number)
+  );
 }
 
 function newerStable(local, remote) {
@@ -74,11 +76,11 @@ function showUpdateOnExit(version, isStable) {
 export default function() {
   log('checking for updates');
 
-    if (SKIP_CHECK_UPDATE) {
-      log('skipping update check');
+  if (SKIP_CHECK_UPDATE) {
+    log('skipping update check');
 
     return;
-    }
+  }
 
 
   return axios.get(`https://registry.npmjs.org/-/package/${pkg.name}/dist-tags`)
@@ -101,5 +103,5 @@ export default function() {
       }
     }).catch(() => {
       // It is okay if this fails
-  });
+    });
 }
