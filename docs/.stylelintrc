@@ -1,7 +1,6 @@
 { 
     "extends": "stylelint-config-standard", 
     "ignoreFiles": [ 
-      "css/bootstrap.min.css", 
       "css/tocbot.css", 
       "css/highlight.css" 
     ] 
