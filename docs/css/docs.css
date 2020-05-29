@@ -74,6 +74,10 @@
   background-color: #181d22;
 }
 
+.toc-list {
+  list-style: none;
+}
+
 .docs-nav > .toc-list {
   overflow-y: auto;
   max-height: 100vh;
@@ -86,10 +90,6 @@
 
 .docs-nav > .toc-list > li:last-child {
   padding-bottom: 20px;
-}
-
-.toc-list {
-  list-style: none;
 }
 
 .is-collapsed {
@@ -108,16 +108,13 @@ a.toc-link {
 
 .toc-list-item {
   padding: 5px 0;
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .toc-list .toc-list .toc-list-item {
   padding: 3px;
   font-weight: 400;
-}
-
-.toc-list-item {
-  font-weight: 700;
-  font-size: 14px;
 }
 
 .toc-link::before {

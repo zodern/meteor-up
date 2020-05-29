@@ -1,3 +1,46 @@
+.card {
+  display: inline-block;
+  width: 130px;
+  text-align: center;
+  vertical-align: top;
+  height: 140px;
+  background: white;
+  color: rgb(28, 31, 35);
+  border-radius: 1px;
+  padding: 20px;
+  margin: 0 20px 20px 0;
+}
+
+.card h3 {
+  margin-bottom: 0;
+  font-size: 18px;
+}
+
+.card p {
+  font-size: 16px;
+}
+
+.card button {
+  font-size: 16px;
+  padding: 10px 20px;
+}
+
+.card.more-link {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-right: none;
+}
+
+.card.more-link h3 {
+  margin-bottom: 10px;
+}
+
+.card img {
+  border-radius: 50%;
+}
+
 #hero {
   height: 100vh;
   text-align: center;
@@ -80,49 +123,6 @@
   height: 50px;
 }
 
-.card {
-  display: inline-block;
-  width: 130px;
-  text-align: center;
-  vertical-align: top;
-  height: 140px;
-  background: white;
-  color: rgb(28, 31, 35);
-  border-radius: 1px;
-  padding: 20px;
-  margin: 0 20px 20px 0;
-}
-
-.card h3 {
-  margin-bottom: 0;
-  font-size: 18px;
-}
-
-.card p {
-  font-size: 16px;
-}
-
-.card button {
-  font-size: 16px;
-  padding: 10px 20px;
-}
-
-.card.more-link {
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-right: none;
-}
-
-.card.more-link h3 {
-  margin-bottom: 10px;
-}
-
-.card img {
-  border-radius: 50%;
-}
-
 #community {
   padding: 50px 100px 100px;
   background: #ffffffa1;
@@ -145,18 +145,18 @@
   padding: 5px 10px;
 }
 
-.stat div {
-  font-size: 50px;
-  font-weight: 200;
-}
-
-.stat p {
-  font-weight: 600;
-}
-
-.stat {
+#community .stat {
   text-align: center;
   display: inline-block;
   margin-right: 20px;
   width: 120px;
+}
+
+#community .stat div {
+  font-size: 50px;
+  font-weight: 200;
+}
+
+#community .stat p {
+  font-weight: 600;
 }
