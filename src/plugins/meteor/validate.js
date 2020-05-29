@@ -1,4 +1,4 @@
-import joi from 'joi';
+import joi from '@hapi/joi';
 
 const schema = joi.object().keys({
   name: joi.string().min(1).required(),

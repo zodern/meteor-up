@@ -1,4 +1,4 @@
-import joi from 'joi';
+import joi from '@hapi/joi';
 
 const swarmSchema = joi.object().keys({
   enabled: joi.bool().required(),

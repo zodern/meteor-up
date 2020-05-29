@@ -6,10 +6,20 @@ FROM phusion/baseimage
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
-
 #Install wget
-RUN apt-get update && \
-  apt-get -y install tree curl sudo netcat lxc iptables && \
+RUN apt-get update >/dev/null && \
+  apt-get -y install \
+    tree \
+    curl \
+    sudo \
+    netcat \
+    lxc \
+    iptables \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common >/dev/null && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #Enable ssh

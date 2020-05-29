@@ -1,6 +1,6 @@
+import { before, describe, it } from 'mocha';
 import chai, { expect } from 'chai';
 import { countOccurences, runSSHCommand } from '../../../utils';
-import { describe, it } from 'mocha';
 import assert from 'assert';
 import chaiString from 'chai-string';
 import os from 'os';
@@ -137,6 +137,12 @@ describe('module - meteor', function() {
 
   describe('deploy', () => {
     const serverInfo = servers.mymeteor;
+    before(async () => {
+      await runSSHCommand(
+        serverInfo,
+        'docker network create mup-tests'
+      );
+    });
 
     async function checkDeploy(out, appText) {
       assert.equal(out.code, 0);
@@ -170,7 +176,7 @@ describe('module - meteor', function() {
       sh.exec('mup setup');
       const out = sh.exec('mup meteor deploy --cached-build');
 
-      checkDeploy(out, '<title>helloapp-new</title>');
+      await checkDeploy(out, '<title>helloapp-new</title>');
     });
 
     it('should deploy app using Meteor 1.2', async () => {
@@ -179,7 +185,49 @@ describe('module - meteor', function() {
       sh.exec('mup setup --config mup.old.js');
       const out = sh.exec('mup meteor deploy --cached-build --config mup.old.js');
       expect(out.code).to.equal(0);
-      checkDeploy(out, '<title>helloapp</title>');
+      await checkDeploy(out, '<title>helloapp</title>');
+    });
+
+    it('should connect to user networks', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
+      sh.exec('mup setup');
+
+      const out = sh.exec('mup deploy --cached-build --config mup.user-network.js');
+      const sshOut = await runSSHCommand(
+        serverInfo,
+        'docker inspect myapp'
+      );
+      const networks = JSON.parse(sshOut.output)[0].NetworkSettings.Networks;
+
+      expect(Object.keys(networks)).to.deep.equal(['bridge', 'mup-tests']);
+      expect(out.code).to.equal(0);
+      await checkDeploy(out, '<title>helloapp-new</title>');
+    });
+
+    it('should verify deployment when not connected to bridge network', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
+      sh.exec('mup setup');
+
+      const out = sh.exec('mup deploy --cached-build --config mup.no-bridge.js');
+      const sshOut = await runSSHCommand(
+        serverInfo,
+        'docker inspect myapp'
+      );
+      const networks = JSON.parse(sshOut.output)[0].NetworkSettings.Networks;
+      await checkDeploy(out, '<title>helloapp-new</title>');
+
+      expect(Object.keys(networks)).to.deep.equal(['mup-tests']);
+      expect(out.code).to.equal(0);
+    });
+
+    it('should use Docker buildkit when enabled', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
+      sh.exec('mup setup');
+
+      const out = sh.exec('mup meteor push --cached-build --config mup.buildkit.js --verbose');
+      expect(out.code).to.equal(0);
+      expect(out.output).to.have.entriesCount('#12 naming to docker.io/library/mup-myapp:build done', 1);
+      expect(out.output).to.have.entriesCount('Prepare Bundle: SUCCESS', 1);
     });
   });
 

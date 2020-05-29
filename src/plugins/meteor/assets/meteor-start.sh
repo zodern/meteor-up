@@ -4,7 +4,7 @@ set -e
 
 APP_DIR=/opt/<%=appName %>
 IMAGE=mup-<%= appName.toLowerCase() %>
-PRIVATE_REGISTRY=<%- privateRegistry ? 1 : 0 %>
+PRIVATE_REGISTRY=<%- privateRegistry ? 0 : 1 %>
 
 <% if (removeImage) { %>
 echo "Removing images"
@@ -17,7 +17,7 @@ docker images
 
 # save the last known version
 cd $APP_DIR
-if sudo docker image inspect $IMAGE:latest >/dev/null || [ $PRIVATE_REGISTRY ]; then
+if sudo docker image inspect $IMAGE:latest >/dev/null || $PRIVATE_REGISTRY; then
   echo "using image"
   sudo rm -rf current || true
 else
