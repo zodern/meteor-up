@@ -1,4 +1,4 @@
-## Next
+## 1.5.0 - July 1, 2020
 
 **Upgrading notes**
 
