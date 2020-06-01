@@ -49,9 +49,17 @@ export function ssh(api) {
   const servers = api.getConfig().servers;
   let serverOption = api.getArgs()[1];
 
+  // Check how many sessions are enabled. Usually is all servers,
+  // but can be reduced by the `--servers` option
+  const enabledSessions = api.getSessionsForServers(Object.keys(servers))
+    .filter(session => session);
+
   if (!(serverOption in servers)) {
-    if (Object.keys(servers).length === 1) {
-      serverOption = Object.keys(servers)[0];
+    if (enabledSessions.length === 1) {
+      const selectedHost = enabledSessions[0]._host;
+      serverOption = Object.keys(servers).find(
+        name => servers[name].host === selectedHost
+      );
     } else {
       console.log('mup ssh <server>');
       console.log('Available servers are:\n', Object.keys(servers).join('\n '));

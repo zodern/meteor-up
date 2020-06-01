@@ -12,15 +12,7 @@ source $APP_PATH/config/shared-config.sh
 ENV_FILE=$APP_PATH/config/env.list
 ENV_FILE_LETSENCRYPT=$APP_PATH/config/env_letsencrypt.list
 
-# Remove previous version of the app, if exists
-sudo docker rm -f $APPNAME
-sudo docker network disconnect bridge -f $APPNAME
-echo "Removed $APPNAME"
-
-# Remove let's encrypt containers if exists
-sudo docker rm -f $APPNAME-letsencrypt
-sudo docker network disconnect bridge -f $APPNAME-nginx-proxy
-echo "Removed $APPNAME-letsencrypt"
+<% include ../proxy-stop.sh %>
 
 # We don't need to fail the deployment because of a docker hub downtime
 set +e
@@ -42,6 +34,12 @@ if ! grep -q "client_max_body_size" "$NGINX_CONFIG_PATH"; then
   echo $NGINX_CONFIG >> /opt/$APPNAME/config/nginx-default.conf
 fi
 
+TEMPLATE_PATH=/opt/$APPNAME/config/nginx.tmpl
+SHARED_TEMPLATE=/opt/$APPNAME/config/nginx-shared.tmpl
+if [ -e $SHARED_TEMPLATE ]; then
+  TEMPLATE_PATH=$SHARED_TEMPLATE
+fi
+
 sudo docker run \
   -d \
   -p $HTTP_PORT:80 \
@@ -51,16 +49,26 @@ sudo docker run \
   --restart=always \
   --log-opt max-size=100m \
   --log-opt max-file=7 \
+  --network bridge \
+  -v $TEMPLATE_PATH:/app/nginx.tmpl:ro \
   -v /opt/$APPNAME/mounted-certs:/etc/nginx/certs \
   -v /opt/$APPNAME/config/vhost.d:/etc/nginx/vhost.d \
   -v /opt/$APPNAME/config/html:/usr/share/nginx/html \
+  -v /opt/$APPNAME/config/htpasswd:/etc/nginx/htpasswd  \
   -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
+  -v /opt/$APPNAME/upstream:/etc/nginx/upstream \
   jwilder/nginx-proxy
 echo "Ran nginx-proxy as $APPNAME"
 
 sleep 2s
-sudo docker run -d \
+
+if docker network inspect mup-proxy ; then
+  docker network connect mup-proxy $APPNAME
+fi
+
+sudo docker run \
+  -d \
   --name $APPNAME-letsencrypt \
   --env-file=$ENV_FILE_LETSENCRYPT \
   --restart=always \
@@ -70,3 +78,18 @@ sudo docker run -d \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
   jrcs/letsencrypt-nginx-proxy-companion
 echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
+
+<% if (swarmEnabled) { %>
+  docker rm -f $APPNAME-swarm-upstream || true
+  docker pull zodern/nginx-proxy-swarm-upstream
+  docker run \
+    -d \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    --network mup-proxy \
+    --volumes-from $APPNAME \
+    --name $APPNAME-swarm-upstream \
+    --env NGINX_PROXY_CONTAINER="$APPNAME" \
+    zodern/nginx-proxy-swarm-upstream
+
+  echo "Ran zodern/nginx-proxy-swarm-upstream"
+<% } %>

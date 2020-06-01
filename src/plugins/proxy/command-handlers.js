@@ -1,8 +1,9 @@
+import { addProxyEnv, getLoadBalancingHosts, getSessions } from './utils';
 import chalk from 'chalk';
 import { clone } from 'lodash';
 import debug from 'debug';
 import fs from 'fs';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 
 const log = debug('mup:module:proxy');
 const PROXY_CONTAINER_NAME = 'mup-nginx-proxy';
@@ -17,7 +18,7 @@ export function logs(api) {
   }
 
   const args = api.getArgs().slice(1);
-  const sessions = api.getSessions(['app']);
+  const sessions = getSessions(api);
 
   return api.getDockerLogs(PROXY_CONTAINER_NAME, sessions, args);
 }
@@ -32,6 +33,7 @@ export function leLogs(api) {
   }
 
   const args = api.getArgs().slice(1);
+
   args[0] = 'logs';
   const sessions = api.getSessions(['app']);
 
@@ -45,20 +47,24 @@ export function leLogs(api) {
 export function setup(api) {
   log('exec => mup proxy setup');
   const config = api.getConfig().proxy;
-  const appName = api.getConfig().app.name;
+  const serverConfig = api.getConfig().servers;
+  const appConfig = api.getConfig().app;
+  const appName = appConfig.name;
 
   if (!config) {
     console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
+  const sessions = getSessions(api);
   const list = nodemiral.taskList('Setup proxy');
   const domains = config.domains.split(',');
 
   list.executeScript('Setup Environment', {
     script: api.resolvePath(__dirname, 'assets/proxy-setup.sh'),
     vars: {
-      name: PROXY_CONTAINER_NAME
+      name: PROXY_CONTAINER_NAME,
+      appName
     }
   });
 
@@ -67,11 +73,18 @@ export function setup(api) {
     dest: `/opt/${PROXY_CONTAINER_NAME}/config/start.sh`,
     vars: {
       appName: PROXY_CONTAINER_NAME,
-      letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null
+      letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : null,
+      swarmEnabled: api.swarmEnabled()
     }
   });
 
+  list.copy('Pushing Nginx Config Template', {
+    src: api.resolvePath(__dirname, 'assets/nginx.tmpl'),
+    dest: `/opt/${PROXY_CONTAINER_NAME}/config/nginx.tmpl`
+  });
+
   let nginxServerConfig = '';
+
   if (config.nginxServerConfig) {
     nginxServerConfig = fs.readFileSync(
       api.resolvePath(api.getBasePath(), config.nginxServerConfig)
@@ -79,6 +92,7 @@ export function setup(api) {
   }
 
   let nginxLocationConfig = '';
+
   if (config.nginxLocationConfig) {
     nginxLocationConfig = fs.readFileSync(
       api.resolvePath(api.getBasePath(), config.nginxLocationConfig)
@@ -130,10 +144,26 @@ export function setup(api) {
     });
   }
 
-  const sessions = api.getSessions(['app']);
+  const hostnames = getLoadBalancingHosts(
+    serverConfig,
+    Object.keys(appConfig.servers)
+  );
+
+  list.executeScript('Configure Nginx Upstream', {
+    script: api.resolvePath(__dirname, 'assets/upstream.sh'),
+    vars: {
+      domains,
+      name: appName,
+      setUpstream: !api.swarmEnabled() && config.loadBalancing,
+      stickySessions: config.stickySessions !== false,
+      proxyName: PROXY_CONTAINER_NAME,
+      port: appConfig.env.PORT,
+      hostnames
+    }
+  });
 
   return api.runTaskList(list, sessions, {
-    series: true,
+    series: false,
     verbose: api.getVerbose()
   }).then(() => api.runCommand('proxy.start'));
 }
@@ -191,7 +221,23 @@ export function reconfigShared(api) {
     dest: `/opt/${PROXY_CONTAINER_NAME}/config/nginx-default.conf`
   });
 
-  const sessions = api.getSessions(['app']);
+  if (shared.templatePath) {
+    const templatePath = shared.templatePath;
+    list.copy('Pushing Nginx Config Template', {
+      src: templatePath,
+      dest: `/opt/${PROXY_CONTAINER_NAME}/config/nginx-shared.tmpl`
+    });
+  } else {
+    list.executeScript('Cleanup Template', {
+      script: api.resolvePath(__dirname, 'assets/cleanup-template.sh'),
+      vars: {
+        appName: PROXY_CONTAINER_NAME
+      }
+    });
+  }
+
+
+  const sessions = getSessions(api);
 
   return api.runTaskList(list, sessions, {
     series: true,
@@ -202,11 +248,13 @@ export function reconfigShared(api) {
 export function start(api) {
   log('exec => mup proxy start');
   const config = api.getConfig().proxy;
+
   if (!config) {
     console.error('error: no configs found for proxy');
     process.exit(1);
   }
 
+  const sessions = getSessions(api);
   const list = nodemiral.taskList('Start proxy');
 
   list.executeScript('Start proxy', {
@@ -216,7 +264,6 @@ export function start(api) {
     }
   });
 
-  const sessions = api.getSessions(['app']);
 
   return api.runTaskList(list, sessions, {
     series: true,
@@ -236,7 +283,7 @@ export function stop(api) {
     }
   });
 
-  const sessions = api.getSessions(['app']);
+  const sessions = getSessions(api);
 
   return api.runTaskList(list, sessions, { verbose: api.getVerbose() });
 }
@@ -245,14 +292,12 @@ export async function nginxConfig(api) {
   log('exec => mup proxy nginx-config');
 
   const command = `docker exec ${PROXY_CONTAINER_NAME} cat /etc/nginx/conf.d/default.conf`;
-  const { servers, app } = api.getConfig();
-  const serverObjects = Object.keys(app.servers)
-    .map(serverName => servers[serverName]);
+  const sessions = getSessions(api);
 
 
   await Promise.all(
-    serverObjects.map(server =>
-      api.runSSHCommand(server, command)
+    sessions.map(session =>
+      api.runSSHCommand(session, command)
     )
   ).then(results => {
     results.forEach(({ host, output }) => {
@@ -264,11 +309,18 @@ export async function nginxConfig(api) {
 
 export async function status(api) {
   const config = api.getConfig();
-  const servers = Object.keys(config.app.servers)
-    .map(key => config.servers[key]);
   const lines = [];
   let overallColor = 'green';
 
+  if (!config.proxy) {
+    if (config.swarm && config.app && config.app.type === 'meteor') {
+      console.log(chalk.yellow('Proxy should be enabled when using swarm for load balancing to work.'));
+    }
+
+    return;
+  }
+
+  const servers = Object.keys(config.proxy.servers || config.app.servers);
   const collectorConfig = {
     nginxDocker: {
       command: `docker inspect ${PROXY_CONTAINER_NAME} --format "{{json .}}"`,
@@ -336,4 +388,27 @@ export async function status(api) {
 
   console.log(chalk[overallColor]('\n=> Reverse Proxy Status'));
   console.log(lines.join('\n'));
+}
+
+export function updateProxyForLoadBalancing(api) {
+  const config = api.getConfig();
+  const sessions = getSessions(api);
+  const list = nodemiral.taskList('Configure Proxy for Service');
+
+  list.executeScript('Configure Proxy', {
+    script: api.resolvePath(__dirname, 'assets/service-configure.sh'),
+    vars: {
+      appName: config.app.name,
+      imagePort: config.app.docker.imagePort,
+      env: addProxyEnv(config, {}),
+      domains: config.proxy.domains.split(','),
+      proxyName: PROXY_CONTAINER_NAME,
+      swarmEnabled: api.swarmEnabled()
+    }
+  });
+
+  return api.runTaskList(list, sessions, {
+    series: true,
+    verbose: api.getVerbose()
+  });
 }

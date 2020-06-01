@@ -1,5 +1,5 @@
 import { clone, merge } from 'lodash';
-import nodemiral from 'nodemiral';
+import nodemiral from '@zodern/nodemiral';
 
 function copy(session, _options, callback) {
   const options = clone(_options);
@@ -84,3 +84,18 @@ function createCallback(cb, varsMapper) {
 
 nodemiral.registerTask('copy', copy);
 nodemiral.registerTask('executeScript', executeScript);
+
+const oldApplyTemplate = nodemiral.session.prototype._applyTemplate;
+// Adds support for using include with ejs
+nodemiral.session.prototype._applyTemplate = function(file, vars, callback) {
+  const ejsOptions = this._options.ejs || {};
+
+  this._options.ejs = {
+    ...ejsOptions,
+    filename: file
+  };
+  oldApplyTemplate.call(this, file, vars, (...args) => {
+    this._options.ejs = ejsOptions;
+    callback(...args);
+  });
+};

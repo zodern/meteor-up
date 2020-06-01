@@ -27,19 +27,22 @@ describe('module - mongo', function() {
   describe('setup', () => {
     it('should setup mongodb on "mongo" vm', async () => {
       const serverInfo = servers.mymongo;
+
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
 
       const out = sh.exec('mup mongo setup');
+
       expect(out.code).to.be.equal(0);
 
       expect(
         countOccurences('Setup Environment: SUCCESS', out.output)
       ).to.be.equal(1);
       expect(
-        countOccurences('Copying mongodb.conf: SUCCESS', out.output)
+        countOccurences('Copying Mongo Config: SUCCESS', out.output)
       ).to.be.equal(1);
 
       const sshOut = await runSSHCommand(serverInfo, 'tree -pufi /opt');
+
       expect(sshOut.code).to.be.equal(0);
       expect(countOccurences('mongodb.conf', sshOut.output)).to.be.equal(1);
     });
@@ -62,6 +65,17 @@ describe('module - mongo', function() {
         (await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code
       ).to.be.equal(0);
     });
+
+    it('should allow configuring db name', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
+      const out = sh.exec('mup --config mup.db-name.js validate --show');
+
+      expect(out.code).to.be.equal(0);
+
+      expect(countOccurences('mongodb://mongodb:27017/test-db', out.output)).to.be.equal(
+        1
+      );
+    });
   });
 
   describe('stop', () => {
@@ -72,9 +86,10 @@ describe('module - mongo', function() {
       sh.exec('mup docker setup && mup mongo setup && mup mongo start');
 
       const out = sh.exec('mup mongo stop');
+
       expect(out.code).to.be.equal(0);
 
-      expect(countOccurences('stop mongo: SUCCESS', out.output)).to.be.equal(1);
+      expect(countOccurences('Stop Mongo: SUCCESS', out.output)).to.be.equal(1);
       expect(
         (await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code
       ).to.be.equal(1);

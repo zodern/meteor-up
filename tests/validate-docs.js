@@ -36,6 +36,8 @@ var servers = {
 var failed = 0;
 var success = 0;
 
+process.env.MUP_SKIP_UPDATE_CHECK = 'true';
+
 validConfigs.forEach(config => {
   fs.writeFileSync(tmpConfig, config.code);
   delete require.cache[require.resolve(tmpConfig)];

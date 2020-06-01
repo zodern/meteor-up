@@ -13,7 +13,18 @@ describe('validator', () => {
       const handler = () => { };
 
       addPluginValidator('metrics', handler);
-      expect(_pluginValidators.metrics).to.equal(handler);
+      expect(_pluginValidators.metrics[0]).to.equal(handler);
+    });
+
+    it('should add multiple validators', () => {
+      const handler = () => { };
+      const handler2 = () => { };
+
+      addPluginValidator('metrics', handler);
+      addPluginValidator('metrics', handler2);
+
+      expect(_pluginValidators.metrics[0]).to.equal(handler);
+      expect(_pluginValidators.metrics[1]).to.equal(handler2);
     });
   });
 

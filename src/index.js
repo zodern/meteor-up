@@ -11,44 +11,45 @@ import yargs from 'yargs';
 
 const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help', 'servers'];
 
+function commandWrapper(pluginName, commandName) {
+  return function() {
+    // Runs in parallel with command
+    checkUpdates();
+
+    const rawArgv = process.argv.slice(2);
+    const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
+    const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
+    let potentialPromise;
+
+    try {
+      potentialPromise = api.runCommand(`${pluginName}.${commandName}`);
+    } catch (e) {
+      api._commandErrorHandler(e);
+    }
+
+    if (potentialPromise && typeof potentialPromise.then === 'function') {
+      potentialPromise.catch(api._commandErrorHandler);
+    }
+  };
+}
+
 function addModuleCommands(builder, module, moduleName) {
   Object.keys(module.commands).forEach(commandName => {
     const command = module.commands[commandName];
-    command.builder = command.builder || {};
+    const name = command.name || commandName;
 
+    command.builder = command.builder || {};
     builder.command(
-      command.name || commandName,
-      command.description,
+      name,
+      command.description.length === 0 ? false : command.description,
       command.builder,
       commandWrapper(moduleName, commandName)
     );
   });
 }
 
-function commandWrapper(pluginName, commandName) {
-  return function() {
-    checkUpdates()
-      .then(() => {
-        const rawArgv = process.argv.slice(2);
-        const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
-        const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
-        let potentialPromise;
-
-        try {
-          potentialPromise = api.runCommand(`${pluginName}.${commandName}`);
-        } catch (e) {
-          api._commandErrorHandler(e);
-        }
-
-        if (potentialPromise && typeof potentialPromise.then === 'function') {
-          potentialPromise.catch(api._commandErrorHandler);
-        }
-      })
-      .catch(e => {
-        console.error(e);
-      });
-  };
-}
+// Prevent yargs from exiting the process before plugins are loaded
+yargs.help(false);
 
 // Load config before creating commands
 const preAPI = new MupAPI(process.cwd(), process.argv, yargs.argv);
@@ -77,7 +78,7 @@ if (config.hooks) {
 let program = yargs
   .usage(`\nUsage: ${chalk.yellow('mup')} <command> [args]`)
   .version(pkg.version)
-  .alias('version', 'V')
+  .alias('v', 'version')
   .global('version', false)
   .option('settings', {
     description: 'Path to Meteor settings file',
@@ -103,7 +104,8 @@ let program = yargs
     boolean: true
   })
   .strict(true)
-  .alias('help', 'h')
+  .scriptName('mup')
+  .alias('h', 'help')
   .epilogue(
     'For more information, read the docs at http://meteor-up.com/docs.html'
   )

@@ -1,17 +1,18 @@
-import joi from 'joi';
+import joi from '@hapi/joi';
 
 const schema = joi.object().keys({
   name: joi.string().min(1).required(),
   path: joi.string().min(1).required(),
   port: joi.number(),
   type: joi.string(),
-  servers: joi.object().required().pattern(
+  servers: joi.object().min(1).required().pattern(
     /[/s/S]*/,
     joi.object().keys({
       env: joi.object().pattern(
         /[/s/S]*/,
         [joi.string(), joi.number(), joi.bool()]
       ),
+      bind: joi.string(),
       settings: joi.string()
     })
   ),
@@ -30,7 +31,8 @@ const schema = joi.object().keys({
       .array()
       .items(joi.string()),
     buildInstructions: joi.array().items(joi.string()),
-    stopAppDuringPrepareBundle: joi.bool()
+    stopAppDuringPrepareBundle: joi.bool(),
+    useBuildKit: joi.bool()
   }),
   buildOptions: joi.object().keys({
     serverOnly: joi.bool(),
@@ -93,6 +95,7 @@ export default function(
   }
 ) {
   let details = [];
+
   details = combineErrorDetails(
     details,
     joi.validate(config.app, schema, VALIDATE_OPTIONS)

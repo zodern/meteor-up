@@ -1,5 +1,8 @@
 FROM mup-tests-server
-RUN apt-get update
-RUN apt-get -y install lxc iptables && \
-    curl https://get.docker.com/ | sh && usermod -aG docker $(whoami)
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+RUN add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+RUN apt-get update >/dev/null && DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io --option=Dpkg::Options::=--force-confdef >/dev/null
 RUN echo 'DOCKER_OPTS="--storage-driver=vfs"' >> /etc/default/docker

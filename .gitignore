@@ -3,9 +3,9 @@ node_modules
 .vscode
 .idea
 *.log
-package-lock.json
 docs/_site
 coverage
+tests/**/package-lock.json
 
 tests/ssh/
 .nyc_output/

@@ -32,7 +32,9 @@ module.exports = {
     },
 
     docker: {
-      // change to 'abernix/meteord:base' if your app is using Meteor 1.4 - 1.5
+      // abernix/meteord:node-12-base works with Meteor 1.9 - 1.10
+      // If you are using a different version of Meteor,
+      // refer to the docs for the correct image to use.
       image: 'abernix/meteord:node-12-base',
     },
 

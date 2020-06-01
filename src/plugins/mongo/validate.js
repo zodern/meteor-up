@@ -1,4 +1,4 @@
-import joi from 'joi';
+import joi from '@hapi/joi';
 
 const schema = joi.object().keys({
   // TODO: mongo.oplog and mongo.port is unused,
@@ -6,6 +6,7 @@ const schema = joi.object().keys({
   // decide what to do with it
   oplog: joi.bool(),
   port: joi.number(),
+  dbName: joi.string(),
   version: joi.string(),
   servers: joi.object().keys().required()
 });

@@ -99,18 +99,13 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
       ...process.env,
       METEOR_HEADLESS: 1
     },
-    stdio: verbose ? 'inherit' : 'pipe'
+    stdio: [process.stdin, process.stdout, process.stderr]
   };
 
   log(`Build Path: ${appPath}`);
   log(`Build Command:  ${executable} ${args.join(' ')}`);
 
   const meteor = spawn(executable, args, options);
-
-  if (!verbose) {
-    meteor.stdout.pipe(process.stdout, { end: false });
-    meteor.stderr.pipe(process.stderr, { end: false });
-  }
 
   meteor.on('error', e => {
     console.log(options);

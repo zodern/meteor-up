@@ -9,17 +9,27 @@ PORT=<%= port %>
 BIND=<%= bind %>
 NGINX_PROXY_VERSION=latest
 LETS_ENCRYPT_VERSION=latest
-APP_IMAGE=mup-<%= appName.toLowerCase() %>
+APP_IMAGE=<%- imagePrefix %><%= appName.toLowerCase() %>
 IMAGE=$APP_IMAGE:latest
 VOLUME="--volume=$BUNDLE_PATH:/bundle"
 LOCAL_IMAGE=false
 
+<% if (!privateRegistry) { %>
 sudo docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
 
 if [ $IMAGE == $APP_IMAGE:latest  ]; then
   VOLUME=""
   LOCAL_IMAGE=true
 fi
+<% } else { %>
+  VOLUME=""
+  LOCAL_IMAGE=true
+  # We want this pull to fail on error since
+  # otherwise we might try to run an old version of the app
+  set -e
+  docker pull $IMAGE
+  set +e
+<% } %>
 
 echo "Image" $IMAGE
 echo "Volume" $VOLUME
@@ -64,8 +74,8 @@ sudo docker run \
   -d \
   --restart=always \
   $VOLUME \
-  <% if((sslConfig && typeof sslConfig.autogenerate === "object") || (typeof proxyConfig === "object"))  { %> \
-  --expose=80 \
+  <% if((sslConfig && typeof sslConfig.autogenerate === "object") || (typeof proxyConfig === "object" && !proxyConfig.loadBalancing))  { %> \
+  --expose=<%= docker.imagePort %> \
   <% } else { %> \
   --publish=$BIND:$PORT:<%= docker.imagePort %> \
   <% } %> \
@@ -84,7 +94,22 @@ sudo docker run \
   --name=$APPNAME \
   $IMAGE
 echo "Ran <%= docker.image %>"
-sleep 15s
+
+# When using a private docker registry, the cleanup run in 
+# Prepare Bundle is only done on one server, so we also
+# cleanup here so the other servers don't run out of disk space
+<% if (privateRegistry) { %>
+  echo "pruning images"
+  sudo docker image prune -f || true
+<% } %>
+
+if [[ $VOLUME == "" ]]; then
+  # The app starts much faster when prepare bundle is enabled,
+  # so we do not need to wait as long
+  sleep 3s
+else
+  sleep 15s
+fi
 
 <% if(typeof sslConfig === "object") { %>
    <% if(typeof sslConfig.autogenerate === "object")  { %>

@@ -16,6 +16,17 @@ export const deploy = {
   handler: commandHandlers.deploy
 };
 
+export const destroy = {
+  description: 'Stop and completely remove app from server',
+  handler: commandHandlers.destroy,
+  builder(subYargs) {
+    return subYargs.option('force', {
+      description: 'forces app to be removed',
+      boolean: true
+    });
+  }
+};
+
 export const logs = {
   description: 'View meteor app\'s logs',
   builder(yargs) {
@@ -50,6 +61,23 @@ export const restart = {
   handler: commandHandlers.restart
 };
 
+export const status = {
+  description: 'View the app\'s status',
+  handler: commandHandlers.status,
+  builder(yargs) {
+    return yargs.option('overview', {
+      description: 'Simplified report to quickly see the status of each component',
+      bool: true
+    });
+  }
+};
+
+export const debug = {
+  name: 'debug [server]',
+  description: 'Debug the meteor app',
+  handler: commandHandlers.debugApp
+};
+
 // Hidden commands
 export const build = {
   description: false,
@@ -76,9 +104,4 @@ export const push = {
 export const envconfig = {
   description: false,
   handler: commandHandlers.envconfig
-};
-
-export const status = {
-  description: 'View the app\'s status',
-  handler: commandHandlers.status
 };

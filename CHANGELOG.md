@@ -1,3 +1,101 @@
+## Next
+
+**Upgrading notes**
+
+- Node 8 is now required to run `mup`. If you are using an older version, it will tell you and exit. This does not affect what versions of Meteor mup supports (Meteor 1.2 and newer)
+- As always, you should run `mup setup` and `mup reconfig` after upgrading
+
+**Load Balancing and Zero Downtime Deploys**
+
+There are two different implementations for load balancing. This is the simpler one. The other one is mentioned under the `Swarm` section.
+
+Mup is now able to use Nginx to load balance across multiple servers with sticky sessions. When this is used with at least two servers, there will be zero downtime during deploys.
+
+How it works:
+1. So the app is available to nginx instances on other servers, it will be exposed to the internet (or to the private network if the new `privateIp` option is configured for each server). In the future mup might setup a firewall to restrict access to the servers with nginx.
+2. To avoid conflicts with other apps, it uses a random port between 10,000 and 20,000. The random number generator uses the app's name as a string.
+3. When `mup setup` or `mup proxy setup` is run, a Nginx config is generated with a list of the server's private IP's, or, if that isn't available, their `host`.
+
+Sticky sessions can be disabled for apps that do not need it.
+
+**Private Docker Registry**
+
+Mup can be configured to use a private docker registry, which allows it to deploy to multiple servers much faster. Instead of uploading the bundle and running Prepare Bundle task on every server, it can do that one a single server, store the image in the registry, and use that image on all of the other servers.
+
+**Production Debugging of Meteor Server**
+
+Run `mup meteor debug` to debug your Meteor app in production. It will enable debugging in your app and forward the port to your computer so you can use Chrome's DevTools for Node, Visual Studio Code, or another debugger for node. Requires Meteor 1.6 or newer.
+
+**Swarm**
+
+Meteor Up can now manage a docker swarm cluster. When swarm is enabled in the config, Meteor up sets up a swarm cluster on all of the servers listed in the config. During `mup setup`, it diffs the config given to it by plugins and the mup config with the current cluster state and carefully makes any needed adjustments to avoid unnecessarily disrupting running swarm services. Mup uses Docker Swarm instead of Kubernetes since it is simpler and uses fewer resources.
+
+When using swarm, rolling deploys and load balancing are always enabled. This uses a different implementation than when load balancing without Docker Swarm without the downsides it has.
+
+We have tried to make using swarm with Meteor Up as simple and reliable as possible. In the rare situation there is an error and you have to take manual action to resolve, in many cases mup gives a solution with the error.
+
+- The app is deployed as a swarm service when swarm is enabled
+- Reverse Proxy uses an overlay network when swarm is enabled for communication with the app instances
+- The `proxy.servers` option has been added to list which servers to run the reverse proxy on. It is required when using docker swarm
+- `mup docker status` shows a warning when the servers do not have the same docker version (@rolljee)
+- When using swarm, the docker images created for the app use numerical tags (`1`, `2`, `3`) instead of `previous` and `current`. This is needed for swarm to correctly roll back failed deploys, but it will also give us more control over how many old versions to keep and allow manually rolling back
+
+**Performance**
+- Add `app.docker.useBuildKit` option. When enabled, it uses the new docker image builder which reduces time spent by Prepare Bundle by 60%
+- When prepare bundle is enabled, mup waits 12 fewer seconds after starting the app and before verifying the deployment
+- Tasks to configure the proxy are no longer run in serial, improving completion speed when there are many servers
+- SSH sessions are reused between task lists to improve performance
+- `mup mongo start` only starts/restarts the container if it isn't running or the start script has changed. This can greatly speed up `mup setup` since starting MongoDB was one of the slower tasks
+- The update check no longer delays starting the cli and can be disabled by  setting the environment variale `MUP_SKIP_UPDATE_CHECK=false`
+- Replace `opencollective` with `opencollective-postinstall` for smaller message and fewer dependencies (@rolljee)
+
+**Other Features**
+- Add `--overview` option to `mup status`. It only shows the top-level status for each plugin and any problems
+- Add an optional `mongo.dbName` option. Multiple apps can share a database by setting it to the same value in all of their configs
+- Add `mup meteor destroy` command to stop and remove app from the servers
+- Add optional `proxy.servers` option to specify which servers to run the reverse proxy on
+- `mup ssh` now respects the `--servers` option
+
+**Verifying Deployment**
+- Fix Verifying Deployment taking longer than the value in `app.deployCheckWaitTime`
+- Verifying Deployment now waits up to 25 seconds for each request to succeed, instead of 10
+- Fix verifying deployment with non-root user
+
+**Reduce common problems**
+
+- Change `http` to `https` in the `ROOT_URL` environment variable when using the reverse proxy and SSL (@rolljee)
+- `app.docker.imagePort` defaults to 3000 instead of 80. This change is backwards compatible with the common docker images, and simplifies using images that run the app with a non-root user
+- Validation error shown when `app.servers` is empty
+
+**Docs**
+- Update docs and default config for Meteor 1.8 (@ninjaPixel)
+- Add instructions for using Cloudflare with Let's Encrypt
+
+**Bugs Fixed**
+- The `NODE_VERSION` build arg is set when building the image during Prepare Bundle with the correct node version for the Meteor version the app is using. This fixes using the `zodern/meteor` image with newer versions of Meteor.
+- Fix `mup reconfig` not able to remove environment variables that were set during the last deploy
+- Fix using images that run the app on a port other than 80 with the reverse proxy
+- When using the reverse proxy, the `VIRTUAL_PORT` environment variable is now set to the same value as `app.docker.imagePort`
+- Prevent bash from modifying custom nginx configs (For example, strings prefixed with `$` were removed by bash)
+- Show stderr from `remoteCommand` hooks
+- Update Stop Mongo task name to use title case
+- Fix some problems with stopping the proxy
+- Fix `meteor status` when docker logs warnings
+- Fix uploading custom certificates before app was set up
+
+**Plugin API**
+- `tasks` has functions that can add reusable tasks to task lists. The functions are:
+  - `addCreateService`
+  - `addUpdateService`
+  - `addCreateOrUpdateService`
+- Yargs has been updated to 12.0.5. For backwards compatibility, commands with an empty description continue to be hidden. (rolljee)
+- `runSSHCommand` can also accept a session instead of a server object. It is recommended to use sessions since mup now reuses them
+- output from `runSSHCommand` will now also include stderr
+- `validateConfig` has an additional parameter `logProblems` to enable showing validation errors
+- `validationErrors` has errors even when `getConfig(false)` was used
+- `VALIDATE_OPTIONS` has `noDefaults: true` set
+- Add `StatusDisplay` class to help with printing the status and deciding what to show when `--overview` is used
+
 ## 1.4.6 - April 27, 2019
 - Mongo and nginx logs are now rotated and limited to 700mb
 - Fix error when running `mup setup` without a `servers` object in the config.

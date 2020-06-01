@@ -1,5 +1,5 @@
 import { addLocation, combineErrorDetails, VALIDATE_OPTIONS } from './utils';
-import joi from 'joi';
+import joi from '@hapi/joi';
 
 // The regexp used matches everything
 const schema = joi.object().keys().pattern(/.*/, {
@@ -13,7 +13,8 @@ const schema = joi.object().keys().pattern(/.*/, {
   password: joi.string(),
   opts: joi.object().keys({
     port: joi.number()
-  })
+  }),
+  privateIp: joi.string()
 });
 
 export default function validateServers(servers) {

@@ -3,122 +3,113 @@ layout: home
 title: 'Deploy Meteor apps'
 description: 'Production Quality Meteor Deployment to Anywhere.'
 ---
-<div class="container">
-    <br><br>
-    <h3 class="section-title">Why Meteor Up?</h3>
-    <div class="row">
-        <div class="col-sm-4">
-            <img class="blurb-img" src="{{site.baseurl}}/imgs/rocket.png">
-            <div class="blurb-text">
-                Ship your application with less headache and overhead.
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <img class="blurb-img" src="{{site.baseurl}}/imgs/swatches.png">
-            <div class="blurb-text">
-                Deploy from anywhere. Meteor Up runs on Windows, Mac, and Linux.
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <img class="blurb-img" src="{{site.baseurl}}/imgs/global.png">
-            <div class="blurb-text">
-                Deploy to anywhere. Meteor Up can run your app on any Ubuntu server you can ssh into.
-            </div>
-        </div>
-    </div>
-    <div class="section-spacer"></div>
-
-    <h3 class="section-title">Features</h3>
-    <br>
-
-    <div class="row">
-        <div class="col-xs-12 col-sm-6 col-lg-8">
-            <div id="terminal-deploy">
-                <div>C:\Users\zodern\dev\Wekan\.deploy>mup deploy</div>
-                <div>Building App Bundle Locally</div>
-                <p></p>
-                <div><span class="terminal-blue">Started TaskList: Pushing Meteor App</span></div>
-                <div><span class="terminal-purple">[100.190.45.50]</span> - Pushing Meteor App Bundle to The Server</div>
-                <div><span class="terminal-purple">[100.190.45.50]</span><span class="terminal-green"> - Pushing Meteor App Bundle to The Server: SUCCESS</span></div>
-                <p></p>
-                <div class="terminal-blue">Started TaskList: Configuring App</div>
-                <div><span class="terminal-purple">[100.190.45.50]</span> - Pushing the Startup Script</div>
-                <div><span class="terminal-purple">[100.190.45.50]</span><span class="terminal-green"> - Pushing the Startup Script: SUCCESS</span></div>
-                <div><span class="terminal-purple">[100.190.45.50]</span> - Sending Environment Variables</div>
-                <div><span class="terminal-purple">[100.190.45.50]</span><span class="terminal-green"> - Sending Environment Variables: SUCCESS</span></div>
-                <p></p>
-                <div class="terminal-blue">Started TaskList: Start Meteor</div>
-                <div><span class="terminal-purple">[100.190.45.50]</span> - Start Meteor</div>
-                <div><span class="terminal-purple">[100.190.45.50]<span class="terminal-green"> - Start Meteor: SUCCESS</span></div>
-                <div><span class="terminal-purple">[100.190.45.50]</span> - Verifying Deployment</div>
-                <div><span class="terminal-purple">[100.190.45.50]<span class="terminal-green"> - Verifying Deployment: SUCCESS</span></div>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-6 col-lg-4">
-            <div class="row">
-                <div class="col-xs-12">
-                    <h4><i class="glyphicon glyphicon-ok"></i> Single-command Server Setup</h4>
-                    <p>Meteor Up can install all of it's dependencies on the servers and prepare them for deployments.</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <h4><i class="glyphicon glyphicon-ok"></i> SSL Support</h4>
-                    <p>Meteor up can setup Let's Encrypt to create free certificates automatically. It also supports using your
-                        custom certificates.</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <h4><i class="glyphicon glyphicon-ok"></i> Application Logs</h4>
-                    <p>View logs from the terminal, with log tailing and following supported.</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <h4><i class="glyphicon glyphicon-ok"></i> Automated Rollback</h4>
-                    <p>Meteor Up verifies that the app sucessfully started, and rolls back to the previous version if it failed.</p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="section-spacer"></div>
-
-    <h3 class="section-title">The Community</h3>
-    <div class="row">
-        <div class="col-xs-6 col-md-3">
-            <div class="stat-num" id="star-hook">
-                900
-            </div>
-            <div class="stat-text">
-                <i class="glyphicon glyphicon-star"></i> &nbsp;&nbsp; Github Stars
-            </div>
-        </div>
-        <div class="col-xs-6 col-md-3">
-            <div class="stat-num" id="fork-hook">
-                100
-            </div>
-            <div class="stat-text">
-                <i class="glyphicon glyphicon-random"></i> &nbsp;&nbsp; Github Forks
-            </div>
-        </div>
-        <div class="col-xs-6 col-md-3">
-            <div class="stat-num" id="contributor-hook">
-                40
-            </div>
-            <div class="stat-text">
-                <i class="glyphicon glyphicon-user"></i> &nbsp;&nbsp; Contributors
-            </div>
-        </div>
-        <div class="col-xs-6 col-md-3">
-            <div class="stat-num" id="commit-hook">
-                500
-            </div>
-            <div class="stat-text">
-                <i class="glyphicon glyphicon-time"></i> &nbsp;&nbsp; Commits
-            </div>
-        </div>
-    </div>
-    <div class="section-spacer"></div>
+<div id="hero">
+  <div class="content">
+    <h1>Easily Deploy Your App</h1>
+    <p>Meteor Up is a production quality tool to setup servers and deploy your Meteor apps to them</p>
+    <a class="button" href="./getting-started.html">Get Started</a>
+  </div>
 </div>
+
+<div id="features">
+  <div class="content">
+    <div>
+      <h2>Simple Server Setup</h2>
+      <ul>
+        <li>Meteor Up supports any Ubuntu server you can SSH into. Save costs by using your own servers instead
+          of expensive hosting services.</li>
+        <li>Describe your server setup with a simple, declarative config. Run a single command to setup or
+          update your
+          servers to match the config.</li>
+      </ul>
+    </div>
+    <div style="clear: both;">
+      <h2>Confidently Deploy</h2>
+      <img style="float: right; margin: 0 0 20px 20px;" src="https://s7.gifyu.com/images/cli2.gif" width="450" />
+      <p>Meteor Up was designed to meet the needs of Meteor apps. Other types of apps are supported through
+        plugins.
+      </p>
+      <ul>
+        <li><strong>Reliability</strong> Meteor Up monitors new versions and rolls back failed deploys.</li>
+        <li><strong>Load Balancing</strong> Deploy your apps to multiple servers, and requests will be load
+          balanced
+          to
+          all of them. Sticky sessions are supported.</li>
+        <li>
+          <strong>Zero Downtime Deploys</strong> Deploy anytime without your app going down.
+        </li>
+      </ul>
+    </div>
+    <h2>Production Debugging</h2>
+    <p>Some performance issues or bugs are difficult to reproduce locally. Connect your local Node debugger to your
+      app
+      in
+      production for full access to the profilers, inspector, and console.</p>
+
+    <h2>Free SSL</h2>
+    <p>Built in support for Let's Encrypt makes SSL easy and free.</p>
+
+
+    <h2>Plugins</h2>
+    <p>Extend Meteor Up with plugins. Deploy non-meteor apps, automate additional server setup,
+      or add functionality to the CLI</p>
+    <div id="plugin-list">
+      <a href="https://github.com/zodern/mup-aws-beanstalk">
+        <div class="card">
+          <h3>mup-aws-beanstalk</h3>
+          <span>Deploy using AWS Elastic Beanstalk. Supports load balancing, auto scaling, and rolling deploys</span>
+        </div>
+      </a>
+      <script src="http://localhost:4000/app/app.js?hash=6caaaf47e7351179da6fe8931771c09215ed482b"></script>
+      <a href="https://www.npmjs.com/package/mup-netdata">
+        <div class="card">
+          <h3>mup-netdata</h3>
+          <span>Monitor servers with Netdata</span>
+        </div>
+      </a>
+      <a href="https://www.npmjs.com/package/mup-node">
+        <div class="card">
+          <h3>mup-node</h3>
+          <span>Deploy node apps</span>
+        </div>
+      </a>
+      <div class="card more-link">
+        <h3>And many more</h3>
+        <a class="button" href="/plugins.html">Discover</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="community">
+  <div class="content">
+    <h2>Community</h2>
+    <div class="stats">
+      <div class='stat'>
+        <div class="star-count">1000+</div>
+        <p>GitHub Stars</p>
+      </div>
+      <div class="stat">
+        <div class="contributor-count">40+</div>
+        <p>Contributors</p>
+      </div>
+      <div class="stat">
+        <div class="fork-count">250+</div>
+        <p>Forks</p>
+      </div>
+      <div class="stat">
+        <div class="commit-count">700+</div>
+        <p>Commits</p>
+      </div>
+    </div>
+    <div class="community-links">
+      <p>Join our active Gitter room: <a href="https://gitter.im/meteor-up/Lobby" class="">Chat on
+          Gitter</a></p>
+      <p>Report bug or request a feature: <a href="https://github.com/zodern/monti-apm/issues/new" class="">
+          Create Issue</a></p>
+    </div>
+    <h2>Sponsors</h2>
+    <div id="sponsor-list">Loading...</div>
+  </div>
+</div>
+<script src="./scripts/index-data.js"></script>
