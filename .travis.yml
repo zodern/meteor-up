@@ -6,12 +6,10 @@ node_js:
   - "14"
 
 env:
-  - TEST_PLUGINS='default'
   - TEST_PLUGINS='meteor'
-  - TEST_PLUGINS='mongo,docker,proxy'
-  - TEST_PLUGINS='default' TEST_OPTIONS="--non-root"
+  - TEST_PLUGINS='docker,mongo,proxy,default'
   - TEST_PLUGINS='meteor' TEST_OPTIONS="--non-root"
-  - TEST_PLUGINS='mongo,docker,proxy' TEST_OPTIONS="--non-root"
+  - TEST_PLUGINS='docker,mongo,proxy,default' TEST_OPTIONS="--non-root"
 
 services:
   - docker
