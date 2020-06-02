@@ -44,7 +44,7 @@ describe('module - mongo', function() {
       const sshOut = await runSSHCommand(serverInfo, 'tree -pufi /opt');
 
       expect(sshOut.code).to.be.equal(0);
-      expect(countOccurences('mongodb.conf', sshOut.output)).to.be.equal(1);
+      expect(countOccurences('mongo-start-new.sh', sshOut.output)).to.be.equal(1);
     });
   });
 
