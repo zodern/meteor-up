@@ -140,7 +140,7 @@ describe('module - meteor', function() {
     before(async () => {
       await runSSHCommand(
         serverInfo,
-        'docker network create mup-tests'
+        'sudo docker network create mup-tests'
       );
     });
 
@@ -195,7 +195,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup deploy --cached-build --config mup.user-network.js');
       const sshOut = await runSSHCommand(
         serverInfo,
-        'docker inspect myapp'
+        'sudo docker inspect myapp'
       );
       const networks = JSON.parse(sshOut.output)[0].NetworkSettings.Networks;
 
@@ -211,7 +211,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup deploy --cached-build --config mup.no-bridge.js');
       const sshOut = await runSSHCommand(
         serverInfo,
-        'docker inspect myapp'
+        'sudo docker inspect myapp'
       );
       const networks = JSON.parse(sshOut.output)[0].NetworkSettings.Networks;
       await checkDeploy(out, '<title>helloapp-new</title>');
