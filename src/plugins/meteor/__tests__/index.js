@@ -15,6 +15,14 @@ const servers = require('../../../../tests/fixtures/servers');
 describe('module - meteor', function() {
   this.timeout(600000);
 
+  before(async () => {
+    const serverInfo = servers.mymeteor;
+    await runSSHCommand(
+      serverInfo,
+      'sudo docker rm -f $(sudo docker ps -a -q)'
+    );
+  });
+
   describe('setup', () => {
     it('should setup environment on "meteor" vm', async () => {
       const serverInfo = servers.mymeteor;
