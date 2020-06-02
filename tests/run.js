@@ -44,6 +44,10 @@ var containerId = sh.exec(
 sh.exec(`docker exec ${containerId} sudo service docker start`);
 sh.exec(`docker exec ${containerId} cp ${userPath}/.ssh/authorized_keys2 ${userPath}/.ssh/authorized_keys`);
 
+if (user !== 'root') {
+  sh.exec(`docker exec ${containerId} chown -R ${user}:${user} ${userPath}/.ssh`);
+}
+
 var watch = argv.watch ? '--watch' : '';
 
 var files = argv.path ? argv.path : 'src/**/__tests__/**/*.js';
