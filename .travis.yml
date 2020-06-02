@@ -11,6 +11,13 @@ env:
   - TEST_PLUGINS='meteor' TEST_OPTIONS="--non-root"
   - TEST_PLUGINS='docker,mongo,proxy,default' TEST_OPTIONS="--non-root"
 
+jobs:
+  exclude:
+  - node_js: "8"
+    env: TEST_PLUGINS='meteor' TEST_OPTIONS="--non-root"
+  - node_js: "8"
+    env: TEST_PLUGINS='docker,mongo,proxy,default' TEST_OPTIONS="--non-root"
+
 services:
   - docker
 
