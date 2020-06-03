@@ -1,22 +1,17 @@
 sudo: required
 
 language: node_js
-node_js:
-  - "8"
-  - "14"
-
-env:
-  - TEST_PLUGINS='meteor'
-  - TEST_PLUGINS='docker,mongo,proxy,default'
-  - TEST_PLUGINS='meteor' TEST_OPTIONS="--non-root"
-  - TEST_PLUGINS='docker,mongo,proxy,default' TEST_OPTIONS="--non-root"
 
 jobs:
-  exclude:
+  include:
   - node_js: "8"
     env: TEST_PLUGINS='meteor' TEST_OPTIONS="--non-root"
   - node_js: "8"
     env: TEST_PLUGINS='docker,mongo,proxy,default' TEST_OPTIONS="--non-root"
+  - node_js: "14"
+    env: TEST_PLUGINS='meteor'
+  - node_js: "14"
+    env: TEST_PLUGINS='docker,mongo,proxy,default'
 
 services:
   - docker
