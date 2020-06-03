@@ -8,7 +8,7 @@ elaspsed=0
 # for it to finish becoming a manager.
 while [[ true ]]; do
 
-  docker node demote \
+  sudo docker node demote \
     <% for(var index in nodeIds) { %> \
     <%= nodeIds[index] %> \
     <% } %> \
@@ -22,4 +22,3 @@ while [[ true ]]; do
     exit 1
   fi
 done
-

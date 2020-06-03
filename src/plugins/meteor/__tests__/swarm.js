@@ -19,7 +19,7 @@ async function checkRunning() {
 
   const sshService = await runSSHCommand(
     serverInfo,
-    'docker service inspect myapp-service'
+    'sudo docker service inspect myapp-service'
   );
 
   expect(sshService.code).to.equal(0);
@@ -84,7 +84,7 @@ describe('module - meteor swarm', function() {
 
       const sshService = await runSSHCommand(
         serverInfo,
-        'docker service inspect myapp-service'
+        'sudo docker service inspect myapp-service'
       );
 
       expect(sshService.code).to.equal(1);

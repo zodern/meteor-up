@@ -529,7 +529,7 @@ export default class PluginAPI {
       throw error;
     }
 
-    const result = await this.runSSHCommand(manager, `docker service inspect ${serviceName}`);
+    const result = await this.runSSHCommand(manager, `sudo docker service inspect ${serviceName}`);
     let serviceInfo = null;
 
     try {

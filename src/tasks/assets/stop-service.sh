@@ -3,4 +3,4 @@ set -e
 
 NAME=<%= name %>
 
-docker service rm $NAME || true
+sudo docker service rm $NAME || true

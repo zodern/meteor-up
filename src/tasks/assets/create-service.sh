@@ -15,7 +15,7 @@ UPDATE_FAILURE_ACTION=<%= updateFailureAction %>
 UPDATE_PARALLELISM=<%= updateParallelism %>
 UPDATE_DELAY=<%= updateDelay %>
 
-docker service create \
+sudo docker service create \
   <%- endpointMode !== 'dnsrr' ? '--publish=$PUBLISHED_PORT:$TARGET_PORT' : '' %> \
   <%- envFile ? '--env-file=' + envFile : '' %> \
   <%- env ? Object.keys(env).map(key => `--env ${key}=${env[key]} `).join(' ') : '' %> \
