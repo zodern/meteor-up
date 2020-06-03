@@ -17,7 +17,7 @@ sudo docker images
 
 # save the last known version
 cd $APP_DIR
-if sudo docker image inspect $IMAGE:latest >/dev/null || $PRIVATE_REGISTRY; then
+if sudo docker image inspect $IMAGE:latest >/dev/null || [ "$PRIVATE_REGISTRY" == "0" ]; then
   echo "using image"
   sudo rm -rf current || true
 else
