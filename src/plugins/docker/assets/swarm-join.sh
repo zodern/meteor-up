@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker swarm join --token <%= token %> <%= managerIP %>
+sudo docker swarm join --token <%= token %> <%= managerIP %>

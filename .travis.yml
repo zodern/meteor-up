@@ -1,16 +1,17 @@
 sudo: required
 
 language: node_js
-node_js:
-  - "8"
-  - "14"
 
-env:
-  - TEST_PLUGIN='default'
-  - TEST_PLUGIN='meteor'
-  - TEST_PLUGIN='mongo'
-  - TEST_PLUGIN='docker'
-  - TEST_PLUGIN='proxy'
+jobs:
+  include:
+  - node_js: "8"
+    env: TEST_PLUGINS='meteor' TEST_OPTIONS="--non-root"
+  - node_js: "8"
+    env: TEST_PLUGINS='docker,mongo,proxy,default' TEST_OPTIONS="--non-root"
+  - node_js: "14"
+    env: TEST_PLUGINS='meteor'
+  - node_js: "14"
+    env: TEST_PLUGINS='docker,mongo,proxy,default'
 
 services:
   - docker
@@ -18,4 +19,4 @@ services:
 before_script:
   - echo 'DOCKER_OPTS="--storage-driver=devicemapper"' | sudo tee --append /etc/default/docker >/dev/null && sudo service docker restart
 
-script: npm run test -- --plugin="$TEST_PLUGIN" --skip-pull
+script: npm run test -- --plugins="$TEST_PLUGINS" $TEST_OPTIONS

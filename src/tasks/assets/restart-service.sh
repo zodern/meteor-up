@@ -3,4 +3,4 @@ set -e
 
 NAME="<%= name %>"
 
-docker service update --force $NAME
+sudo docker service update --force $NAME

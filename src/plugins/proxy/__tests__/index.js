@@ -31,7 +31,7 @@ describe('module - proxy', function() {
       expect(out.output).to.have.entriesCount('Setup proxy', 1);
       expect(out.output).to.have.entriesCount('Start proxy: SUCCESS', 1);
 
-      out = await runSSHCommand(serverInfo, 'docker ps');
+      out = await runSSHCommand(serverInfo, 'sudo docker ps');
 
       expect(out.code).to.equal(0);
       expect(out.output).to.have.entriesCount('mup-nginx-proxy', 2);

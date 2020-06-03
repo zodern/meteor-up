@@ -27,7 +27,7 @@ fi
   # We want this pull to fail on error since
   # otherwise we might try to run an old version of the app
   set -e
-  docker pull $IMAGE
+  sudo docker pull $IMAGE
   set +e
 <% } %>
 

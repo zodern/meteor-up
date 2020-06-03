@@ -42,9 +42,9 @@ To run the test in parallel, add a matching regex to the `<meteor-up dir>/tests/
 
 `--path <test files>` Defaults to `src/**/__tests__/**/*.js`
 
-`--plugin <plugin name>` Runs tests for plugin. Overrides `--path`
+`--plugins mocha,meter` Runs tests for the plugins, separated by commas. Overrides `--path`
 
-`--skip-pull` To speedup running the tests, it creates a docker image before the first run that has docker installed and has pulled all of the images used during the tests. This option disables creating or using the image.
+`--non-root` Uses a non-root user in the docker container it deploys to
 
 For example:
 ```

@@ -12,7 +12,7 @@ echo "Removing images"
 # This command is only run during a deploy.
 # Removes the latest image, so the start script will use the bundle instead
 sudo docker rmi $IMAGE:latest || true
-docker images
+sudo docker images
 <% } %>
 
 # save the last known version

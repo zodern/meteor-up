@@ -47,15 +47,15 @@ export const builtInParsers = {
 
 export const _collectors = {
   swarm: {
-    command: 'docker info --format \'{{json .Swarm}}\'',
+    command: 'sudo docker info --format \'{{json .Swarm}}\'',
     parser: builtInParsers.json
   },
   swarmNodes: {
-    command: 'docker node inspect $(docker node ls -q) --format \'{{json .}}\'',
+    command: 'sudo docker node inspect $(sudo docker node ls -q) --format \'{{json .}}\'',
     parser: parseJSONArray
   },
   swarmToken: {
-    command: 'docker swarm join-token worker -q',
+    command: 'sudo docker swarm join-token worker -q',
     parser(stdout, code) {
       if (code === 0 && stdout.indexOf('Error response') === -1) {
         return stdout.trim();
@@ -65,7 +65,7 @@ export const _collectors = {
     }
   },
   images: {
-    command: 'docker images --format \'{{json .}}\'',
+    command: 'sudo docker images --format \'{{json .}}\'',
     parser: parseJSONArray
   }
 };

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker swarm init --advertise-addr <%= host %>
+sudo docker swarm init --advertise-addr <%= host %>

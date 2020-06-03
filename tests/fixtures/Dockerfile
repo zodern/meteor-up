@@ -29,5 +29,13 @@ COPY ./docker.conf /etc/init.d/docker
 RUN chmod +x /etc/init.d/docker && \
   update-rc.d docker defaults
 
+RUN groupadd -r normal-user && \
+    useradd -s /bin/bash -r -g normal-user normal-user && \
+    adduser normal-user sudo && \
+    mkdir -p /home/normal-user/.ssh && \
+    chown -R normal-user:normal-user /home/normal-user/.ssh && \
+    echo normal-user:password | chpasswd && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' | sudo EDITOR='tee -a' visudo
+
 #Expose ssh port
 EXPOSE 22
