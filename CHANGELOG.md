@@ -1,9 +1,9 @@
-## 1.5.1 - July 2, 2020
+## 1.5.1 - June 2, 2020
 
 - Fix some commands failing when using a non-root user on the server
 - Fix deploying with privateDockerRegistry enabled.
 
-## 1.5.0 - July 1, 2020
+## 1.5.0 - June 1, 2020
 
 **Upgrading notes**
 
