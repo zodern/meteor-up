@@ -1,3 +1,7 @@
+## Next
+
+- Fix selecting server for `mup ssh` and `mup meteor debug`
+
 ## 1.5.1 - June 2, 2020
 
 - Fix some commands failing when using a non-root user on the server

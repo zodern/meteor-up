@@ -63,7 +63,12 @@ export const stop = {
 export const ssh = {
   name: 'ssh [server]',
   description: 'SSH into server',
-  handler: commandHandlers.ssh
+  handler: commandHandlers.ssh,
+  builder(yargs) {
+    yargs.positional('server', {
+      description: 'Name of server'
+    }).strict(false);
+  }
 };
 
 export const validate = {

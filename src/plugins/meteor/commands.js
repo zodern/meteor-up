@@ -75,6 +75,9 @@ export const status = {
 export const debug = {
   name: 'debug [server]',
   description: 'Debug the meteor app',
+  builder(yargs) {
+    yargs.strict(false);
+  },
   handler: commandHandlers.debugApp
 };
 
