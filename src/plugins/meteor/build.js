@@ -89,8 +89,8 @@ function buildMeteorApp(appPath, buildOptions, verbose, callback) {
   if (isWin) {
     // Sometimes cmd.exe not available in the path
     // See: http://goo.gl/ADmzoD
+    args = ['/c', executable].concat(args);
     executable = process.env.comspec || 'cmd.exe';
-    args = ['/c', 'meteor'].concat(args);
   }
 
   const options = {
