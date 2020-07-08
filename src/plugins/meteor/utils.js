@@ -1,7 +1,11 @@
 import { cloneDeep, flatMap } from 'lodash';
 import fs from 'fs';
 import os from 'os';
+import {
+  prepareBundleSupported
+} from './prepare-bundle.js';
 import random from 'random-seed';
+import { spawn } from 'child_process';
 import uuid from 'uuid';
 
 export function checkAppStarted(list, api) {
@@ -42,20 +46,6 @@ export function addStartAppTask(list, api) {
   });
 
   return list;
-}
-
-export function prepareBundleSupported(dockerConfig) {
-  const supportedImages = ['abernix/meteord', 'zodern/meteor'];
-
-  if ('prepareBundle' in dockerConfig) {
-    return dockerConfig.prepareBundle;
-  }
-
-  return (
-    supportedImages.find(
-      supportedImage => dockerConfig.image.indexOf(supportedImage) === 0
-    ) || false
-  );
 }
 
 export function createEnv(appConfig, settings) {
@@ -134,6 +124,35 @@ export function tmpBuildPath(appPath, api) {
     os.tmpdir(),
     `mup-meteor-${uuid.v4({ random: uuidNumbers })}`
   );
+}
+
+export function runCommand(_executable, _args, cwd) {
+  return new Promise((resolve, reject) => {
+    let executable = _executable;
+    let args = _args;
+    const isWin = /^win/.test(process.platform);
+    if (isWin) {
+      // Sometimes cmd.exe not available in the path
+      // See: http://goo.gl/ADmzoD
+      executable = process.env.comspec || 'cmd.exe';
+      args = ['/c', _executable].concat(args);
+    }
+
+    const options = {
+      cwd,
+      stdio: [process.stdin, process.stdout, process.stderr]
+    };
+    const commandProcess = spawn(executable, args, options);
+
+    commandProcess.on('error', e => {
+      console.log(options);
+      console.log(e);
+      console.log(`This error usually happens when ${_executable} is not installed.`);
+
+      return reject(e);
+    });
+    commandProcess.on('close', resolve);
+  });
 }
 
 export function getBuildOptions(api) {

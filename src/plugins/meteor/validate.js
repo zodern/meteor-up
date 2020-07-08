@@ -27,12 +27,13 @@ const schema = joi.object().keys({
     args: joi.array().items(joi.string()),
     bind: joi.string().trim(),
     prepareBundle: joi.bool(),
-    networks: joi
-      .array()
-      .items(joi.string()),
+    prepareBundleLocally: joi.bool(),
     buildInstructions: joi.array().items(joi.string()),
     stopAppDuringPrepareBundle: joi.bool(),
-    useBuildKit: joi.bool()
+    useBuildKit: joi.bool(),
+    networks: joi
+      .array()
+      .items(joi.string())
   }),
   buildOptions: joi.object().keys({
     serverOnly: joi.bool(),

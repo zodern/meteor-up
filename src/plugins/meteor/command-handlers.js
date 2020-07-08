@@ -8,12 +8,12 @@ import {
   getImagePrefix,
   getNodeVersion,
   getSessions,
-  prepareBundleSupported,
   shouldRebuild
 } from './utils';
 import buildApp, { archiveApp } from './build.js';
 import { checkUrls, createPortInfoLines, displayAvailability, getInformation, withColor } from './status';
 import { map, promisify } from 'bluebird';
+import { prepareBundleLocally, prepareBundleSupported } from './prepare-bundle';
 import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
 
@@ -139,6 +139,10 @@ export async function push(api) {
 
   if (shouldRebuild(api)) {
     await promisify(archiveApp)(buildOptions.buildLocation, api);
+  }
+
+  if (appConfig.docker.prepareBundleLocally) {
+    return prepareBundleLocally(buildOptions.buildLocation, api);
   }
 
   const list = nodemiral.taskList('Pushing Meteor App');
