@@ -28,7 +28,7 @@ export function createDockerFile(appConfig) {
   const syntax = useBuildKit ? '# syntax=docker/dockerfile:1-experimental' : '';
   const args = Object.entries(env).map(([key, value]) => `ARG ${key}=${value}`).join('\n');
   const copy = useBuildKit ?
-    'RUN --mount=type=bind,target=/tmp/__mup-bundle tar -xzf /tmp/__mup-bundle/bundle.tar.gz -C /built_app --strip-components=1 && ls /built_app' :
+    'RUN --mount=type=bind,target=/tmp/__mup-bundle tar -xzf /tmp/__mup-bundle/bundle.tar.gz -C /built_app --strip-components=1' :
     'COPY ./ /built_app';
 
   return `
@@ -40,7 +40,7 @@ export function createDockerFile(appConfig) {
     ${copy}
     RUN cd /built_app/programs/server && \
       npm install --unsafe-perm
-  `;
+  `.trim();
 }
 
 export async function prepareBundleLocally(
@@ -51,11 +51,23 @@ export async function prepareBundleLocally(
     privateDockerRegistry
   } = api.getConfig();
 
+  if (!appConfig.docker.useBuildKit) {
+    const error = new Error('useBuildKit must be enabled when using prepareBundleLocally');
+    error.solution = 'Set app.docker.useBuildKit to true in your config.';
+    throw error;
+  }
+
   const image = `${getImagePrefix(privateDockerRegistry)}${appConfig.name}`;
   const dockerFile = createDockerFile(appConfig);
+  const dockerIgnoreContent = `
+  bundle
+  .bundle-garbage*
+  !bundle.tar.gz
+  `;
 
   console.log('=> Writing Dockerfile');
-  fs.writeFileSync(api.resolvePath(buildLocation, 'bundle/Dockerfile'), dockerFile);
+  fs.writeFileSync(api.resolvePath(buildLocation, 'Dockerfile'), dockerFile);
+  fs.writeFileSync(api.resolvePath(buildLocation, 'dockerignore'), dockerIgnoreContent);
 
   console.log('');
   console.log('=> Updating base image');
@@ -64,12 +76,12 @@ export async function prepareBundleLocally(
 
   console.log('');
   console.log('=> Build image');
-  const cwd = api.resolvePath(buildLocation, 'bundle');
+
   if (appConfig.docker.useBuildKit) {
-    process.env.USE_BUILDKIT = '1';
+    process.env.DOCKER_BUILDKIT = '1';
   }
 
-  await runCommand('docker', ['build', '-t', `${image}:build`, '.'], cwd);
+  await runCommand('docker', ['build', '-t', `${image}:build`, '.'], buildLocation);
 
   console.log('');
   console.log('=> Updating tags');

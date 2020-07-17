@@ -151,7 +151,13 @@ export function runCommand(_executable, _args, cwd) {
 
       return reject(e);
     });
-    commandProcess.on('close', resolve);
+    commandProcess.on('close', code => {
+      if (code > 0) {
+        return reject(new Error(`"${executable} ${args.join(' ')}" exited with the code ${code}`));
+      }
+
+      resolve();
+    });
   });
 }
 
