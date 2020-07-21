@@ -63,7 +63,7 @@ export async function prepareBundleLocally(
   const dockerFile = createDockerFile(appConfig);
   const dockerIgnoreContent = `
   bundle
-  .bundle-garbage*
+  .bundle-garbage*/
   !bundle.tar.gz
   `;
 
