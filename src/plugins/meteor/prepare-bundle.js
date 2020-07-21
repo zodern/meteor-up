@@ -1,5 +1,6 @@
 import {
   getImagePrefix,
+  getNodeVersion,
   runCommand
 } from './utils';
 import fs from 'fs';
@@ -57,6 +58,7 @@ export async function prepareBundleLocally(
     throw error;
   }
 
+  const nodeVersion = getNodeVersion(api, buildLocation);
   const image = `${getImagePrefix(privateDockerRegistry)}${appConfig.name}`;
   const dockerFile = createDockerFile(appConfig);
   const dockerIgnoreContent = `
@@ -81,7 +83,12 @@ export async function prepareBundleLocally(
     process.env.DOCKER_BUILDKIT = '1';
   }
 
-  await runCommand('docker', ['build', '-t', `${image}:build`, '.'], buildLocation);
+  await runCommand('docker', [
+    'build',
+    '-t', `${image}:build`,
+    '.',
+    '--build-arg', `NODE_VERSION=${nodeVersion}`
+  ], buildLocation);
 
   console.log('');
   console.log('=> Updating tags');
