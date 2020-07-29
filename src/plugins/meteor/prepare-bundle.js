@@ -72,7 +72,7 @@ export async function prepareBundleLocally(
 
   console.log('');
   console.log('=> Updating base image');
-  await runCommand('docker', ['login', '--password', privateDockerRegistry.password, '--username', privateDockerRegistry.username, privateDockerRegistry.host]);
+  await runCommand('docker', ['login', '--password-stdin', '--username', privateDockerRegistry.username, privateDockerRegistry.host], { stdin: privateDockerRegistry.password });
   await runCommand('docker', ['pull', appConfig.docker.image]);
 
   console.log('');
@@ -87,10 +87,11 @@ export async function prepareBundleLocally(
     '-t', `${image}:build`,
     '.',
     '--build-arg', `NODE_VERSION=${nodeVersion}`
-  ], buildLocation);
+  ], { cwd: buildLocation });
 
   console.log('');
   console.log('=> Updating tags');
+
   // Pull latest image so we can tag is as previous
   // TODO: use docker registry api instead
   await runCommand('docker', ['pull', `${image}:latest`]);
@@ -112,5 +113,6 @@ export async function prepareBundleLocally(
     'push',
     `${image}:latest`
   ]);
+
   console.log('=> Finished preparing bundle');
 }

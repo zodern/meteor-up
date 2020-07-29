@@ -126,7 +126,7 @@ export function tmpBuildPath(appPath, api) {
   );
 }
 
-export function runCommand(_executable, _args, cwd) {
+export function runCommand(_executable, _args, { cwd, stdin } = {}) {
   return new Promise((resolve, reject) => {
     let executable = _executable;
     let args = _args;
@@ -140,9 +140,19 @@ export function runCommand(_executable, _args, cwd) {
 
     const options = {
       cwd,
-      stdio: [process.stdin, process.stdout, process.stderr]
+      stdio: [
+        stdin ? 'pipe' : process.stdin,
+        process.stdout,
+        process.stderr
+      ]
     };
     const commandProcess = spawn(executable, args, options);
+
+    if (stdin) {
+      commandProcess.stdin.setEncoding('utf-8');
+      commandProcess.stdin.write(`${stdin}\r\n`);
+      commandProcess.stdin.end();
+    }
 
     commandProcess.on('error', e => {
       console.log(options);
