@@ -62,8 +62,7 @@ export async function prepareBundleLocally(
   const image = `${getImagePrefix(privateDockerRegistry)}${appConfig.name}`;
   const dockerFile = createDockerFile(appConfig);
   const dockerIgnoreContent = `
-  bundle
-  .bundle-garbage*/
+  *
   !bundle.tar.gz
   `;
 
