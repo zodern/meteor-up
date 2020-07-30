@@ -604,7 +604,10 @@ module.exports = {
 
   proxy: {
     domains: 'website.com',
-    loadBalancing: true
+
+    loadBalancing: true,
+    // Use sticky sessions when load balancing (optional, default is true)
+    stickySessions: true
   }
 };
 ```
