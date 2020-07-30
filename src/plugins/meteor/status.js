@@ -156,9 +156,9 @@ export function createPortInfoLines(
   }
 
   if (publishedPorts.length > 0) {
-    const publisehdSection = statusDisplay.addLine('Published Ports:');
+    const publishedSection = statusDisplay.addLine('Published Ports (Inside Container => On Server):');
     publishedPorts.forEach(port => {
-      publisehdSection.addLine(`- ${port}`);
+      publishedSection.addLine(`- ${port}`);
     });
   }
 }
