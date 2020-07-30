@@ -3,11 +3,13 @@
 - Add `app.docker.prepareBundleLocally` option to build docker image locally instead of on the servers. It is then pushed to the private docker registry
 - Fix selecting server for `mup ssh` and `mup meteor debug`
 - `mup validate --scrub` will now scrub `proxy` and `privateDockerRegistry`
+- Shows a message when exiting if plugins have updates
 - Fix running Prepare Bundle when env vars have spaces
 - Fix overriding app's port using `app.servers[server name].env.PORT`
 - Add explanation to Published Ports section of `meteor status`'s output
 - Reduced size of npm package
 - Fix spelling in log in deploy check script
+- Document `proxy.stickySessions` option
 
 ## 1.5.1 - June 2, 2020
 
