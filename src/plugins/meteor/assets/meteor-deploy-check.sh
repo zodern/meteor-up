@@ -77,7 +77,7 @@ while [[ true ]]; do
     # If the container is not on the bridge network,
     # check for an IP Address on other networks
     if [ -z "$CONTAINER_IP" ]; then
-      echo "CONTAINER IP EMPTRY"
+      echo "CONTAINER IP EMPTY"
       CONTAINER_IP=$(sudo docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}
 {{end}}' $APPNAME | head -n 1)
     fi
