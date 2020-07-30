@@ -11,6 +11,7 @@ export const validate = {
   proxy: validator
 };
 
+// eslint-disable-next-line complexity
 export function prepareConfig(config) {
   if (!config.app || !config.proxy) {
     return config;
@@ -44,6 +45,20 @@ export function prepareConfig(config) {
   }
 
   config.app.env.ROOT_URL = normalizeUrl(config, config.app.env);
+
+  return config;
+}
+
+
+// eslint-disable-next-line complexity
+export function scrubConfig(config) {
+  if (config.app && config.app.env && config.app.env.LETSENCRYPT_EMAIL) {
+    config.app.env.LETSENCRYPT_EMAIL = 'email@domain.com';
+  }
+
+  if (config.proxy && config.proxy.ssl && config.proxy.ssl.letsEncryptEmail) {
+    config.proxy.ssl.letsEncryptEmail = 'email@domain.com';
+  }
 
   return config;
 }
