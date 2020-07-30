@@ -168,7 +168,7 @@ describe('module - meteor', function() {
       );
     });
 
-    async function checkDeploy(out, appText) {
+    async function checkDeploy(out, appText, port = 80) {
       assert.equal(out.code, 0);
 
       const num = countOccurences(
@@ -188,7 +188,7 @@ describe('module - meteor', function() {
 
       const sshOut = await runSSHCommand(
         serverInfo,
-        'curl localhost:80 && exit 0'
+        `curl localhost:${port} && exit 0`
       );
       assert.equal(sshOut.code, 0);
       expect(sshOut.output).to.have.entriesCount(appText, 1);
@@ -252,6 +252,21 @@ describe('module - meteor', function() {
       expect(out.code).to.equal(0);
       expect(out.output).to.have.entriesCount('#12 naming to docker.io/library/mup-myapp:build done', 1);
       expect(out.output).to.have.entriesCount('Prepare Bundle: SUCCESS', 1);
+    });
+
+    it('should allow overriding PORT on specific servers', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
+
+      sh.exec('mup --config mup.override-port.js setup');
+      const out = sh.exec('mup meteor deploy --config mup.override-port.js --cached-build');
+
+      await checkDeploy(out, '<title>helloapp-new</title>', 4000);
+
+      const status = sh.exec('mup --config mup.override-port.js meteor status');
+      expect(status.output).to.have.entriesCount('- 3000/tcp => 4000', 1);
+      expect(status.output).to.have.entriesCount(`App running at http://${serverInfo.host}:4000`, 1);
+      expect(status.output).to.have.entriesCount('Available in app\'s docker container: true', 1);
+      expect(status.output).to.have.entriesCount('Available on server: true', 1);
     });
   });
 

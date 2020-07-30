@@ -250,9 +250,14 @@ export function envconfig(api) {
 
   Object.keys(app.servers).forEach(serverName => {
     const host = servers[serverName].host;
+    const vars = {};
     if (app.servers[serverName].bind) {
-      startHostVars[host] = { bind: app.servers[serverName].bind };
+      vars.bind = app.servers[serverName].bind;
     }
+    if (app.servers[serverName].env && app.servers[serverName].env.PORT) {
+      vars.port = app.servers[serverName].env.PORT;
+    }
+    startHostVars[host] = vars;
   });
 
   const list = nodemiral.taskList('Configuring App');
@@ -282,7 +287,13 @@ export function envconfig(api) {
   Object.keys(app.servers).forEach(key => {
     const host = servers[key].host;
     if (app.servers[key].env) {
-      hostVars[host] = { env: app.servers[key].env };
+      hostVars[host] = {
+        env: {
+          ...app.servers[key].env,
+          // We treat the PORT specially and do not pass it to the container
+          PORT: undefined
+        }
+      };
     }
     if (app.servers[key].settings) {
       const settings = JSON.stringify(api.getSettingsFromPath(

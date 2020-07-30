@@ -73,10 +73,10 @@ export function getInformation(server, appName, api) {
     });
 }
 
-async function checkUrlLocally(server, appConfig) {
+async function checkUrlLocally(server, appConfig, port) {
   let result;
 
-  let portString = `:${appConfig.env.PORT}`;
+  let portString = `:${port}`;
   let domain = server.host;
   if (appConfig.env.VIRTUAL_HOST) {
     domain = appConfig.env.VIRTUAL_HOST.split(',')[0];
@@ -118,14 +118,18 @@ function getCheckAddress(server, appConfig) {
 }
 
 export async function checkUrls(server, appConfig, api) {
+  const port = appConfig.servers[server.name].env ?
+    appConfig.servers[server.name].env.PORT :
+    appConfig.env.PORT;
+
   const [
     remote,
     inDocker,
     local
   ] = await Promise.all([
-    api.runSSHCommand(server, `curl ${getCheckAddress(server, appConfig)}:${appConfig.env.PORT}`),
+    api.runSSHCommand(server, `curl ${getCheckAddress(server, appConfig)}:${port}`),
     api.runSSHCommand(server, `docker exec ${appConfig.name} curl http://localhost:${appConfig.docker.imagePort}`),
-    checkUrlLocally(server, appConfig)
+    checkUrlLocally(server, appConfig, port)
   ]);
   const inDockerResult = inDocker.code === 0;
   const remoteResult = remote.code === 0;
