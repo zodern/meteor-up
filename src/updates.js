@@ -6,7 +6,7 @@ import axios from 'axios';
 import boxen from 'boxen';
 import chalk from 'chalk';
 import debug from 'debug';
-import pkg from '../package.json';
+import path from 'path';
 
 const log = debug('mup:updates');
 const SKIP_CHECK_UPDATE = process.env.MUP_SKIP_UPDATE_CHECK === 'true';
@@ -55,9 +55,10 @@ function compareVersions(local, remote, next) {
   };
 }
 
-function showUpdateOnExit(version, isStable) {
-  const command = isStable ? 'npm i -g mup' : 'npm i -g mup@next';
-  let text = `update available ${pkg.version} => ${version}`;
+function showUpdateOnExit(pkg, version, isStable) {
+  const command = isStable ? `npm i -g ${pkg.name}` : `npm i -g ${pkg.name}@next`;
+  let text = `Update available for ${pkg.name}`;
+  text += `\n${pkg.version} => ${version}`;
 
   text += `\nTo update, run ${chalk.green(command)}`;
 
@@ -73,8 +74,36 @@ function showUpdateOnExit(version, isStable) {
   });
 }
 
-export default function() {
+function checkPackageUpdates(name, pkg) {
+  log(`retrieving tags for ${name}`);
+
+  return axios.get(`https://registry.npmjs.org/-/package/${name}/dist-tags`)
+    .then(({ data }) => {
+      const npmVersion = data.latest || '0.0.0';
+      const nextVersion = data.next || '0.0.0';
+
+      const local = parseVersion(pkg.version);
+      const remote = parseVersion(npmVersion);
+      const next = parseVersion(nextVersion);
+
+      const {
+        available,
+        isStable
+      } = compareVersions(local, remote, next);
+
+      log(`finished update check for ${name}`);
+      if (available) {
+        showUpdateOnExit(pkg, isStable ? npmVersion : nextVersion, isStable);
+      }
+    }).catch(e => {
+      // It is okay if this fails
+      log(e);
+    });
+}
+
+export default function(packages) {
   log('checking for updates');
+  log('Packages: ', packages);
 
   if (SKIP_CHECK_UPDATE) {
     log('skipping update check');
@@ -82,26 +111,15 @@ export default function() {
     return;
   }
 
-
-  return axios.get(`https://registry.npmjs.org/-/package/${pkg.name}/dist-tags`)
-    .then(({ data }) => {
-      const npmVersion = data.latest;
-      const nextVersion = data.next;
-
-      const local = parseVersion(pkg.version);
-      const remote = parseVersion(data.latest);
-      const next = parseVersion(data.next);
-
-      const {
-        available,
-        isStable
-      } = compareVersions(local, remote, next);
-
-      log('finished update check');
-      if (available) {
-        showUpdateOnExit(isStable ? npmVersion : nextVersion, isStable);
-      }
-    }).catch(() => {
+  packages.forEach(({ name, path: packagePath }) => {
+    try {
+      const packageJsonPath = path.resolve(path.dirname(packagePath), 'package.json');
+      // eslint-disable-next-line global-require
+      const pkg = require(packageJsonPath);
+      checkPackageUpdates(name, pkg);
+    } catch (e) {
       // It is okay if this fails
-    });
+      log(e);
+    }
+  });
 }

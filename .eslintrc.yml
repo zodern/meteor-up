@@ -58,7 +58,7 @@ rules:
   comma-style:
   - 2
   - last
-  complexity: [1, 6]
+  complexity: [1, 9]
   computed-property-spacing:
   - 2
   - never
