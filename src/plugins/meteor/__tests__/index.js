@@ -72,6 +72,22 @@ describe('module - meteor', function() {
       );
       assert.equal(sshOut.code, 0);
     });
+
+    it('should handle env vars with space during Prepare Bundle', async () => {
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
+
+      sh.exec('mup docker setup');
+      sh.exec('mup meteor setup');
+
+      const out = sh.exec('mup --config mup.env-with-space.js meteor push --cached-build');
+      assert.equal(out.code, 0);
+
+      const num = countOccurences(
+        'Prepare Bundle: SUCCESS',
+        out.output
+      );
+      assert.equal(num, 1);
+    });
   });
 
   describe('envconfig', () => {

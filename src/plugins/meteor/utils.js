@@ -104,6 +104,19 @@ export function getNodeVersion(api, bundlePath) {
   return star.nodeVersion || nodeVersion;
 }
 
+export function escapeEnvQuotes(env) {
+  return Object.entries(env).reduce((result, [key, _value]) => {
+    let value = _value;
+
+    if (typeof value === 'string') {
+      value = value.replace(/"/, '\\"');
+    }
+    result[key] = value;
+
+    return result;
+  }, {});
+}
+
 export async function getSessions(api) {
   if (api.swarmEnabled()) {
     return [await api.getManagerSession()];

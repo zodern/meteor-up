@@ -4,6 +4,7 @@ import {
   createEnv,
   createServiceConfig,
   currentImageTag,
+  escapeEnvQuotes,
   getBuildOptions,
   getImagePrefix,
   getNodeVersion,
@@ -169,7 +170,7 @@ export async function push(api) {
       vars: {
         appName: appConfig.name,
         dockerImage: appConfig.docker.image,
-        env: appConfig.env,
+        env: escapeEnvQuotes(appConfig.env),
         buildInstructions: appConfig.docker.buildInstructions || [],
         nodeVersion: getNodeVersion(api, buildOptions.buildLocation),
         stopApp: appConfig.docker.stopAppDuringPrepareBundle,
