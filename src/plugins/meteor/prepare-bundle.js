@@ -53,6 +53,7 @@ export async function prepareBundleLocally(
     app: appConfig,
     privateDockerRegistry
   } = api.getConfig();
+  const startTime = new Date();
 
   if (!appConfig.docker.useBuildKit) {
     const error = new Error('useBuildKit must be enabled when using prepareBundleLocally');
@@ -116,5 +117,8 @@ export async function prepareBundleLocally(
     `${image}:latest`
   ]);
 
-  console.log('=> Finished preparing bundle');
+  const endTime = new Date();
+  const durationText = `in ${endTime.getTime() - startTime.getTime()}ms`;
+
+  console.log('=> Finished preparing bundle', durationText);
 }
