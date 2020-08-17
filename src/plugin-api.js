@@ -39,7 +39,6 @@ export default class PluginAPI {
     this.validationErrors = [];
 
     this.resolvePath = utils.resolvePath;
-    this.runTaskList = utils.runTaskList;
     this.getDockerLogs = utils.getDockerLogs;
     this.runSSHCommand = utils.runSSHCommand;
     this.forwardPort = utils.forwardPort;
@@ -85,6 +84,17 @@ export default class PluginAPI {
 
       return false;
     }
+  }
+
+  runTaskList(list, sessions, opts = {}) {
+    if (!('verbose' in opts)) {
+      opts.verbose = this.verbose;
+    }
+    if (!('showDuration' in opts)) {
+      opts.showDuration = this.profileTasks;
+    }
+
+    return utils.runTaskList(list, sessions, opts);
   }
 
   validateConfig(configPath, logProblems) {
