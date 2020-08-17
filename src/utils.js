@@ -33,6 +33,14 @@ export function runTaskList(list, sessions, opts) {
     delete opts.verbose;
   }
 
+  if (opts && opts.showDuration) {
+    list._taskQueue.forEach(task => {
+      task.options = task.options || {};
+      task.options.showDuration = true;
+    });
+    delete opts.showDuration;
+  }
+
   return new Promise((resolve, reject) => {
     list.run(sessions, opts, summaryMap => {
       for (const host in summaryMap) {
