@@ -1,4 +1,5 @@
 import {
+  escapeEnvQuotes,
   getImagePrefix,
   getNodeVersion,
   runCommand
@@ -25,9 +26,10 @@ export function createDockerFile(appConfig) {
       image
     } = {}
   } = appConfig;
+  const escapedEnv = escapeEnvQuotes(env);
 
   const syntax = useBuildKit ? '# syntax=docker/dockerfile:1-experimental' : '';
-  const args = Object.entries(env).map(([key, value]) => `ARG ${key}=${value}`).join('\n');
+  const args = Object.entries(escapedEnv).map(([key, value]) => `ARG ${key}="${value}"`).join('\n');
   const copy = useBuildKit ?
     'RUN --mount=type=bind,target=/tmp/__mup-bundle tar -xzf /tmp/__mup-bundle/bundle.tar.gz -C /built_app --strip-components=1' :
     'COPY ./ /built_app';
