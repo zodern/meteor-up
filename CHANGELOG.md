@@ -4,6 +4,7 @@
 - Fix selecting server for `mup ssh` and `mup meteor debug`
 - `mup validate --scrub` will now scrub `proxy` and `privateDockerRegistry`
 - Shows a message when exiting if plugins have updates
+- Add `MUP_PROFILE_TASKS` env var to show how long each task took
 - Fix running Prepare Bundle when env vars have spaces
 - Fix overriding app's port using `app.servers[server name].env.PORT`
 - Add explanation to Published Ports section of `meteor status`'s output
