@@ -35,6 +35,7 @@ export default class PluginAPI {
     this.verbose = program.verbose;
     this.program = program;
     this.commandHistory = [];
+    this.profileTasks = process.env.MUP_PROFILE_TASKS === 'true';
 
     this.validationErrors = [];
 
