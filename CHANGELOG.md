@@ -1,16 +1,26 @@
 ## Next
 
+- Add `mup mongo shell` command to access a Mongo shell on the server
 - Add `app.docker.prepareBundleLocally` option to build docker image locally instead of on the servers. It is then pushed to the private docker registry
+- Add warning when using Node 14.0 - 14.15 that the Node version is not supported
 - Fix selecting server for `mup ssh` and `mup meteor debug`
 - `mup validate --scrub` will now scrub `proxy` and `privateDockerRegistry`
 - Shows a message when exiting if plugins have updates
 - Add `MUP_PROFILE_TASKS` env var to show how long each task took
 - Fix running Prepare Bundle when env vars have spaces
+- Fix error shown when unable to find config file on newer Node versions
 - Fix overriding app's port using `app.servers[server name].env.PORT`
 - Add explanation to Published Ports section of `meteor status`'s output
 - Reduced size of npm package
 - Fix spelling in log in deploy check script
+- Fix `mup deploy --cached-build` only requires the `.tar.gz` file, and not the extracted `bundle` folder. This matches the behavior with mup 1.4.
+- Fix using `app.buildOptions.executable` option on Windows
 - Document `proxy.stickySessions` option
+
+**Plugins**
+
+- The `verbose` option in `runTaskList` defaults to `true` when mup is run with the `--verbose` option
+- Add `showDuration` option to `runTaskList`. When true, nodemiral will log how long each task took. Defaults to `true` when the `MUP_PROFILE_TASKS` env var is set to `true`
 
 ## 1.5.1 - June 2, 2020
 
