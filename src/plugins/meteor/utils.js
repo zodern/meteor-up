@@ -6,6 +6,7 @@ import {
 } from './prepare-bundle.js';
 import random from 'random-seed';
 import { spawn } from 'child_process';
+import tar from 'tar';
 import uuid from 'uuid';
 
 export function checkAppStarted(list, api) {
@@ -88,20 +89,19 @@ export function createServiceConfig(api, tag) {
   };
 }
 
-export function getNodeVersion(api, bundlePath) {
-  let star = fs
-    .readFileSync(api.resolvePath(bundlePath, 'bundle/star.json'))
-    .toString();
-  let nodeVersion = fs
-    .readFileSync(api.resolvePath(bundlePath, 'bundle/.node_version.txt'))
-    .toString()
-    .trim();
+export async function getNodeVersion(bundlePath) {
+  let star = await readFileFromTar(bundlePath, 'bundle/star.json');
+  star = JSON.parse(star || '{}');
 
-  star = JSON.parse(star);
+  // star.json started having nodeVersion in Meteor 1.5.2
+  if (star && star.nodeVersion) {
+    return star.nodeVersion;
+  }
+
+  const nodeVersion = await readFileFromTar(bundlePath, 'bundle/.node_version.txt');
+
   // Remove leading 'v'
-  nodeVersion = nodeVersion.substr(1);
-
-  return star.nodeVersion || nodeVersion;
+  return nodeVersion.trim().substr(1);
 }
 
 export function escapeEnvQuotes(env) {
@@ -233,4 +233,34 @@ export function currentImageTag(serverInfo, appName) {
     .sort((a, b) => b - a);
 
   return result[0] || 0;
+}
+
+export function readFileFromTar(tarPath, filePath) {
+  const data = [];
+  let found = false;
+
+  const onentry = entry => {
+    if (entry.path === filePath) {
+      found = true;
+      entry.on('data', d => data.push(d));
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    tar.t({
+      onentry,
+      file: tarPath
+    }, err => {
+      if (err) {
+        return reject(err);
+      }
+
+      if (!found) {
+        return reject(new Error('file-not-found'));
+      }
+
+      const combined = Buffer.concat(data);
+      resolve(combined.toString('utf-8'));
+    });
+  });
 }

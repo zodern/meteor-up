@@ -162,6 +162,8 @@ export async function push(api) {
       tag = currentImageTag(data, appConfig.name) + 1;
     }
 
+    const nodeVersion = await getNodeVersion(bundlePath);
+
     list.executeScript('Prepare Bundle', {
       script: api.resolvePath(
         __dirname,
@@ -172,7 +174,7 @@ export async function push(api) {
         dockerImage: appConfig.docker.image,
         env: escapeEnvQuotes(appConfig.env),
         buildInstructions: appConfig.docker.buildInstructions || [],
-        nodeVersion: getNodeVersion(api, buildOptions.buildLocation),
+        nodeVersion,
         stopApp: appConfig.docker.stopAppDuringPrepareBundle,
         useBuildKit: appConfig.docker.useBuildKit,
         tag,
