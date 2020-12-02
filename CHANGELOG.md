@@ -1,4 +1,4 @@
-## Next
+## 2.5.2 - December 2, 2020
 
 - Add `mup mongo shell` command to access a Mongo shell on the server
 - Add `app.docker.prepareBundleLocally` option to build docker image locally instead of on the servers. It is then pushed to the private docker registry
@@ -17,7 +17,7 @@
 - Fix using `app.buildOptions.executable` option on Windows
 - Document `proxy.stickySessions` option
 
-**Plugins**
+**Plugin API**
 
 - The `verbose` option in `runTaskList` defaults to `true` when mup is run with the `--verbose` option
 - Add `showDuration` option to `runTaskList`. When true, nodemiral will log how long each task took. Defaults to `true` when the `MUP_PROFILE_TASKS` env var is set to `true`
