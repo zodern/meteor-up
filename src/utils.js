@@ -33,6 +33,14 @@ export function runTaskList(list, sessions, opts) {
     delete opts.verbose;
   }
 
+  if (opts && opts.showDuration) {
+    list._taskQueue.forEach(task => {
+      task.options = task.options || {};
+      task.options.showDuration = true;
+    });
+    delete opts.showDuration;
+  }
+
   return new Promise((resolve, reject) => {
     list.run(sessions, opts, summaryMap => {
       for (const host in summaryMap) {
@@ -278,16 +286,17 @@ export function resolvePath(...paths) {
 }
 
 /**
- * Checks if the module not found is a certain module
+ * Checks if the module not found by `require` is a certain module
  *
- * @param {Error} e - Error that was thwon
+ * @param {Error} e - Error that was thrown
  * @param {String} modulePath - path to the module to compare the error to
  * @returns {Boolean} true if the modulePath and path in the error is the same
  */
 export function moduleNotFoundIsPath(e, modulePath) {
-  const pathPosition = e.message.length - modulePath.length - 1;
+  const message = e.message.split('\n')[0];
+  const pathPosition = message.length - modulePath.length - 1;
 
-  return e.message.indexOf(modulePath) === pathPosition;
+  return message.indexOf(modulePath) === pathPosition;
 }
 
 export function argvContains(argvArray, option) {

@@ -4,16 +4,17 @@ import {
   createEnv,
   createServiceConfig,
   currentImageTag,
+  escapeEnvQuotes,
   getBuildOptions,
   getImagePrefix,
   getNodeVersion,
   getSessions,
-  prepareBundleSupported,
   shouldRebuild
 } from './utils';
 import buildApp, { archiveApp } from './build.js';
 import { checkUrls, createPortInfoLines, displayAvailability, getInformation, withColor } from './status';
 import { map, promisify } from 'bluebird';
+import { prepareBundleLocally, prepareBundleSupported } from './prepare-bundle';
 import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
 
@@ -141,6 +142,10 @@ export async function push(api) {
     await promisify(archiveApp)(buildOptions.buildLocation, api);
   }
 
+  if (appConfig.docker.prepareBundleLocally) {
+    return prepareBundleLocally(buildOptions.buildLocation, api);
+  }
+
   const list = nodemiral.taskList('Pushing Meteor App');
 
   list.copy('Pushing Meteor App Bundle to the Server', {
@@ -157,6 +162,8 @@ export async function push(api) {
       tag = currentImageTag(data, appConfig.name) + 1;
     }
 
+    const nodeVersion = await getNodeVersion(bundlePath);
+
     list.executeScript('Prepare Bundle', {
       script: api.resolvePath(
         __dirname,
@@ -165,9 +172,9 @@ export async function push(api) {
       vars: {
         appName: appConfig.name,
         dockerImage: appConfig.docker.image,
-        env: appConfig.env,
+        env: escapeEnvQuotes(appConfig.env),
         buildInstructions: appConfig.docker.buildInstructions || [],
-        nodeVersion: getNodeVersion(api, buildOptions.buildLocation),
+        nodeVersion,
         stopApp: appConfig.docker.stopAppDuringPrepareBundle,
         useBuildKit: appConfig.docker.useBuildKit,
         tag,
@@ -245,9 +252,14 @@ export function envconfig(api) {
 
   Object.keys(app.servers).forEach(serverName => {
     const host = servers[serverName].host;
+    const vars = {};
     if (app.servers[serverName].bind) {
-      startHostVars[host] = { bind: app.servers[serverName].bind };
+      vars.bind = app.servers[serverName].bind;
     }
+    if (app.servers[serverName].env && app.servers[serverName].env.PORT) {
+      vars.port = app.servers[serverName].env.PORT;
+    }
+    startHostVars[host] = vars;
   });
 
   const list = nodemiral.taskList('Configuring App');
@@ -277,7 +289,13 @@ export function envconfig(api) {
   Object.keys(app.servers).forEach(key => {
     const host = servers[key].host;
     if (app.servers[key].env) {
-      hostVars[host] = { env: app.servers[key].env };
+      hostVars[host] = {
+        env: {
+          ...app.servers[key].env,
+          // We treat the PORT specially and do not pass it to the container
+          PORT: undefined
+        }
+      };
     }
     if (app.servers[key].settings) {
       const settings = JSON.stringify(api.getSettingsFromPath(

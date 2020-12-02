@@ -11,10 +11,41 @@ import yargs from 'yargs';
 
 const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help', 'servers'];
 
+// Prevent yargs from exiting the process before plugins are loaded
+yargs.help(false);
+
+// Load config before creating commands
+const preAPI = new MupAPI(process.cwd(), process.argv, yargs.argv);
+const config = preAPI.getConfig(false);
+let pluginList = [];
+
+// Load plugins
+if (config.plugins instanceof Array) {
+  const appPath = config.app && config.app.path ? config.app.path : '';
+  const absoluteAppPath = preAPI.resolvePath(preAPI.base, appPath);
+
+  pluginList = config.plugins.map(plugin => ({
+    name: plugin,
+    path: locatePluginDir(plugin, preAPI.configPath, absoluteAppPath)
+  }));
+
+  loadPlugins(pluginList);
+}
+
+// Load hooks
+if (config.hooks) {
+  Object.keys(config.hooks).forEach(key => {
+    registerHook(key, config.hooks[key]);
+  });
+}
+
 function commandWrapper(pluginName, commandName) {
   return function() {
     // Runs in parallel with command
-    checkUpdates();
+    checkUpdates([
+      { name: pkg.name, path: require.resolve('../package.json') },
+      ...pluginList
+    ]);
 
     const rawArgv = process.argv.slice(2);
     const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
@@ -45,33 +76,6 @@ function addModuleCommands(builder, module, moduleName) {
       command.builder,
       commandWrapper(moduleName, commandName)
     );
-  });
-}
-
-// Prevent yargs from exiting the process before plugins are loaded
-yargs.help(false);
-
-// Load config before creating commands
-const preAPI = new MupAPI(process.cwd(), process.argv, yargs.argv);
-const config = preAPI.getConfig(false);
-
-// Load plugins
-if (config.plugins instanceof Array) {
-  const appPath = config.app && config.app.path ? config.app.path : '';
-  const absoluteAppPath = preAPI.resolvePath(preAPI.base, appPath);
-
-  loadPlugins(
-    config.plugins.map(plugin => ({
-      name: plugin,
-      path: locatePluginDir(plugin, preAPI.configPath, absoluteAppPath)
-    }))
-  );
-}
-
-// Load hooks
-if (config.hooks) {
-  Object.keys(config.hooks).forEach(key => {
-    registerHook(key, config.hooks[key]);
   });
 }
 

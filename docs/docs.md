@@ -604,7 +604,10 @@ module.exports = {
 
   proxy: {
     domains: 'website.com',
-    loadBalancing: true
+
+    loadBalancing: true,
+    // Use sticky sessions when load balancing (optional, default is true)
+    stickySessions: true
   }
 };
 ```
@@ -1003,7 +1006,7 @@ If you have deployed to the server, it involves a couple more steps.
 
 ## Swarm
 
-Mup can setup and manage a Docker Swarm cluster. This is required for some features, such as load balancing and zero downtime deploys.
+Mup can setup and manage a Docker Swarm cluster.
 
 *This feature is experimental.* There could be backwards breaking changes and a larger number of bugs and problems. At this time, it is not recommended to use in production.
 

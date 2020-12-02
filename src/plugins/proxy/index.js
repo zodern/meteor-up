@@ -11,6 +11,7 @@ export const validate = {
   proxy: validator
 };
 
+// eslint-disable-next-line complexity
 export function prepareConfig(config) {
   if (!config.app || !config.proxy) {
     return config;
@@ -44,6 +45,60 @@ export function prepareConfig(config) {
   }
 
   config.app.env.ROOT_URL = normalizeUrl(config, config.app.env);
+
+  return config;
+}
+
+
+// eslint-disable-next-line complexity
+export function scrubConfig(config, { scrubUrl }) {
+  if (!config.proxy) {
+    return config;
+  }
+
+  function scrubDomains(domains) {
+    return domains.split(',').map(domain =>
+      // We temporarily add a protocol so it can be parsed as a url
+      scrubUrl(`http://${domain.trim()}`).slice(7)
+    ).join(',');
+  }
+
+  if (config.app && config.app.env) {
+    const {
+      LETSENCRYPT_EMAIL,
+      VIRTUAL_HOST,
+      LETSENCRYPT_HOST
+    } = config.app.env;
+
+    if (LETSENCRYPT_EMAIL) {
+      config.app.env.LETSENCRYPT_EMAIL = 'email@domain.com';
+    }
+    if (LETSENCRYPT_HOST) {
+      config.app.env.LETSENCRYPT_HOST = scrubDomains(LETSENCRYPT_HOST);
+    }
+    if (VIRTUAL_HOST) {
+      config.app.env.VIRTUAL_HOST = scrubDomains(VIRTUAL_HOST);
+    }
+  }
+
+  if (config.proxy) {
+    const {
+      shared,
+      ssl,
+      domains
+    } = config.proxy;
+
+    if (ssl && ssl.letsEncryptEmail) {
+      config.proxy.ssl.letsEncryptEmail = 'email@domain.com';
+    }
+    if (domains) {
+      config.proxy.domains = scrubDomains(domains);
+    }
+
+    if (shared && shared.env && shared.env.DEFAULT_HOST) {
+      shared.env.DEFAULT_HOST = scrubDomains(shared.env.DEFAULT_HOST);
+    }
+  }
 
   return config;
 }

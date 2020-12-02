@@ -69,6 +69,34 @@ export function locatePluginDir(name, configPath, appPath) {
   return name;
 }
 
+function registerPlugin(plugin) {
+  if (plugin.module.commands) {
+    Object.keys(plugin.module.commands).forEach(key => {
+      registerCommand(plugin.name, key, plugin.module.commands[key]);
+    });
+  }
+  if (plugin.module.hooks) {
+    Object.keys(plugin.module.hooks).forEach(key => {
+      registerHook(key, plugin.module.hooks[key]);
+    });
+  }
+  if (typeof plugin.module.validate === 'object') {
+    const validators = Object.entries(plugin.module.validate);
+    for (const [property, validator] of validators) {
+      addPluginValidator(property, validator);
+    }
+  }
+  if (plugin.module.prepareConfig) {
+    registerPreparer(plugin.module.prepareConfig);
+  }
+  if (plugin.module.scrubConfig) {
+    registerScrubber(plugin.module.scrubConfig);
+  }
+  if (plugin.module.swarmOptions) {
+    registerSwarmOptions(plugin.module.swarmOptions);
+  }
+}
+
 export function loadPlugins(plugins) {
   plugins
     .map(plugin => {
@@ -96,31 +124,7 @@ export function loadPlugins(plugins) {
     .filter(plugin => !plugin.failed)
     .forEach(plugin => {
       modules[plugin.name] = plugin.module;
-      if (plugin.module.commands) {
-        Object.keys(plugin.module.commands).forEach(key => {
-          registerCommand(plugin.name, key, plugin.module.commands[key]);
-        });
-      }
-      if (plugin.module.hooks) {
-        Object.keys(plugin.module.hooks).forEach(key => {
-          registerHook(key, plugin.module.hooks[key]);
-        });
-      }
-      if (typeof plugin.module.validate === 'object') {
-        const validators = Object.entries(plugin.module.validate);
-        for (const [property, validator] of validators) {
-          addPluginValidator(property, validator);
-        }
-      }
-      if (plugin.module.prepareConfig) {
-        registerPreparer(plugin.module.prepareConfig);
-      }
-      if (plugin.module.scrubConfig) {
-        registerScrubber(plugin.module.scrubConfig);
-      }
-      if (plugin.module.swarmOptions) {
-        registerSwarmOptions(plugin.module.swarmOptions);
-      }
+      registerPlugin(plugin);
     });
 }
 

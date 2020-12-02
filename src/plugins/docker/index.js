@@ -22,3 +22,23 @@ export function swarmOptions(config) {
     };
   }
 }
+
+export function scrubConfig(config) {
+  if (!config.privateDockerRegistry) {
+    return config;
+  }
+
+  const {
+    username,
+    password
+  } = config.privateDockerRegistry;
+
+  if (username) {
+    config.privateDockerRegistry.username = 'username';
+  }
+  if (password) {
+    config.privateDockerRegistry.password = 'password';
+  }
+
+  return config;
+}

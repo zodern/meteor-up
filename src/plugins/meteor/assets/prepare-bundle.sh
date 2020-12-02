@@ -45,7 +45,7 @@ sudo cat <<"EOT" > Dockerfile
 FROM <%= dockerImage %>
 RUN mkdir /built_app || true
 <% for(var key in env) { %>
-ARG <%- key %>=<%- env[key] %>
+ARG <%- key %>="<%- env[key] %>"
 <% } %>
 <% for(var instruction in buildInstructions) { %>
 <%-  buildInstructions[instruction] %>

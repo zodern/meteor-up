@@ -1,4 +1,7 @@
 src
 tests
 node_modules
-.tern-port
+.nyc_output
+coverage
+docs/*
+!docs/*.md

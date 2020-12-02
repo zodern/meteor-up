@@ -1,3 +1,4 @@
+import { Client } from 'ssh2';
 import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
 
@@ -104,6 +105,43 @@ export function stop(api) {
   return api.runTaskList(list, sessions, { verbose: api.verbose });
 }
 
+export function shell(api) {
+  const config = api.getConfig();
+
+  const mongoServer = Object.keys(config.mongo.servers)[0];
+  const server = config.servers[mongoServer];
+  const sshOptions = api._createSSHOptions(server);
+
+  const dbName = config.app.name;
+
+  const conn = new Client();
+  conn.on('ready', () => {
+    conn.exec(`docker exec -it mongodb mongo ${dbName}`, {
+      pty: true
+    }, (err, stream) => {
+      if (err) {
+        throw err;
+      }
+
+      stream.on('close', () => {
+        conn.end();
+        process.exit();
+      });
+
+      process.stdin.setRawMode(true);
+      process.stdin.pipe(stream);
+
+      stream.pipe(process.stdout);
+      stream.stderr.pipe(process.stderr);
+      stream.setWindow(process.stdout.rows, process.stdout.columns);
+
+      process.stdout.on('resize', () => {
+        stream.setWindow(process.stdout.rows, process.stdout.columns);
+      });
+    });
+  }).connect(sshOptions);
+}
+
 export async function status(api) {
   const config = api.getConfig();
 
@@ -156,7 +194,7 @@ export async function status(api) {
 
   const hour = 1000 * 60 * 60;
   const upTime = new Date(dockerStatus.State.FinishedAt).getTime() -
-     new Date(dockerStatus.Created).getTime();
+    new Date(dockerStatus.Created).getTime();
 
   if (restartCount > 0 && upTime / hour <= restartCount) {
     restartCountColor = 'red';
