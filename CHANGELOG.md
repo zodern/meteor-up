@@ -1,3 +1,8 @@
+## 1.5.3 - December 8, 2020
+
+- Fix getting node version when `app.docker.prepareBundleLocally` is enabled
+- Fix issue with let's encrypt regenerating SSL certificate too often
+
 ## 1.5.2 - December 2, 2020
 
 - Add `mup mongo shell` command to access a Mongo shell on the server
