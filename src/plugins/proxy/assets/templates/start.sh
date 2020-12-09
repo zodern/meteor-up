@@ -2,6 +2,8 @@
 
 APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
+NGINX_PROXY_VERSION="0.8.0"
+LETSENCRYPT_COMPANION_VERSION="v1.13.1"
 
 # Shared settings
 source $APP_PATH/config/shared-config.sh
@@ -16,8 +18,8 @@ ENV_FILE_LETSENCRYPT=$APP_PATH/config/env_letsencrypt.list
 
 # We don't need to fail the deployment because of a docker hub downtime
 set +e
-sudo docker pull jrcs/letsencrypt-nginx-proxy-companion:latest
-sudo docker pull jwilder/nginx-proxy
+sudo docker pull jrcs/letsencrypt-nginx-proxy-companion:$LETSENCRYPT_COMPANION_VERSION
+sudo docker pull jwilder/nginx-proxy:$NGINX_PROXY_VERSION
 set -e
 echo "Pulled jwilder/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
 
@@ -58,7 +60,7 @@ sudo docker run \
   -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
   -v /opt/$APPNAME/upstream:/etc/nginx/upstream \
-  jwilder/nginx-proxy
+  jwilder/nginx-proxy:$NGINX_PROXY_VERSION
 echo "Ran nginx-proxy as $APPNAME"
 
 sleep 2s
@@ -76,7 +78,7 @@ sudo docker run \
   --log-opt max-size=100m \
   --log-opt max-file=3 \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
-  jrcs/letsencrypt-nginx-proxy-companion
+  jrcs/letsencrypt-nginx-proxy-companion:$LETSENCRYPT_COMPANION_VERSION
 echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
 
 <% if (swarmEnabled) { %>

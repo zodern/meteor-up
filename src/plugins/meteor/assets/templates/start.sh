@@ -7,8 +7,8 @@ BUNDLE_PATH=$APP_PATH/current
 ENV_FILE=$APP_PATH/config/env.list
 PORT=<%= port %>
 BIND=<%= bind %>
-NGINX_PROXY_VERSION=latest
-LETS_ENCRYPT_VERSION=latest
+NGINX_PROXY_VERSION="0.8.0"
+LETS_ENCRYPT_VERSION="v1.13.1"
 APP_IMAGE=<%- imagePrefix %><%= appName.toLowerCase() %>
 IMAGE=$APP_IMAGE:latest
 VOLUME="--volume=$BUNDLE_PATH:/bundle"
