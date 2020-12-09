@@ -61,7 +61,7 @@ export async function prepareBundleLocally(
     throw error;
   }
 
-  const nodeVersion = getNodeVersion(api, buildLocation);
+  const nodeVersion = await getNodeVersion(api, buildLocation);
   const image = `${getImagePrefix(privateDockerRegistry)}${appConfig.name}`;
   const dockerFile = createDockerFile(appConfig);
   const dockerIgnoreContent = `
