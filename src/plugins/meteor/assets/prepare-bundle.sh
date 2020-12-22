@@ -8,6 +8,12 @@ IMAGE_PREFIX=<%- imagePrefix %>
 IMAGE=$IMAGE_PREFIX'<%= appName.toLowerCase() %>'
 USE_BUILDKIT=<%= useBuildKit ? 1 : 0 %>
 
+<% if (privateRegistry) { %>
+  PRIVATE_REGISTRY_USERNAME='<%= privateRegistry.username %>'
+  PRIVATE_REGISTRY_PASSWORD='<%= privateRegistry.password %>'
+  PRIVATE_REGISTRY_HOST='<%= privateRegistry.host %>'
+<% } %>
+
 build_failed() {
   <% if (stopApp) { %>
   sudo docker start $APPNAME >/dev/null 2>&1 || true
@@ -81,6 +87,8 @@ sudo docker tag $IMAGE:latest $IMAGE:previous || true
 sudo docker tag $IMAGE:build $IMAGE:<%= tag %>
 
 <% if (privateRegistry) { %>
+  echo "Login into private registry"
+  echo $PRIVATE_REGISTRY_PASSWORD | sudo -S docker login --password-stdin --username $PRIVATE_REGISTRY_USERNAME $PRIVATE_REGISTRY_HOST
   echo "Pushing images to private registry"
   # Fails if the previous tag doesn't exist (such as during the initial deploy)
   sudo docker push $IMAGE:previous || true
