@@ -26,7 +26,7 @@ export function prepareConfig(config) {
   }
 
   config.app.docker = defaultsDeep(config.app.docker, {
-    image: config.app.dockerImage || 'kadirahq/meteord',
+    image: config.app.dockerImage || 'zodern/meteor:0.6.1-root',
     stopAppDuringPrepareBundle: true
   });
 
