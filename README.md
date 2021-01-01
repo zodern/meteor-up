@@ -1,4 +1,4 @@
-# Meteor Up [![Travis branch](https://img.shields.io/travis/zodern/meteor-up/master.svg?style=flat-square)](https://travis-ci.org/zodern/meteor-up/) [![Code Climate](https://img.shields.io/codeclimate/github/zodern/meteor-up.svg?style=flat-square)](https://codeclimate.com/github/zodern/meteor-up) [![Gitter](https://img.shields.io/gitter/room/meteor-up/Lobby.svg?style=flat-square)](https://gitter.im/meteor-up/Lobby) [![Backers on Open Collective](https://opencollective.com/meteor-up/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/meteor-up/sponsors/badge.svg)](#sponsors)
+# Meteor Up [![Travis branch](https://img.shields.io/travis/zodern/meteor-up/master.svg?style=flat-square)](https://travis-ci.org/zodern/meteor-up/) [![Gitter](https://img.shields.io/gitter/room/meteor-up/Lobby.svg?style=flat-square)](https://gitter.im/meteor-up/Lobby) [![Backers on Open Collective](https://opencollective.com/meteor-up/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/meteor-up/sponsors/badge.svg)](#sponsors)
 
 #### Production Quality Meteor Deployments
 
@@ -14,7 +14,7 @@ Read the [getting started tutorial](http://meteor-up.com/getting-started.html).
 
 * Single command server setup
 * Single command deployment
-* Deploy to multiple servers
+* Deploy to multiple servers, with optional load balancing and sticky sessions
 * Environment Variable management
 * Support for [`settings.json`](http://docs.meteor.com/#meteor_settings)
 * Password or Private Key (pem) based server authentication
@@ -30,11 +30,10 @@ Read the [getting started tutorial](http://meteor-up.com/getting-started.html).
 * Auto-start after server reboot
 * Runs with docker for better security and isolation
 * Reverts to the previous version if the deployment failed
-* Pre-installed PhantomJS
 
 ### Installation
 
-Meteor Up requires Node v4 or newer. It runs on Windows, Mac, and Windows.
+Meteor Up requires Node v8 or newer. It runs on Windows, Mac, and Linux.
 
 ```bash
 npm install -g mup
@@ -56,6 +55,7 @@ To use Meteor 1.4 and newer, you will need to change the docker image. A list of
 First, look at the [troubleshooting](http://meteor-up.com/docs.html#troubleshooting) and [common problems](http://meteor-up.com/docs.html#common-problems) sections of the docs. You can also search the [github issues](https://github.com/zodern/meteor-up/issues).
 
 If that doesn't solve the problem, you can:
+
 - [Create a Github issue](https://github.com/zodern/meteor-up/issues/new)
 - [Chat on Gitter](https://gitter.im/meteor-up/Lobby)
 
@@ -86,5 +86,3 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/meteor-up/sponsor/7/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/7/avatar.svg"></a>
 <a href="https://opencollective.com/meteor-up/sponsor/8/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/meteor-up/sponsor/9/website" target="_blank"><img src="https://opencollective.com/meteor-up/sponsor/9/avatar.svg"></a>
-
-
