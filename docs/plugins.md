@@ -7,11 +7,14 @@ title: 'Plugins'
   - [mup-aws-beanstalk](https://github.com/zodern/mup-aws-beanstalk) Deploy using AWS Elastic Beanstalk. Supports load balancing, auto scaling, and rolling deploys
   - [mup-node](https://github.com/zodern/mup-node) Deploy node apps with Meteor Up
   - [mup-docker-deploy](https://github.com/zodern/mup-docker-deploy) Use a custom Dockerfile to deploy any type of app
+  - [mup-deploy-notifications](https://www.npmjs.com/package/mup-deploy-notifications) Receive slack notifications when a deploy succeeds or fails
   - [mup-cloud-front](https://github.com/zodern/mup-cloud-front) Setup and use CloudFlare, with support for rolling deploys
   - [mup-disk](https://www.npmjs.com/package/mup-disk) Shows disk usage and cleans up old files and docker items
   - [mup-redis](https://www.npmjs.com/package/mup-redis) Set up and manage Redis
-  - [mup-fix-bin-paths](https://www.npmjs.com/package/mup-fix-bin-paths) Fix npm bin paths that break deploying from Windows
-  
+  - [mup-netdata](https://www.npmjs.com/package/mup-netdata) Setup Netdata to monitor your servers
+  - [mup-fix-bin-paths](https://www.npmjs.com/package/mup-fix-bin-paths) Fix npm bin paths that break deploying from Windows when using Meteor 1.5.
+  - [mup-server-security](https://www.npmjs.com/package/mup-server-security) Helps secure your server
+
   If you have created a plugin, create a pull request to add it to this list. 
   
   Meteor Up comes with some built-in plugins. These include:
