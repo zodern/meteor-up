@@ -20,6 +20,7 @@ module.exports = {
     },
 
     buildOptions: {
+      // Set to true to skip building mobile apps
       serverOnly: true,
     },
 
@@ -30,10 +31,6 @@ module.exports = {
       MONGO_URL: 'mongodb://mongodb/meteor',
       MONGO_OPLOG_URL: 'mongodb://mongodb/local',
     },
-
-    // Show progress bar while uploading bundle to server
-    // You might need to disable it on CI servers
-    enableUploadProgressBar: true
   },
 
   mongo: {

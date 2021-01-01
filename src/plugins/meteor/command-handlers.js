@@ -151,7 +151,7 @@ export async function push(api) {
   list.copy('Pushing Meteor App Bundle to the Server', {
     src: bundlePath,
     dest: `/opt/${appConfig.name}/tmp/bundle.tar.gz`,
-    progressBar: appConfig.enableUploadProgressBar
+    progressBar: true
   });
 
   if (prepareBundleSupported(appConfig.docker)) {

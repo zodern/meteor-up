@@ -461,7 +461,7 @@ Big thanks to @shaiamir for his work on the shared proxy.
 - Change mongo version
 - Validates `mup.js` and displays problems found in it
 - Update message is clearer and more colorful
-- `uploadProgressBar` is part of default `mup.js`
+- `enableUploadProgressBar` is part of default `mup.js`
 - Add trailing commas to mup.js (@ffxsam)
 - Improve message when settings.json is not found or is invalid
 - Loads and parses settings.json before building the app

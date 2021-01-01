@@ -150,5 +150,13 @@ export default function(
     );
   }
 
+  if (config.app.enableUploadProgressBar) {
+    details = addDepreciation(
+      details,
+      'enableUploadProgressBar',
+      'This option is no longer used.'
+    );
+  }
+
   return addLocation(details, config.meteor ? 'meteor' : 'app');
 }

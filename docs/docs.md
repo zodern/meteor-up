@@ -239,8 +239,7 @@ module.exports = {
     deployCheckPort: 80,
 
     // Shows progress bar while uploading bundle to server
-    // You might need to disable it on CI servers
-    // (optional, default is false)
+    // Since Meteor Up 1.6, this option does nothing, and is always true.
     enableUploadProgressBar: true
   },
 
