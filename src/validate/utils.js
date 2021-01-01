@@ -66,10 +66,12 @@ export function serversExist(serversConfig = {}, serversUsed = {}) {
 }
 
 export function addDepreciation(details, path, reason, link) {
+  const learnMore = link ? `\n Learn more at ${link}` : '';
+
   details.push({
     type: 'depreciation',
     path,
-    message: `${reason}\n  Learn more at ${link}`
+    message: `${reason}${learnMore}`
   });
 
   return details;
