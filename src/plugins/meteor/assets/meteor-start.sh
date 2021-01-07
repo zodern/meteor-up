@@ -6,6 +6,17 @@ APP_DIR=/opt/<%=appName %>
 IMAGE=mup-<%= appName.toLowerCase() %>
 PRIVATE_REGISTRY=<%- privateRegistry ? 0 : 1 %>
 
+<% if (privateRegistry) { %>
+  PRIVATE_REGISTRY_USERNAME='<%= privateRegistry.username %>'
+  PRIVATE_REGISTRY_PASSWORD='<%= privateRegistry.password %>'
+  PRIVATE_REGISTRY_HOST='<%= privateRegistry.host %>'
+<% } %>
+
+<% if (privateRegistry) { %>
+  echo "Login into private registry"
+  echo $PRIVATE_REGISTRY_PASSWORD | sudo -S docker login --password-stdin --username $PRIVATE_REGISTRY_USERNAME $PRIVATE_REGISTRY_HOST
+<% } %>
+
 <% if (removeImage) { %>
 echo "Removing images"
 # Run when the docker image doesn't support prepare-bundle.sh.
