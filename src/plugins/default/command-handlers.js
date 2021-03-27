@@ -151,7 +151,7 @@ function statusColor(
 }
 
 export async function status(api) {
-  const servers = Object.values(api.getConfig().servers);
+  const servers = Object.values(api.getConfig().servers || {});
   const lines = [];
   let overallColor = 'green';
   const command = 'lsb_release -r -s || echo "false"; lsb_release -is; apt-get -v &> /dev/null && echo "true" || echo "false"; echo $BASH';
