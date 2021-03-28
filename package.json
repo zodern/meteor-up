@@ -80,6 +80,7 @@
     "parse-json": "^5.0.0",
     "random-seed": "0.3.0",
     "resolve-from": "^5.0.0",
+    "rimraf": "^3.0.2",
     "shell-escape": "^0.2.0",
     "shelljs": "0.5.3",
     "ssh2": "^0.8.9",

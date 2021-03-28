@@ -1,5 +1,6 @@
 import debug from 'debug';
 import fs from 'fs';
+import rimraf from 'rimraf';
 import { spawn } from 'child_process';
 import tar from 'tar';
 
@@ -95,8 +96,8 @@ function buildMeteorApp(appPath, buildOptions, callback) {
   if (isWin) {
     // Sometimes cmd.exe is not available in the path
     // See: http://goo.gl/ADmzoD
-    executable = process.env.comspec || 'cmd.exe';
     args = ['/c', executable].concat(args);
+    executable = process.env.comspec || 'cmd.exe';
   }
 
   const options = {
@@ -141,5 +142,19 @@ export function archiveApp(buildLocation, api, cb) {
     }
 
     cb(err);
+  });
+}
+
+export function cleanBuildDir(buildLocation) {
+  return new Promise((resolve, reject) => {
+    rimraf(buildLocation, {
+      glob: false
+    }, err => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve();
+    });
   });
 }

@@ -5,13 +5,12 @@ import {
   createServiceConfig,
   currentImageTag,
   escapeEnvQuotes,
-  getBuildOptions,
   getImagePrefix,
   getNodeVersion,
   getSessions,
   shouldRebuild
 } from './utils';
-import buildApp, { archiveApp } from './build.js';
+import buildApp, { archiveApp, cleanBuildDir } from './build.js';
 import { checkUrls, createPortInfoLines, displayAvailability, getInformation, withColor } from './status';
 import { map, promisify } from 'bluebird';
 import { prepareBundleLocally, prepareBundleSupported } from './prepare-bundle';
@@ -103,7 +102,7 @@ export function setup(api) {
 export async function build(api) {
   const config = api.getConfig().app;
   const appPath = api.resolvePath(api.getBasePath(), config.path);
-  const buildOptions = getBuildOptions(api);
+  const buildOptions = config.buildOptions;
 
   const rebuild = shouldRebuild(api);
 
@@ -115,6 +114,10 @@ export async function build(api) {
   }
 
   if (rebuild) {
+    if (buildOptions.cleanBuildLocation === true) {
+      console.log('Preparing to Build App');
+      await cleanBuildDir(buildOptions.buildLocation);
+    }
     console.log('Building App Bundle Locally');
     await buildApp(appPath, buildOptions, api.getVerbose(), api);
   }
@@ -134,7 +137,7 @@ export async function push(api) {
     process.exit(1);
   }
 
-  const buildOptions = getBuildOptions(api);
+  const buildOptions = appConfig.buildOptions;
 
   const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
