@@ -19,7 +19,7 @@ const schema = joi.object().keys({
   servers: joi.object(),
   loadBalancing: joi.bool(),
   stickySessions: joi.bool(),
-	loadBalanceStrategy: joi.string(),
+  loadBalanceStrategy: joi.string(),
   shared: joi.object().keys({
     clientUploadLimit: joi.alternatives().try(joi.number(), joi.string()),
     httpPort: joi.number(),

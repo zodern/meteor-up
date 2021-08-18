@@ -606,8 +606,8 @@ module.exports = {
     domains: 'website.com',
 
     loadBalancing: true,
-    // Use sticky sessions when load balancing (optional, default is true)
-    stickySessions: true,
+		// Use sticky sessions when load balancing (optional, default is true)
+		stickySessions: true,
 		// Configure the strategy used for load balancing (optional, default is 'ip_hash')
 		loadBalanceStrategy: 'least_conn'
   }
