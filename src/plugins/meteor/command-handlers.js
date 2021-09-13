@@ -115,7 +115,7 @@ export async function build(api) {
 
   if (rebuild) {
     if (buildOptions.cleanBuildLocation === true) {
-      console.log('Preparing to Build App');
+      console.log('Cleaning Up Previous Builds');
       await cleanBuildDir(buildOptions.buildLocation);
     }
     console.log('Building App Bundle Locally');
