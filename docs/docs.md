@@ -477,10 +477,10 @@ Any files stored in `/images` by the app inside the docker container will persis
 
 ### Private Docker Registry
 
-Mup uploads the app's bundle and builds a docker image (when prepare bundle is enabled) on each server, which is slow when there are many servers. When using a private docker registry, it is much faster:
+Normally, mup uploads the app's bundle and builds a docker image (when prepare bundle is enabled) on each server, which is slow when there are many servers. When using a private docker registry, it is much faster:
 
 1. Mup uploads the bundle to a single server, and builds the image there.
-2. The image is stored in the private registry
+2. The image is pushed to the private registry
 3. On the other servers, mup will use the image from the private registry
 
 To use a private registry, add the `dockerPrivateRegistry` option to your config:
