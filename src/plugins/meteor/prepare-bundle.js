@@ -67,13 +67,13 @@ export async function prepareBundleLocally(
   const image = `${getImagePrefix(privateDockerRegistry)}${appConfig.name}`;
   const dockerFile = createDockerFile(appConfig);
   const dockerIgnoreContent = `
-  *
-  !bundle.tar.gz
-  `;
+*
+!bundle.tar.gz
+`;
 
   console.log('=> Writing Dockerfile');
   fs.writeFileSync(api.resolvePath(buildLocation, 'Dockerfile'), dockerFile);
-  fs.writeFileSync(api.resolvePath(buildLocation, 'dockerignore'), dockerIgnoreContent);
+  fs.writeFileSync(api.resolvePath(buildLocation, '.dockerignore'), dockerIgnoreContent);
 
   console.log('');
   console.log('=> Updating base image');
