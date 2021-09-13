@@ -28,7 +28,7 @@ export function prepareConfig(config) {
     return;
   }
 
-  config.privateDockerRegistry.host = config.privateDockerRegistry.host || 'docker.io';
+  config.privateDockerRegistry.host = config.privateDockerRegistry.host || 'registry-1.docker.io';
 
   return config;
 }
