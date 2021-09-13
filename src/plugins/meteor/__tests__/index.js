@@ -254,13 +254,16 @@ describe('module - meteor', function() {
       expect(out.output).to.have.entriesCount('Prepare Bundle: SUCCESS', 1);
     });
 
-    it('should allow overriding PORT on specific servers', async () => {
+    it.only('should allow overriding PORT on specific servers', async () => {
       sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
 
       sh.exec('mup --config mup.override-port.js setup');
       const out = sh.exec('mup meteor deploy --config mup.override-port.js --cached-build');
 
       await checkDeploy(out, '<title>helloapp-new</title>', 4000);
+
+      sh.exec('mup docker ps');
+      sh.exec('mup logs');
 
       const status = sh.exec('mup --config mup.override-port.js meteor status');
       expect(status.output).to.have.entriesCount('- 3000/tcp => 4000', 1);
