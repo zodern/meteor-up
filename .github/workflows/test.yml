@@ -1,0 +1,39 @@
+name: Test
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+       include:
+         - nodeVersion: 8.x
+           testPlugins: "meteor"
+           testOptions: "--non-root"
+         - nodeVersion: 8.x
+           testPlugins: "docker,mongo,proxy,default"
+           testOptions: "--non-root"
+         - nodeVersion: 14.x
+           testPlugins: "meteor"
+           testOptions: ""
+         - nodeVersion: 14.x
+           testPlugins: "docker,mongo,proxy,default"
+           testOptions: ""
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.nodeVersion }}
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run tests
+        env:
+          TEST_PLUGINS: ${{ matrix.testPlugins }}
+          TEST_OPTIONS: ${{ matrix.testOptions }}
+        run: |
+          npm run test -- --plugins="$TEST_PLUGINS" $TEST_OPTIONS
