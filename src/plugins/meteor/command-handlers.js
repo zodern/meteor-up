@@ -123,10 +123,8 @@ export async function build(api) {
   }
 }
 
-export async function push(api) {
-  log('exec => mup meteor push');
-
-  await api.runCommand('meteor.build');
+export async function prepareBundle(api) {
+  log('exec => mup meteor prepare-bundle');
   const {
     app: appConfig,
     privateDockerRegistry
@@ -137,27 +135,19 @@ export async function push(api) {
     process.exit(1);
   }
 
-  const buildOptions = appConfig.buildOptions;
+  if (!prepareBundleSupported(appConfig.docker)) {
+    return;
+  }
 
+  const buildOptions = appConfig.buildOptions;
   const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
-  if (shouldRebuild(api)) {
-    await promisify(archiveApp)(buildOptions.buildLocation, api);
-  }
-
   if (appConfig.docker.prepareBundleLocally) {
-    return prepareBundleLocally(buildOptions.buildLocation, api);
+    return prepareBundleLocally(buildOptions.buildLocation, bundlePath, api);
   }
 
-  const list = nodemiral.taskList('Pushing Meteor App');
+  const list = nodemiral.taskList('Prepare App Bundle');
 
-  list.copy('Pushing Meteor App Bundle to the Server', {
-    src: bundlePath,
-    dest: `/opt/${appConfig.name}/tmp/bundle.tar.gz`,
-    progressBar: appConfig.enableUploadProgressBar
-  });
-
-  if (prepareBundleSupported(appConfig.docker)) {
     let tag = 'latest';
 
     if (api.swarmEnabled()) {
@@ -186,9 +176,53 @@ export async function push(api) {
       }
     });
 
-    // After running Prepare Bundle, the list of images is out of date
+  // After running Prepare Bundle, the list of images will be out of date
     api.serverInfoStale();
+
+  let sessions = api.getSessions(['app']);
+  if (privateDockerRegistry) {
+    sessions = sessions.slice(0, 1);
   }
+
+  return api.runTaskList(list, sessions, {
+    series: true,
+    verbose: api.verbose
+  });
+}
+
+export async function push(api) {
+  log('exec => mup meteor push');
+
+  await api.runCommand('meteor.build');
+  const {
+    app: appConfig,
+    privateDockerRegistry
+  } = api.getConfig();
+
+  if (!appConfig) {
+    console.error('error: no configs found for meteor');
+    process.exit(1);
+  }
+
+  const buildOptions = appConfig.buildOptions;
+
+  const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+
+  if (shouldRebuild(api)) {
+    await promisify(archiveApp)(buildOptions.buildLocation, api);
+  }
+
+  if (appConfig.docker.prepareBundleLocally) {
+    return api.runCommand('meteor.prepareBundle');
+  }
+
+  const list = nodemiral.taskList('Pushing Meteor App');
+
+  list.copy('Pushing Meteor App Bundle to the Server', {
+    src: bundlePath,
+    dest: `/opt/${appConfig.name}/tmp/bundle.tar.gz`,
+    progressBar: appConfig.enableUploadProgressBar
+  });
 
   let sessions = api.getSessions(['app']);
 
@@ -199,10 +233,12 @@ export async function push(api) {
     sessions = sessions.slice(0, 1);
   }
 
-  return api.runTaskList(list, sessions, {
+  await api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
   });
+
+  return api.runCommand('meteor.prepareBundle');
 }
 
 export function envconfig(api) {
