@@ -148,36 +148,36 @@ export async function prepareBundle(api) {
 
   const list = nodemiral.taskList('Prepare App Bundle');
 
-    let tag = 'latest';
+  let tag = 'latest';
 
-    if (api.swarmEnabled()) {
-      const data = await api.getServerInfo();
-      tag = currentImageTag(data, appConfig.name) + 1;
+  if (api.swarmEnabled()) {
+    const data = await api.getServerInfo();
+    tag = currentImageTag(data, appConfig.name) + 1;
+  }
+
+  const nodeVersion = await getNodeVersion(bundlePath);
+
+  list.executeScript('Prepare Bundle', {
+    script: api.resolvePath(
+      __dirname,
+      'assets/prepare-bundle.sh'
+    ),
+    vars: {
+      appName: appConfig.name,
+      dockerImage: appConfig.docker.image,
+      env: escapeEnvQuotes(appConfig.env),
+      buildInstructions: appConfig.docker.buildInstructions || [],
+      nodeVersion,
+      stopApp: appConfig.docker.stopAppDuringPrepareBundle,
+      useBuildKit: appConfig.docker.useBuildKit,
+      tag,
+      privateRegistry: privateDockerRegistry,
+      imagePrefix: getImagePrefix(privateDockerRegistry)
     }
-
-    const nodeVersion = await getNodeVersion(bundlePath);
-
-    list.executeScript('Prepare Bundle', {
-      script: api.resolvePath(
-        __dirname,
-        'assets/prepare-bundle.sh'
-      ),
-      vars: {
-        appName: appConfig.name,
-        dockerImage: appConfig.docker.image,
-        env: escapeEnvQuotes(appConfig.env),
-        buildInstructions: appConfig.docker.buildInstructions || [],
-        nodeVersion,
-        stopApp: appConfig.docker.stopAppDuringPrepareBundle,
-        useBuildKit: appConfig.docker.useBuildKit,
-        tag,
-        privateRegistry: privateDockerRegistry,
-        imagePrefix: getImagePrefix(privateDockerRegistry)
-      }
-    });
+  });
 
   // After running Prepare Bundle, the list of images will be out of date
-    api.serverInfoStale();
+  api.serverInfoStale();
 
   let sessions = api.getSessions(['app']);
   if (privateDockerRegistry) {
