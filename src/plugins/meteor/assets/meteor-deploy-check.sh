@@ -107,6 +107,8 @@ while [[ true ]]; do
   curl \
     --max-time 25 \
     --insecure \
+    --silent \
+    --show-error \
     $DEPLOY_CHECK_URL \
     && exit 0
 done
