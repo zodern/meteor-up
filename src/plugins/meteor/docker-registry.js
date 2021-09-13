@@ -195,12 +195,4 @@ export async function renameTag({
     },
     data: manifest
   });
-
-  await retryWithAuth(registryConfig, {
-    url: `/v2/${image}/manifests/${newTag}`,
-    method: 'GET',
-    headers: {
-      accept: 'application/vnd.docker.distribution.manifest.v2+json',
-    }
-  });
 }
