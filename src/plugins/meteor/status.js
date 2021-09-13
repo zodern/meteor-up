@@ -130,7 +130,7 @@ export async function checkUrls(server, appConfig, api) {
     local
   ] = await Promise.all([
     api.runSSHCommand(server, `curl ${getCheckAddress(server, appConfig)}:${port}`),
-    api.runSSHCommand(server, `docker exec ${appConfig.name} curl http://localhost:${appConfig.docker.imagePort}`),
+    api.runSSHCommand(server, `sudo docker exec ${appConfig.name} curl http://localhost:${appConfig.docker.imagePort}`),
     checkUrlLocally(server, appConfig, port)
   ]);
   const inDockerResult = inDocker.code === 0;
