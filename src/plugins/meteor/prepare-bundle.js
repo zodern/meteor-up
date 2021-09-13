@@ -97,7 +97,9 @@ export async function prepareBundleLocally(
   console.log('');
   console.log('=> Updating tags');
 
-  // Pull latest image so we can tag as previous
+  // Rename previous tag to latest
+  // If we can't use the registry api, we pull the latest image, tag it
+  // locally, and then push it
   if (useRegistryApi) {
     await renameTag({
       registryConfig: privateDockerRegistry,
