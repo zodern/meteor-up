@@ -266,6 +266,9 @@ describe('module - meteor', function() {
       sh.exec('mup logs');
 
       const status = sh.exec('mup --config mup.override-port.js meteor status');
+      sh.exec('mup docker ps');
+      sh.exec('mup logs');
+
       expect(status.output).to.have.entriesCount('- 3000/tcp => 4000', 1);
       expect(status.output).to.have.entriesCount(`App running at http://${serverInfo.host}:4000`, 1);
       expect(status.output).to.have.entriesCount('Available in app\'s docker container: true', 1);
