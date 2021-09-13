@@ -2,7 +2,7 @@ import axios from 'axios';
 import chalk from 'chalk';
 
 export function getInformation(server, appName, api) {
-  return api.runSSHCommand(server, `docker inspect ${appName} --format "{{json .}}"`)
+  return api.runSSHCommand(server, `sudo docker inspect ${appName} --format "{{json .}}"`)
     // eslint-disable-next-line complexity
     .then(({ host, output }) => {
       console.log(appName);
