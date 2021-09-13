@@ -490,15 +490,20 @@ module.exports = {
   // ... rest of config
 
   privateDockerRegistry: {
-    host: 'registry.domain.com',
     username: 'username',
     password: 'password',
 
+    // (optional) Hostname of registry. If not provided, defaults to the
+    // docker hub registry
+    host: 'registry.domain.com',
+
     // (optional) The image name will start with this value.
-    imagePrefix: 'image-name-prefix-'
+    imagePrefix: 'image-name-prefix-',
   }
 };
 ```
+
+The image name is `mup-${app name}`. When an image prefix is supplied, the image is named `${imagePrefix}/mup-${app name}`.
 
 Some registries, such as Gitlab's or Google Cloud's, require image names to start with a certain string. For example, the prefix for Google Cloud would be `eu.gcr.io/<project id>`, and for GitLab it would be `registry.gitlab.com/<group name>/<project name>`.
 
