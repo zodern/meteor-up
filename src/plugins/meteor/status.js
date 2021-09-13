@@ -5,6 +5,8 @@ export function getInformation(server, appName, api) {
   return api.runSSHCommand(server, `docker inspect ${appName} --format "{{json .}}"`)
     // eslint-disable-next-line complexity
     .then(({ host, output }) => {
+      console.log(appName);
+      console.dir(output);
       let info;
       const stoppedResult = {
         statusColor: 'red',
