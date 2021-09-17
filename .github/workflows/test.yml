@@ -19,6 +19,23 @@ jobs:
       - name: Lint
         run: npm run lint
 
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.nodeVersion }}
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Unit Tests
+        run: npm run test:unit
+
   test:
     runs-on: ubuntu-latest
     strategy:
