@@ -498,7 +498,7 @@ module.exports = {
     host: 'registry.domain.com',
 
     // (optional) The image name will start with this value.
-    imagePrefix: 'image-name-prefix-',
+    imagePrefix: 'image-name-prefix-'
   }
 };
 ```
