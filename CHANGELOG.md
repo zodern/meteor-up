@@ -7,7 +7,6 @@
 - Fix `mup status` when the config does not have a servers object
 - Reduced unnecessary output in the deploy check script
 - Mup now sets `config.app.buildOptions.buildLocation` to the default value while preparing the mup config, making the build location available to other plugins and hooks. You can also see the build location by running `mup validate --show`
-
 - Fix `mup meteor status` when mup uses a non-root user on the server
 
 **Prepare Bundle Locally**
