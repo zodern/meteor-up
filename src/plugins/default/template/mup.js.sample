@@ -6,10 +6,8 @@ module.exports = {
       username: 'root',
 
       // TODO: Choose one of these authentication methods
-      // - To use a private SSH key, set the `pem` option to the
-      //   path to the key.
-      // - For a password, set the `password` option
-      //   to the user's password.
+      // - To use a private SSH key, set the `pem` option to the path to the key
+      // - For a password, set the `password` option to the user's password
       // - If neither `pem` or `password` are set, the ssh-agent is used
       //   for authentication.
       //
@@ -38,6 +36,7 @@ module.exports = {
       // protocol (https:// or http://) and, if you've changed it
       // from the default, the port.
       ROOT_URL: 'http://app.com',
+
       MONGO_URL: 'mongodb://mongodb/meteor',
       MONGO_OPLOG_URL: 'mongodb://mongodb/local',
     },
