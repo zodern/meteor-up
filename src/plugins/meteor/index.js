@@ -1,6 +1,7 @@
 import * as _commands from './commands';
 import _validator from './validate';
 import { defaultsDeep } from 'lodash';
+import { tmpBuildPath } from './utils';
 import traverse from 'traverse';
 
 export const description = 'Deploy and manage meteor apps';
@@ -20,7 +21,7 @@ export const validate = {
   }
 };
 
-export function prepareConfig(config) {
+export function prepareConfig(config, api) {
   if (!config.app || config.app.type !== 'meteor') {
     return config;
   }
@@ -38,6 +39,15 @@ export function prepareConfig(config) {
   // and meteorhacks/meteord, but they allow the PORT env
   // variable to override it.
   config.app.docker.imagePort = config.app.docker.imagePort || 3000;
+
+  const appPath = api.resolvePath(api.getBasePath(), config.app.path || '');
+
+  config.app.buildOptions = config.app.buildOptions || {};
+
+  if (config.app.buildOptions.buildLocation === undefined) {
+    config.app.buildOptions.buildLocation = tmpBuildPath(appPath, api);
+    config.app.buildOptions.cleanBuildLocation = true;
+  }
 
   return config;
 }

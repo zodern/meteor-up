@@ -1,3 +1,4 @@
+import { checkCompatible, renameTag } from './docker-registry';
 import {
   escapeEnvQuotes,
   getImagePrefix,
@@ -47,7 +48,7 @@ export function createDockerFile(appConfig) {
 }
 
 export async function prepareBundleLocally(
-  buildLocation, api
+  buildLocation, bundlePath, api
 ) {
   const {
     app: appConfig,
@@ -61,18 +62,18 @@ export async function prepareBundleLocally(
     throw error;
   }
 
-  const bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
+  const useRegistryApi = await checkCompatible(privateDockerRegistry);
   const nodeVersion = await getNodeVersion(bundlePath);
   const image = `${getImagePrefix(privateDockerRegistry)}${appConfig.name}`;
   const dockerFile = createDockerFile(appConfig);
   const dockerIgnoreContent = `
-  *
-  !bundle.tar.gz
-  `;
+*
+!bundle.tar.gz
+`;
 
   console.log('=> Writing Dockerfile');
   fs.writeFileSync(api.resolvePath(buildLocation, 'Dockerfile'), dockerFile);
-  fs.writeFileSync(api.resolvePath(buildLocation, 'dockerignore'), dockerIgnoreContent);
+  fs.writeFileSync(api.resolvePath(buildLocation, '.dockerignore'), dockerIgnoreContent);
 
   console.log('');
   console.log('=> Updating base image');
@@ -96,27 +97,48 @@ export async function prepareBundleLocally(
   console.log('');
   console.log('=> Updating tags');
 
-  // Pull latest image so we can tag is as previous
-  // TODO: use docker registry api instead
-  await runCommand('docker', ['pull', `${image}:latest`]);
-  await runCommand('docker', [
-    'tag',
-    `${image}:latest`,
-    `${image}:previous`
-  ]);
-  await runCommand('docker', [
-    'tag',
-    `${image}:build`,
-    `${image}:latest`
-  ]);
-  await runCommand('docker', [
-    'push',
-    `${image}:previous`
-  ]);
-  await runCommand('docker', [
-    'push',
-    `${image}:latest`
-  ]);
+  // Rename previous tag to latest
+  // If we can't use the registry api, we pull the latest image, tag it
+  // locally, and then push it
+  if (useRegistryApi) {
+    await renameTag({
+      registryConfig: privateDockerRegistry,
+      image,
+      oldTag: 'latest',
+      newTag: 'previous',
+      ignoreIfMissing: true
+    });
+    await runCommand('docker', [
+      'tag',
+      `${image}:build`,
+      `${image}:latest`
+    ]);
+    await runCommand('docker', [
+      'push',
+      `${image}:latest`
+    ]);
+  } else {
+    console.log('Not able to use the api provided by this docker registry. Falling back to the slower method to rename tags.');
+    await runCommand('docker', ['pull', `${image}:latest`]);
+    await runCommand('docker', [
+      'tag',
+      `${image}:latest`,
+      `${image}:previous`
+    ]);
+    await runCommand('docker', [
+      'tag',
+      `${image}:build`,
+      `${image}:latest`
+    ]);
+    await runCommand('docker', [
+      'push',
+      `${image}:previous`
+    ]);
+    await runCommand('docker', [
+      'push',
+      `${image}:latest`
+    ]);
+  }
 
   const endTime = new Date();
   const durationText = `in ${endTime.getTime() - startTime.getTime()}ms`;

@@ -477,10 +477,10 @@ Any files stored in `/images` by the app inside the docker container will persis
 
 ### Private Docker Registry
 
-Mup uploads the app's bundle and builds a docker image (when prepare bundle is enabled) on each server, which is slow when there are many servers. When using a private docker registry, it is much faster:
+Normally, mup uploads the app's bundle and builds a docker image (when prepare bundle is enabled) on each server, which is slow when there are many servers. When using a private docker registry, it is much faster:
 
 1. Mup uploads the bundle to a single server, and builds the image there.
-2. The image is stored in the private registry
+2. The image is pushed to the private registry
 3. On the other servers, mup will use the image from the private registry
 
 To use a private registry, add the `dockerPrivateRegistry` option to your config:
@@ -490,15 +490,20 @@ module.exports = {
   // ... rest of config
 
   privateDockerRegistry: {
-    host: 'registry.domain.com',
     username: 'username',
     password: 'password',
+
+    // (optional) Hostname of registry. If not provided, defaults to the
+    // docker hub registry
+    host: 'registry.domain.com',
 
     // (optional) The image name will start with this value.
     imagePrefix: 'image-name-prefix-'
   }
 };
 ```
+
+The image name is `mup-${app name}`. When an image prefix is supplied, the image is named `${imagePrefix}/mup-${app name}`.
 
 Some registries, such as Gitlab's or Google Cloud's, require image names to start with a certain string. For example, the prefix for Google Cloud would be `eu.gcr.io/<project id>`, and for GitLab it would be `registry.gitlab.com/<group name>/<project name>`.
 

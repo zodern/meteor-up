@@ -2,7 +2,7 @@ import axios from 'axios';
 import chalk from 'chalk';
 
 export function getInformation(server, appName, api) {
-  return api.runSSHCommand(server, `docker inspect ${appName} --format "{{json .}}"`)
+  return api.runSSHCommand(server, `sudo docker inspect ${appName} --format "{{json .}}"`)
     // eslint-disable-next-line complexity
     .then(({ host, output }) => {
       let info;
@@ -128,7 +128,7 @@ export async function checkUrls(server, appConfig, api) {
     local
   ] = await Promise.all([
     api.runSSHCommand(server, `curl ${getCheckAddress(server, appConfig)}:${port}`),
-    api.runSSHCommand(server, `docker exec ${appConfig.name} curl http://localhost:${appConfig.docker.imagePort}`),
+    api.runSSHCommand(server, `sudo docker exec ${appConfig.name} curl http://localhost:${appConfig.docker.imagePort}`),
     checkUrlLocally(server, appConfig, port)
   ]);
   const inDockerResult = inDocker.code === 0;
