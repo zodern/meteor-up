@@ -1,4 +1,4 @@
-## vNext
+## 1.5.4 - September 19, 2021
 
 - Increase worker_connections in nginx (@markdowney)
 - When setting `config.privateDockerRegistry`, the host option is now optional and defaults to the docker hub registry
