@@ -5,13 +5,12 @@ import {
   createServiceConfig,
   currentImageTag,
   escapeEnvQuotes,
-  getBuildOptions,
   getImagePrefix,
   getNodeVersion,
   getSessions,
   shouldRebuild
 } from './utils';
-import buildApp, { archiveApp } from './build.js';
+import buildApp, { archiveApp, cleanBuildDir } from './build.js';
 import { checkUrls, createPortInfoLines, displayAvailability, getInformation, withColor } from './status';
 import { map, promisify } from 'bluebird';
 import { prepareBundleLocally, prepareBundleSupported } from './prepare-bundle';
@@ -103,7 +102,7 @@ export function setup(api) {
 export async function build(api) {
   const config = api.getConfig().app;
   const appPath = api.resolvePath(api.getBasePath(), config.path);
-  const buildOptions = getBuildOptions(api);
+  const buildOptions = config.buildOptions;
 
   const rebuild = shouldRebuild(api);
 
@@ -115,9 +114,80 @@ export async function build(api) {
   }
 
   if (rebuild) {
+    if (buildOptions.cleanBuildLocation === true) {
+      console.log('Cleaning Up Previous Builds');
+      await cleanBuildDir(buildOptions.buildLocation);
+    }
     console.log('Building App Bundle Locally');
     await buildApp(appPath, buildOptions, api.getVerbose(), api);
   }
+}
+
+export async function prepareBundle(api) {
+  log('exec => mup meteor prepare-bundle');
+  const {
+    app: appConfig,
+    privateDockerRegistry
+  } = api.getConfig();
+
+  if (!appConfig) {
+    console.error('error: no configs found for meteor');
+    process.exit(1);
+  }
+
+  if (!prepareBundleSupported(appConfig.docker)) {
+    return;
+  }
+
+  const buildOptions = appConfig.buildOptions;
+  const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
+
+  if (appConfig.docker.prepareBundleLocally) {
+    return prepareBundleLocally(buildOptions.buildLocation, bundlePath, api);
+  }
+
+  const list = nodemiral.taskList('Prepare App Bundle');
+
+  let tag = 'latest';
+
+  if (api.swarmEnabled()) {
+    const data = await api.getServerInfo();
+    tag = currentImageTag(data, appConfig.name) + 1;
+  }
+
+  const nodeVersion = await getNodeVersion(bundlePath);
+
+  list.executeScript('Prepare Bundle', {
+    script: api.resolvePath(
+      __dirname,
+      'assets/prepare-bundle.sh'
+    ),
+    vars: {
+      appName: appConfig.name,
+      dockerImage: appConfig.docker.image,
+      env: escapeEnvQuotes(appConfig.env),
+      buildInstructions: appConfig.docker.buildInstructions || [],
+      nodeVersion,
+      stopApp: appConfig.docker.stopAppDuringPrepareBundle,
+      useBuildKit: appConfig.docker.useBuildKit,
+      tag,
+      privateRegistry: privateDockerRegistry,
+      imagePrefix: getImagePrefix(privateDockerRegistry)
+    }
+  });
+
+  // After running Prepare Bundle, the list of images will be out of date
+  api.serverInfoStale();
+
+  let sessions = api.getSessions(['app']);
+  if (privateDockerRegistry) {
+    sessions = sessions.slice(0, 1);
+  }
+
+  return api.runTaskList(list, sessions, {
+    series: true,
+    verbose: api.verbose
+  });
 }
 
 export async function push(api) {
@@ -134,7 +204,7 @@ export async function push(api) {
     process.exit(1);
   }
 
-  const buildOptions = getBuildOptions(api);
+  const buildOptions = appConfig.buildOptions;
 
   const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
@@ -143,7 +213,7 @@ export async function push(api) {
   }
 
   if (appConfig.docker.prepareBundleLocally) {
-    return prepareBundleLocally(buildOptions.buildLocation, api);
+    return api.runCommand('meteor.prepareBundle');
   }
 
   const list = nodemiral.taskList('Pushing Meteor App');
@@ -154,39 +224,6 @@ export async function push(api) {
     progressBar: true
   });
 
-  if (prepareBundleSupported(appConfig.docker)) {
-    let tag = 'latest';
-
-    if (api.swarmEnabled()) {
-      const data = await api.getServerInfo();
-      tag = currentImageTag(data, appConfig.name) + 1;
-    }
-
-    const nodeVersion = await getNodeVersion(bundlePath);
-
-    list.executeScript('Prepare Bundle', {
-      script: api.resolvePath(
-        __dirname,
-        'assets/prepare-bundle.sh'
-      ),
-      vars: {
-        appName: appConfig.name,
-        dockerImage: appConfig.docker.image,
-        env: escapeEnvQuotes(appConfig.env),
-        buildInstructions: appConfig.docker.buildInstructions || [],
-        nodeVersion,
-        stopApp: appConfig.docker.stopAppDuringPrepareBundle,
-        useBuildKit: appConfig.docker.useBuildKit,
-        tag,
-        privateRegistry: privateDockerRegistry,
-        imagePrefix: getImagePrefix(privateDockerRegistry)
-      }
-    });
-
-    // After running Prepare Bundle, the list of images is out of date
-    api.serverInfoStale();
-  }
-
   let sessions = api.getSessions(['app']);
 
   // If we are using a private registry,
@@ -196,10 +233,12 @@ export async function push(api) {
     sessions = sessions.slice(0, 1);
   }
 
-  return api.runTaskList(list, sessions, {
+  await api.runTaskList(list, sessions, {
     series: true,
     verbose: api.verbose
   });
+
+  return api.runCommand('meteor.prepareBundle');
 }
 
 export function envconfig(api) {

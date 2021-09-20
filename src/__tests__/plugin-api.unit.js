@@ -173,6 +173,9 @@ describe('PluginAPI', () => {
       const config = { meteor: { path: '../' } };
       const result = api._normalizeConfig(config);
 
+      // is different on each computer
+      delete result.app.buildOptions;
+
       expect(result).to.deep.equal(expected);
     });
   });

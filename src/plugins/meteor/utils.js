@@ -184,21 +184,9 @@ export function runCommand(_executable, _args, { cwd, stdin } = {}) {
   });
 }
 
-export function getBuildOptions(api) {
-  const config = api.getConfig().app;
-  const appPath = api.resolvePath(api.getBasePath(), config.path);
-
-  const buildOptions = config.buildOptions || {};
-
-  buildOptions.buildLocation =
-    buildOptions.buildLocation || tmpBuildPath(appPath, api);
-
-  return buildOptions;
-}
-
 export function shouldRebuild(api) {
   let rebuild = true;
-  const { buildLocation } = getBuildOptions(api);
+  const { buildLocation } = api.getConfig().app.buildOptions;
   const bundlePath = api.resolvePath(buildLocation, 'bundle.tar.gz');
 
   if (api.getOptions()['cached-build']) {

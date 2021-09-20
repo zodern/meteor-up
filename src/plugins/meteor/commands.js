@@ -27,6 +27,12 @@ export const destroy = {
   }
 };
 
+export const prepareBundle = {
+  name: 'prepare-bundle',
+  description: false,
+  handler: commandHandlers.prepareBundle
+};
+
 export const logs = {
   description: 'View meteor app\'s logs',
   builder(yargs) {

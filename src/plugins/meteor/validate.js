@@ -43,7 +43,8 @@ const schema = joi.object().keys({
     mobileSettings: joi.object(),
     server: joi.string().uri(),
     allowIncompatibleUpdates: joi.boolean(),
-    executable: joi.string()
+    executable: joi.string(),
+    cleanBuildLocation: joi.bool()
   }),
   env: joi
     .object()

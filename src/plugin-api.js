@@ -144,7 +144,7 @@ export default class PluginAPI {
       config.app.type = 'meteor';
     }
 
-    return runConfigPreps(config);
+    return runConfigPreps(config, this);
   }
   getConfig(validate = true) {
     if (!this.config) {

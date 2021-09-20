@@ -292,11 +292,10 @@ Mup supports Meteor 1.2 and newer, though you might need to change the docker im
 | Meteor version | Docker image | Prepare Bundle | Notes |
 | --- | --- | --- |
 | 1.2 - 1.3 | `kadirahq/meteord` | false | This is the default docker image. When using Meteor 1.2, `app.buildOptions.serverOnly` should be false. |
-| 1.4 - 1.5 | `abernix/meteord:base` | true |  |
-| 1.6 | `abernix/meteord:node-8.4.0-base` | true | |
-| 1.8 | `abernix/meteord:node-8.11.2-base` | true | |
-| 1.2 - 1.6 | `zodern/meteor:root` | true | Automatically uses the correct node version. |
-| 1.9 | `abernix/meteord:node-12-base` | true | |
+| 1.2 - 2.4 and newer | `zodern/meteor:root` | true | Automatically uses the correct node version for the app's Meteor version. |
+| 1.4 - 1.5 | `abernix/meteord:node-4-base` | true |  |
+| 1.6 - 1.8| `abernix/meteord:node-8-base` | true | |
+| 1.9 - 2.2 | `abernix/meteord:node-12-base` | true | |
 
 When using an image that supports `Prepare Bundle`, deployments are easier to debug and more reliable.
 
@@ -477,10 +476,10 @@ Any files stored in `/images` by the app inside the docker container will persis
 
 ### Private Docker Registry
 
-Mup uploads the app's bundle and builds a docker image (when prepare bundle is enabled) on each server, which is slow when there are many servers. When using a private docker registry, it is much faster:
+Normally, mup uploads the app's bundle and builds a docker image (when prepare bundle is enabled) on each server, which is slow when there are many servers. When using a private docker registry, it is much faster:
 
 1. Mup uploads the bundle to a single server, and builds the image there.
-2. The image is stored in the private registry
+2. The image is pushed to the private registry
 3. On the other servers, mup will use the image from the private registry
 
 To use a private registry, add the `dockerPrivateRegistry` option to your config:
@@ -490,15 +489,20 @@ module.exports = {
   // ... rest of config
 
   privateDockerRegistry: {
-    host: 'registry.domain.com',
     username: 'username',
     password: 'password',
+
+    // (optional) Hostname of registry. If not provided, defaults to the
+    // docker hub registry
+    host: 'registry.domain.com',
 
     // (optional) The image name will start with this value.
     imagePrefix: 'image-name-prefix-'
   }
 };
 ```
+
+The image name is `mup-${app name}`. When an image prefix is supplied, the image is named `${imagePrefix}/mup-${app name}`.
 
 Some registries, such as Gitlab's or Google Cloud's, require image names to start with a certain string. For example, the prefix for Google Cloud would be `eu.gcr.io/<project id>`, and for GitLab it would be `registry.gitlab.com/<group name>/<project name>`.
 

@@ -23,6 +23,16 @@ export function swarmOptions(config) {
   }
 }
 
+export function prepareConfig(config) {
+  if (!config.privateDockerRegistry) {
+    return;
+  }
+
+  config.privateDockerRegistry.host = config.privateDockerRegistry.host || 'registry-1.docker.io';
+
+  return config;
+}
+
 export function scrubConfig(config) {
   if (!config.privateDockerRegistry) {
     return config;
