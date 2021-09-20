@@ -32,10 +32,7 @@ module.exports = {
     },
 
     docker: {
-      // abernix/meteord:node-12-base works with Meteor 1.9 - 1.10
-      // If you are using a different version of Meteor,
-      // refer to the docs for the correct image to use.
-      image: 'abernix/meteord:node-12-base',
+      image: 'zodern/meteor:root',
     },
 
     // Show progress bar while uploading bundle to server
