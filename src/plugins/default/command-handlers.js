@@ -201,6 +201,12 @@ export async function status(api) {
     lines.push(text);
   });
 
+  if (lines.length === 0) {
+    overallColor = 'gray';
+    lines.push(chalk.gray('   No servers listed in config'));
+  }
+
   console.log(chalk[overallColor]('=> Servers'));
   console.log(lines.join('\n'));
+  console.log('');
 }
