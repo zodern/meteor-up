@@ -1,7 +1,10 @@
 import * as _commands from './commands';
+import _serverSources from './server-groups/index.js';
 import traverse from 'traverse';
 
 export const commands = _commands;
+
+export const serverSources = _serverSources;
 
 export function scrubConfig(config) {
   if (config.servers) {

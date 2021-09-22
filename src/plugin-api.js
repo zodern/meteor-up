@@ -17,6 +17,7 @@ import path from 'path';
 import { runConfigPreps } from './prepare-config';
 import { scrubConfig } from './scrub-config';
 import serverInfo from './server-info';
+import { serverSources } from './server-sources';
 
 const { resolvePath, moduleNotFoundIsPath } = utils;
 const log = debug('mup:api');
@@ -29,6 +30,7 @@ export default class PluginAPI {
     this.config = null;
     this.settings = null;
     this.sessions = null;
+    this._serverGroupServers = Object.create(null);
     this._enabledSessions = program.servers ? program.servers.split(' ') : [];
     this.configPath = program.config ? resolvePath(program.config) : path.join(this.base, 'mup.js');
     this.settingsPath = program.settings;
@@ -127,9 +129,9 @@ export default class PluginAPI {
       );
       console.log('    http://meteor-up.com/docs');
       console.log('');
-    }
 
-    this.validationErrors = problems;
+      this.validationErrors = problems;
+    }
 
     return problems;
   }
@@ -374,6 +376,56 @@ export default class PluginAPI {
     this._cachedServerInfo = null;
   }
 
+  async loadServerGroups() {
+    const { servers } = this.getConfig(false);
+
+    if (typeof servers !== 'object' || servers === null) {
+      return;
+    }
+
+    const promises = Object.entries(servers)
+      .filter(([, serverConfig]) => serverConfig && typeof serverConfig.source === 'string')
+      .map(async ([name, serverConfig]) => {
+        const source = serverConfig.source;
+
+        if (!(source in serverSources)) {
+          throw new Error(`Unrecognized server source: ${source}. Available: ${Object.keys(serverSources)}`);
+        }
+
+        const list = await serverSources[source].load(name, serverConfig, this);
+        this._serverGroupServers[name] = list;
+
+        // TODO: handle errors. We should delay throwing the error until
+        // we need the sessions from this server group
+      });
+
+    await Promise.all(promises);
+  }
+
+  async updateServerGroups() {
+    const { servers } = this.getConfig();
+
+    if (typeof servers !== 'object' || servers === null) {
+      return;
+    }
+
+    const promises = Object.entries(servers)
+      .filter(([, serverConfig]) => serverConfig && typeof serverConfig.source === 'string')
+      .map(async ([name, serverConfig]) => {
+        const source = serverConfig.source;
+
+        if (!(source in serverSources)) {
+          throw new Error(`Unrecognized server source: ${source}. Available: ${Object.keys(serverSources)}`);
+        }
+
+        await serverSources[source].update(name, serverConfig, this);
+        const list = await serverSources[source].load(name, serverConfig, this);
+        this._serverGroupServers[name] = list;
+      });
+
+    await Promise.all(promises);
+  }
+
   getSessions(modules = []) {
     const sessions = this._pickSessions(modules);
 
@@ -413,7 +465,16 @@ export default class PluginAPI {
           continue;
         }
 
-        if (this.sessions[name]) {
+        if (!this.sessions[name]) {
+          continue;
+        }
+
+        if (Array.isArray(this.sessions[name])) {
+          // Is a server group. Add the members of the group.
+          this.sessions[name].forEach(memberName => {
+            sessions[memberName] = this.sessions[memberName];
+          });
+        } else {
           sessions[name] = this.sessions[name];
         }
       }
@@ -427,21 +488,7 @@ export default class PluginAPI {
 
     this.sessions = {};
 
-    // `mup.servers` contains login information for servers
-    // Use this information to create nodemiral sessions.
-    for (const name in config.servers) {
-      if (!config.servers.hasOwnProperty(name)) {
-        continue;
-      }
-
-      if (
-        this._enabledSessions.length > 0 &&
-        this._enabledSessions.indexOf(name) === -1
-      ) {
-        continue;
-      }
-
-      const info = config.servers[name];
+    function createNodemiralSession(name, info) {
       const auth = {
         username: info.username
       };
@@ -478,9 +525,38 @@ export default class PluginAPI {
         process.exit(1);
       }
 
-      const session = nodemiral.session(info.host, auth, opts);
+      return nodemiral.session(info.host, auth, opts);
+    }
 
-      this.sessions[name] = session;
+    // `mup.servers` contains login information for servers
+    // Use this information to create nodemiral sessions.
+    for (const name in config.servers) {
+      if (!config.servers.hasOwnProperty(name)) {
+        continue;
+      }
+
+      if (
+        this._enabledSessions.length > 0 &&
+        this._enabledSessions.indexOf(name) === -1
+      ) {
+        // TODO: if server group, check if any servers in group are enabled
+        continue;
+      }
+
+      const info = config.servers[name];
+
+      if (typeof info.source === 'string') {
+        const servers = this._serverGroupServers[name];
+        servers.forEach(server => {
+          const session = createNodemiralSession(
+            server.name, server
+          );
+          this.sessions[server.name] = session;
+        });
+        this.sessions[name] = servers.map(s => s.name);
+      } else {
+        this.sessions[name] = createNodemiralSession(name, info);
+      }
     }
   }
 
@@ -491,7 +567,9 @@ export default class PluginAPI {
     }
 
     Object.keys(this.sessions).forEach(key => {
-      this.sessions[key].close();
+      if (!Array.isArray(this.sessions[key])) {
+        this.sessions[key].close();
+      }
     });
   }
 

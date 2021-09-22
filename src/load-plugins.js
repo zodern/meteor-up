@@ -9,6 +9,7 @@ import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { registerPreparer } from './prepare-config';
 import { registerScrubber } from './scrub-config';
+import { registerServerSource } from './server-sources';
 import { registerSwarmOptions } from './swarm-options';
 import resolveFrom from 'resolve-from';
 
@@ -94,6 +95,11 @@ function registerPlugin(plugin) {
   }
   if (plugin.module.swarmOptions) {
     registerSwarmOptions(plugin.module.swarmOptions);
+  }
+  if (plugin.module.serverSources) {
+    for (const [type, config] of Object.entries(plugin.module.serverSources)) {
+      registerServerSource(type, config);
+    }
   }
 }
 

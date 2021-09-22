@@ -21,7 +21,10 @@ export function restart() {
   log('exec => mup restart');
 }
 
-export function setup(api) {
+export async function setup(api) {
+  log('exec => mup setup');
+  await api.updateServerGroups();
+
   process.on('exit', code => {
     if (code > 0) {
       return;
@@ -32,7 +35,6 @@ export function setup(api) {
     console.log('    mup deploy');
   });
 
-  log('exec => mup setup');
 
   return api.runCommand('docker.setup');
 }
