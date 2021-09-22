@@ -39,9 +39,6 @@ parserOptions:
     templateStrings: true
     unicodeCodePointEscapes: true
 rules:
-  arrow-parens:
-  - 2
-  - as-needed
   array-bracket-spacing:
   - 2
   - never
@@ -58,7 +55,6 @@ rules:
   comma-style:
   - 2
   - last
-  complexity: [1, 9]
   computed-property-spacing:
   - 2
   - never
@@ -290,4 +286,4 @@ rules:
   newline-per-chained-call: 0
   class-methods-use-this: 0
   no-empty-function: 0
-  sort-imports: [2, { memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'], ignoreCase: true  }]
+  sort-imports: 0
