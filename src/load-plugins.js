@@ -73,7 +73,14 @@ export function locatePluginDir(name, configPath, appPath) {
 function registerPlugin(plugin) {
   if (plugin.module.commands) {
     Object.keys(plugin.module.commands).forEach(key => {
-      registerCommand(plugin.name, key, plugin.module.commands[key]);
+      let command = plugin.module.commands[key];
+      registerCommand(
+        // The __plugin option can be used to change the top-level command
+        // the command is added to
+        command.__plugin || plugin.name,
+        key,
+        plugin.module.commands[key]
+      );
     });
   }
   if (plugin.module.hooks) {
