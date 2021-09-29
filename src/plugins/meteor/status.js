@@ -103,11 +103,10 @@ async function checkUrlLocally(server, appConfig, port) {
 
 function getCheckAddress(server, appConfig) {
   if (
-    appConfig.servers &&
-    appConfig.servers[server.name] &&
-    appConfig.servers[server.name].bind
+    server.overrides &&
+    server.overrides.bind
   ) {
-    return appConfig.servers[server.name].bind;
+    return server.overrides.bind;
   }
 
   if (appConfig.docker && appConfig.docker.bind) {
@@ -118,8 +117,8 @@ function getCheckAddress(server, appConfig) {
 }
 
 export async function checkUrls(server, appConfig, api) {
-  const port = appConfig.servers[server.name].env ?
-    appConfig.servers[server.name].env.PORT :
+  const port = server.overrides.env?.PORT ?
+    server.overrides.env.PORT :
     appConfig.env.PORT;
 
   const [

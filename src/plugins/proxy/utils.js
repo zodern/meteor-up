@@ -44,8 +44,8 @@ export function normalizeUrl(config, env) {
   return _config.app.env.ROOT_URL;
 }
 
-export function getLoadBalancingHosts(serverConfig, serverNames) {
-  return serverNames.map(name =>
-    serverConfig[name].privateIp || serverConfig[name].host
+export function getLoadBalancingHosts(expandedServers) {
+  return Object.values(expandedServers).map(({ server }) =>
+    server.privateIp || server.host
   );
 }

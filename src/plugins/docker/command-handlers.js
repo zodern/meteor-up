@@ -248,8 +248,11 @@ export async function status(api) {
     return;
   }
 
+  const allServers = Object.values(api.expandServers(config.servers || {}))
+    .map(({ server }) => server);
+
   const results = await map(
-    Object.values(config.servers),
+    allServers,
     server => api.runSSHCommand(server, 'sudo docker version --format "{{.Server.Version}}"'),
     { concurrency: 2 }
   );

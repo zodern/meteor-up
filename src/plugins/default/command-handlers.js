@@ -49,6 +49,7 @@ export function stop() {
 
 export function ssh(api) {
   const servers = api.getConfig().servers;
+  const expandedServers = api.expandServers(servers);
   let serverOption = api.getArgs()[1];
 
   // Check how many sessions are enabled. Usually is all servers,
@@ -56,7 +57,7 @@ export function ssh(api) {
   const enabledSessions = api.getSessionsForServers(Object.keys(servers))
     .filter(session => session);
 
-  if (!(serverOption in servers)) {
+  if (!(serverOption in expandedServers)) {
     if (enabledSessions.length === 1) {
       const selectedHost = enabledSessions[0]._host;
       serverOption = Object.keys(servers).find(
@@ -64,14 +65,14 @@ export function ssh(api) {
       );
     } else {
       console.log('mup ssh <server>');
-      console.log('Available servers are:\n', Object.keys(servers).join('\n '));
+      console.log('Available servers are:\n', Object.keys(expandedServers).join('\n '));
       process.exitCode = 1;
 
       return;
     }
   }
 
-  const server = servers[serverOption];
+  const server = expandedServers[serverOption].server;
   const sshOptions = api._createSSHOptions(server);
 
   const conn = new Client();
@@ -153,12 +154,14 @@ function statusColor(
 }
 
 export async function status(api) {
-  const servers = Object.values(api.getConfig().servers || {});
+  const config = api.getConfig();
+  const allServers = Object.values(api.expandServers(config.servers || {}))
+    .map(({ server }) => server);
   const lines = [];
   let overallColor = 'green';
   const command = 'lsb_release -r -s || echo "false"; lsb_release -is; apt-get -v &> /dev/null && echo "true" || echo "false"; echo $BASH';
   const results = await map(
-    servers,
+    allServers,
     server => api.runSSHCommand(server, command),
     { concurrency: 2 }
   );

@@ -345,6 +345,26 @@ export default class PluginAPI {
     });
   }
 
+  expandServers(serversObj) {
+    let result = {};
+    const serverConfig = this.getConfig().servers;
+
+    Object.entries(serversObj).forEach(([key, config]) => {
+      if (key in this._serverGroupServers) {
+        this._serverGroupServers[key].forEach(server => {
+          result[server.name] = { server, config };
+        });
+      } else {
+        result[key] = {
+          server: serverConfig[key],
+          config
+        };
+      }
+    });
+
+    return result;
+  }
+
   async getServerInfo(selectedServers, collectors) {
     if (this._cachedServerInfo && !collectors) {
       return this._cachedServerInfo;

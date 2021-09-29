@@ -244,7 +244,6 @@ export async function push(api) {
 export function envconfig(api) {
   log('exec => mup meteor envconfig');
   const {
-    servers,
     app,
     proxy,
     privateDockerRegistry
@@ -288,15 +287,16 @@ export function envconfig(api) {
   }
 
   const startHostVars = {};
+  const expandedServers = api.expandServers(app.servers);
 
-  Object.keys(app.servers).forEach(serverName => {
-    const host = servers[serverName].host;
+  Object.values(expandedServers).forEach(({ server, config }) => {
+    const host = server.host;
     const vars = {};
-    if (app.servers[serverName].bind) {
-      vars.bind = app.servers[serverName].bind;
+    if (config.bind) {
+      vars.bind = config.bind;
     }
-    if (app.servers[serverName].env && app.servers[serverName].env.PORT) {
-      vars.port = app.servers[serverName].env.PORT;
+    if (config.env && config.env.PORT) {
+      vars.port = config.env.PORT;
     }
     startHostVars[host] = vars;
   });
@@ -325,20 +325,20 @@ export function envconfig(api) {
   const env = createEnv(app, api.getSettings());
   const hostVars = {};
 
-  Object.keys(app.servers).forEach(key => {
-    const host = servers[key].host;
-    if (app.servers[key].env) {
+  Object.values(expandedServers).forEach(({ server, config }) => {
+    const host = server.host;
+    if (config.env) {
       hostVars[host] = {
         env: {
-          ...app.servers[key].env,
+          ...config.env,
           // We treat the PORT specially and do not pass it to the container
           PORT: undefined
         }
       };
     }
-    if (app.servers[key].settings) {
+    if (config.settings) {
       const settings = JSON.stringify(api.getSettingsFromPath(
-        app.servers[key].settings));
+        config.settings));
 
       if (hostVars[host]) {
         hostVars[host].env.METEOR_SETTINGS = settings;
@@ -478,21 +478,21 @@ export async function restart(api) {
 
 export async function debugApp(api) {
   const {
-    servers,
     app
   } = api.getConfig();
   let serverOption = api.getArgs()[2];
+  let expandedServers = api.expandServers(app.servers);
 
   // Check how many sessions are enabled. Usually is all servers,
   // but can be reduced by the `--servers` option
   const enabledSessions = api.getSessions(['app'])
     .filter(session => session);
 
-  if (!(serverOption in app.servers)) {
+  if (!(serverOption in expandedServers)) {
     if (enabledSessions.length === 1) {
       const selectedHost = enabledSessions[0]._host;
-      serverOption = Object.keys(app.servers).find(
-        name => servers[name].host === selectedHost
+      serverOption = Object.keys(expandedServers).find(
+        name => expandedServers[name].server.host === selectedHost
       );
     } else {
       console.log('mup meteor debug <server>');
@@ -503,7 +503,7 @@ export async function debugApp(api) {
     }
   }
 
-  const server = servers[serverOption];
+  const server = expandedServers[serverOption].server;
   console.log(`Setting up to debug app running on ${serverOption}`);
 
   const {
@@ -626,10 +626,12 @@ export async function status(api) {
     StatusDisplay
   } = api.statusHelpers;
   const overview = api.getOptions().overview;
-  const servers = Object.keys(config.app.servers)
+  const expandedServers = api.expandServers(config.app.servers);
+  const servers = Object.keys(expandedServers)
     .map(key => ({
-      ...config.servers[key],
-      name: key
+      ...expandedServers[key].server,
+      name: key,
+      overrides: expandedServers[key].config
     }));
 
   const results = await map(
