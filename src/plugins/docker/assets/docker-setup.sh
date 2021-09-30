@@ -18,8 +18,17 @@ echo "Major" $majorVersion
 echo "Minor" $minorVersion
 set -e
 
-if [ ! "$hasDocker" ]; then
+retry_install () {
+  echo "waiting 30 seconds"
+  sleep 30
+  echo "trying installation again"
   install_docker
+}
+
+if [ ! "$hasDocker" ]; then
+  # If the server was just created, it might still be running some apt-get
+  # commands and installing docker could fail due to apt-get locks.
+  install_docker || retry_install || retry_install
 
 elif [ "$minimumMajor" -gt "$majorVersion" ]; then
   echo "major wrong"
