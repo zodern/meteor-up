@@ -1,4 +1,5 @@
 #!/bin/bash
+exec 2>&1
 
 # TODO make sure we can run docker in this server
 

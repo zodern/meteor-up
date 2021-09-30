@@ -63,13 +63,18 @@ function createCallback(cb, varsMapper) {
       return cb(err);
     }
     if (code > 0) {
-      const message = `
-      ------------------------------------STDERR------------------------------------
-      ${logs.stderr.substring(logs.stderr.length - 4200)}
-      ------------------------------------STDOUT------------------------------------
-      ${logs.stdout.substring(logs.stdout.length - 4200)}
-      ------------------------------------------------------------------------------
-      `;
+      let message = '';
+      if (!logs.stderr.length && logs.stdout.length) {
+        message = logs.stdout.substring(logs.stdout.length - 4200);
+      } else {
+        message = `
+        ------------------------------------STDERR------------------------------------
+        ${logs.stderr.substring(logs.stderr.length - 4200)}
+        ------------------------------------STDOUT------------------------------------
+        ${logs.stdout.substring(logs.stdout.length - 4200)}
+        ------------------------------------------------------------------------------
+        `;
+      }
 
       return cb(new Error(message));
     }
