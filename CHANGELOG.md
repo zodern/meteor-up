@@ -1,3 +1,10 @@
+## 1.5.5 - September 30, 2021
+
+- Config created by `mup init` now uses `zodern/meteor:root` as docker image
+- Update docs for Meteor support
+- Fix default docker registry host when using private docker registery
+- Avoid race condition when `app.docker.prepareBundleLocally` is enabled and logging into private docker registry
+
 ## 1.5.4 - September 19, 2021
 
 - Increase worker_connections in nginx (@markdowney)
