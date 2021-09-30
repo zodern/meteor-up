@@ -10,7 +10,7 @@ export default class DigitalOcean {
     this.tag = `${tagPrefix}-${this.name}`;
   }
 
-  async getServers() {
+  async getServers(ids) {
     // TODO: implement pagination
     const results = await this._request(
       'get',
@@ -24,7 +24,13 @@ export default class DigitalOcean {
       pem: this.config.pem,
       privateIp: droplet.networks.v4.find(n => n.type === 'private').ip_address,
       __droplet: droplet
-    }));
+    })).filter(server => {
+      if (ids) {
+        return ids.includes(server.__droplet.id);
+      }
+
+      return true;
+    });
   }
 
   async compareServers() {
@@ -98,6 +104,9 @@ export default class DigitalOcean {
 
     const ids = result.data.droplets.map(droplet => droplet.id);
     await Promise.all(ids.map(id => this._waitForDropletActive(id)));
+
+    return this.getServers(ids);
+  }
   }
 
   async _waitForDropletActive(id) {

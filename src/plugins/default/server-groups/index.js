@@ -1,14 +1,15 @@
 import DigitalOcean from './digital-ocean';
+import { waitForServers } from './utils';
 
 function createSourceConfig(SourceAPI) {
   return {
-    async load(name, groupConfig) {
-      const api = new SourceAPI(name, groupConfig);
+    async load(name, groupConfig, pluginApi) {
+      const api = new SourceAPI(name, groupConfig, pluginApi);
 
       return api.getServers();
     },
-    async update(name, groupConfig) {
-      const api = new SourceAPI(name, groupConfig);
+    async update(name, groupConfig, pluginApi) {
+      const api = new SourceAPI(name, groupConfig, pluginApi);
       const { wrong, good } = await api.compareServers();
 
       const addCount = Math.max(0, groupConfig.count - good.length);
@@ -33,7 +34,8 @@ function createSourceConfig(SourceAPI) {
       }
       if (addCount > 0) {
         console.log(`=> Creating ${addCount} servers for ${name}`);
-        await api.createServers(addCount);
+        const created = await api.createServers(addCount);
+        await waitForServers(created, pluginApi);
         console.log(`=> Finished creating ${addCount} servers for ${name}`);
       }
     }
