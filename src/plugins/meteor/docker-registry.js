@@ -4,6 +4,10 @@ import querystring from 'querystring';
 
 const log = debug('mup:docker-registry');
 
+function getHost(registryConfig) {
+  return registryConfig.host || 'registry-1.docker.io';
+}
+
 function parseWWWAuthenticate(value) {
   // eslint-disable-next-line global-require
   const parsers = require('www-authenticate/lib/parsers');
@@ -61,6 +65,7 @@ async function retryWithAuth(
   const headers = {
     ..._headers
   };
+  let host = getHost(registryConfig);
 
   let tries = 0;
   async function doCall() {
@@ -69,7 +74,7 @@ async function retryWithAuth(
       const result = await axios({
         method,
         data,
-        url: `https://${registryConfig.host}${url}`,
+        url: `https://${host}${url}`,
         headers
       });
 
@@ -109,8 +114,9 @@ async function retryWithAuth(
 
 export async function checkCompatible(registryConfig) {
   try {
-    await axios.get(`https://${registryConfig.host}/v2`);
-    log(registryConfig.host);
+    const host = getHost(registryConfig);
+    await axios.get(`https://${host}/v2`);
+    log(host);
 
     // We don't know if this registry uses an authentication method we support
     log('Not compatible - request did not fail');
@@ -160,7 +166,6 @@ export async function renameTag({
   ignoreIfMissing = false
 }) {
   if (image.indexOf(registryConfig.host) === 0) {
-    // eslint-disable-next-line no-param-reassign
     image = image.slice(registryConfig.host.length);
   }
 
