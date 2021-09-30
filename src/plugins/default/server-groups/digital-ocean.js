@@ -1,10 +1,13 @@
 import axios from 'axios';
-import { generateName } from './utils';
+import { generateName, createFingerprint } from './utils';
+import fs from 'fs';
 
 export default class DigitalOcean {
-  constructor(groupName, groupConfig) {
+  constructor(groupName, groupConfig, pluginApi) {
     this.name = groupName;
     this.config = groupConfig;
+
+    this.publicKeyPath = pluginApi.resolvePath(this.config.sshKey.public);
 
     const tagPrefix = groupConfig.__tagPrefix || 'mup-';
     this.tag = `${tagPrefix}-${this.name}`;
@@ -21,7 +24,7 @@ export default class DigitalOcean {
       name: droplet.name,
       host: droplet.networks.v4.find(n => n.type === 'public').ip_address,
       username: 'root',
-      pem: this.config.pem,
+      pem: this.config.sshKey.private,
       privateIp: droplet.networks.v4.find(n => n.type === 'private').ip_address,
       __droplet: droplet
     })).filter(server => {
@@ -67,6 +70,7 @@ export default class DigitalOcean {
   }
 
   async createServers(count) {
+    let fingerprint = await this._setupPublicKey();
     const names = [];
 
     while (names.length < count) {
@@ -83,12 +87,7 @@ export default class DigitalOcean {
 
       // eslint-disable-next-line camelcase
       ssh_keys: [
-        // TODO: Replace the fingerprint in the config with the path to the
-        // public key. Then mup can create the fingerprint, and add the ssh key
-        // to digital ocean if missing. This would allow each developer to have
-        // their own keys as long as during `mup setup` the other public keys
-        // are added to the server
-        this.config.sshKeyFingerprint
+        fingerprint
       ],
       monitoring: true,
       tags: [
@@ -107,6 +106,44 @@ export default class DigitalOcean {
 
     return this.getServers(ids);
   }
+
+  async _setupPublicKey() {
+    let content = fs.readFileSync(this.publicKeyPath, 'utf-8');
+    let fingerprint = createFingerprint(content);
+
+    try {
+      await this._request(
+        'get',
+        `account/keys/${fingerprint}`
+      );
+
+      return fingerprint;
+    } catch (e) {
+      if (!e || !e.response || !e.response.status === 404) {
+        console.dir(e);
+
+        throw e;
+      }
+
+      // Key doesn't exist. Ignore error since we will be adding it
+    }
+
+    try {
+      await this._request(
+        'post',
+        'account/keys',
+        {
+          // eslint-disable-next-line camelcase
+          public_key: content,
+          name: this.config.sshKey.name || this.name
+        }
+      );
+    } catch (e) {
+      console.dir(e);
+      throw e;
+    }
+
+    return fingerprint;
   }
 
   async _waitForDropletActive(id) {

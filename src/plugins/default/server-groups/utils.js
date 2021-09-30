@@ -4,7 +4,22 @@ import { Client } from 'ssh2';
 export function generateName(groupName) {
   const randomString = crypto.randomBytes(4).toString('hex');
 
-  return `mup-${groupName}-${randomString}`;
+  return `${groupName}-${randomString}`;
+}
+
+export function createFingerprint(keyContent) {
+  keyContent = keyContent
+    // Remove key type at beginning
+    .replace(/(^ssh-[a-zA-Z0-9]*)/, '')
+    .trim()
+    // Remove comment at end
+    .replace(/ [^ ]+$/, '');
+
+  const buffer = Buffer.from(keyContent, 'base64');
+  const hash = crypto.createHash('md5').update(buffer).digest('hex');
+
+  // Add colons between every 2 characters
+  return hash.match(/.{1,2}/g).join(':');
 }
 
 const FIVE_MINUTES = 1000 * 60 * 5;
