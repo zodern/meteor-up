@@ -65,7 +65,7 @@ function createCallback(cb, varsMapper) {
     if (code > 0) {
       let message = '';
       if (!logs.stderr.length && logs.stdout.length) {
-        message = logs.stdout.substring(logs.stdout.length - 4200);
+        message = logs.stdout.substring(logs.stdout.length - 8400);
       } else {
         message = `
         ------------------------------------STDERR------------------------------------
