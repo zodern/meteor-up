@@ -1,4 +1,5 @@
 #!/bin/bash
+exec 2>&1
 
 APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
@@ -15,39 +16,64 @@ cd $APP_PATH
 revert_app () {
   echo "=> Container status:"
   sudo docker inspect $APPNAME --format "restarted: {{.RestartCount}} times {{json .NetworkSettings}} {{json .State}}"
-  echo "=> Logs:" 1>&2
+  echo ""
+  echo ""
+  echo "=================================="
+  echo "=> App Logs:" 1>&2
   sudo docker logs --tail=100 $APPNAME 1>&2
 
-  <% if (privateRegistry) { %>
-    sudo docker pull $IMAGE:previous || true
+  <% if (canRollback) { %>
+    # Record that the version failed
+    FAILED_VERSION=$(tail -1 /opt/$APPNAME/config/version-history.txt) || ''
+    PREVIOUS_VERSION=$(tail -n 2 /opt/$APPNAME/config/version-history.txt | head -1) || ''
+
+    # Make sure we can roll back using a versioned image
+    if [ -n "$FAILED_VERSION" ] && [ -n "$PREVIOUS_VERSION" ]; then
+      <% if (recordFailed) { %>
+        # TODO: limit how large this file can grow
+        echo "$FAILED_VERSION" >> /opt/$APPNAME/config/failed-versions.txt
+      <% } %>
+
+      # Remove last line so we don't rollback to the failed version
+      head -n -1 /opt/$APPNAME/config/version-history.txt > /opt/$APPNAME/config/version-history.tmp.txt 
+      mv /opt/$APPNAME/config/version-history.tmp.txt /opt/$APPNAME/config/version-history.txt
+
+      sudo bash $START_SCRIPT > /dev/null 2>&1
+      echo " " 1>&2
+      echo "=> Redeploying previous version of the app" 1>&2
+      echo " " 1>&2
+
+    # If the versioned image isn't available, check if there is a previous image
+    elif sudo docker image inspect $IMAGE:latest >/dev/null; then
+      sudo docker tag $IMAGE:previous $IMAGE:latest
+
+      <% if (privateRegistry) { %>
+        sudo docker push $IMAGE:latest
+        docker image prune -f
+      <% } %>
+
+      echo "latest" > /opt/$APPNAME/config/version-history.txt
+      sudo bash $START_SCRIPT > /dev/null 2>&1
+
+      echo " " 1>&2
+      echo "=> Redeploying previous version of the app" 1>&2
+      echo " " 1>&2
+
+    elif [ -d last ]; then
+      rm /opt/$APPNAME/config/version-history.txt
+      sudo mv last current
+      sudo bash $START_SCRIPT > /dev/null 2>&1
+
+      echo " " 1>&2
+      echo "=> Redeploying previous version of the app" 1>&2
+      echo " " 1>&2
+    fi
   <% } %>
-  
-  if sudo docker image inspect $IMAGE:previous >/dev/null 2>&1; then
-    sudo docker tag $IMAGE:previous $IMAGE:latest
+}
 
-    <% if (privateRegistry) { %>
-      sudo docker push $IMAGE:latest
-      docker image prune -f
-    <% } %>
-
-    sudo bash $START_SCRIPT > /dev/null 2>&1
-
-    echo " " 1>&2
-    echo "=> Redeploying previous version of the app" 1>&2
-    echo " " 1>&2
-
-  elif [ -d last ]; then
-    sudo mv last current
-    sudo bash $START_SCRIPT > /dev/null 2>&1
-
-    echo " " 1>&2
-    echo "=> Redeploying previous version of the app" 1>&2
-    echo " " 1>&2
-  fi
-
-  echo
-  echo "To see more logs type 'mup logs --tail=200'"
-  echo ""
+finish () {
+  # TODO: if canRollback is true, remove version from failed list
+  exit 0
 }
 
 START_TIME=$(date +%s)

@@ -1,4 +1,4 @@
-import { cloneDeep, flatMap } from 'lodash';
+import { cloneDeep } from 'lodash';
 import fs from 'fs';
 import os from 'os';
 import {
@@ -9,7 +9,7 @@ import { spawn } from 'child_process';
 import tar from 'tar';
 import uuid from 'uuid';
 
-export function checkAppStarted(list, api) {
+export function checkAppStarted(list, api, { canRollback, recordFailed } = {}) {
   const script = api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh');
   const { app, privateDockerRegistry } = api.getConfig();
   const publishedPort = app.docker.imagePort || 80;
@@ -21,28 +21,28 @@ export function checkAppStarted(list, api) {
       appName: app.name,
       deployCheckPort: publishedPort,
       privateRegistry: privateDockerRegistry,
-      imagePrefix: getImagePrefix(privateDockerRegistry)
+      imagePrefix: getImagePrefix(privateDockerRegistry),
+      canRollback: canRollback || false,
+      recordFailed: recordFailed || false
     }
   });
 
   return list;
 }
 
-export function addStartAppTask(list, api) {
+export function addStartAppTask(list, api, { isDeploy, version } = {}) {
   const {
     app: appConfig,
     privateDockerRegistry
   } = api.getConfig();
-  const isDeploy = api.commandHistory.find(
-    ({ name }) => name === 'meteor.deploy'
-  );
 
   list.executeScript('Start Meteor', {
     script: api.resolvePath(__dirname, 'assets/meteor-start.sh'),
     vars: {
       appName: appConfig.name,
       removeImage: isDeploy && !prepareBundleSupported(appConfig.docker),
-      privateRegistry: privateDockerRegistry
+      privateRegistry: privateDockerRegistry,
+      version: typeof version === 'number' ? version : null
     }
   });
 
@@ -210,17 +210,96 @@ export function getImagePrefix(privateRegistry) {
   return 'mup-';
 }
 
-export function currentImageTag(serverInfo, appName) {
-  const result = flatMap(
-    Object.values(serverInfo),
-    ({images}) => images || []
-  )
-    .filter(image => image.Repository === `mup-${appName}`)
-    .map(image => parseInt(image.Tag, 10))
-    .filter(tag => !isNaN(tag))
-    .sort((a, b) => b - a);
+function mostCommon(values) {
+  let counts = new Map();
+  values.forEach(value => {
+    let number = counts.get(value) || 0;
+    counts.set(value, number + 1);
+  });
 
-  return result[0] || 0;
+  if (counts.size === 0) {
+    return null;
+  }
+
+  return [...counts].sort((a, b) => b[1] - a[1])[0][0];
+}
+
+export async function getVersions(api) {
+  const {
+    app: appConfig,
+    privateDockerRegistry
+  } = api.getConfig();
+
+  const imageName = `${getImagePrefix(privateDockerRegistry)}${appConfig.name.toLowerCase()}`;
+
+  const collector = {
+    images: {
+      command: `sudo docker images ${imageName} --format '{{json .}}'`,
+      parser: 'jsonArray'
+    },
+    history: {
+      command: `cat /opt/${appConfig.name}/config/version-history.txt`,
+      parser: 'text'
+    },
+    failed: {
+      command: `cat /opt/${appConfig.name}/config/failed-versions.txt`,
+      parser: 'text'
+    }
+  };
+
+  const data = await api.getServerInfo(
+    Object.keys(api.expandServers(appConfig.servers)),
+    collector
+  );
+  const result = {
+    latest: 0,
+    versions: [],
+    servers: [],
+    failed: [],
+    versionDates: new Map()
+  };
+
+  Object.values(data).forEach(entry => {
+    let serverVersions = [];
+
+    entry.images.forEach(image => {
+      let version = parseInt(image.Tag, 10);
+      if (!Number.isNaN(version)) {
+        serverVersions.push(version);
+      }
+
+      let date = new Date(image.CreatedAt);
+      let existingDate = result.versionDates.get(version);
+      if (!existingDate || existingDate.getTime() > date.getTime()) {
+        result.versionDates.set(version, date);
+      }
+    });
+
+    result.versions.push(...serverVersions);
+
+    const serverFailed = entry.failed ? entry.failed.split('\n').map(v => parseInt(v, 10)) : [];
+    result.failed.push(...serverFailed);
+
+    const history = entry.history ? entry.history.split('\n').map(v => parseInt(v, 10)) : [];
+
+    result.servers.push({
+      host: entry._host,
+      name: entry._serverName,
+      current: history[history.length - 1] || null,
+      previous: history[history.length - 2] || null,
+      versions: serverVersions.sort((a, b) => b - a),
+      history,
+      failed: serverFailed
+    });
+  });
+
+  result.versions = Array.from(new Set(result.versions)).sort((a, b) => b - a);
+  result.failed = Array.from(new Set(result.failed));
+  result.latest = result.versions[0] || 0;
+  result.current = mostCommon(result.servers.map(server => server.current));
+  result.previous = mostCommon(result.servers.map(server => server.previous));
+
+  return result;
 }
 
 export function readFileFromTar(tarPath, filePath) {

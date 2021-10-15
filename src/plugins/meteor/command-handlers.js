@@ -3,11 +3,11 @@ import {
   checkAppStarted,
   createEnv,
   createServiceConfig,
-  currentImageTag,
   escapeEnvQuotes,
   getImagePrefix,
   getNodeVersion,
   getSessions,
+  getVersions,
   shouldRebuild
 } from './utils';
 import buildApp, { archiveApp, cleanBuildDir } from './build.js';
@@ -16,6 +16,8 @@ import { map, promisify } from 'bluebird';
 import { prepareBundleLocally, prepareBundleSupported } from './prepare-bundle';
 import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
+import { rollback } from './rollback';
+import state from './state';
 
 
 const log = debug('mup:module:meteor');
@@ -142,51 +144,79 @@ export async function prepareBundle(api) {
   const buildOptions = appConfig.buildOptions;
   const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
+  // await getVersions(api);
+
+  const sessions = api.getSessions(['app']);
+
+  const { latest, servers: serverVersions } = await getVersions(api);
+  const tag = latest + 1;
+  state.deployingVersion = tag;
+
   if (appConfig.docker.prepareBundleLocally) {
-    return prepareBundleLocally(buildOptions.buildLocation, bundlePath, api);
-  }
+    await prepareBundleLocally(buildOptions.buildLocation, bundlePath, api);
+  } else {
+    const list = nodemiral.taskList('Prepare App Bundle');
+    const nodeVersion = await getNodeVersion(bundlePath);
 
-  const list = nodemiral.taskList('Prepare App Bundle');
+    list.executeScript('Prepare Bundle', {
+      script: api.resolvePath(
+        __dirname,
+        'assets/prepare-bundle.sh'
+      ),
+      vars: {
+        appName: appConfig.name,
+        dockerImage: appConfig.docker.image,
+        env: escapeEnvQuotes(appConfig.env),
+        buildInstructions: appConfig.docker.buildInstructions || [],
+        nodeVersion,
+        stopApp: appConfig.docker.stopAppDuringPrepareBundle,
+        useBuildKit: appConfig.docker.useBuildKit,
+        tag,
+        privateRegistry: privateDockerRegistry,
+        imagePrefix: getImagePrefix(privateDockerRegistry)
+      }
+    });
 
-  let tag = 'latest';
+    // After running Prepare Bundle, the list of images will be out of date
+    api.serverInfoStale();
 
-  if (api.swarmEnabled()) {
-    const data = await api.getServerInfo();
-    tag = currentImageTag(data, appConfig.name) + 1;
-  }
-
-  const nodeVersion = await getNodeVersion(bundlePath);
-
-  list.executeScript('Prepare Bundle', {
-    script: api.resolvePath(
-      __dirname,
-      'assets/prepare-bundle.sh'
-    ),
-    vars: {
-      appName: appConfig.name,
-      dockerImage: appConfig.docker.image,
-      env: escapeEnvQuotes(appConfig.env),
-      buildInstructions: appConfig.docker.buildInstructions || [],
-      nodeVersion,
-      stopApp: appConfig.docker.stopAppDuringPrepareBundle,
-      useBuildKit: appConfig.docker.useBuildKit,
-      tag,
-      privateRegistry: privateDockerRegistry,
-      imagePrefix: getImagePrefix(privateDockerRegistry)
+    let prepareSessions = sessions;
+    if (privateDockerRegistry) {
+      prepareSessions = [sessions[0]].filter(s => s);
     }
+
+    await api.runTaskList(list, prepareSessions, {
+      series: true,
+      verbose: api.verbose
+    });
+  }
+
+  const toClean = Object.create(null);
+
+  serverVersions.forEach(({ host, versions, current, previous }) => {
+    let toKeep = [current, previous, tag];
+    toClean[host] = {
+      versions: versions.filter(version => !toKeep.includes(version))
+    };
   });
 
-  // After running Prepare Bundle, the list of images will be out of date
-  api.serverInfoStale();
 
-  let sessions = api.getSessions(['app']);
-  if (privateDockerRegistry) {
-    sessions = sessions.slice(0, 1);
-  }
+  const list = nodemiral.taskList('Clean Up Versions');
 
-  return api.runTaskList(list, sessions, {
-    series: true,
-    verbose: api.verbose
+  list.executeScript('Clean up app versions', {
+    script: api.resolvePath(__dirname, 'assets/clean-versions.sh'),
+    vars: {
+      // TODO: add a default version-history from other servers
+      // on servers that don't have a history so it has something to
+      // rollback to if the current deploy fails
+      appName: appConfig.name,
+      imagePrefix: getImagePrefix(privateDockerRegistry)
+    },
+    hostVars: toClean
+  });
+
+  await api.runTaskList(list, sessions, {
+    series: false
   });
 }
 
@@ -368,7 +398,7 @@ export function envconfig(api) {
 
 export async function start(api) {
   log('exec => mup meteor start');
-  const config = api.getConfig().app;
+  const { app: config } = api.getConfig();
   const swarmEnabled = api.swarmEnabled();
 
   if (!config) {
@@ -376,12 +406,14 @@ export async function start(api) {
     process.exit(1);
   }
 
+  const isDeploy = api.commandHistory.find(entry =>
+    ['meteor.deploy', 'meteor.deployVersion'].includes(entry.name)
+  );
   const list = nodemiral.taskList('Start Meteor');
 
   if (swarmEnabled) {
     const currentService = await api.dockerServiceInfo(config.name);
-    const serverInfo = await api.getServerInfo();
-    const imageTag = currentImageTag(serverInfo, config.name);
+    const { latest: imageTag } = await getVersions(api);
 
     // TODO: make it work when the reverse proxy isn't enabled
     api.tasks.addCreateOrUpdateService(
@@ -390,16 +422,39 @@ export async function start(api) {
       currentService
     );
   } else {
-    addStartAppTask(list, api);
-    checkAppStarted(list, api);
+    addStartAppTask(list, api, { isDeploy, version: state.deployingVersion });
+    checkAppStarted(list, api, {
+      canRollback: isDeploy,
+      recordFailed: isDeploy && !api.commandHistory.find(
+        entry => entry.name === 'meteor.deployVersion'
+      )
+    });
   }
 
   const sessions = await getSessions(api);
 
-  return api.runTaskList(list, sessions, {
-    series: true,
-    verbose: api.verbose
-  });
+  try {
+    await api.runTaskList(list, sessions, {
+      series: true,
+      verbose: api.verbose
+    });
+
+    if (isDeploy) {
+      console.log(`Successfully deployed version ${state.deployingVersion}`);
+    }
+  } catch (e) {
+    if (
+      isDeploy &&
+      prepareBundleSupported(config.docker) &&
+      !api.swarmEnabled()
+    ) {
+      console.log('Deploy failed. Check the logs above for the reason');
+      console.log('=> Ensuring all servers have same version');
+      await rollback(api);
+    }
+
+    throw e;
+  }
 }
 
 export function deploy(api) {
@@ -417,6 +472,37 @@ export function deploy(api) {
   return api
     .runCommand('meteor.push')
     .then(() => api.runCommand('default.reconfig'));
+}
+
+export async function deployVersion(api) {
+  log('exec => mup meteor deploy');
+
+  // validate settings and config before starting
+  api.getSettings();
+  const config = api.getConfig().app;
+
+  if (!config) {
+    console.error('error: no configs found for meteor');
+    process.exit(1);
+  }
+
+  let version = api.getArgs()[2];
+
+  if (!version) {
+    console.error('Please provide a version');
+    process.exit(1);
+  }
+
+  version = parseInt(version, 10);
+
+  if (Number.isNaN(version)) {
+    console.log('Version is not a valid number');
+    process.exit(1);
+  }
+
+  state.deployingVersion = version;
+
+  return api.runCommand('default.reconfig');
 }
 
 export async function stop(api) {
@@ -666,4 +752,33 @@ export async function status(api) {
   });
 
   display.show(overview);
+}
+
+export async function listVersions(api) {
+  const versions = await getVersions(api);
+  console.log('Application versions:');
+  // TODO: when using private docker registry, combine versions
+  // and history to get a more complete list
+  versions.versions.forEach(version => {
+    let text = `  - ${version}`;
+
+    if (version === versions.current) {
+      text += ' (current)';
+    } else if (version === versions.previous) {
+      text += ' (previous)';
+    } else if (versions.failed.includes(version)) {
+      text += ' (failed)';
+    }
+
+    text = text.padEnd(17, ' ');
+
+    let date = versions.versionDates.get(version);
+    text += ` created ${date.toLocaleDateString('en-US', { dateStyle: 'short', timeStyle: 'short' })}`;
+
+    console.log(text);
+  });
+
+  console.log();
+  console.log('Switch to a different version by running:');
+  console.log('  mup meteor deploy-version <version>');
 }

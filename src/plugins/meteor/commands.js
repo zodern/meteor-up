@@ -87,6 +87,20 @@ export const debug = {
   handler: commandHandlers.debugApp
 };
 
+export const versions = {
+  description: 'List application versions',
+  handler: commandHandlers.listVersions
+};
+
+export const deployVersion = {
+  name: 'deploy-version [version]',
+  description: 'Deploy specific application version',
+  builder(yargs) {
+    yargs.strict(false);
+  },
+  handler: commandHandlers.deployVersion
+};
+
 // Hidden commands
 export const build = {
   description: false,

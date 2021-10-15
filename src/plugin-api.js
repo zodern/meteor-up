@@ -369,12 +369,12 @@ export default class PluginAPI {
     if (this._cachedServerInfo && !collectors) {
       return this._cachedServerInfo;
     }
-    const serverConfig = this.getConfig().servers;
+    const serverConfig = this.expandServers(this.getConfig().servers);
 
     const servers = (
-      selectedServers || Object.keys(this.getConfig().servers)
+      selectedServers || Object.keys(serverConfig)
     ).map(serverName => ({
-      ...serverConfig[serverName],
+      ...serverConfig[serverName].server,
       name: serverName
     }));
 
@@ -443,7 +443,10 @@ export default class PluginAPI {
         this._serverGroupServers[name] = list;
       });
 
-    await Promise.all(promises);
+    await Promise.all(promises).catch(e => {
+      console.dir(e);
+      throw e;
+    });
   }
 
   getSessions(modules = []) {

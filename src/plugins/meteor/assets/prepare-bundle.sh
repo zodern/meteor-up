@@ -1,4 +1,5 @@
 #!/bin/bash
+exec 2>&1
 
 set -e
 
@@ -85,7 +86,7 @@ sudo docker tag $IMAGE:build $IMAGE:<%= tag %>
   # Fails if the previous tag doesn't exist (such as during the initial deploy)
   sudo docker push $IMAGE:previous || true
 
-  sudo docker push $IMAGE:latest
+  sudo docker push $IMAGE:<%= tag %>
   
 <% } %>
 

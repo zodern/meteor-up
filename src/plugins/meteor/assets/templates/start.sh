@@ -10,14 +10,19 @@ BIND=<%= bind %>
 NGINX_PROXY_VERSION="1.0.0"
 LETS_ENCRYPT_VERSION="v1.13.1"
 APP_IMAGE=<%- imagePrefix %><%= appName.toLowerCase() %>
-IMAGE=$APP_IMAGE:latest
+
+TAG=$(tail -1 $APP_PATH/config/version-history.txt)
+TAG=${TAG:="latest"}
+echo "TAG: $TAG"
+
+IMAGE=$APP_IMAGE:$TAG
 VOLUME="--volume=$BUNDLE_PATH:/bundle"
 LOCAL_IMAGE=false
 
 <% if (!privateRegistry) { %>
 sudo docker image inspect $IMAGE >/dev/null || IMAGE=<%= docker.image %>
 
-if [ $IMAGE == $APP_IMAGE:latest  ]; then
+if [ $IMAGE == $APP_IMAGE:$TAG  ]; then
   VOLUME=""
   LOCAL_IMAGE=true
 fi

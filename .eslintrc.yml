@@ -230,7 +230,7 @@ rules:
   - 2
   - after
   padded-blocks: [2, 'never']
-  prefer-const: 2
+  prefer-const: 0
   prefer-reflect: 0
   prefer-spread: 2
   quote-props:

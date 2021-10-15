@@ -42,7 +42,14 @@ export const builtInParsers = {
 
     return null;
   },
-  jsonArray: parseJSONArray
+  jsonArray: parseJSONArray,
+  text(stdout, code) {
+    if (code === 0) {
+      return stdout.trim();
+    }
+
+    return null;
+  }
 };
 
 export const _collectors = {
@@ -78,8 +85,9 @@ function generateVarCommand(name, command) {
   return `
   echo "${prefix}${name}${suffix}"
   ${command} 2>&1
+  MUP_CODE=$?
   echo "${codeSeperator}"
-  echo $?
+  echo $MUP_CODE
   `;
 }
 
