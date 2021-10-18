@@ -72,7 +72,12 @@ describe('module - proxy', function() {
       sh.exec('mup setup');
 
       const out = sh.exec('mup proxy logs --tail 2');
-      expect(out.output).to.have.entriesCount('Generating DSA parameters', 1);
+      if (out.output.indexOf('Received event start for') > -1) {
+        expect(out.output).to.have.entriesCount('Received event start for', 1);
+      } else {
+        expect(out.output).to.have.entriesCount('Generating DSA parameters', 1);
+      }
+
       expect(out.code).to.equal(0);
     });
   });
