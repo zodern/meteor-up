@@ -8,14 +8,14 @@ export function generateName(groupName) {
 }
 
 export function createFingerprint(keyContent) {
-  keyContent = keyContent
+  const cleanedContent = keyContent
     // Remove key type at beginning
     .replace(/(^ssh-[a-zA-Z0-9]*)/, '')
     .trim()
     // Remove comment at end
     .replace(/ [^ ]+$/, '');
 
-  const buffer = Buffer.from(keyContent, 'base64');
+  const buffer = Buffer.from(cleanedContent, 'base64');
   const hash = crypto.createHash('md5').update(buffer).digest('hex');
 
   // Add colons between every 2 characters

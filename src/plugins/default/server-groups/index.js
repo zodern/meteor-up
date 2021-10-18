@@ -21,11 +21,12 @@ function createSourceConfig(SourceAPI) {
       const addCount = Math.max(0, groupConfig.count - good.length);
       const goodRemoveCount = Math.max(0, good.length - groupConfig.count);
 
+      // TODO: finish implementing this
       // If the region or type changed, all of the servers are wrong.
       // We want to temporarily keep some of the wrong servers so they can
       // handle requests until the new servers are ready
-      const min = Math.ceil(groupConfig.count / 2);
-      const tempCount = Math.min(wrong.length, min - groupConfig.count);
+      // const min = Math.ceil(groupConfig.count / 2);
+      // const tempCount = Math.min(wrong.length, min - groupConfig.count);
 
       if (goodRemoveCount > 0) {
         console.log(`=> Removing ${goodRemoveCount} servers for ${name}`);

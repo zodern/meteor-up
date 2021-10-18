@@ -11,7 +11,6 @@ export async function deploy(api) {
   if (await api.checkSetupNeeded()) {
     await api.runCommand('default.setup');
   }
-
 }
 
 export function logs() {
@@ -30,7 +29,6 @@ export async function reconfig(api) {
   if (await api.checkSetupNeeded()) {
     await api.runCommand('default.setup');
   }
-
 }
 
 export function restart() {

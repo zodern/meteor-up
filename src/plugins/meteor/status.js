@@ -117,7 +117,7 @@ function getCheckAddress(server, appConfig) {
 }
 
 export async function checkUrls(server, appConfig, api) {
-  const port = server.overrides.env?.PORT ?
+  const port = server.overrides.env && server.overrides.env.PORT ?
     server.overrides.env.PORT :
     appConfig.env.PORT;
 
