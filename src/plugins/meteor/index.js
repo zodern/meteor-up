@@ -1,7 +1,7 @@
 import * as _commands from './commands';
 import _validator from './validate';
 import { defaultsDeep } from 'lodash';
-import { tmpBuildPath } from './utils';
+import { getSessions, tmpBuildPath } from './utils';
 import traverse from 'traverse';
 
 export const description = 'Deploy and manage meteor apps';
@@ -137,4 +137,29 @@ export function swarmOptions(config) {
       labels: [label]
     };
   }
+}
+
+export async function checkSetup(api) {
+  const config = api.getConfig();
+  if (!config.app || config.app.type !== 'meteor') {
+    return [];
+  }
+
+  const sessions = await getSessions(api);
+
+  return [
+    {
+      sessions,
+      name: `meteor-${config.app.name}`,
+      setupKey: {
+        // TODO: handle legacy ssl configuration
+        scripts: [
+          api.resolvePath(__dirname, 'assets/meteor-setup.sh')
+        ],
+        config: {
+          name: config.app.name
+        }
+      }
+    }
+  ];
 }

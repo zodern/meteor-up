@@ -36,8 +36,12 @@ export default class DigitalOcean {
     });
   }
 
-  async compareServers() {
-    const servers = await this.getServers();
+  async compareServers(servers) {
+    if (!servers) {
+      // eslint-disable-next-line no-param-reassign
+      servers = await this.getServers();
+    }
+
     const good = [];
     const wrong = [];
 

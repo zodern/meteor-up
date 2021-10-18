@@ -18,6 +18,7 @@ import { runConfigPreps } from './prepare-config';
 import { scrubConfig } from './scrub-config';
 import serverInfo from './server-info';
 import { serverSources } from './server-sources';
+import { checkSetup, updateSetupKeys } from './check-setup';
 
 const { resolvePath, moduleNotFoundIsPath } = utils;
 const log = debug('mup:api');
@@ -337,12 +338,17 @@ export default class PluginAPI {
       this._commandErrorHandler(e);
     }
 
-    await this._runPostHooks(name).then(() => {
-      // The post hooks for the first command should be the last thing run
-      if (firstCommand) {
-        this._cleanupSessions();
-      }
-    });
+    await this._runPostHooks(name);
+
+    if (name === 'default.setup') {
+      console.log('=> Storing setup config on servers');
+      await updateSetupKeys(this);
+    }
+
+    // The post hooks for the first command should be the last thing run
+    if (firstCommand) {
+      this._cleanupSessions();
+    }
   }
 
   expandServers(serversObj) {
@@ -396,14 +402,23 @@ export default class PluginAPI {
     this._cachedServerInfo = null;
   }
 
-  async loadServerGroups() {
+  async checkSetupNeeded() {
+    const [upToDate, serverGroupsUpToDate] = await Promise.all([
+      checkSetup(this),
+      this._serverGroupsUpToDate()
+    ]);
+
+    return !upToDate || !serverGroupsUpToDate;
+  }
+
+  _mapServerGroup(cb) {
     const { servers } = this.getConfig(false);
 
     if (typeof servers !== 'object' || servers === null) {
-      return;
+      return [];
     }
 
-    const promises = Object.entries(servers)
+    return Object.entries(servers)
       .filter(([, serverConfig]) => serverConfig && typeof serverConfig.source === 'string')
       .map(async ([name, serverConfig]) => {
         const source = serverConfig.source;
@@ -412,36 +427,48 @@ export default class PluginAPI {
           throw new Error(`Unrecognized server source: ${source}. Available: ${Object.keys(serverSources)}`);
         }
 
-        const list = await serverSources[source].load(name, serverConfig, this);
-        this._serverGroupServers[name] = list;
-
-        // TODO: handle errors. We should delay throwing the error until
-        // we need the sessions from this server group
+        return cb(name, serverConfig);
       });
+  }
+
+  async loadServerGroups() {
+    const promises = this._mapServerGroup(async (name, groupConfig) => {
+      const source = groupConfig.source;
+      const list = await serverSources[source].load(
+        { name, groupConfig }, this
+      );
+      this._serverGroupServers[name] = list;
+
+      // TODO: handle errors. We should delay throwing the error until
+      // we need the sessions from this server group
+    });
 
     await Promise.all(promises);
   }
 
+  async _serverGroupsUpToDate() {
+    const promises = this._mapServerGroup((name, groupConfig) => {
+      const source = groupConfig.source;
+
+      return serverSources[source].upToDate({ name, groupConfig }, this);
+    });
+
+    const result = await Promise.all(promises);
+
+    return result.every(upToDate => upToDate);
+  }
+
   async updateServerGroups() {
-    const { servers } = this.getConfig();
+    this.sessions = null;
 
-    if (typeof servers !== 'object' || servers === null) {
-      return;
-    }
-
-    const promises = Object.entries(servers)
-      .filter(([, serverConfig]) => serverConfig && typeof serverConfig.source === 'string')
-      .map(async ([name, serverConfig]) => {
-        const source = serverConfig.source;
-
-        if (!(source in serverSources)) {
-          throw new Error(`Unrecognized server source: ${source}. Available: ${Object.keys(serverSources)}`);
-        }
-
-        await serverSources[source].update(name, serverConfig, this);
-        const list = await serverSources[source].load(name, serverConfig, this);
-        this._serverGroupServers[name] = list;
-      });
+    const promises = this._mapServerGroup(async (name, groupConfig) => {
+      const source = groupConfig.source;
+      await serverSources[source].update({ name, groupConfig }, this);
+      const list = await serverSources[source].load(
+        { name, groupConfig }, this
+      );
+      this._serverGroupServers[name] = list;
+    });
 
     await Promise.all(promises).catch(e => {
       console.dir(e);

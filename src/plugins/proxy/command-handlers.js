@@ -6,7 +6,7 @@ import fs from 'fs';
 import nodemiral from '@zodern/nodemiral';
 
 const log = debug('mup:module:proxy');
-const PROXY_CONTAINER_NAME = 'mup-nginx-proxy';
+export const PROXY_CONTAINER_NAME = 'mup-nginx-proxy';
 
 export function logs(api) {
   log('exec => mup proxy logs');

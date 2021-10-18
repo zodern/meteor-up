@@ -11,6 +11,7 @@ import { registerPreparer } from './prepare-config';
 import { registerScrubber } from './scrub-config';
 import { registerServerSource } from './server-sources';
 import { registerSwarmOptions } from './swarm-options';
+import { registerChecker } from './check-setup';
 import resolveFrom from 'resolve-from';
 
 const log = debug('mup:plugin-loader');
@@ -107,6 +108,9 @@ function registerPlugin(plugin) {
     for (const [type, config] of Object.entries(plugin.module.serverSources)) {
       registerServerSource(type, config);
     }
+  }
+  if (plugin.module.checkSetup) {
+    registerChecker(plugin.module.checkSetup);
   }
 }
 

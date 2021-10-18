@@ -21,7 +21,7 @@ import nodemiral from '@zodern/nodemiral';
 
 const log = debug('mup:module:docker');
 
-function uniqueSessions(api) {
+export function uniqueSessions(api) {
   const { servers } = api.getConfig();
   const sessions = api.getSessions(['app', 'mongo', 'proxy']);
 

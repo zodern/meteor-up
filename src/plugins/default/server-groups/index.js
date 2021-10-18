@@ -3,12 +3,18 @@ import { waitForServers } from './utils';
 
 function createSourceConfig(SourceAPI) {
   return {
-    async load(name, groupConfig, pluginApi) {
+    async load({ name, groupConfig }, pluginApi) {
       const api = new SourceAPI(name, groupConfig, pluginApi);
 
       return api.getServers();
     },
-    async update(name, groupConfig, pluginApi) {
+    async upToDate({ name, groupConfig, list }, pluginApi) {
+      const api = new SourceAPI(name, groupConfig, pluginApi);
+      const { wrong, good } = await api.compareServers(list);
+
+      return wrong.length === 0 && good.length === groupConfig.count;
+    },
+    async update({ name, groupConfig }, pluginApi) {
       const api = new SourceAPI(name, groupConfig, pluginApi);
       const { wrong, good } = await api.compareServers();
 

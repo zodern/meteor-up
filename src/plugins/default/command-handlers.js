@@ -5,16 +5,32 @@ import { map } from 'bluebird';
 
 const log = debug('mup:module:default');
 
-export function deploy() {
+export async function deploy(api) {
   log('exec => mup deploy');
+  console.log('=> Checking if server setup needed');
+  if (await api.checkSetupNeeded()) {
+    await api.runCommand('default.setup');
+  }
+
 }
 
 export function logs() {
   log('exec => mup logs');
 }
 
-export function reconfig() {
+export async function reconfig(api) {
   log('exec => mup reconfig');
+
+  if (api.commandHistory.find(({ name }) => name === 'default.deploy')) {
+    // We've already checked if setup is needed
+    return;
+  }
+
+  console.log('=> Checking if server setup needed');
+  if (await api.checkSetupNeeded()) {
+    await api.runCommand('default.setup');
+  }
+
 }
 
 export function restart() {

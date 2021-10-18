@@ -47,3 +47,32 @@ export const hooks = {
     }
   }
 };
+
+export async function checkSetup(api) {
+  const config = api.getConfig();
+  if (!config.mongo) {
+    return [];
+  }
+
+  const sessions = api.getSessions(['mongo']);
+
+  return [
+    {
+      sessions,
+      name: `mongo-${config.app.name}`,
+      setupKey: {
+        scripts: [
+          api.resolvePath(__dirname, 'assets/mongo-setup.sh'),
+          api.resolvePath(__dirname, 'assets/templates/start.sh'),
+          api.resolvePath(__dirname, 'assets/mongo-start.sh')
+        ],
+        config: {
+          version: config.mongo.version
+        }
+      },
+      containers: [
+        'mongodb'
+      ]
+    }
+  ];
+}
