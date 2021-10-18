@@ -236,11 +236,7 @@ module.exports = {
     // lets you define which port to check after the deploy process, if it
     // differs from the meteor port you are serving
     // (like meteor behind a proxy/firewall) (optional)
-    deployCheckPort: 80,
-
-    // Shows progress bar while uploading bundle to server
-    // Since Meteor Up 1.6, this option does nothing, and is always true.
-    enableUploadProgressBar: true
+    deployCheckPort: 80
   },
 
   // (optional) Use built-in mongodb. Remove it to use a remote MongoDB
