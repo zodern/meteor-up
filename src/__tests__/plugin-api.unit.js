@@ -169,7 +169,7 @@ describe('PluginAPI', () => {
 
   describe('_normalizeConfig', () => {
     it('should copy meteor object to app', () => {
-      const expected = { meteor: { path: '../' }, app: { type: 'meteor', path: '../', docker: { image: 'kadirahq/meteord', imagePort: 3000, stopAppDuringPrepareBundle: true } } };
+      const expected = { meteor: { path: '../' }, app: { type: 'meteor', path: '../', docker: { image: 'zodern/meteor:0.6.1-root', imagePort: 3000, stopAppDuringPrepareBundle: true } } };
       const config = { meteor: { path: '../' } };
       const result = api._normalizeConfig(config);
 
