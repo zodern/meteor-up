@@ -487,7 +487,20 @@ export default class PluginAPI {
       this._loadSessions();
     }
 
-    return servers.map(name => this.sessions[name]);
+    let result = [];
+
+    servers.forEach(name => {
+      let session = this.sessions[name];
+      if (Array.isArray(session)) {
+        session.forEach(memberName => {
+          result.push(this.sessions[memberName]);
+        });
+      } else {
+        result.push(session);
+      }
+    });
+
+    return result;
   }
 
   async getManagerSession() {
