@@ -77,7 +77,16 @@ export async function prepareBundleLocally(
 
   console.log('');
   console.log('=> Updating base image');
-  await runCommand('docker', ['login', '--password-stdin', '--username', privateDockerRegistry.username, privateDockerRegistry.host], { stdin: privateDockerRegistry.password });
+  await runCommand(
+    'docker',
+    [
+      'login',
+      '--username',
+      privateDockerRegistry.username,
+      '--password',
+      privateDockerRegistry.password
+    ].concat(privateDockerRegistry.host ? [privateDockerRegistry.host] : [])
+  );
   await runCommand('docker', ['pull', appConfig.docker.image]);
 
   console.log('');
