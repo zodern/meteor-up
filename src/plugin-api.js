@@ -98,6 +98,8 @@ export default class PluginAPI {
       opts.showDuration = this.profileTasks;
     }
 
+    opts._mupPluginApi = this;
+
     return utils.runTaskList(list, sessions, opts);
   }
 
@@ -247,7 +249,7 @@ export default class PluginAPI {
       process.exit(1);
     }
   }
-  _runHooks = async function(handlers, hookName) {
+  _runHooks = async function(handlers, hookName, secondArg) {
     const messagePrefix = `> Running hook ${hookName}`;
 
     for (const hookHandler of handlers) {
@@ -257,7 +259,7 @@ export default class PluginAPI {
       }
       if (typeof hookHandler.method === 'function') {
         try {
-          await hookHandler.method(this, nodemiral);
+          await hookHandler.method(this, secondArg || nodemiral);
         } catch (e) {
           this._commandErrorHandler(e);
         }
@@ -271,6 +273,19 @@ export default class PluginAPI {
           hookHandler.remoteCommand
         );
       }
+    }
+  }
+  async _runDuringHooks(name, session) {
+    const hookName = `during.${name}`;
+
+    if (this.program['show-hook-names']) {
+      console.log(chalk.yellow(`Hook: ${hookName}`));
+    }
+
+    if (hookName in hooks) {
+      const hookList = hooks[hookName];
+
+      await this._runHooks(hookList, name, { session });
     }
   }
   _runPreHooks = async function(name) {

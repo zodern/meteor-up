@@ -2,6 +2,7 @@ import * as _commands from './commands';
 import { addProxyEnv, getLoadBalancingHosts, getSessions, normalizeUrl } from './utils';
 import { PROXY_CONTAINER_NAME, updateProxyForLoadBalancing } from './command-handlers';
 import validator from './validate';
+import { gracefulShutdown, readdInstance } from './graceful-shutdown';
 
 export const description = 'Setup and manage reverse proxy and ssl';
 
@@ -125,7 +126,9 @@ export const hooks = {
     }
   },
   'post.reconfig': configureServiceHook,
-  'post.proxy.setup': configureServiceHook
+  'post.proxy.setup': configureServiceHook,
+  'during.app.shutdown': gracefulShutdown,
+  'during.app.start-instance': readdInstance
 };
 
 export function swarmOptions(config) {
@@ -169,7 +172,6 @@ export async function checkSetup(api) {
   let upstream = [];
 
   if (config.loadBalancing) {
-    console.dir(config.app);
     upstream = getLoadBalancingHosts(
       api.expandServers(config.app.servers)
     );

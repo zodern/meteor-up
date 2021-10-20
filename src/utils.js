@@ -33,11 +33,21 @@ export function runTaskList(list, sessions, opts) {
     delete opts.verbose;
   }
 
-  if (opts && opts.showDuration) {
+  if (opts) {
+    let pluginApi = opts._mupPluginApi;
     list._taskQueue.forEach(task => {
       task.options = task.options || {};
-      task.options.showDuration = true;
+
+      if (task.type === '_runHook') {
+        task.options._getMupApi = () => () => pluginApi;
+      }
+
+      if (opts.showDuration) {
+        task.options.showDuration = true;
+      }
     });
+
+    delete opts._mupPluginApi;
     delete opts.showDuration;
   }
 
@@ -240,7 +250,7 @@ export function forwardPort({
   remotePort,
   onReady,
   onError,
-  onConnection = () => {}
+  onConnection = () => { }
 }) {
   const sshOptions = createSSHOptions(server);
   const netServer = net.createServer(netConnection => {

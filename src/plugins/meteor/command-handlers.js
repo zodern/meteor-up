@@ -546,6 +546,9 @@ export async function restart(api) {
   if (api.swarmEnabled()) {
     api.tasks.addRestartService(list, { name: appConfig.name });
   } else {
+    list._runHook('Stopping app', {
+      hookName: 'app.shutdown'
+    });
     list.executeScript('Stop Meteor', {
       script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
       vars: {
@@ -554,6 +557,9 @@ export async function restart(api) {
     });
     addStartAppTask(list, api);
     checkAppStarted(list, api);
+    list._runHook('Finish starting', {
+      hookName: 'app.start-instance'
+    });
   }
 
 

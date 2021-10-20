@@ -23,7 +23,7 @@ cat <<"EOT" > /opt/$PROXYNAME/upstream/$APPNAME
 ip_hash;
 <% } %>
 <% for(var index in hostnames) { %>
-server <%= hostnames[index] %>:<%= port %>;
+server <%= hostnames[index].host %>:<%= port %> <%= hostnames[index].params %>;
 <% } %>
 EOT
 
