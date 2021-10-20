@@ -87,6 +87,15 @@ export const debug = {
   handler: commandHandlers.debugApp
 };
 
+export const shell = {
+  name: 'shell [server]',
+  description: 'Open production Meteor shell',
+  builder(yargs) {
+    yargs.strict(false);
+  },
+  handler: commandHandlers.meteorShell
+};
+
 export const versions = {
   description: 'List application versions',
   handler: commandHandlers.listVersions

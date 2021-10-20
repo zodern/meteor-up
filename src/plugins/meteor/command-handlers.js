@@ -18,6 +18,7 @@ import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
 import { rollback } from './rollback';
 import state from './state';
+import { Client } from 'ssh2';
 
 
 const log = debug('mup:module:meteor');
@@ -662,6 +663,61 @@ export async function debugApp(api) {
       }
     }
   });
+}
+
+export async function meteorShell(api) {
+  const { app } = api.getConfig();
+  const expandedServers = api.expandServers(app.servers);
+  let serverOption = api.getArgs()[1];
+
+  // Check how many sessions are enabled. Usually is all servers,
+  // but can be reduced by the `--servers` option
+  const enabledSessions = api.getSessionsForServers(Object.keys(app.servers))
+    .filter(session => session);
+
+  if (!(serverOption in expandedServers)) {
+    if (enabledSessions.length === 1) {
+      const selectedHost = enabledSessions[0]._host;
+      serverOption = Object.keys(expandedServers).find(key =>
+        expandedServers[key].server.host === selectedHost);
+    } else {
+      console.log('mup meteor shell <server>');
+      console.log('Available servers are:\n', Object.keys(expandedServers).join('\n '));
+      process.exitCode = 1;
+
+      return;
+    }
+  }
+
+  const server = expandedServers[serverOption].server;
+  const sshOptions = api._createSSHOptions(server);
+
+  const conn = new Client();
+  conn.on('ready', () => {
+    conn.exec(
+      `docker exec -it ${app.name} node ./meteor-shell.js`,
+      { pty: true },
+      (err, stream) => {
+        if (err) {
+          throw err;
+        }
+        stream.on('close', () => {
+          conn.end();
+          process.exit();
+        });
+
+        process.stdin.setRawMode(true);
+        process.stdin.pipe(stream);
+
+        stream.pipe(process.stdout);
+        stream.stderr.pipe(process.stderr);
+        stream.setWindow(process.stdout.rows, process.stdout.columns);
+
+        process.stdout.on('resize', () => {
+          stream.setWindow(process.stdout.rows, process.stdout.columns);
+        });
+      });
+  }).connect(sshOptions);
 }
 
 export async function destroy(api) {
