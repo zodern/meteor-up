@@ -28,7 +28,8 @@ export function prepareConfig(config, api) {
 
   config.app.docker = defaultsDeep(config.app.docker, {
     image: config.app.dockerImage || 'zodern/meteor:0.6.1-root',
-    stopAppDuringPrepareBundle: true
+    stopAppDuringPrepareBundle: true,
+    useBuildKit: true
   });
 
   delete config.app.dockerImage;

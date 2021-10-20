@@ -139,7 +139,7 @@ module.exports = {
       // make deploys more reliable and easier to troubleshoot
       prepareBundle: true,
 
-      // (optional, default is false) Uses the new docker image builder
+      // (optional, default is true) Uses the new docker image builder
       // during Prepare bundle. When enabled,
       // Prepare Bundle is much faster
       useBuildKit: true,
