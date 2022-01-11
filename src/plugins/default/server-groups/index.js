@@ -10,23 +10,18 @@ function createSourceConfig(SourceAPI) {
     },
     async upToDate({ name, groupConfig, list }, pluginApi) {
       const api = new SourceAPI(name, groupConfig, pluginApi);
-      const { wrong, good } = await api.compareServers(list);
+      const { wrong, good, toResize = [] } = await api.compareServers(list);
 
-      return wrong.length === 0 && good.length === groupConfig.count;
+      return wrong.length === 0 &&
+        good.length === groupConfig.count &&
+        toResize.length === 0;
     },
     async update({ name, groupConfig }, pluginApi) {
       const api = new SourceAPI(name, groupConfig, pluginApi);
-      const { wrong, good } = await api.compareServers();
+      const { wrong, good, toResize = [] } = await api.compareServers();
 
       const addCount = Math.max(0, groupConfig.count - good.length);
       const goodRemoveCount = Math.max(0, good.length - groupConfig.count);
-
-      // TODO: finish implementing this
-      // If the region or type changed, all of the servers are wrong.
-      // We want to temporarily keep some of the wrong servers so they can
-      // handle requests until the new servers are ready
-      // const min = Math.ceil(groupConfig.count / 2);
-      // const tempCount = Math.min(wrong.length, min - groupConfig.count);
 
       if (goodRemoveCount > 0) {
         console.log(`=> Removing ${goodRemoveCount} servers for ${name}`);
@@ -44,6 +39,13 @@ function createSourceConfig(SourceAPI) {
         const created = await api.createServers(addCount);
         await waitForServers(created, pluginApi);
         console.log(`=> Finished creating ${addCount} servers for ${name}`);
+      }
+
+      for (const server of toResize) {
+        console.log(`=> Resizing ${server.__droplet.name} for ${name}`);
+        await api.resizeServer(server.__droplet.id);
+        await waitForServers([server], pluginApi);
+        console.log(`=> Finished resizing ${server.__droplet.name} for ${name}`);
       }
     }
   };

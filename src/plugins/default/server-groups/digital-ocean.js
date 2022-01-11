@@ -44,23 +44,36 @@ export default class DigitalOcean {
 
     const good = [];
     const wrong = [];
+    const toResize = [];
 
     servers.forEach(server => {
       const droplet = server.__droplet;
 
-      if (
-        droplet.size_slug !== this.config.size ||
-        droplet.region.slug !== this.config.region
-      ) {
+      if (droplet.region.slug !== this.config.region) {
         wrong.push(server);
-      } else {
-        good.push(server);
+
+        return;
       }
+
+      if (
+        droplet.size_slug !== this.config.size
+      ) {
+        if (this.config._resize) {
+          toResize.push(server);
+        } else {
+          wrong.push(server);
+        }
+
+        return;
+      }
+
+      good.push(server);
     });
 
     return {
       wrong,
-      good
+      good,
+      toResize
     };
   }
 
@@ -77,6 +90,11 @@ export default class DigitalOcean {
     let fingerprint = await this._setupPublicKey();
     const names = [];
 
+    let size = this.config.size;
+    if (this.config._resize) {
+      size = this.config._resize.initialSize;
+    }
+
     while (names.length < count) {
       names.push(generateName(this.name));
     }
@@ -84,7 +102,7 @@ export default class DigitalOcean {
     const data = {
       names,
       region: this.config.region,
-      size: this.config.size,
+      size,
 
       // TODO: pick image from API
       image: 'ubuntu-20-04-x64',
@@ -106,7 +124,11 @@ export default class DigitalOcean {
     );
 
     const ids = result.data.droplets.map(droplet => droplet.id);
-    await Promise.all(ids.map(id => this._waitForDropletActive(id)));
+    await Promise.all(ids.map(id => this._waitForStatus(id, 'active')));
+
+    if (size !== this.config.size) {
+      await Promise.all(ids.map(id => this.resizeServer(id, this.config.size)));
+    }
 
     return this.getServers(ids);
   }
@@ -150,25 +172,89 @@ export default class DigitalOcean {
     return fingerprint;
   }
 
-  async _waitForDropletActive(id) {
-    const TEN_MINUTES = 1000 * 60 * 10;
-    const timeoutAt = Date.now() + TEN_MINUTES;
+  // Default timeout is 10 minutes
+  async _waitForStatus(dropletId, desiredStatus, timeout = 1000 * 60 * 10) {
+    const timeoutAt = Date.now() + timeout;
 
     while (Date.now() < timeoutAt) {
       const response = await this._request(
         'get',
-        `droplets/${id}`
+        `droplets/${dropletId}`
       );
       const status = response.data.droplet.status;
 
-      if (status === 'active') {
+      if (status === desiredStatus) {
         return;
       }
 
       await new Promise(resolve => setTimeout(resolve, 1000 * 10));
     }
 
-    throw new Error(`Timed out waiting for droplet ${id} to become active`);
+    throw new Error(`Timed out waiting for droplet ${dropletId} to become active`);
+  }
+
+  async resizeServer(dropletId) {
+    await this._shutdownDroplet(dropletId);
+
+    const result = await this._request(
+      'post',
+      `droplets/${dropletId}/actions`,
+      {
+        type: 'resize',
+        disk: false,
+        size: this.config.size
+      }
+    );
+
+    const actionId = result.data.action.id;
+
+    let timeoutAt = Date.now() + (1000 * 60 * 10);
+    while (Date.now() < timeoutAt) {
+      const { data } = await this._request(
+        'get',
+        `droplets/${dropletId}/actions/${actionId}`
+      );
+
+      if (data.action.status === 'completed') {
+        break;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1000 * 10));
+    }
+
+    await this._request(
+      'post',
+      `droplets/${dropletId}/actions`,
+      {
+        type: 'power_on'
+      }
+    );
+
+    await this._waitForStatus(dropletId, 'active');
+  }
+
+  async _shutdownDroplet(dropletId) {
+    await this._request(
+      'post',
+      `droplets/${dropletId}/actions`,
+      {
+        type: 'shutdown'
+      }
+    );
+
+    try {
+      await this._waitForStatus(dropletId, 'off', 1000 * 60 * 3);
+    } catch (e) {
+      console.log(e);
+      await this._request(
+        'post',
+        `droplets/${dropletId}/actions`,
+        {
+          type: 'power_off'
+        }
+      );
+      await this._waitForStatus(dropletId, 'off');
+    }
   }
 
   _request(method, path, data) {
