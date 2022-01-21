@@ -9,8 +9,7 @@ export default class DigitalOcean {
 
     this.publicKeyPath = pluginApi.resolvePath(this.config.sshKey.public);
 
-    const tagPrefix = groupConfig.__tagPrefix || 'mup-';
-    this.tag = `${tagPrefix}-${this.name}`;
+    this.tag = groupConfig.__tag || `mup-${this.name}`;
   }
 
   async getServers(ids) {
