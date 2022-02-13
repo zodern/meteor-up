@@ -1,3 +1,7 @@
+## 1.5.6 - February 13, 2022
+
+- Fix connecting to built-in MongoDB with Meteor 1.6. The replica set now uses `mongodb:27017` as the member's hostname instead of `127.0.0.1:27017`
+
 ## 1.5.5 - September 30, 2021
 
 - Config created by `mup init` now uses `zodern/meteor:root` as docker image

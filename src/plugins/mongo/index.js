@@ -16,7 +16,7 @@ export function prepareConfig(config) {
 
   config.app.env = config.app.env || {};
   config.mongo.dbName = config.mongo.dbName || config.app.name.split('.').join('');
-  config.app.env.MONGO_URL = `mongodb://mongodb:27017/${config.mongo.dbName}`;
+  config.app.env.MONGO_URL = `mongodb://mongodb:27017/${config.mongo.dbName}?replicaSet=meteor`;
 
   if (!config.app.docker) {
     config.app.docker = {};
