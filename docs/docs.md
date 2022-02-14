@@ -981,7 +981,7 @@ mup mongo logs
 
 For backup you can use:
 ```sh
-ssh root@host "docker exec mongodb mongodump -d meteor --archive --gzip" > dump.gz
+ssh root@host "docker exec mongodb mongodump -d <appName> --archive --gzip" > dump.gz
 ```
 and for restore:
 ```sh
