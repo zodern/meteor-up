@@ -1,3 +1,8 @@
+## 1.5.7 - February 13, 2022
+
+- Update mongo version in config created by `mup init`
+- Fix initializing Mongo replica set
+
 ## 1.5.6 - February 13, 2022
 
 - Fix connecting to built-in MongoDB with Meteor 1.6. The replica set now uses `mongodb:27017` as the member's hostname instead of `127.0.0.1:27017`
