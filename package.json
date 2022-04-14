@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^15.1.1",
-    "@zodern/nodemiral": "^1.4.0-beta.1",
+    "@zodern/nodemiral": "^1.4.0-beta.2",
     "axios": "^0.21.4",
     "bluebird": "^3.7.2",
     "boxen": "^4.2.0",
