@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { Client } from 'ssh2';
+import { Client } from 'ssh2-classic';
 import debug from 'debug';
 import { map } from 'bluebird';
 
