@@ -19,8 +19,8 @@ describe('module - mongo', function() {
       const out = sh.exec('mup mongo logs');
 
       expect(out.code).to.be.equal(0);
-      expect(countOccurrences('MongoDB starting :', out.output)).to.be.equal(1);
-      expect(countOccurrences('db version', out.output)).to.be.equal(1);
+      expect(countOccurrences('MongoDB starting :', out.stdout)).to.be.equal(1);
+      expect(countOccurrences('db version', out.stdout)).to.be.equal(1);
     });
   });
 
@@ -35,10 +35,10 @@ describe('module - mongo', function() {
       expect(out.code).to.be.equal(0);
 
       expect(
-        countOccurrences('Setup Environment: SUCCESS', out.output)
+        countOccurrences('Setup Environment: SUCCESS', out.stdout)
       ).to.be.equal(1);
       expect(
-        countOccurrences('Copying Mongo Config: SUCCESS', out.output)
+        countOccurrences('Copying Mongo Config: SUCCESS', out.stdout)
       ).to.be.equal(1);
 
       const sshOut = await runSSHCommand(serverInfo, 'tree -pufi /opt');
@@ -58,7 +58,7 @@ describe('module - mongo', function() {
       const out = sh.exec('mup mongo start');
       expect(out.code).to.be.equal(0);
 
-      expect(countOccurrences('Start Mongo: SUCCESS', out.output)).to.be.equal(
+      expect(countOccurrences('Start Mongo: SUCCESS', out.stdout)).to.be.equal(
         1
       );
       expect(
@@ -72,7 +72,7 @@ describe('module - mongo', function() {
 
       expect(out.code).to.be.equal(0);
 
-      expect(countOccurrences('mongodb://mongodb:27017/test-db', out.output)).to.be.equal(
+      expect(countOccurrences('mongodb://mongodb:27017/test-db', out.stdout)).to.be.equal(
         1
       );
     });
@@ -89,7 +89,7 @@ describe('module - mongo', function() {
 
       expect(out.code).to.be.equal(0);
 
-      expect(countOccurrences('Stop Mongo: SUCCESS', out.output)).to.be.equal(1);
+      expect(countOccurrences('Stop Mongo: SUCCESS', out.stdout)).to.be.equal(1);
       expect(
         (await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code
       ).to.be.equal(1);
