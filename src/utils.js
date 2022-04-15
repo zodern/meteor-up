@@ -272,7 +272,7 @@ export function forwardPort({
   });
 }
 
-export function countOccurences(needle, haystack) {
+export function countOccurrences(needle, haystack) {
   const regex = new RegExp(needle, 'g');
   const match = haystack.match(regex) || [];
 

@@ -1,6 +1,6 @@
 import { before, describe, it } from 'mocha';
 import chai, { expect } from 'chai';
-import { countOccurences, runSSHCommand } from '../../../utils';
+import { countOccurrences, runSSHCommand } from '../../../utils';
 import assert from 'assert';
 import chaiString from 'chai-string';
 import os from 'os';
@@ -38,7 +38,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor setup');
       assert.equal(out.code, 0);
 
-      const num = countOccurences('Setup Environment: SUCCESS', out.output);
+      const num = countOccurrences('Setup Environment: SUCCESS', out.output);
       assert.equal(num, 1);
 
       const sshOut = await runSSHCommand(serverInfo, 'tree -pufid /opt');
@@ -60,7 +60,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor push --cached-build');
       assert.equal(out.code, 0);
 
-      const num = countOccurences(
+      const num = countOccurrences(
         'Pushing Meteor App Bundle to the Server: SUCCESS',
         out.output
       );
@@ -82,7 +82,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup --config mup.env-with-space.js meteor push --cached-build');
       assert.equal(out.code, 0);
 
-      const num = countOccurences(
+      const num = countOccurrences(
         'Prepare Bundle: SUCCESS',
         out.output
       );
@@ -100,7 +100,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor envconfig');
       assert.equal(out.code, 0);
 
-      const num = countOccurences(
+      const num = countOccurrences(
         'Sending Environment Variables: SUCCESS',
         out.output
       );
@@ -148,7 +148,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor start');
       assert.equal(out.code, 0);
 
-      const num = countOccurences('Start Meteor: SUCCESS', out.output);
+      const num = countOccurrences('Start Meteor: SUCCESS', out.output);
       assert.equal(num, 1);
 
       const sshOut = await runSSHCommand(
@@ -171,16 +171,16 @@ describe('module - meteor', function() {
     async function checkDeploy(out, appText, port = 80) {
       assert.equal(out.code, 0);
 
-      const num = countOccurences(
+      const num = countOccurrences(
         'Sending Environment Variables: SUCCESS',
         out.output
       );
       assert.equal(num, 1);
 
-      const num2 = countOccurences('Start Meteor: SUCCESS', out.output);
+      const num2 = countOccurrences('Start Meteor: SUCCESS', out.output);
       assert.equal(num2, 1);
 
-      const num3 = countOccurences(
+      const num3 = countOccurrences(
         'Pushing Meteor App Bundle to the Server: SUCCESS',
         out.output
       );
@@ -288,7 +288,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor stop');
       assert.equal(out.code, 0);
 
-      const num = countOccurences('Stop Meteor: SUCCESS', out.output);
+      const num = countOccurrences('Stop Meteor: SUCCESS', out.output);
       assert.equal(num, 1);
 
       const sshOut = await runSSHCommand(

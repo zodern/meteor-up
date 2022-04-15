@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import { before, describe, it } from 'mocha';
 import chai, { expect } from 'chai';
-import { countOccurences, runSSHCommand } from '../../../utils';
+import { countOccurrences, runSSHCommand } from '../../../utils';
 import chaiString from 'chai-string';
 import fs from 'fs';
 import os from 'os';
@@ -44,22 +44,22 @@ describe('module - default', function() {
       });
 
       expect(
-        countOccurences(
+        countOccurrences(
           'Pushing Meteor App Bundle to the Server: SUCCESS',
           out.stdout
         )
       ).to.be.equal(1);
       expect(
-        countOccurences('Pushing the Startup Script: SUCCESS', out.stdout)
+        countOccurrences('Pushing the Startup Script: SUCCESS', out.stdout)
       ).to.be.equal(1);
       expect(
-        countOccurences('Sending Environment Variables: SUCCESS', out.stdout)
+        countOccurrences('Sending Environment Variables: SUCCESS', out.stdout)
       ).to.be.equal(1);
-      expect(countOccurences('Start Meteor: SUCCESS', out.stdout)).to.be.equal(
+      expect(countOccurrences('Start Meteor: SUCCESS', out.stdout)).to.be.equal(
         1
       );
       expect(
-        countOccurences('Verifying Deployment: SUCCESS', out.stdout)
+        countOccurrences('Verifying Deployment: SUCCESS', out.stdout)
       ).to.be.equal(1);
       const ssh1 = await runSSHCommand(
         serverInfo,
@@ -104,13 +104,13 @@ describe('module - default', function() {
 
       expect(out.code).to.be.equal(0);
       expect(
-        countOccurences('Sending Environment Variables: SUCCESS', out.stdout)
+        countOccurrences('Sending Environment Variables: SUCCESS', out.stdout)
       ).to.be.equal(1);
-      expect(countOccurences('Start Meteor: SUCCESS', out.stdout)).to.be.equal(
+      expect(countOccurrences('Start Meteor: SUCCESS', out.stdout)).to.be.equal(
         1
       );
       expect(
-        countOccurences('Verifying Deployment: SUCCESS', out.stdout)
+        countOccurrences('Verifying Deployment: SUCCESS', out.stdout)
       ).to.be.equal(1);
       expect(
         (await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0')).code
@@ -146,13 +146,13 @@ describe('module - default', function() {
       const out = sh.exec('mup setup');
 
       expect(out.code).to.be.equal(0);
-      expect(countOccurences('Setup Docker: SUCCESS', out.stdout)).to.be.equal(
+      expect(countOccurrences('Setup Docker: SUCCESS', out.stdout)).to.be.equal(
         1
       );
       expect(
-        countOccurences('Setup Environment: SUCCESS', out.stdout)
+        countOccurrences('Setup Environment: SUCCESS', out.stdout)
       ).to.be.equal(2);
-      expect(countOccurences('Start Mongo: SUCCESS', out.stdout)).to.be.equal(
+      expect(countOccurrences('Start Mongo: SUCCESS', out.stdout)).to.be.equal(
         1
       );
       expect(
@@ -170,11 +170,11 @@ describe('module - default', function() {
       const out = sh.exec('mup start');
 
       expect(out.code).to.be.equal(0);
-      expect(countOccurences('Start Meteor: SUCCESS', out.stdout)).to.be.equal(
+      expect(countOccurrences('Start Meteor: SUCCESS', out.stdout)).to.be.equal(
         1
       );
       expect(
-        countOccurences('Verifying Deployment: SUCCESS', out.stdout)
+        countOccurrences('Verifying Deployment: SUCCESS', out.stdout)
       ).to.be.equal(1);
       expect(
         (await runSSHCommand(serverInfo, 'curl localhost:80 && exit 0')).code
@@ -191,7 +191,7 @@ describe('module - default', function() {
       const out = sh.exec('mup stop');
 
       expect(out.code).to.be.equal(0);
-      expect(countOccurences('Stop Meteor: SUCCESS', out.stdout)).to.be.equal(
+      expect(countOccurrences('Stop Meteor: SUCCESS', out.stdout)).to.be.equal(
         1
       );
       expect(
@@ -214,7 +214,7 @@ describe('module - default', function() {
 
       expect(out.code).to.be.equal(0);
       expect(
-        countOccurences('=> Starting meteor app on port 3000', out.output)
+        countOccurrences('=> Starting meteor app on port 3000', out.output)
       ).gte(1);
     });
   });
