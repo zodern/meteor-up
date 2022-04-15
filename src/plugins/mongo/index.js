@@ -12,7 +12,7 @@ export function prepareConfig(config) {
     return config;
   }
 
-  config.mongo.version = config.mongo.version || '3.4.1';
+  config.mongo.version = config.mongo.version || '3.4.24';
 
   config.app.env = config.app.env || {};
   config.mongo.dbName = config.mongo.dbName || config.app.name.split('.').join('');
