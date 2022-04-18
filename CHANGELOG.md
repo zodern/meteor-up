@@ -1,3 +1,13 @@
+## Next
+
+- Update nginx
+- Improve output from prepare bundle when it fails
+- Update docs to refer to `app` instead of the deprecated `meteor` object (@maxmatthews)
+- Fix description of mup-cloud-front plugin (@cunneen)
+- Update default mongo version to 3.4.24 from 3.4.1
+- Update deps
+
+
 ## 1.5.7 - February 13, 2022
 
 - Update mongo version in config created by `mup init`
