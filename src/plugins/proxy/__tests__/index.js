@@ -28,8 +28,8 @@ describe('module - proxy', function() {
       let out = sh.exec('mup setup');
 
       expect(out.code).to.equal(0);
-      expect(out.output).to.have.entriesCount('Setup proxy', 1);
-      expect(out.output).to.have.entriesCount('Start proxy: SUCCESS', 1);
+      expect(out.stdout).to.have.entriesCount('Setup proxy', 1);
+      expect(out.stdout).to.have.entriesCount('Start proxy: SUCCESS', 1);
 
       out = await runSSHCommand(serverInfo, 'sudo docker ps');
 
@@ -58,8 +58,8 @@ describe('module - proxy', function() {
 
       let out = sh.exec('mup proxy reconfig-shared');
       expect(out.code).to.equal(0);
-      expect(out.output).to.have.entriesCount('Configuring Proxy\'s Shared Settings', 1);
-      expect(out.output).to.have.entriesCount('Start proxy: SUCCESS', 1);
+      expect(out.stdout).to.have.entriesCount('Configuring Proxy\'s Shared Settings', 1);
+      expect(out.stdout).to.have.entriesCount('Start proxy: SUCCESS', 1);
 
       out = await runSSHCommand(serverInfo, 'cat /opt/mup-nginx-proxy/config/shared-config.sh');
       expect(out.output).to.have.entriesCount('CLIENT_UPLOAD_LIMIT=10M', 1);
@@ -72,10 +72,10 @@ describe('module - proxy', function() {
       sh.exec('mup setup');
 
       const out = sh.exec('mup proxy logs --tail 2');
-      if (out.output.indexOf('Received event start for') > -1) {
-        expect(out.output).to.have.entriesCount('Received event start for', 1);
+      if (out.stdout.indexOf('Received event start for') > -1) {
+        expect(out.stdout).to.have.entriesCount('Received event start for', 1);
       } else {
-        expect(out.output).to.have.entriesCount('Generating DSA parameters', 1);
+        expect(out.stdout).to.have.entriesCount('Generating DSA parameters', 1);
       }
 
       expect(out.code).to.equal(0);

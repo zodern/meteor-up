@@ -1,4 +1,4 @@
-import { Client } from 'ssh2';
+import { Client } from 'ssh2-classic';
 import debug from 'debug';
 import expandTilde from 'expand-tilde';
 import fs from 'fs';
@@ -272,7 +272,7 @@ export function forwardPort({
   });
 }
 
-export function countOccurences(needle, haystack) {
+export function countOccurrences(needle, haystack) {
   const regex = new RegExp(needle, 'g');
   const match = haystack.match(regex) || [];
 
