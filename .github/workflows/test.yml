@@ -39,8 +39,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-       fail-fast: false
        include:
          - nodeVersion: 8.x
            testPlugins: "meteor"
