@@ -82,6 +82,9 @@ describe('module - default', function() {
       sh.exec('mup init');
       expect(fs.existsSync(path.resolve(dir, 'mup.js'))).to.true;
       expect(fs.existsSync(path.resolve(dir, 'settings.json'))).to.true;
+
+      // Deleting the current dir causes future sh commands to fail
+      sh.cd('..');
       sh.rm('-rf', dir);
     });
   });
