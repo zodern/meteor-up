@@ -1,3 +1,4 @@
+import * as uuid from 'uuid';
 import { cloneDeep, flatMap } from 'lodash';
 import fs from 'fs';
 import os from 'os';
@@ -7,7 +8,6 @@ import {
 import random from 'random-seed';
 import { spawn } from 'child_process';
 import tar from 'tar';
-import uuid from 'uuid';
 
 export function checkAppStarted(list, api) {
   const script = api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh');
