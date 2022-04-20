@@ -1,4 +1,4 @@
-import { countOccurences, runSSHCommand } from '../../../utils';
+import { countOccurrences, runSSHCommand } from '../../../utils';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import os from 'os';
@@ -19,8 +19,8 @@ describe('module - mongo', function() {
       const out = sh.exec('mup mongo logs');
 
       expect(out.code).to.be.equal(0);
-      expect(countOccurences('MongoDB starting :', out.output)).to.be.equal(1);
-      expect(countOccurences('db version', out.output)).to.be.equal(1);
+      expect(countOccurrences('MongoDB starting :', out.stdout)).to.be.equal(1);
+      expect(countOccurrences('db version', out.stdout)).to.be.equal(1);
     });
   });
 
@@ -35,16 +35,16 @@ describe('module - mongo', function() {
       expect(out.code).to.be.equal(0);
 
       expect(
-        countOccurences('Setup Environment: SUCCESS', out.output)
+        countOccurrences('Setup Environment: SUCCESS', out.stdout)
       ).to.be.equal(1);
       expect(
-        countOccurences('Copying Mongo Config: SUCCESS', out.output)
+        countOccurrences('Copying Mongo Config: SUCCESS', out.stdout)
       ).to.be.equal(1);
 
       const sshOut = await runSSHCommand(serverInfo, 'tree -pufi /opt');
 
       expect(sshOut.code).to.be.equal(0);
-      expect(countOccurences('mongo-start-new.sh', sshOut.output)).to.be.equal(1);
+      expect(countOccurrences('mongo-start-new.sh', sshOut.output)).to.be.equal(1);
     });
   });
 
@@ -58,7 +58,7 @@ describe('module - mongo', function() {
       const out = sh.exec('mup mongo start');
       expect(out.code).to.be.equal(0);
 
-      expect(countOccurences('Start Mongo: SUCCESS', out.output)).to.be.equal(
+      expect(countOccurrences('Start Mongo: SUCCESS', out.stdout)).to.be.equal(
         1
       );
       expect(
@@ -72,7 +72,7 @@ describe('module - mongo', function() {
 
       expect(out.code).to.be.equal(0);
 
-      expect(countOccurences('mongodb://mongodb:27017/test-db', out.output)).to.be.equal(
+      expect(countOccurrences('mongodb://mongodb:27017/test-db', out.stdout)).to.be.equal(
         1
       );
     });
@@ -89,7 +89,7 @@ describe('module - mongo', function() {
 
       expect(out.code).to.be.equal(0);
 
-      expect(countOccurences('Stop Mongo: SUCCESS', out.output)).to.be.equal(1);
+      expect(countOccurrences('Stop Mongo: SUCCESS', out.stdout)).to.be.equal(1);
       expect(
         (await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code
       ).to.be.equal(1);

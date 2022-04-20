@@ -1,5 +1,5 @@
 import {
-  countOccurences,
+  countOccurrences,
   runSSHCommand
 } from './utils';
 
@@ -9,7 +9,7 @@ export function registerHook(_hookName, _handler) {
   let hookName = _hookName;
   let handler = _handler;
 
-  if (countOccurences('\\.', hookName) === 1) {
+  if (countOccurrences('\\.', hookName) === 1) {
     const sections = hookName.split('.');
     hookName = `${sections[0]}.default.${sections[1]}`;
   }

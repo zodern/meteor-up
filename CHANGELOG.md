@@ -1,3 +1,22 @@
+## 1.5.8 - April 20, 2022
+
+- Update nginx
+- Improve output from prepare bundle when it fails
+- Update docs to refer to `app` instead of the deprecated `meteor` object (@maxmatthews)
+- Fix description of mup-cloud-front plugin (@cunneen)
+- Update default mongo version to 3.4.24 from 3.4.1
+- Update deps
+
+
+## 1.5.7 - February 13, 2022
+
+- Update mongo version in config created by `mup init`
+- Fix initializing Mongo replica set
+
+## 1.5.6 - February 13, 2022
+
+- Fix connecting to built-in MongoDB with Meteor 1.6. The replica set now uses `mongodb:27017` as the member's hostname instead of `127.0.0.1:27017`
+
 ## 1.5.5 - September 30, 2021
 
 - Config created by `mup init` now uses `zodern/meteor:root` as docker image

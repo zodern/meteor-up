@@ -288,7 +288,7 @@ Mup supports Meteor 1.2 and newer, though you might need to change the docker im
 | Meteor version | Docker image | Prepare Bundle | Notes |
 | --- | --- | --- |
 | 1.2 - 1.3 | `kadirahq/meteord` | false | This is the default docker image. When using Meteor 1.2, `app.buildOptions.serverOnly` should be false. |
-| 1.2 - 2.4 and newer | `zodern/meteor:root` | true | Automatically uses the correct node version for the app's Meteor version. |
+| 1.2 - 2.6 and newer | `zodern/meteor:root` | true | Automatically uses the correct node version for the app's Meteor version. |
 | 1.4 - 1.5 | `abernix/meteord:node-4-base` | true |  |
 | 1.6 - 1.8| `abernix/meteord:node-8-base` | true | |
 | 1.9 - 2.2 | `abernix/meteord:node-12-base` | true | |
@@ -324,7 +324,7 @@ app: {
 
 ### Deploy Wait Time
 
-Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can successfully load the app's client, or it runs out of time as defined in `meteor.deployCheckWaitTime`.
+Meteor Up checks if the deployment is successful or not just after the deployment. It will wait 15 seconds after starting the docker container before starting the checks.  The check runs every second until it either can successfully load the app's client, or it runs out of time as defined in `app.deployCheckWaitTime`.
 
 #### Deploy check port
 
@@ -537,7 +537,7 @@ app: {
 
 ### Base Image from a Private Docker Registry
 
-Simply reference the docker image by url in the `meteor.docker.image` setting:
+Simply reference the docker image by url in the `app.docker.image` setting:
 
 ```
 app: {
@@ -553,15 +553,15 @@ And then add a docker setup hook to login to your private registry on the server
 
 ### Image Port
 
-You can set `meteor.docker.imagePort` to the port to expose from the container. This does not affect the port the app is accessed on, only the port the app runs on inside the docker container. It defaults to 3000.
+You can set `app.docker.imagePort` to the port to expose from the container. This does not affect the port the app is accessed on, only the port the app runs on inside the docker container. It defaults to 3000.
 
 ## Reverse Proxy
 
 Meteor Up can create a nginx reverse proxy that will handle SSL, and, if you are running multiple apps on the server, it will route requests to the correct app. The proxy is shared between all apps on the servers.
 
-This replaces the former nginx setup, configured using `meteor.ssl` and `meteor.nginx`.
+This replaces the former nginx setup, configured using `app.ssl` and `app.nginx`.
 
-Remove `meteor.ssl` and `meteor.nginx` from your config and add a `proxy` section:
+Remove `app.ssl` and `app.nginx` from your config and add a `proxy` section:
 
 ```js
 module.exports = {
@@ -640,7 +640,7 @@ module.exports = {
 ```
 
 For Let's Encrypt to work, you also need to:
-1. Make sure `meteor.env.ROOT_URL` starts with `https://`
+1. Make sure `app.env.ROOT_URL` starts with `https://`
 2. Setup DNS for each of the domains in `proxy.domains` to point to the server
 3. Open port 80 if it isn't. That port is used to verify that you control the domain
 4. If you are using Cloudflare, change the SSL setting under Crypto to `Full` or `Full (strict)`
@@ -846,8 +846,8 @@ app: {
 ```
 
 You also need to:
-1. Make sure `meteor.env.ROOT_URL` starts with `https://`
-2. Set up DNS for each of the domains in `meteor.ssl.autogenerate.domains`
+1. Make sure `app.env.ROOT_URL` starts with `https://`
+2. Set up DNS for each of the domains in `app.ssl.autogenerate.domains`
 
 Then run `mup deploy`. It will automatically create certificates and set up SSL, which can take up to a few minutes. The certificates will be automatically renewed when they expire within 30 days.
 
@@ -871,7 +871,7 @@ app: {
 
 Now simply do `mup setup` and then `mup deploy`. Your app is now running with a modern SSL setup.
 
-If your certificate and key are already in the right location on your server and you would like to prevent Mup from overriding them while still needing an SSL setup, you can add `upload: false` in the `meteor.ssl` object.
+If your certificate and key are already in the right location on your server and you would like to prevent Mup from overriding them while still needing an SSL setup, you can add `upload: false` in the `app.ssl` object.
 
 To learn more about SSL setup when using your own certificates, refer to the [`mup-frontend-server`](https://github.com/meteorhacks/mup-frontend-server) project.
 
@@ -902,12 +902,12 @@ app: {
 To use an external database:
 
 1. Remove the `mongo` object from your config
-2. Set `meteor.env.MONGO_URL` to point to the external Mongo instance
+2. Set `app.env.MONGO_URL` to point to the external Mongo instance
 
 Two popular Mongo DbaaS's are [Compose](https://www.compose.com/mongodb) and [mLab](https://mlab.com/).
 
 ### Built-in Database
-Meteor Up can start a MongoDB instance on the server and set `meteor.env.MONGO_URL` to connect to it.
+Meteor Up can start a MongoDB instance on the server and set `app.env.MONGO_URL` to connect to it.
 
 It is recommended to use an external database instead of the one built-in to mup for apps in production. The built-in database is not easy to backup, and only works when the app is running on one server.
 
@@ -976,7 +976,7 @@ mup mongo logs
 
 For backup you can use:
 ```sh
-ssh root@host "docker exec mongodb mongodump -d meteor --archive --gzip" > dump.gz
+ssh root@host "docker exec mongodb mongodump -d <appName> --archive --gzip" > dump.gz
 ```
 and for restore:
 ```sh
@@ -1201,7 +1201,7 @@ The `--verbose` flag shows output from commands and scripts run on the server.
 
 ### Verifying Deployment: FAILED
 
-If you do not see `=> Starting meteor app on port` in the logs, your app did not have enough time to start. Try increase `meteor.deployCheckWaitTime`. This only applies if `Prepare Bundle` is disabled.
+If you do not see `=> Starting meteor app on port` in the logs, your app did not have enough time to start. Try increase `app.deployCheckWaitTime`. This only applies if `Prepare Bundle` is disabled.
 
 If you do see it in your logs, make sure your `ROOT_URL` starts with https or http, depending on if you are using SSL or not. If that did not fix it, create a new issue with your config and output from `mup deploy --verbose`.
 
@@ -1228,7 +1228,7 @@ Make sure meteor is installed on the computer you are deploying from.
 
 ### Let's Encrypt is not working
 
-Make sure your `meteor.env.ROOT_URL` starts with `https://`. Also, check that the DNS for all of the domains in `ssl.autogenerate.domains` is correctly configured to point to the server. Port 80 needs to be open on the server so it can verify that you control the domain.
+Make sure your `app.env.ROOT_URL` starts with `https://`. Also, check that the DNS for all of the domains in `ssl.autogenerate.domains` is correctly configured to point to the server. Port 80 needs to be open on the server so it can verify that you control the domain.
 
 You can view the Let's Encrypt logs by running this command on the server:
 ```

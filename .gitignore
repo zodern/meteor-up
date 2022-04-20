@@ -3,6 +3,7 @@ node_modules
 .vscode
 .idea
 *.log
+.DS_Store
 docs/_site
 coverage
 tests/**/package-lock.json

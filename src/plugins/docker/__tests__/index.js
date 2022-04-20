@@ -1,4 +1,4 @@
-import { countOccurences, resolvePath, runSSHCommand } from '../../../utils';
+import { countOccurrences, resolvePath, runSSHCommand } from '../../../utils';
 import { describe, it } from 'mocha';
 import assert from 'assert';
 import os from 'os';
@@ -25,7 +25,7 @@ describe('module - docker', function() {
         const out = sh.exec('mup docker setup');
         assert.equal(out.code, 0);
 
-        const num = countOccurences('Setup Docker: SUCCESS', out.output);
+        const num = countOccurrences('Setup Docker: SUCCESS', out.stdout);
         assert.equal(num, 1);
 
         const sshOut = await runSSHCommand(serverInfo, 'which docker');
