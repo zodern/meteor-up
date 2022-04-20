@@ -1,4 +1,4 @@
-## Next
+## 1.5.8 - April 20, 2022
 
 - Update nginx
 - Improve output from prepare bundle when it fails
