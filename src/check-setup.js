@@ -48,7 +48,6 @@ export async function checkSetup(pluginApi) {
   const promises = [];
 
   bySession.forEach((config, session) => {
-    console.log(session._host, config);
     const promise = new Promise(resolve => {
       session.executeScript(
         pluginApi.resolvePath(__dirname, './tasks/assets/check-setup.sh'),
