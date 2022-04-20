@@ -56,11 +56,11 @@ describe('utils', () => {
     });
   });
 
-  describe('countOccurences', () => {
+  describe('countOccurrences', () => {
     it('should return the correct count', () => {
       const needle = 'Meteor';
       const haystack = 'Production Quality Meteor Deployments. Meteor Up is a command line tool that allows you to deploy any Meteor app to your own server.';
-      const count = utils.countOccurences(needle, haystack);
+      const count = utils.countOccurrences(needle, haystack);
       assert(count === 3);
     });
   });

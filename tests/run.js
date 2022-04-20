@@ -4,18 +4,18 @@ var sh = require('shelljs');
 var path = require('path');
 var argv = require('yargs').argv;
 
-console.log('=> Setting up for tests');
-require('./setup.js');
-
 var mupDir = process.cwd();
 var keyPath = path.resolve(mupDir, 'tests/fixtures/ssh/new.pub');
+var pemPath = path.resolve(mupDir, 'tests/fixtures/ssh/new');
 var user = argv.nonRoot ? 'normal-user' : 'root';
 var userPath = user === 'root' ? '/root' : `/home/${user}`;
+var host = '127.0.0.1';
+var port = '3500';
 
 sh.env.PROD_SERVER_USER = user;
-sh.env.PROD_SERVER = '127.0.0.1';
-sh.env.PROD_SERVER_PORT = '3500';
-sh.env.PROD_SERVER_PEM = path.resolve(mupDir, 'tests/fixtures/ssh/new');
+sh.env.PROD_SERVER = host;
+sh.env.PROD_SERVER_PORT = port;
+sh.env.PROD_SERVER_PEM = pemPath;
 sh.env.MUP_SKIP_UPDATE_CHECK = 'true';
 sh.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
@@ -23,11 +23,15 @@ var keyVolume = `-v ${keyPath}:${userPath}/.ssh/authorized_keys2`;
 var publish = '-p 127.0.0.1:3500:22';
 var image = 'mup-tests-server-docker';
 var dockerVolume = '-v mup-test-docker-data:/var/lib/docker';
+var containerId;
+
+console.log('=> Setting up for tests');
+require('./setup.js');
 
 console.log('=> Cleaning cache');
 var cleaningContainerId = sh.exec(
   `docker run ${keyVolume} ${publish} ${dockerVolume} --privileged -d -t ${image} /sbin/my_init`
-).output.trim();
+).stdout.trim();
 sh.exec(`docker exec ${cleaningContainerId} sudo service docker start`);
 
 // Stop all running containers
@@ -38,9 +42,9 @@ sh.exec(`docker exec ${cleaningContainerId} bash -c "docker rm -f $(docker ps -a
 sh.exec(`docker rm -f ${cleaningContainerId}`);
 
 console.log('=> Starting Ubuntu Container');
-var containerId = sh.exec(
+containerId = sh.exec(
   `docker run ${keyVolume} ${publish} ${dockerVolume} --privileged -d -t ${image} /sbin/my_init`
-).output.trim();
+).stdout.trim();
 
 sh.exec(`docker exec ${containerId} sudo service docker start`);
 sh.exec(`docker exec ${containerId} cp ${userPath}/.ssh/authorized_keys2 ${userPath}/.ssh/authorized_keys`);
@@ -66,5 +70,10 @@ console.log('=> COMMAND', command);
 var testCode = sh.exec(command)
   .code;
 
-sh.exec(`docker rm -f ${containerId}`);
+// If the tests failed, leave the container running to
+// help with finding the cause
+if (testCode === 0) {
+  sh.exec(`docker rm -f ${containerId}`);
+}
+
 process.exit(testCode);

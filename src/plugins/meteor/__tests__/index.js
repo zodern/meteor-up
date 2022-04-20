@@ -1,6 +1,6 @@
 import { before, describe, it } from 'mocha';
 import chai, { expect } from 'chai';
-import { countOccurences, runSSHCommand } from '../../../utils';
+import { countOccurrences, runSSHCommand } from '../../../utils';
 import assert from 'assert';
 import chaiString from 'chai-string';
 import os from 'os';
@@ -38,7 +38,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor setup');
       assert.equal(out.code, 0);
 
-      const num = countOccurences('Setup Environment: SUCCESS', out.output);
+      const num = countOccurrences('Setup Environment: SUCCESS', out.stdout);
       assert.equal(num, 1);
 
       const sshOut = await runSSHCommand(serverInfo, 'tree -pufid /opt');
@@ -60,9 +60,9 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor push --cached-build');
       assert.equal(out.code, 0);
 
-      const num = countOccurences(
+      const num = countOccurrences(
         'Pushing Meteor App Bundle to the Server: SUCCESS',
-        out.output
+        out.stdout
       );
       assert.equal(num, 1);
 
@@ -82,9 +82,9 @@ describe('module - meteor', function() {
       const out = sh.exec('mup --config mup.env-with-space.js meteor push --cached-build');
       assert.equal(out.code, 0);
 
-      const num = countOccurences(
+      const num = countOccurrences(
         'Prepare Bundle: SUCCESS',
-        out.output
+        out.stdout
       );
       assert.equal(num, 1);
     });
@@ -100,9 +100,9 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor envconfig');
       assert.equal(out.code, 0);
 
-      const num = countOccurences(
+      const num = countOccurrences(
         'Sending Environment Variables: SUCCESS',
-        out.output
+        out.stdout
       );
       assert.equal(num, 1);
 
@@ -148,7 +148,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor start');
       assert.equal(out.code, 0);
 
-      const num = countOccurences('Start Meteor: SUCCESS', out.output);
+      const num = countOccurrences('Start Meteor: SUCCESS', out.stdout);
       assert.equal(num, 1);
 
       const sshOut = await runSSHCommand(
@@ -171,18 +171,18 @@ describe('module - meteor', function() {
     async function checkDeploy(out, appText, port = 80) {
       assert.equal(out.code, 0);
 
-      const num = countOccurences(
+      const num = countOccurrences(
         'Sending Environment Variables: SUCCESS',
-        out.output
+        out.stdout
       );
       assert.equal(num, 1);
 
-      const num2 = countOccurences('Start Meteor: SUCCESS', out.output);
+      const num2 = countOccurrences('Start Meteor: SUCCESS', out.stdout);
       assert.equal(num2, 1);
 
-      const num3 = countOccurences(
+      const num3 = countOccurrences(
         'Pushing Meteor App Bundle to the Server: SUCCESS',
-        out.output
+        out.stdout
       );
       assert.equal(num3, 1);
 
@@ -250,8 +250,8 @@ describe('module - meteor', function() {
 
       const out = sh.exec('mup meteor push --cached-build --config mup.buildkit.js --verbose');
       expect(out.code).to.equal(0);
-      expect(out.output).to.have.entriesCount('#12 naming to docker.io/library/mup-myapp:build done', 1);
-      expect(out.output).to.have.entriesCount('Prepare Bundle: SUCCESS', 1);
+      expect(out.stdout).to.have.entriesCount('#12 naming to docker.io/library/mup-myapp:build done', 1);
+      expect(out.stdout).to.have.entriesCount('Prepare Bundle: SUCCESS', 1);
     });
 
     it('should allow overriding PORT on specific servers', async () => {
@@ -263,10 +263,10 @@ describe('module - meteor', function() {
       await checkDeploy(out, '<title>helloapp-new</title>', 4000);
 
       const status = sh.exec('mup --config mup.override-port.js meteor status');
-      expect(status.output).to.have.entriesCount('- 3000/tcp => 4000', 1);
-      expect(status.output).to.have.entriesCount(`App running at http://${serverInfo.host}:4000`, 1);
-      expect(status.output).to.have.entriesCount('Available in app\'s docker container: true', 1);
-      expect(status.output).to.have.entriesCount('Available on server: true', 1);
+      expect(status.stdout).to.have.entriesCount('- 3000/tcp => 4000', 1);
+      expect(status.stdout).to.have.entriesCount(`App running at http://${serverInfo.host}:4000`, 1);
+      expect(status.stdout).to.have.entriesCount('Available in app\'s docker container: true', 1);
+      expect(status.stdout).to.have.entriesCount('Available on server: true', 1);
     });
   });
 
@@ -288,7 +288,7 @@ describe('module - meteor', function() {
       const out = sh.exec('mup meteor stop');
       assert.equal(out.code, 0);
 
-      const num = countOccurences('Stop Meteor: SUCCESS', out.output);
+      const num = countOccurrences('Stop Meteor: SUCCESS', out.stdout);
       assert.equal(num, 1);
 
       const sshOut = await runSSHCommand(
