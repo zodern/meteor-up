@@ -1,3 +1,7 @@
+## 1.5.9 - June 27, 2022
+
+- Update @zodern/nodemiral
+
 ## 1.5.8 - April 20, 2022
 
 - Update nginx
