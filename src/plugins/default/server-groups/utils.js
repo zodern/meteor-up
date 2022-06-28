@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { Client } from 'ssh2';
+import { Client } from 'ssh2-classic';
 
 export function generateName(groupName) {
   const randomString = crypto.randomBytes(4).toString('hex');

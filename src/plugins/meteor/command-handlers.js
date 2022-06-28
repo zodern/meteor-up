@@ -18,7 +18,7 @@ import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
 import { rollback } from './rollback';
 import state from './state';
-import { Client } from 'ssh2';
+import { Client } from 'ssh2-classic';
 
 
 const log = debug('mup:module:meteor');
