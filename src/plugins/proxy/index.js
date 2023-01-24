@@ -1,7 +1,8 @@
 import * as _commands from './commands';
-import { addProxyEnv, normalizeUrl } from './utils';
-import { updateProxyForLoadBalancing } from './command-handlers';
+import { addProxyEnv, getLoadBalancingHosts, getSessions, normalizeUrl } from './utils';
+import { PROXY_CONTAINER_NAME, updateProxyForLoadBalancing } from './command-handlers';
 import validator from './validate';
+import { gracefulShutdown, readdInstance } from './graceful-shutdown';
 
 export const description = 'Setup and manage reverse proxy and ssl';
 
@@ -37,7 +38,7 @@ export function prepareConfig(config) {
   }
 
   config.app.env.HTTP_FORWARDED_COUNT =
-  config.app.env.HTTP_FORWARDED_COUNT || 1;
+    config.app.env.HTTP_FORWARDED_COUNT || 1;
 
   if (swarmEnabled) {
     config.app.docker.networks = config.app.docker.networks || [];
@@ -125,7 +126,9 @@ export const hooks = {
     }
   },
   'post.reconfig': configureServiceHook,
-  'post.proxy.setup': configureServiceHook
+  'post.proxy.setup': configureServiceHook,
+  'during.app.shutdown': gracefulShutdown,
+  'during.app.start-instance': readdInstance
 };
 
 export function swarmOptions(config) {
@@ -134,4 +137,77 @@ export function swarmOptions(config) {
       managers: Object.keys(config.proxy.servers)
     };
   }
+}
+
+export async function checkSetup(api) {
+  const config = api.getConfig();
+  if (!config.proxy) {
+    return [];
+  }
+
+  const sessions = getSessions(api);
+
+  let configPaths = [];
+
+  if (config.proxy.nginxServerConfig) {
+    configPaths.push(
+      api.resolvePath(api.getBasePath(), config.proxy.nginxServerConfig)
+    );
+  }
+  if (config.proxy.nginxLocationConfig) {
+    configPaths.push(
+      api.resolvePath(api.getBasePath(), config.proxy.nginxLocationConfig)
+    );
+  }
+
+  if (config.proxy.ssl && config.proxy.ssl.crt) {
+    configPaths.push(
+      api.resolvePath(api.getBasePath(), config.proxy.ssl.crt)
+    );
+    configPaths.push(
+      api.resolvePath(api.getBasePath(), config.proxy.ssl.key)
+    );
+  }
+
+  let upstream = [];
+
+  if (config.loadBalancing) {
+    upstream = getLoadBalancingHosts(
+      api.expandServers(config.app.servers)
+    );
+  }
+
+  return [
+    {
+      sessions,
+      name: `proxy-${config.app.name}`,
+      setupKey: {
+        // TODO: handle legacy ssl configuration
+        scripts: [
+          api.resolvePath(__dirname, 'assets/proxy-setup.sh'),
+          api.resolvePath(__dirname, 'assets/templates/start.sh'),
+          api.resolvePath(__dirname, 'assets/nginx.tmpl'),
+          api.resolvePath(__dirname, 'assets/nginx-config.sh'),
+          api.resolvePath(__dirname, 'assets/ssl-cleanup.sh'),
+          api.resolvePath(__dirname, 'assets/ssl-setup.sh'),
+          api.resolvePath(__dirname, 'assets/upstream.sh'),
+          api.resolvePath(__dirname, 'assets/proxy-start.sh')
+        ],
+        config: {
+          domains: config.proxy.domains,
+          app: config.app.name,
+          letsEncryptEmail: config.ssl ? config.ssl.letsEncryptEmail : '',
+          swarm: api.swarmEnabled(),
+          clientUploadLimit: config.clientUploadLimit,
+          upstream,
+          stickySessions: config.stickySessions,
+          appPort: config.app.env.PORT
+        }
+      },
+      containers: [
+        `${PROXY_CONTAINER_NAME}-letsencrypt`,
+        PROXY_CONTAINER_NAME
+      ]
+    }
+  ];
 }

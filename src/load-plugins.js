@@ -9,7 +9,9 @@ import registerCommand from './commands';
 import { registerHook } from './hooks';
 import { registerPreparer } from './prepare-config';
 import { registerScrubber } from './scrub-config';
+import { registerServerSource } from './server-sources';
 import { registerSwarmOptions } from './swarm-options';
+import { registerChecker } from './check-setup';
 import resolveFrom from 'resolve-from';
 
 const log = debug('mup:plugin-loader');
@@ -72,7 +74,14 @@ export function locatePluginDir(name, configPath, appPath) {
 function registerPlugin(plugin) {
   if (plugin.module.commands) {
     Object.keys(plugin.module.commands).forEach(key => {
-      registerCommand(plugin.name, key, plugin.module.commands[key]);
+      let command = plugin.module.commands[key];
+      registerCommand(
+        // The __plugin option can be used to change the top-level command
+        // the command is added to
+        command.__plugin || plugin.name,
+        key,
+        plugin.module.commands[key]
+      );
     });
   }
   if (plugin.module.hooks) {
@@ -94,6 +103,14 @@ function registerPlugin(plugin) {
   }
   if (plugin.module.swarmOptions) {
     registerSwarmOptions(plugin.module.swarmOptions);
+  }
+  if (plugin.module.serverSources) {
+    for (const [type, config] of Object.entries(plugin.module.serverSources)) {
+      registerServerSource(type, config);
+    }
+  }
+  if (plugin.module.checkSetup) {
+    registerChecker(plugin.module.checkSetup);
   }
 }
 

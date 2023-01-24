@@ -1,17 +1,23 @@
 module.exports = {
   servers: {
     one: {
-      // TODO: set host address, username, and authentication method
+      // TODO: set host address and username
       host: '1.2.3.4',
       username: 'root',
-      // pem: './path/to/pem'
+
+      // TODO: Choose one of these authentication methods
+      // - To use a private SSH key, set the `pem` option to the path to the key
+      // - For a password, set the `password` option to the user's password
+      // - If neither `pem` or `password` are set, the ssh-agent is used
+      //   for authentication.
+      //
+      // pem: '~/.ssh/key-name'
       // password: 'server-password'
-      // or neither for authenticate from ssh-agent
     }
   },
 
   app: {
-    // TODO: change app name and path
+    // TODO: change app name and the path to the app
     name: 'app',
     path: '<app path>',
 
@@ -20,24 +26,20 @@ module.exports = {
     },
 
     buildOptions: {
+      // Set to true to skip building mobile apps
       serverOnly: true,
     },
 
     env: {
-      // TODO: Change to your app's url
-      // If you are using ssl, it needs to start with https://
+      // TODO: Change to your app's url. This should be
+      // the url you access your app at, including the correct
+      // protocol (https:// or http://) and, if you've changed it
+      // from the default, the port.
       ROOT_URL: 'http://app.com',
+
       MONGO_URL: 'mongodb://mongodb/meteor',
       MONGO_OPLOG_URL: 'mongodb://mongodb/local',
     },
-
-    docker: {
-      image: 'zodern/meteor:root',
-    },
-
-    // Show progress bar while uploading bundle to server
-    // You might need to disable it on CI servers
-    enableUploadProgressBar: true
   },
 
   mongo: {
@@ -48,15 +50,22 @@ module.exports = {
   },
 
   // (Optional)
-  // Use the proxy to setup ssl or to route requests to the correct
-  // app when there are several apps
-
+  // Use the proxy to:
+  // - setup ssl
+  // - if multiple apps share the server, route requests to the correct one
+  // - load balance requests across multiple servers
+  //
   // proxy: {
   //   domains: 'mywebsite.com,www.mywebsite.com',
 
   //   ssl: {
   //     // Enable Let's Encrypt
-  //     letsEncryptEmail: 'email@domain.com'
-  //   }
+  //     // This email is used by Let's encrypt to
+  //     // inform you when a certificate is close to
+  //     // expiring.
+  //     letsEncryptEmail: 'email@domain.com',
+  //   },
+  //
+  //   loadBalancing: true
   // }
 };

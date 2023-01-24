@@ -17,6 +17,8 @@ import path from 'path';
 import { runConfigPreps } from './prepare-config';
 import { scrubConfig } from './scrub-config';
 import serverInfo from './server-info';
+import { serverSources } from './server-sources';
+import { checkSetup, updateSetupKeys } from './check-setup';
 
 const { resolvePath, moduleNotFoundIsPath } = utils;
 const log = debug('mup:api');
@@ -29,6 +31,7 @@ export default class PluginAPI {
     this.config = null;
     this.settings = null;
     this.sessions = null;
+    this._serverGroupServers = Object.create(null);
     this._enabledSessions = program.servers ? program.servers.split(' ') : [];
     this.configPath = program.config ? resolvePath(program.config) : path.join(this.base, 'mup.js');
     this.settingsPath = program.settings;
@@ -95,6 +98,8 @@ export default class PluginAPI {
       opts.showDuration = this.profileTasks;
     }
 
+    opts._mupPluginApi = this;
+
     return utils.runTaskList(list, sessions, opts);
   }
 
@@ -127,9 +132,9 @@ export default class PluginAPI {
       );
       console.log('    http://meteor-up.com/docs');
       console.log('');
-    }
 
-    this.validationErrors = problems;
+      this.validationErrors = problems;
+    }
 
     return problems;
   }
@@ -244,7 +249,7 @@ export default class PluginAPI {
       process.exit(1);
     }
   }
-  _runHooks = async function(handlers, hookName) {
+  _runHooks = async function(handlers, hookName, secondArg) {
     const messagePrefix = `> Running hook ${hookName}`;
 
     for (const hookHandler of handlers) {
@@ -254,7 +259,7 @@ export default class PluginAPI {
       }
       if (typeof hookHandler.method === 'function') {
         try {
-          await hookHandler.method(this, nodemiral);
+          await hookHandler.method(this, secondArg || nodemiral);
         } catch (e) {
           this._commandErrorHandler(e);
         }
@@ -268,6 +273,19 @@ export default class PluginAPI {
           hookHandler.remoteCommand
         );
       }
+    }
+  }
+  async _runDuringHooks(name, session) {
+    const hookName = `during.${name}`;
+
+    if (this.program['show-hook-names']) {
+      console.log(chalk.yellow(`Hook: ${hookName}`));
+    }
+
+    if (hookName in hooks) {
+      const hookList = hooks[hookName];
+
+      await this._runHooks(hookList, name, { session });
     }
   }
   _runPreHooks = async function(name) {
@@ -335,24 +353,49 @@ export default class PluginAPI {
       this._commandErrorHandler(e);
     }
 
-    await this._runPostHooks(name).then(() => {
-      // The post hooks for the first command should be the last thing run
-      if (firstCommand) {
-        this._cleanupSessions();
+    await this._runPostHooks(name);
+
+    if (name === 'default.setup') {
+      console.log('=> Storing setup config on servers');
+      await updateSetupKeys(this);
+    }
+
+    // The post hooks for the first command should be the last thing run
+    if (firstCommand) {
+      this._cleanupSessions();
+    }
+  }
+
+  expandServers(serversObj) {
+    let result = {};
+    const serverConfig = this.getConfig().servers;
+
+    Object.entries(serversObj).forEach(([key, config]) => {
+      if (key in this._serverGroupServers) {
+        this._serverGroupServers[key].forEach(server => {
+          result[server.name] = { server, config };
+        });
+      } else {
+        result[key] = {
+          server: serverConfig[key],
+          config
+        };
       }
     });
+
+    return result;
   }
 
   async getServerInfo(selectedServers, collectors) {
     if (this._cachedServerInfo && !collectors) {
       return this._cachedServerInfo;
     }
-    const serverConfig = this.getConfig().servers;
+    const serverConfig = this.expandServers(this.getConfig().servers);
 
     const servers = (
-      selectedServers || Object.keys(this.getConfig().servers)
+      selectedServers || Object.keys(serverConfig)
     ).map(serverName => ({
-      ...serverConfig[serverName],
+      ...serverConfig[serverName].server,
       name: serverName
     }));
 
@@ -374,6 +417,80 @@ export default class PluginAPI {
     this._cachedServerInfo = null;
   }
 
+  async checkSetupNeeded() {
+    const [upToDate, serverGroupsUpToDate] = await Promise.all([
+      checkSetup(this),
+      this._serverGroupsUpToDate()
+    ]);
+
+    return !upToDate || !serverGroupsUpToDate;
+  }
+
+  _mapServerGroup(cb) {
+    const { servers } = this.getConfig(false);
+
+    if (typeof servers !== 'object' || servers === null) {
+      return [];
+    }
+
+    return Object.entries(servers)
+      .filter(([, serverConfig]) => serverConfig && typeof serverConfig.source === 'string')
+      .map(async ([name, serverConfig]) => {
+        const source = serverConfig.source;
+
+        if (!(source in serverSources)) {
+          throw new Error(`Unrecognized server source: ${source}. Available: ${Object.keys(serverSources)}`);
+        }
+
+        return cb(name, serverConfig);
+      });
+  }
+
+  async loadServerGroups() {
+    const promises = this._mapServerGroup(async (name, groupConfig) => {
+      const source = groupConfig.source;
+      const list = await serverSources[source].load(
+        { name, groupConfig }, this
+      );
+      this._serverGroupServers[name] = list;
+
+      // TODO: handle errors. We should delay throwing the error until
+      // we need the sessions from this server group
+    });
+
+    await Promise.all(promises);
+  }
+
+  async _serverGroupsUpToDate() {
+    const promises = this._mapServerGroup((name, groupConfig) => {
+      const source = groupConfig.source;
+
+      return serverSources[source].upToDate({ name, groupConfig }, this);
+    });
+
+    const result = await Promise.all(promises);
+
+    return result.every(upToDate => upToDate);
+  }
+
+  async updateServerGroups() {
+    this.sessions = null;
+
+    const promises = this._mapServerGroup(async (name, groupConfig) => {
+      const source = groupConfig.source;
+      await serverSources[source].update({ name, groupConfig }, this);
+      const list = await serverSources[source].load(
+        { name, groupConfig }, this
+      );
+      this._serverGroupServers[name] = list;
+    });
+
+    await Promise.all(promises).catch(e => {
+      console.dir(e);
+      throw e;
+    });
+  }
+
   getSessions(modules = []) {
     const sessions = this._pickSessions(modules);
 
@@ -385,7 +502,20 @@ export default class PluginAPI {
       this._loadSessions();
     }
 
-    return servers.map(name => this.sessions[name]);
+    let result = [];
+
+    servers.forEach(name => {
+      let session = this.sessions[name];
+      if (Array.isArray(session)) {
+        session.forEach(memberName => {
+          result.push(this.sessions[memberName]);
+        });
+      } else {
+        result.push(session);
+      }
+    });
+
+    return result;
   }
 
   async getManagerSession() {
@@ -413,7 +543,16 @@ export default class PluginAPI {
           continue;
         }
 
-        if (this.sessions[name]) {
+        if (!this.sessions[name]) {
+          continue;
+        }
+
+        if (Array.isArray(this.sessions[name])) {
+          // Is a server group. Add the members of the group.
+          this.sessions[name].forEach(memberName => {
+            sessions[memberName] = this.sessions[memberName];
+          });
+        } else {
           sessions[name] = this.sessions[name];
         }
       }
@@ -427,21 +566,7 @@ export default class PluginAPI {
 
     this.sessions = {};
 
-    // `mup.servers` contains login information for servers
-    // Use this information to create nodemiral sessions.
-    for (const name in config.servers) {
-      if (!config.servers.hasOwnProperty(name)) {
-        continue;
-      }
-
-      if (
-        this._enabledSessions.length > 0 &&
-        this._enabledSessions.indexOf(name) === -1
-      ) {
-        continue;
-      }
-
-      const info = config.servers[name];
+    function createNodemiralSession(name, info) {
       const auth = {
         username: info.username
       };
@@ -478,9 +603,38 @@ export default class PluginAPI {
         process.exit(1);
       }
 
-      const session = nodemiral.session(info.host, auth, opts);
+      return nodemiral.session(info.host, auth, opts);
+    }
 
-      this.sessions[name] = session;
+    // `mup.servers` contains login information for servers
+    // Use this information to create nodemiral sessions.
+    for (const name in config.servers) {
+      if (!config.servers.hasOwnProperty(name)) {
+        continue;
+      }
+
+      if (
+        this._enabledSessions.length > 0 &&
+        this._enabledSessions.indexOf(name) === -1
+      ) {
+        // TODO: if server group, check if any servers in group are enabled
+        continue;
+      }
+
+      const info = config.servers[name];
+
+      if (typeof info.source === 'string') {
+        const servers = this._serverGroupServers[name];
+        servers.forEach(server => {
+          const session = createNodemiralSession(
+            server.name, server
+          );
+          this.sessions[server.name] = session;
+        });
+        this.sessions[name] = servers.map(s => s.name);
+      } else {
+        this.sessions[name] = createNodemiralSession(name, info);
+      }
     }
   }
 
@@ -491,7 +645,9 @@ export default class PluginAPI {
     }
 
     Object.keys(this.sessions).forEach(key => {
-      this.sessions[key].close();
+      if (!Array.isArray(this.sessions[key])) {
+        this.sessions[key].close();
+      }
     });
   }
 

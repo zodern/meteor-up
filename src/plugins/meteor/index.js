@@ -1,7 +1,7 @@
 import * as _commands from './commands';
 import _validator from './validate';
 import { defaultsDeep } from 'lodash';
-import { tmpBuildPath } from './utils';
+import { getSessions, tmpBuildPath } from './utils';
 import traverse from 'traverse';
 
 export const description = 'Deploy and manage meteor apps';
@@ -27,8 +27,9 @@ export function prepareConfig(config, api) {
   }
 
   config.app.docker = defaultsDeep(config.app.docker, {
-    image: config.app.dockerImage || 'kadirahq/meteord',
-    stopAppDuringPrepareBundle: true
+    image: config.app.dockerImage || 'zodern/meteor:0.6.1-root',
+    stopAppDuringPrepareBundle: true,
+    useBuildKit: true
   });
 
   delete config.app.dockerImage;
@@ -137,4 +138,29 @@ export function swarmOptions(config) {
       labels: [label]
     };
   }
+}
+
+export async function checkSetup(api) {
+  const config = api.getConfig();
+  if (!config.app || config.app.type !== 'meteor') {
+    return [];
+  }
+
+  const sessions = await getSessions(api);
+
+  return [
+    {
+      sessions,
+      name: `meteor-${config.app.name}`,
+      setupKey: {
+        // TODO: handle legacy ssl configuration
+        scripts: [
+          api.resolvePath(__dirname, 'assets/meteor-setup.sh')
+        ],
+        config: {
+          name: config.app.name
+        }
+      }
+    }
+  ];
 }

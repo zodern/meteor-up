@@ -3,11 +3,11 @@ import {
   checkAppStarted,
   createEnv,
   createServiceConfig,
-  currentImageTag,
   escapeEnvQuotes,
   getImagePrefix,
   getNodeVersion,
   getSessions,
+  getVersions,
   shouldRebuild
 } from './utils';
 import buildApp, { archiveApp, cleanBuildDir } from './build.js';
@@ -16,6 +16,9 @@ import { map, promisify } from 'bluebird';
 import { prepareBundleLocally, prepareBundleSupported } from './prepare-bundle';
 import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
+import { rollback } from './rollback';
+import state from './state';
+import { Client } from 'ssh2-classic';
 
 
 const log = debug('mup:module:meteor');
@@ -142,51 +145,79 @@ export async function prepareBundle(api) {
   const buildOptions = appConfig.buildOptions;
   const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
+  // await getVersions(api);
+
+  const sessions = api.getSessions(['app']);
+
+  const { latest, servers: serverVersions } = await getVersions(api);
+  const tag = latest + 1;
+  state.deployingVersion = tag;
+
   if (appConfig.docker.prepareBundleLocally) {
-    return prepareBundleLocally(buildOptions.buildLocation, bundlePath, api);
-  }
+    await prepareBundleLocally(buildOptions.buildLocation, bundlePath, api);
+  } else {
+    const list = nodemiral.taskList('Prepare App Bundle');
+    const nodeVersion = await getNodeVersion(bundlePath);
 
-  const list = nodemiral.taskList('Prepare App Bundle');
+    list.executeScript('Prepare Bundle', {
+      script: api.resolvePath(
+        __dirname,
+        'assets/prepare-bundle.sh'
+      ),
+      vars: {
+        appName: appConfig.name,
+        dockerImage: appConfig.docker.image,
+        env: escapeEnvQuotes(appConfig.env),
+        buildInstructions: appConfig.docker.buildInstructions || [],
+        nodeVersion,
+        stopApp: appConfig.docker.stopAppDuringPrepareBundle,
+        useBuildKit: appConfig.docker.useBuildKit,
+        tag,
+        privateRegistry: privateDockerRegistry,
+        imagePrefix: getImagePrefix(privateDockerRegistry)
+      }
+    });
 
-  let tag = 'latest';
+    // After running Prepare Bundle, the list of images will be out of date
+    api.serverInfoStale();
 
-  if (api.swarmEnabled()) {
-    const data = await api.getServerInfo();
-    tag = currentImageTag(data, appConfig.name) + 1;
-  }
-
-  const nodeVersion = await getNodeVersion(bundlePath);
-
-  list.executeScript('Prepare Bundle', {
-    script: api.resolvePath(
-      __dirname,
-      'assets/prepare-bundle.sh'
-    ),
-    vars: {
-      appName: appConfig.name,
-      dockerImage: appConfig.docker.image,
-      env: escapeEnvQuotes(appConfig.env),
-      buildInstructions: appConfig.docker.buildInstructions || [],
-      nodeVersion,
-      stopApp: appConfig.docker.stopAppDuringPrepareBundle,
-      useBuildKit: appConfig.docker.useBuildKit,
-      tag,
-      privateRegistry: privateDockerRegistry,
-      imagePrefix: getImagePrefix(privateDockerRegistry)
+    let prepareSessions = sessions;
+    if (privateDockerRegistry) {
+      prepareSessions = [sessions[0]].filter(s => s);
     }
+
+    await api.runTaskList(list, prepareSessions, {
+      series: true,
+      verbose: api.verbose
+    });
+  }
+
+  const toClean = Object.create(null);
+
+  serverVersions.forEach(({ host, versions, current, previous }) => {
+    let toKeep = [current, previous, tag];
+    toClean[host] = {
+      versions: versions.filter(version => !toKeep.includes(version))
+    };
   });
 
-  // After running Prepare Bundle, the list of images will be out of date
-  api.serverInfoStale();
 
-  let sessions = api.getSessions(['app']);
-  if (privateDockerRegistry) {
-    sessions = sessions.slice(0, 1);
-  }
+  const list = nodemiral.taskList('Clean Up Versions');
 
-  return api.runTaskList(list, sessions, {
-    series: true,
-    verbose: api.verbose
+  list.executeScript('Clean up app versions', {
+    script: api.resolvePath(__dirname, 'assets/clean-versions.sh'),
+    vars: {
+      // TODO: add a default version-history from other servers
+      // on servers that don't have a history so it has something to
+      // rollback to if the current deploy fails
+      appName: appConfig.name,
+      imagePrefix: getImagePrefix(privateDockerRegistry)
+    },
+    hostVars: toClean
+  });
+
+  await api.runTaskList(list, sessions, {
+    series: false
   });
 }
 
@@ -221,7 +252,7 @@ export async function push(api) {
   list.copy('Pushing Meteor App Bundle to the Server', {
     src: bundlePath,
     dest: `/opt/${appConfig.name}/tmp/bundle.tar.gz`,
-    progressBar: appConfig.enableUploadProgressBar
+    progressBar: true
   });
 
   let sessions = api.getSessions(['app']);
@@ -244,7 +275,6 @@ export async function push(api) {
 export function envconfig(api) {
   log('exec => mup meteor envconfig');
   const {
-    servers,
     app,
     proxy,
     privateDockerRegistry
@@ -288,15 +318,16 @@ export function envconfig(api) {
   }
 
   const startHostVars = {};
+  const expandedServers = api.expandServers(app.servers);
 
-  Object.keys(app.servers).forEach(serverName => {
-    const host = servers[serverName].host;
+  Object.values(expandedServers).forEach(({ server, config }) => {
+    const host = server.host;
     const vars = {};
-    if (app.servers[serverName].bind) {
-      vars.bind = app.servers[serverName].bind;
+    if (config.bind) {
+      vars.bind = config.bind;
     }
-    if (app.servers[serverName].env && app.servers[serverName].env.PORT) {
-      vars.port = app.servers[serverName].env.PORT;
+    if (config.env && config.env.PORT) {
+      vars.port = config.env.PORT;
     }
     startHostVars[host] = vars;
   });
@@ -325,20 +356,20 @@ export function envconfig(api) {
   const env = createEnv(app, api.getSettings());
   const hostVars = {};
 
-  Object.keys(app.servers).forEach(key => {
-    const host = servers[key].host;
-    if (app.servers[key].env) {
+  Object.values(expandedServers).forEach(({ server, config }) => {
+    const host = server.host;
+    if (config.env) {
       hostVars[host] = {
         env: {
-          ...app.servers[key].env,
+          ...config.env,
           // We treat the PORT specially and do not pass it to the container
           PORT: undefined
         }
       };
     }
-    if (app.servers[key].settings) {
+    if (config.settings) {
       const settings = JSON.stringify(api.getSettingsFromPath(
-        app.servers[key].settings));
+        config.settings));
 
       if (hostVars[host]) {
         hostVars[host].env.METEOR_SETTINGS = settings;
@@ -368,7 +399,7 @@ export function envconfig(api) {
 
 export async function start(api) {
   log('exec => mup meteor start');
-  const config = api.getConfig().app;
+  const { app: config } = api.getConfig();
   const swarmEnabled = api.swarmEnabled();
 
   if (!config) {
@@ -376,12 +407,14 @@ export async function start(api) {
     process.exit(1);
   }
 
+  const isDeploy = api.commandHistory.find(entry =>
+    ['meteor.deploy', 'meteor.deployVersion'].includes(entry.name)
+  );
   const list = nodemiral.taskList('Start Meteor');
 
   if (swarmEnabled) {
     const currentService = await api.dockerServiceInfo(config.name);
-    const serverInfo = await api.getServerInfo();
-    const imageTag = currentImageTag(serverInfo, config.name);
+    const { latest: imageTag } = await getVersions(api);
 
     // TODO: make it work when the reverse proxy isn't enabled
     api.tasks.addCreateOrUpdateService(
@@ -390,16 +423,39 @@ export async function start(api) {
       currentService
     );
   } else {
-    addStartAppTask(list, api);
-    checkAppStarted(list, api);
+    addStartAppTask(list, api, { isDeploy, version: state.deployingVersion });
+    checkAppStarted(list, api, {
+      canRollback: isDeploy,
+      recordFailed: isDeploy && !api.commandHistory.find(
+        entry => entry.name === 'meteor.deployVersion'
+      )
+    });
   }
 
   const sessions = await getSessions(api);
 
-  return api.runTaskList(list, sessions, {
-    series: true,
-    verbose: api.verbose
-  });
+  try {
+    await api.runTaskList(list, sessions, {
+      series: true,
+      verbose: api.verbose
+    });
+
+    if (isDeploy) {
+      console.log(`Successfully deployed version ${state.deployingVersion}`);
+    }
+  } catch (e) {
+    if (
+      isDeploy &&
+      prepareBundleSupported(config.docker) &&
+      !api.swarmEnabled()
+    ) {
+      console.log('Deploy failed. Check the logs above for the reason');
+      console.log('=> Ensuring all servers have same version');
+      await rollback(api);
+    }
+
+    throw e;
+  }
 }
 
 export function deploy(api) {
@@ -417,6 +473,37 @@ export function deploy(api) {
   return api
     .runCommand('meteor.push')
     .then(() => api.runCommand('default.reconfig'));
+}
+
+export async function deployVersion(api) {
+  log('exec => mup meteor deploy');
+
+  // validate settings and config before starting
+  api.getSettings();
+  const config = api.getConfig().app;
+
+  if (!config) {
+    console.error('error: no configs found for meteor');
+    process.exit(1);
+  }
+
+  let version = api.getArgs()[2];
+
+  if (!version) {
+    console.error('Please provide a version');
+    process.exit(1);
+  }
+
+  version = parseInt(version, 10);
+
+  if (Number.isNaN(version)) {
+    console.log('Version is not a valid number');
+    process.exit(1);
+  }
+
+  state.deployingVersion = version;
+
+  return api.runCommand('default.reconfig');
 }
 
 export async function stop(api) {
@@ -459,6 +546,9 @@ export async function restart(api) {
   if (api.swarmEnabled()) {
     api.tasks.addRestartService(list, { name: appConfig.name });
   } else {
+    list._runHook('Stopping app', {
+      hookName: 'app.shutdown'
+    });
     list.executeScript('Stop Meteor', {
       script: api.resolvePath(__dirname, 'assets/meteor-stop.sh'),
       vars: {
@@ -467,6 +557,9 @@ export async function restart(api) {
     });
     addStartAppTask(list, api);
     checkAppStarted(list, api);
+    list._runHook('Finish starting', {
+      hookName: 'app.start-instance'
+    });
   }
 
 
@@ -478,21 +571,21 @@ export async function restart(api) {
 
 export async function debugApp(api) {
   const {
-    servers,
     app
   } = api.getConfig();
   let serverOption = api.getArgs()[2];
+  let expandedServers = api.expandServers(app.servers);
 
   // Check how many sessions are enabled. Usually is all servers,
   // but can be reduced by the `--servers` option
   const enabledSessions = api.getSessions(['app'])
     .filter(session => session);
 
-  if (!(serverOption in app.servers)) {
+  if (!(serverOption in expandedServers)) {
     if (enabledSessions.length === 1) {
       const selectedHost = enabledSessions[0]._host;
-      serverOption = Object.keys(app.servers).find(
-        name => servers[name].host === selectedHost
+      serverOption = Object.keys(expandedServers).find(
+        name => expandedServers[name].server.host === selectedHost
       );
     } else {
       console.log('mup meteor debug <server>');
@@ -503,7 +596,7 @@ export async function debugApp(api) {
     }
   }
 
-  const server = servers[serverOption];
+  const server = expandedServers[serverOption].server;
   console.log(`Setting up to debug app running on ${serverOption}`);
 
   const {
@@ -578,6 +671,61 @@ export async function debugApp(api) {
   });
 }
 
+export async function meteorShell(api) {
+  const { app } = api.getConfig();
+  const expandedServers = api.expandServers(app.servers);
+  let serverOption = api.getArgs()[1];
+
+  // Check how many sessions are enabled. Usually is all servers,
+  // but can be reduced by the `--servers` option
+  const enabledSessions = api.getSessionsForServers(Object.keys(app.servers))
+    .filter(session => session);
+
+  if (!(serverOption in expandedServers)) {
+    if (enabledSessions.length === 1) {
+      const selectedHost = enabledSessions[0]._host;
+      serverOption = Object.keys(expandedServers).find(key =>
+        expandedServers[key].server.host === selectedHost);
+    } else {
+      console.log('mup meteor shell <server>');
+      console.log('Available servers are:\n', Object.keys(expandedServers).join('\n '));
+      process.exitCode = 1;
+
+      return;
+    }
+  }
+
+  const server = expandedServers[serverOption].server;
+  const sshOptions = api._createSSHOptions(server);
+
+  const conn = new Client();
+  conn.on('ready', () => {
+    conn.exec(
+      `docker exec -it ${app.name} node ./meteor-shell.js`,
+      { pty: true },
+      (err, stream) => {
+        if (err) {
+          throw err;
+        }
+        stream.on('close', () => {
+          conn.end();
+          process.exit();
+        });
+
+        process.stdin.setRawMode(true);
+        process.stdin.pipe(stream);
+
+        stream.pipe(process.stdout);
+        stream.stderr.pipe(process.stderr);
+        stream.setWindow(process.stdout.rows, process.stdout.columns);
+
+        process.stdout.on('resize', () => {
+          stream.setWindow(process.stdout.rows, process.stdout.columns);
+        });
+      });
+  }).connect(sshOptions);
+}
+
 export async function destroy(api) {
   const config = api.getConfig();
   const options = api.getOptions();
@@ -626,10 +774,12 @@ export async function status(api) {
     StatusDisplay
   } = api.statusHelpers;
   const overview = api.getOptions().overview;
-  const servers = Object.keys(config.app.servers)
+  const expandedServers = api.expandServers(config.app.servers);
+  const servers = Object.keys(expandedServers)
     .map(key => ({
-      ...config.servers[key],
-      name: key
+      ...expandedServers[key].server,
+      name: key,
+      overrides: expandedServers[key].config
     }));
 
   const results = await map(
@@ -664,4 +814,33 @@ export async function status(api) {
   });
 
   display.show(overview);
+}
+
+export async function listVersions(api) {
+  const versions = await getVersions(api);
+  console.log('Application versions:');
+  // TODO: when using private docker registry, combine versions
+  // and history to get a more complete list
+  versions.versions.forEach(version => {
+    let text = `  - ${version}`;
+
+    if (version === versions.current) {
+      text += ' (current)';
+    } else if (version === versions.previous) {
+      text += ' (previous)';
+    } else if (versions.failed.includes(version)) {
+      text += ' (failed)';
+    }
+
+    text = text.padEnd(17, ' ');
+
+    let date = versions.versionDates.get(version);
+    text += ` created ${date.toLocaleDateString('en-US', { dateStyle: 'short', timeStyle: 'short' })}`;
+
+    console.log(text);
+  });
+
+  console.log();
+  console.log('Switch to a different version by running:');
+  console.log('  mup meteor deploy-version <version>');
 }

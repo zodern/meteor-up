@@ -139,7 +139,7 @@ module.exports = {
       // make deploys more reliable and easier to troubleshoot
       prepareBundle: true,
 
-      // (optional, default is false) Uses the new docker image builder
+      // (optional, default is true) Uses the new docker image builder
       // during Prepare bundle. When enabled,
       // Prepare Bundle is much faster
       useBuildKit: true,
@@ -236,12 +236,7 @@ module.exports = {
     // lets you define which port to check after the deploy process, if it
     // differs from the meteor port you are serving
     // (like meteor behind a proxy/firewall) (optional)
-    deployCheckPort: 80,
-
-    // Shows progress bar while uploading bundle to server
-    // You might need to disable it on CI servers
-    // (optional, default is false)
-    enableUploadProgressBar: true
+    deployCheckPort: 80
   },
 
   // (optional) Use built-in mongodb. Remove it to use a remote MongoDB

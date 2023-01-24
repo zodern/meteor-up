@@ -2,6 +2,7 @@
 
 APPNAME=<%= appName %>
 
+sudo docker stop -t 30 $APPNAME || :
 sudo docker rm -f $APPNAME || :
 sudo docker rm -f $APPNAME-frontend || :
 sudo docker rm -f $APPNAME-nginx-letsencrypt || :

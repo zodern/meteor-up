@@ -99,8 +99,10 @@ export default function init(api) {
     console.log('  Available options can be found in the docs at');
     console.log('    https://github.com/zodern/meteor-up');
     console.log('');
-    console.log('  Then, run the command:');
+    console.log('  Once the config is ready, you can setup your servers with:');
     console.log('    mup setup');
+    console.log('  And deploy your app by running:');
+    console.log('    mup deploy');
   } else {
     console.log('Skipping creation of mup.js');
     console.log(`mup.js already exists at ${configDest}`);

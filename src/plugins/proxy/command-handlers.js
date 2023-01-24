@@ -6,7 +6,7 @@ import fs from 'fs';
 import nodemiral from '@zodern/nodemiral';
 
 const log = debug('mup:module:proxy');
-const PROXY_CONTAINER_NAME = 'mup-nginx-proxy';
+export const PROXY_CONTAINER_NAME = 'mup-nginx-proxy';
 
 export function logs(api) {
   log('exec => mup proxy logs');
@@ -47,7 +47,6 @@ export function leLogs(api) {
 export function setup(api) {
   log('exec => mup proxy setup');
   const config = api.getConfig().proxy;
-  const serverConfig = api.getConfig().servers;
   const appConfig = api.getConfig().app;
   const appName = appConfig.name;
 
@@ -145,8 +144,7 @@ export function setup(api) {
   }
 
   const hostnames = getLoadBalancingHosts(
-    serverConfig,
-    Object.keys(appConfig.servers)
+    api.expandServers(appConfig.servers),
   );
 
   list.executeScript('Configure Nginx Upstream', {

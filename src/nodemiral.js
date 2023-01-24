@@ -63,13 +63,18 @@ function createCallback(cb, varsMapper) {
       return cb(err);
     }
     if (code > 0) {
-      const message = `
-      ------------------------------------STDERR------------------------------------
-      ${logs.stderr.substring(logs.stderr.length - 4200)}
-      ------------------------------------STDOUT------------------------------------
-      ${logs.stdout.substring(logs.stdout.length - 4200)}
-      ------------------------------------------------------------------------------
-      `;
+      let message = '';
+      if (!logs.stderr.length && logs.stdout.length) {
+        message = logs.stdout.substring(logs.stdout.length - 8400);
+      } else {
+        message = `
+        ------------------------------------STDERR------------------------------------
+        ${logs.stderr.substring(logs.stderr.length - 4200)}
+        ------------------------------------STDOUT------------------------------------
+        ${logs.stdout.substring(logs.stdout.length - 4200)}
+        ------------------------------------------------------------------------------
+        `;
+      }
 
       return cb(new Error(message));
     }
@@ -82,8 +87,24 @@ function createCallback(cb, varsMapper) {
   };
 }
 
+// TODO: running hooks should be an option for executeScript instead of
+// a separate task
+async function runDuringHooks(session, options, callback) {
+  console.dir(options);
+  const pluginApi = options._getMupApi();
+  // console.dir(pluginApi);
+  try {
+    await pluginApi._runDuringHooks(options.hookName, session);
+  } catch (e) {
+    return callback(e);
+  }
+
+  callback();
+}
+
 nodemiral.registerTask('copy', copy);
 nodemiral.registerTask('executeScript', executeScript);
+nodemiral.registerTask('_runHook', runDuringHooks);
 
 const oldApplyTemplate = nodemiral.session.prototype._applyTemplate;
 // Adds support for using include with ejs

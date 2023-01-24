@@ -40,7 +40,7 @@ if (config.hooks) {
 }
 
 function commandWrapper(pluginName, commandName) {
-  return function() {
+  return async function() {
     // Runs in parallel with command
     checkUpdates([
       { name: pkg.name, path: require.resolve('../package.json') },
@@ -51,6 +51,8 @@ function commandWrapper(pluginName, commandName) {
     const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
     const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
     let potentialPromise;
+
+    await api.loadServerGroups();
 
     try {
       potentialPromise = api.runCommand(`${pluginName}.${commandName}`);
