@@ -1,3 +1,7 @@
+## 1.5.10 - January 25, 2022
+
+- Support relative paths for proxy.shared.nginxConfig (@sitiarel)
+
 ## 1.5.9 - June 27, 2022
 
 - Update @zodern/nodemiral
