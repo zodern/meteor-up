@@ -77,7 +77,7 @@ cd ..
 npm run docs
 ```
 
-The webiste will now be running at [http://localhost:8080/](http://localhost:8080/). 
+The website will now be running at [http://localhost:8080/](http://localhost:8080/). 
 
 ## Financial contributions
 
