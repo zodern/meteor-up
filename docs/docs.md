@@ -162,7 +162,11 @@ module.exports = {
       // (runs docker network connect <net name> for each network listed here)
       networks: [
         'net1'
-      ]
+      ],
+
+      // Change the container's restart policy
+      // See https://docs.docker.com/config/containers/start-containers-automatically/#use-a-restart-policy
+      restartPolicy: 'always'
     },
 
     // list of servers to deploy to, from the 'servers' list
@@ -390,7 +394,7 @@ Meteor Up uses Docker to run and manage your app. It uses [MeteorD](https://gith
 
 * Your currently running meteor bundle lives at `/opt/<appName>/current`
 * We have a demonized docker container running the above bundle
-* The docker container is started with `--restart=always` flag and it'll re-spawn the container if it dies
+* The docker container is started with `--restart=always` flag (by default) and it'll re-spawn the container if it dies
 * Logs are maintained via Docker
 * If you decided to use MongoDB, it will be running as its own Docker container. It's bound to the local interface and to port `27017` (you cannot access it from the outside)
 * The database is named `<appName>`
@@ -559,6 +563,20 @@ And then add a docker setup hook to login to your private registry on the server
 ### Image Port
 
 You can set `app.docker.imagePort` to the port to expose from the container. This does not affect the port the app is accessed on, only the port the app runs on inside the docker container. It defaults to 3000.
+
+### Restart policy
+
+You can change the default ('always') [Docker restart policy](https://docs.docker.com/config/containers/start-containers-automatically/#use-a-restart-policy) by specifying `restartPolicy` in the 'docker' section of the config:
+
+```
+app: {
+  ...
+  docker: {
+    ...
+    restartPolicy: 'no'
+  }
+}
+```
 
 ## Reverse Proxy
 
