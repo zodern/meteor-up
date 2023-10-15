@@ -43,7 +43,7 @@ elaspsed=0
 while [[ true ]]; do
   sleep 1
   elaspsed=$((elaspsed+1))
-  sudo docker exec mongodb mongo --eval \
+  sudo docker exec mongodb <%= mongoshCmd %> --eval \
     'try {var c = rs.config();} catch (e){} if (c && c.members[0].host === "127.0.0.1:27017") { c.members[0].host = "mongodb:27017"; rs.reconfig(c);  } else { rs.initiate({_id: "meteor", members: [{_id: 0, host: "mongodb:27017"}]}) }' \
     && exit 0
   
