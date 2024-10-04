@@ -2,7 +2,7 @@
 // This file doesn't use es6 since it needs to work on old versions of Node
 
 if (typeof Buffer.alloc === 'undefined') {
-  console.log('Meteor Up requries a version of node that has "Buffer.alloc". Please update node.');
+  console.log('Meteor Up requires a version of node that has "Buffer.alloc". Please update node.');
   process.exit(1);
 }
 
