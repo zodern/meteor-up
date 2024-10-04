@@ -264,6 +264,12 @@ export default class DigitalOcean {
       headers: {
         Authorization: `Bearer ${this.config.token}`
       }
+    }).catch(err => {
+      if (err.config && err.config.headers) {
+        err.config.headers.Authorization = '<redacted>';
+      }
+
+      throw err;
     });
   }
 }
