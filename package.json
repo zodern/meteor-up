@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^15.1.1",
-    "@zodern/nodemiral": "^1.4.1",
+    "@zodern/nodemiral": "git+https://github.com/zodern/nodemiral.git#2c0eaa948f5d429f8ab1fc6c22cf7f0cab1c04ba",
     "axios": "^0.21.4",
     "bluebird": "^3.7.2",
     "boxen": "^4.2.0",
@@ -83,7 +83,6 @@
     "rimraf": "^3.0.2",
     "shell-escape": "^0.2.0",
     "shelljs": "^0.8.5",
-    "ssh2-classic": "^0.8.10",
     "tar": "^6.1.11",
     "traverse": "^0.6.6",
     "uuid": "^7.0.3",

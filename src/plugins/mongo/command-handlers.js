@@ -1,4 +1,4 @@
-import { Client } from 'ssh2-classic';
+import { Client } from 'ssh2';
 import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
 
