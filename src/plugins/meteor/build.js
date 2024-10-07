@@ -1,6 +1,5 @@
 import debug from 'debug';
 import fs from 'fs';
-import rimraf from 'rimraf';
 import { spawn } from 'child_process';
 import tar from 'tar';
 
@@ -147,14 +146,24 @@ export function archiveApp(buildLocation, api, cb) {
 
 export function cleanBuildDir(buildLocation) {
   return new Promise((resolve, reject) => {
-    rimraf(buildLocation, {
-      glob: false
+    // fs.rm was added in Node 14.14
+    // Cleaning the build dir is a precaution (Meteor should already
+    // be deleting it), so we aren't too concerned about not doing it on old
+    // node versions
+    if (!fs.rm) {
+      return resolve(false);
+    }
+
+    fs.rm(buildLocation, {
+      recursive: true,
+      maxRetries: 10,
+      force: true
     }, err => {
       if (err) {
         return reject(err);
       }
 
-      return resolve();
+      return resolve(true);
     });
   });
 }
