@@ -11,9 +11,9 @@ var version = parseInt(versionParts[0], 10);
 // eslint-disable-next-line no-var
 var minorVersion = parseInt(versionParts[1], 10);
 
-if (version < 8) {
+if (version < 10 || (version === 10 && minorVersion < 16)) {
   // eslint-disable-next-line
-  console.log('Meteor Up requires node 8 or newer. You are using ' + process.version);
+  console.log('Meteor Up requires node 10.16 or newer. You are using ' + process.version);
   process.exit(1);
 }
 
