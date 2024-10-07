@@ -66,6 +66,9 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
+      - name: Free up space
+        run: sudo rm -rf /usr/local/lib/android
+
       - name: Run tests
         env:
           TEST_PLUGINS: ${{ matrix.testPlugins }}
