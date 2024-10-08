@@ -66,7 +66,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^15.1.1",
-    "@zodern/nodemiral": "git+https://github.com/zodern/nodemiral.git#2c0eaa948f5d429f8ab1fc6c22cf7f0cab1c04ba",
+    "@zodern/nodemiral": "^2.0.0-beta.1",
     "axios": "^0.28.1",
     "bluebird": "^3.7.2",
     "boxen": "^4.2.0",
