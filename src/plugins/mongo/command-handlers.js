@@ -58,7 +58,7 @@ export function setup(api) {
     vars: {
       mongoVersion: mongoConfig.version,
       mongoshCmd: mongoConfig.version.split('.')[0] > 5 ? 'mongosh' : 'mongo',
-      mongoDbDir: '/var/lib/mongodb'
+      mongoDbDir: mongoConfig.dataPath || '/var/lib/mongodb'
     }
   });
 

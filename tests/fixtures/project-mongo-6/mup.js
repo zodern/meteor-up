@@ -31,6 +31,7 @@ module.exports = {
   },
   mongo: {
     version: '6.0.18',
+    dataPath: '/opt/mongo-5-data',
     servers: {
       mymongo: {}
     }

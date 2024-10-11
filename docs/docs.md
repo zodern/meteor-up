@@ -249,6 +249,12 @@ module.exports = {
     // (optional, default is 3.4.1) Version of MongoDB
     version: '3.4.1',
 
+    // (optional, default is the name of the app)
+    dbName: 'maps',
+
+    // (optional, default is /var/lib/mongodb) Folder to store the mongodb data
+    dataPath: '/var/lib/mongodb',
+
     servers: {
       one: {}
     }

@@ -7,6 +7,7 @@ const schema = joi.object().keys({
   oplog: joi.bool(),
   port: joi.number(),
   dbName: joi.string(),
+  dataPath: joi.string(),
   version: joi.string(),
   servers: joi.object().keys().required()
 });
