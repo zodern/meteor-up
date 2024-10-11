@@ -94,5 +94,21 @@ describe('module - mongo', function() {
         (await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code
       ).to.be.equal(1);
     });
+
+    it('should start Mongo 6', async () => {
+      const serverInfo = servers.mymongo;
+      sh.cd(path.resolve(os.tmpdir(), 'tests/project-mongo-6'));
+      sh.exec('mup docker setup && mup mongo setup');
+
+      const out = sh.exec('mup mongo start');
+      expect(out.code).to.be.equal(0);
+
+      expect(countOccurrences('Start Mongo: SUCCESS', out.stdout)).to.be.equal(
+        1
+      );
+      expect(
+        (await runSSHCommand(serverInfo, 'nc -z -v -w5 localhost 27017')).code
+      ).to.be.equal(0);
+    });
   });
 });
