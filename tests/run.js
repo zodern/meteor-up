@@ -35,7 +35,11 @@ var cleaningContainerId = sh.exec(
 sh.exec(`docker exec ${cleaningContainerId} sudo service docker start`);
 
 // Stop all running containers
-sh.exec(`docker exec ${cleaningContainerId} bash -c "docker rm -f $(docker ps -a -q)"`);
+let containers = sh.exec(`docker exec ${cleaningContainerId} bash -c "docker ps -a -q"`).stdout.trim();
+if (containers.length > 0) {
+  sh.exec(`docker exec ${cleaningContainerId} bash -c "docker rm -f ${containers}"`);
+}
+
 // Exit the container. We use a new container to discard any
 // changes docker made for running containers, such as creating
 // missing directories for volumes.
@@ -52,6 +56,7 @@ sh.exec(`docker exec ${containerId} cp ${userPath}/.ssh/authorized_keys2 ${userP
 if (user !== 'root') {
   sh.exec(`docker exec ${containerId} chown -R ${user}:${user} ${userPath}/.ssh`);
 }
+
 
 var watch = argv.watch ? '--watch' : '';
 

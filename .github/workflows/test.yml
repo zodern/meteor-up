@@ -42,16 +42,16 @@ jobs:
       fail-fast: false
       matrix:
        include:
-         - nodeVersion: 8.x
+         - nodeVersion: 10.x
            testPlugins: "meteor"
            testOptions: "--non-root"
-         - nodeVersion: 8.x
+         - nodeVersion: 10.x
            testPlugins: "docker,mongo,proxy,default"
            testOptions: "--non-root"
-         - nodeVersion: 14.x
+         - nodeVersion: 22.x
            testPlugins: "meteor"
            testOptions: ""
-         - nodeVersion: 14.x
+         - nodeVersion: 22.x
            testPlugins: "docker,mongo,proxy,default"
            testOptions: ""
     steps:
@@ -65,6 +65,9 @@ jobs:
 
       - name: Install npm dependencies
         run: npm ci
+
+      - name: Free up space
+        run: sudo rm -rf /usr/local/lib/android
 
       - name: Run tests
         env:

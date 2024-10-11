@@ -3,5 +3,8 @@
     "ignoreFiles": [ 
       "css/tocbot.css", 
       "css/highlight.css" 
-    ] 
+    ],
+    "rules": {
+      "media-feature-range-notation": null
+    }
 }

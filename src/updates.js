@@ -74,7 +74,7 @@ function showUpdateOnExit(pkg, version, isStable) {
   });
 }
 
-function checkPackageUpdates(name, pkg) {
+export function checkPackageUpdates(name, pkg) {
   log(`retrieving tags for ${name}`);
 
   return axios.get(`https://registry.npmjs.org/-/package/${name}/dist-tags`)
@@ -95,6 +95,8 @@ function checkPackageUpdates(name, pkg) {
       if (available) {
         showUpdateOnExit(pkg, isStable ? npmVersion : nextVersion, isStable);
       }
+
+      return Boolean(available);
     }).catch(e => {
       // It is okay if this fails
       log(e);

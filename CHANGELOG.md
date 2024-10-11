@@ -1,3 +1,11 @@
+## Next
+
+- Node 8 is no longer supported. The minimum node version is 10.16
+- Fix issues with deploying in Node 20.10 and newer
+- Fix some ssh issues
+- When there is a connection issue with SSH, the error now includes the hostname of the server
+- Fix running `mup proxy reconfig-shared` when shared nginx config is not configured
+
 ## 1.5.10 - January 25, 2022
 
 - Support relative paths for proxy.shared.nginxConfig (@sitiarel)

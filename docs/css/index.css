@@ -5,7 +5,7 @@
   vertical-align: top;
   height: 140px;
   background: white;
-  color: rgb(28, 31, 35);
+  color: rgb(28 31 35);
   border-radius: 1px;
   padding: 20px;
   margin: 0 20px 20px 0;
@@ -48,7 +48,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: linear-gradient(180deg, rgba(27, 27, 27, 0) 0%, rgba(28, 31, 35, 0.79) 71.75%, rgb(28, 33, 38) 100%);
+  background: linear-gradient(180deg, rgb(27 27 27 / 0%) 0%, rgb(28 31 35 / 79%) 71.75%, rgb(28 33 38) 100%);
 }
 
 #hero .content {
@@ -126,7 +126,7 @@
 #community {
   padding: 50px 100px 100px;
   background: #ffffffa1;
-  color: rgb(28, 31, 35);
+  color: rgb(28 31 35);
 }
 
 #community .content {

@@ -244,7 +244,7 @@ export default class PluginAPI {
       process.exit(1);
     }
   }
-  _runHooks = async function(handlers, hookName) {
+  async _runHooks(handlers, hookName) {
     const messagePrefix = `> Running hook ${hookName}`;
 
     for (const hookHandler of handlers) {
@@ -270,7 +270,7 @@ export default class PluginAPI {
       }
     }
   }
-  _runPreHooks = async function(name) {
+  async _runPreHooks(name) {
     const hookName = `pre.${name}`;
 
     if (this.program['show-hook-names']) {
@@ -282,8 +282,8 @@ export default class PluginAPI {
 
       await this._runHooks(hookList, name);
     }
-  };
-  _runPostHooks = async function(commandName) {
+  }
+  async _runPostHooks(commandName) {
     const hookName = `post.${commandName}`;
 
     if (this.program['show-hook-names']) {
@@ -295,7 +295,7 @@ export default class PluginAPI {
 
       await this._runHooks(hookList, hookName);
     }
-  };
+  }
   _commandErrorHandler(e) {
     log('_commandErrorHandler');
     process.exitCode = 1;
@@ -313,7 +313,7 @@ export default class PluginAPI {
 
     process.exit(1);
   }
-  runCommand = async function(name) {
+  async runCommand(name) {
     const firstCommand = this.commandHistory.length === 0;
 
     if (!name) {
