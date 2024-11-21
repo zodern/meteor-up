@@ -1,6 +1,7 @@
+const path = require('path');
 const host = process.env.PROD_SERVER || '0.0.0.0';
 const username = process.env.PROD_SERVER_USER || 'root';
-const pem = process.env.PROD_SERVER_PEM || '../ssh/new';
+const pem = process.env.PROD_SERVER_PEM || path.resolve(__dirname, 'ssh/new');
 const port = parseInt(process.env.PROD_SERVER_PORT, 10) || 3500;
 
 module.exports = {

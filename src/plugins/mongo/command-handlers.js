@@ -1,4 +1,4 @@
-import { Client } from 'ssh2-classic';
+import { Client } from 'ssh2';
 import debug from 'debug';
 import nodemiral from '@zodern/nodemiral';
 
@@ -57,7 +57,8 @@ export function setup(api) {
     dest: '/opt/mongodb/mongo-start-new.sh',
     vars: {
       mongoVersion: mongoConfig.version,
-      mongoDbDir: '/var/lib/mongodb'
+      mongoshCmd: mongoConfig.version.split('.')[0] > 5 ? 'mongosh' : 'mongo',
+      mongoDbDir: mongoConfig.dataPath || '/var/lib/mongodb'
     }
   });
 
@@ -116,7 +117,7 @@ export function shell(api) {
 
   const conn = new Client();
   conn.on('ready', () => {
-    conn.exec(`docker exec -it mongodb mongo ${dbName}`, {
+    conn.exec(`docker exec -it mongodb ${config.mongo.version.split('.')[0] > 5 ? 'mongosh' : 'mongo'} ${dbName}`, {
       pty: true
     }, (err, stream) => {
       if (err) {
@@ -160,7 +161,7 @@ export async function status(api) {
     output: mongoStatus
   } = await api.runSSHCommand(
     server,
-    `docker exec mongodb mongo --eval ${mongoCommand} --quiet`
+    `docker exec mongodb ${config.mongo.version.split('.')[0] > 5 ? 'mongosh' : 'mongo'} --eval ${mongoCommand} --quiet`
   );
 
   try {
