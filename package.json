@@ -1,6 +1,6 @@
 {
-  "name": "mup",
-  "version": "1.5.11",
+  "name": "@meteor-community/mup",
+  "version": "1.5.12",
   "description": "Production Quality Meteor Deployments",
   "main": "lib/index.js",
   "repository": {
