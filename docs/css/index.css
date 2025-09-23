@@ -160,3 +160,19 @@
 #community .stat p {
   font-weight: 600;
 }
+
+.banner {
+  background: rgb(28 33 38 / 50%);
+  color: white;
+  padding: 16px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 50px;
+}
+
+#hero .banner .button {
+  margin-top: 0;
+  padding: 8px 20px;
+  margin-left: 15px;
+}
