@@ -791,7 +791,15 @@ module.exports = {
       // Add an nginx config that is used proxy-wide.
       // This config can add additional upstream and server blocks if needed.
       nginxConfig: './path/to/config',
-      // Environment variables for nginx proxy
+
+      // Customize the base image running Nginx proxy
+      nginxProxyImage: 'zodern/nginx-proxy',
+      nginxProxyVersion: 'v1.1.0', 
+      // Customize the base image running letsencrypt nginx proxy companion 
+      letsencryptCompanionImage: 'jrcs/letsencrypt-nginx-proxy-companion',
+      letsencryptCompanionVersion: 'v1.13.1',
+      
+       // Environment variables for nginx proxy
       env: {
         DEFAULT_HOST: 'foo.bar.com'
       },
