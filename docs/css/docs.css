@@ -129,7 +129,7 @@ a.toc-link {
 .docs-content table {
   table-layout: fixed;
   width: 100%;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   border-spacing: 0;
 }
 
@@ -203,7 +203,7 @@ a.toc-link {
 
   .docs-nav-wrapper {
     min-width: 0;
-    max-width: auto;
+    max-width: unset;
   }
 
   .docs-nav {
