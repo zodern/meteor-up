@@ -1,5 +1,7 @@
-import { _configPreps, registerPreparer, runConfigPreps } from '../prepare-config';
-import { expect } from 'chai';
+import { _configPreps, registerPreparer, runConfigPreps } from '../prepare-config.js';
+import chai from 'chai';
+
+const { expect } = chai;
 
 describe('prepare-config', () => {
   beforeEach(() => {

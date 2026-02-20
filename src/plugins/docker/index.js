@@ -1,5 +1,5 @@
-import * as _commands from './commands';
-import { validateRegistry, validateSwarm } from './validate';
+import * as _commands from './commands.js';
+import { validateRegistry, validateSwarm } from './validate.js';
 
 export const description = 'Setup and manage docker';
 export const commands = _commands;

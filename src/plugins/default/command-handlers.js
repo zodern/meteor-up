@@ -1,7 +1,7 @@
+import bluebird from 'bluebird';
 import chalk from 'chalk';
 import { Client } from 'ssh2';
 import debug from 'debug';
-import { map } from 'bluebird';
 
 const log = debug('mup:module:default');
 
@@ -155,7 +155,7 @@ export async function status(api) {
   const lines = [];
   let overallColor = 'green';
   const command = 'lsb_release -r -s || echo "false"; lsb_release -is; apt-get -v &> /dev/null && echo "true" || echo "false"; echo $BASH';
-  const results = await map(
+  const results = await bluebird.map(
     servers,
     server => api.runSSHCommand(server, command),
     { concurrency: 2 }

@@ -1,18 +1,19 @@
-/* eslint-disable no-var */
+import codeBlocks from 'gfm-code-blocks';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import path from 'path';
+import sh from 'shelljs';
 
-var codeBlocks = require('gfm-code-blocks');
-var fs = require('fs');
-var path = require('path');
-var sh = require('shelljs');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-var docsPath = path.resolve(__dirname, '../docs/docs.md');
-var tmpPath = path.resolve(__dirname, './validate-tmp');
-var tmpConfig = path.resolve(__dirname, './validate-tmp/mup.js');
+const docsPath = path.resolve(__dirname, '../docs/docs.md');
+const tmpPath = path.resolve(__dirname, './validate-tmp');
+const tmpConfig = path.resolve(__dirname, './validate-tmp/mup.cjs');
 
-var docs = fs.readFileSync(docsPath).toString().split('## Creating a plugin')[0];
+const docs = fs.readFileSync(docsPath).toString().split('## Creating a plugin')[0];
 
-var blocks = codeBlocks(docs);
-var validConfigs = blocks.filter(block => block.lang === 'js');
+const blocks = codeBlocks(docs);
+const validConfigs = blocks.filter(block => block.lang === 'js');
 
 try {
   if (!fs.existsSync(tmpPath)) {
@@ -22,7 +23,7 @@ try {
   console.log(e);
 }
 
-var servers = {
+const servers = {
   one: {
     host: '1.1.1.1',
     username: 'test'
@@ -33,21 +34,22 @@ var servers = {
   }
 };
 
-var failed = 0;
-var success = 0;
+let failed = 0;
+let success = 0;
 
 process.env.MUP_SKIP_UPDATE_CHECK = 'true';
 
-validConfigs.forEach(config => {
+for (const config of validConfigs) {
   fs.writeFileSync(tmpConfig, config.code);
-  delete require.cache[require.resolve(tmpConfig)];
-  var configObject = require(tmpConfig); // eslint-disable-line
+
+  const configModule = await import(`${tmpConfig}?t=${Date.now()}`);
+  const configObject = configModule.default;
 
   configObject.servers = configObject.servers || servers;
 
-  fs.writeFileSync(tmpConfig, `module.exports = ${JSON.stringify(configObject)}`);
+  fs.writeFileSync(tmpConfig, `module.exports = ${JSON.stringify(configObject, null, 2)}`);
   sh.cd(tmpPath);
-  var out = sh.exec('node ../../index.js validate');
+  const out = sh.exec(`node ../../index.js validate --config ${tmpConfig}`);
 
   if (out.code > 0) {
     console.dir(configObject);
@@ -56,7 +58,7 @@ validConfigs.forEach(config => {
   } else {
     success += 1;
   }
-});
+}
 
 console.log(`${success - failed}/${success} configs are valid`);
 

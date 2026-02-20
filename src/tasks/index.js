@@ -1,4 +1,4 @@
-import { resolvePath } from '../utils';
+import { resolvePath } from '../utils.js';
 import shellEscape from 'shell-escape';
 
 function escapeEnv(env) {

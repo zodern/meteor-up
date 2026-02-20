@@ -1,4 +1,4 @@
-import { hooks, registerHook } from '../hooks';
+import { hooks, registerHook } from '../hooks.js';
 import assert from 'assert';
 
 describe('hooks', () => {

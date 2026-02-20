@@ -1,13 +1,17 @@
 import * as uuid from 'uuid';
-import { cloneDeep, flatMap } from 'lodash';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
+import lodash from 'lodash';
 import os from 'os';
+import path from 'path';
 import {
   prepareBundleSupported
 } from './prepare-bundle.js';
 import random from 'random-seed';
 import { spawn } from 'child_process';
 import tar from 'tar';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function checkAppStarted(list, api) {
   const script = api.resolvePath(__dirname, 'assets/meteor-deploy-check.sh');
@@ -50,7 +54,7 @@ export function addStartAppTask(list, api) {
 }
 
 export function createEnv(appConfig, settings) {
-  const env = cloneDeep(appConfig.env);
+  const env = lodash.cloneDeep(appConfig.env);
 
   env.METEOR_SETTINGS = JSON.stringify(settings);
 
@@ -211,7 +215,7 @@ export function getImagePrefix(privateRegistry) {
 }
 
 export function currentImageTag(serverInfo, appName) {
-  const result = flatMap(
+  const result = lodash.flatMap(
     Object.values(serverInfo),
     ({images}) => images || []
   )

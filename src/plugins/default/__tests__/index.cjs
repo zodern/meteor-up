@@ -1,17 +1,18 @@
 /* eslint-disable no-unused-expressions */
-import { before, describe, it } from 'mocha';
-import chai, { expect } from 'chai';
-import { countOccurrences, runSSHCommand } from '../../../utils';
-import chaiString from 'chai-string';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
-import sh from 'shelljs';
+const { before, describe, it } = require('mocha');
+const chai = require('chai');
+const { expect } = chai;
+const { countOccurrences, runSSHCommand } = require('../../../test-helpers.cjs');
+const chaiString = require('chai-string');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const sh = require('shelljs');
 
 chai.use(chaiString);
 
 sh.config.silent = false;
-const servers = require('../../../../tests/fixtures/servers');
+const servers = require('../../../../tests/fixtures/servers.cjs');
 
 describe('module - default', function() {
   this.timeout(900000);

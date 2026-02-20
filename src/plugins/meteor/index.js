@@ -1,7 +1,7 @@
-import * as _commands from './commands';
-import _validator from './validate';
-import { defaultsDeep } from 'lodash';
-import { tmpBuildPath } from './utils';
+import * as _commands from './commands.js';
+import _validator from './validate.js';
+import lodash from 'lodash';
+import { tmpBuildPath } from './utils.js';
 import traverse from 'traverse';
 
 export const description = 'Deploy and manage meteor apps';
@@ -26,7 +26,7 @@ export function prepareConfig(config, api) {
     return config;
   }
 
-  config.app.docker = defaultsDeep(config.app.docker, {
+  config.app.docker = lodash.defaultsDeep(config.app.docker, {
     image: config.app.dockerImage || 'kadirahq/meteord',
     stopAppDuringPrepareBundle: true
   });

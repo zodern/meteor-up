@@ -1,12 +1,12 @@
-import { clone, merge } from 'lodash';
+import lodash from 'lodash';
 import nodemiral from '@zodern/nodemiral';
 
 function copy(session, _options, callback) {
-  const options = clone(_options);
+  const options = lodash.clone(_options);
   let retries = 0;
 
   if (typeof options.hostVars === 'object' && options.hostVars[session._host]) {
-    options.vars = merge(options.vars, options.hostVars[session._host]);
+    options.vars = lodash.merge(options.vars, options.hostVars[session._host]);
   }
 
   function doCopy() {
@@ -42,9 +42,9 @@ function copy(session, _options, callback) {
 }
 
 function executeScript(session, _options, callback, varsMapper) {
-  const options = clone(_options);
+  const options = lodash.clone(_options);
   if (typeof options.hostVars === 'object' && options.hostVars[session._host]) {
-    options.vars = merge(options.vars, options.hostVars[session._host]);
+    options.vars = lodash.merge(options.vars, options.hostVars[session._host]);
   }
 
   session.executeScript(

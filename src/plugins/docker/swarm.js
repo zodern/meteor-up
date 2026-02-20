@@ -1,10 +1,16 @@
-import {
+import debug from 'debug';
+import { fileURLToPath } from 'url';
+import lodash from 'lodash';
+import nodemiral from '@zodern/nodemiral';
+import path from 'path';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const {
   findKey,
   isEqual,
   partial
-} from 'lodash';
-import debug from 'debug';
-import nodemiral from '@zodern/nodemiral';
+} = lodash;
 
 const log = debug('mup:docker:swarm');
 

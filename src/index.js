@@ -1,13 +1,19 @@
-import './node-version';
-import './nodemiral';
-import modules, { loadPlugins, locatePluginDir } from './load-plugins';
+import './node-version.js';
+import './nodemiral.js';
+import modules, { loadPlugins, locatePluginDir } from './load-plugins.js';
 import chalk from 'chalk';
-import checkUpdates from './updates';
-import { filterArgv } from './utils';
-import MupAPI from './plugin-api';
-import pkg from '../package.json';
-import { registerHook } from './hooks';
+import checkUpdates from './updates.js';
+import { createRequire } from 'node:module';
+import { filterArgv } from './utils.js';
+import MupAPI from './plugin-api.js';
+import { registerHook } from './hooks.js';
 import yargs from 'yargs';
+import ConfigLoader from './config.js';
+import path from 'path';
+
+const require = createRequire(import.meta.url);
+
+const pkg = require('../package.json');
 
 const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-names', 'help', 'servers'];
 
@@ -15,8 +21,12 @@ const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-na
 yargs.help(false);
 
 // Load config before creating commands
-const preAPI = new MupAPI(process.cwd(), process.argv, yargs.argv);
-const config = preAPI.getConfig(false);
+let configPath = yargs.argv.config ?? path.join(process.cwd(), 'mup.js');
+let configLoader = new ConfigLoader(configPath);
+
+await configLoader.loadConfig();
+let config = configLoader.getConfig();
+
 let pluginList = [];
 
 // Load plugins
@@ -29,7 +39,7 @@ if (config.plugins instanceof Array) {
     path: locatePluginDir(plugin, preAPI.configPath, absoluteAppPath)
   }));
 
-  loadPlugins(pluginList);
+  await loadPlugins(pluginList);
 }
 
 // Load hooks
@@ -49,7 +59,7 @@ function commandWrapper(pluginName, commandName) {
 
     const rawArgv = process.argv.slice(2);
     const filteredArgv = filterArgv(rawArgv, yargs.argv, unwantedArgvs);
-    const api = new MupAPI(process.cwd(), filteredArgv, yargs.argv);
+    const api = new MupAPI(configLoader, filteredArgv, yargs.argv);
     let potentialPromise;
 
     try {

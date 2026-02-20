@@ -1,5 +1,5 @@
-import * as commandHandlers from './command-handlers';
-import initHandler from './init';
+import * as commandHandlers from './command-handlers.js';
+import initHandler from './init.js';
 
 export const init = {
   description: 'Setup files for new mup project',

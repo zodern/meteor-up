@@ -1,7 +1,10 @@
 import debug from 'debug';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
 import sh from 'shelljs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const log = debug('mup:init');
 

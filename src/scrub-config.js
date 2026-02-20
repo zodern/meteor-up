@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import lodash from 'lodash';
 import { parse } from 'url';
 
 export const _configScrubbers = [];
@@ -48,7 +48,7 @@ export const utils = {
 };
 
 export function scrubConfig(_config) {
-  let config = cloneDeep(_config);
+  let config = lodash.cloneDeep(_config);
   _configScrubbers.forEach(scrubber => {
     config = scrubber(config, utils);
   });
