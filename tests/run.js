@@ -37,7 +37,7 @@ sh.exec(`docker exec ${cleaningContainerId} sudo service docker start`);
 // Stop all running containers
 const containers = sh.exec(`docker exec ${cleaningContainerId} bash -c "docker ps -a -q"`).stdout.trim();
 if (containers.length > 0) {
-  sh.exec(`docker exec ${cleaningContainerId} bash -c "docker rm -f ${containers}"`);
+  sh.exec(`docker exec ${cleaningContainerId} bash -c "docker rm -f ${containers.split('\n').join(' ')}"`);
 }
 
 // Exit the container. We use a new container to discard any
