@@ -1,4 +1,4 @@
-import * as _commands from './commands';
+import * as _commands from './commands.js';
 import traverse from 'traverse';
 
 export const commands = _commands;

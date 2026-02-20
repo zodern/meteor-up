@@ -1,9 +1,13 @@
-import { addProxyEnv, getLoadBalancingHosts, getSessions } from './utils';
+import { addProxyEnv, getLoadBalancingHosts, getSessions } from './utils.js';
 import chalk from 'chalk';
-import { clone } from 'lodash';
 import debug from 'debug';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
+import lodash from 'lodash';
 import nodemiral from '@zodern/nodemiral';
+import path from 'path';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const log = debug('mup:module:proxy');
 const PROXY_CONTAINER_NAME = 'mup-nginx-proxy';
@@ -195,7 +199,7 @@ export function reconfigShared(api) {
     }
   });
 
-  const env = clone(shared.env);
+  const env = lodash.clone(shared.env);
 
   list.copy('Sending proxy environment variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),
@@ -205,7 +209,7 @@ export function reconfigShared(api) {
     }
   });
 
-  const envLetsEncrypt = clone(shared.envLetsEncrypt);
+  const envLetsEncrypt = lodash.clone(shared.envLetsEncrypt);
 
   list.copy('Sending let\'s encrypt environment variables', {
     src: api.resolvePath(__dirname, 'assets/templates/env.list'),

@@ -1,4 +1,4 @@
-import { addLocation, combineErrorDetails, VALIDATE_OPTIONS } from './utils';
+import { addLocation, combineErrorDetails, VALIDATE_OPTIONS } from './utils.js';
 import joi from '@hapi/joi';
 
 // The regexp used matches everything

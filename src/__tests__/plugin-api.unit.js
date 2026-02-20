@@ -1,11 +1,16 @@
-import * as validate from '../validate';
-import { commands } from '../commands';
-import { expect } from 'chai';
+import * as validate from '../validate/index.js';
+import chai from 'chai';
+import { commands } from '../commands.js';
+import { fileURLToPath } from 'url';
 import fs from 'fs';
-import { hooks } from '../hooks';
+import { hooks } from '../hooks.js';
 import path from 'path';
-import PluginAPI from '../plugin-api';
+import PluginAPI from '../plugin-api.js';
 import sinon from 'sinon';
+
+const { expect } = chai;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('PluginAPI', () => {
   let api;
@@ -131,25 +136,27 @@ describe('PluginAPI', () => {
   });
 
   describe('validateConfig', () => {
-    const errors = { errors: ['error1', 'error2'], depreciations: [] };
-    let validatorStub;
     let totalConsoleOutput = '';
     let consoleStub;
+    let oldMongoValidator = validate._pluginValidators.mongo;
 
     beforeEach(() => {
       totalConsoleOutput = '';
-      validatorStub = sinon.stub(validate, 'default').returns(errors);
       consoleStub = sinon.stub(console, 'log').callsFake((...text) => {
         totalConsoleOutput += text.join(' ');
       });
     });
 
     afterEach(() => {
-      validatorStub.restore();
       consoleStub.restore();
+      validate._pluginValidators.mongo = oldMongoValidator;
     });
 
     it('should show validation errors', () => {
+      validate._pluginValidators.mongo = [function() {
+        return [{ message: 'error1' }, { message: 'error2' }];
+      }];
+
       api.validateConfig(api.configPath);
       consoleStub.restore();
 
@@ -158,9 +165,6 @@ describe('PluginAPI', () => {
     });
 
     it('should show nothing when config is valid', () => {
-      errors.errors = [];
-      errors.depreciations = [];
-
       api.validateConfig(api.configPath);
 
       expect(totalConsoleOutput).to.equal('');
@@ -256,7 +260,7 @@ describe('PluginAPI', () => {
 
     it('should update commandHistory', () => {
       api.runCommand('test.logs');
-      expect(api.commandHistory).to.deep.equal([{name: 'test.logs'}]);
+      expect(api.commandHistory).to.deep.equal([{ name: 'test.logs' }]);
     });
   });
 

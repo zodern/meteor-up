@@ -1,14 +1,12 @@
-/* eslint-disable no-var */
-
-var sh = require('shelljs');
-var os = require('os');
-var path = require('path');
-var fs = require('fs');
-var keypair = require('keypair');
-var forge = require('node-forge');
+import forge from 'node-forge';
+import fs from 'fs';
+import keypair from 'keypair';
+import os from 'os';
+import path from 'path';
+import sh from 'shelljs';
 
 if (process.platform !== 'win32') {
-  var installCommands = [
+  const installCommands = [
     'command -v docker >/dev/null 2>&1 || { curl https://get.docker.com/ |  sh && echo \'DOCKER_OPTS="--storage-driver=devicemapper"\' |  tee --append /etc/default/docker >/dev/null &&  service docker start ||  service docker restart; }',
     'command -v meteor >/dev/null 2>&1 || { curl https://install.meteor.com/ | sh; }'
   ];
@@ -17,9 +15,9 @@ if (process.platform !== 'win32') {
   });
 }
 
-var mupDir = process.cwd();
-var tmp = path.resolve(os.tmpdir(), 'tests');
-var helloapp = path.resolve(mupDir, 'tests/fixtures/helloapp');
+const mupDir = process.cwd();
+const tmp = path.resolve(os.tmpdir(), 'tests');
+const helloapp = path.resolve(mupDir, 'tests/fixtures/helloapp');
 
 if (!fs.existsSync(path.resolve(helloapp, 'node_modules'))) {
   sh.cd(path.resolve(mupDir, 'tests/fixtures/helloapp'));
@@ -32,7 +30,7 @@ sh.rm('-fr', tmp);
 sh.mkdir(tmp);
 sh.cp('-rf', path.resolve(mupDir, 'tests/fixtures/*'), tmp);
 
-var containers = sh.exec('docker ps -a -q --filter=ancestor=mup-tests-server');
+let containers = sh.exec('docker ps -a -q --filter=ancestor=mup-tests-server');
 if (containers.stdout.length > 0) {
   console.log('server containers');
   sh.exec(`docker rm -f ${containers.stdout.trim().split('\n').join(' ')}`);
@@ -48,7 +46,7 @@ if (containers.stdout.length > 0) {
 
 sh.cd(path.resolve(mupDir, 'tests/fixtures'));
 
-var images = sh.exec('docker images -aq mup-tests-server');
+let images = sh.exec('docker images -aq mup-tests-server');
 if (images.stdout.length === 0) {
   sh.exec('docker build -t mup-tests-server .');
 }
@@ -59,7 +57,7 @@ if (images.stdout.length === 0) {
   sh.exec('docker build -f ./Dockerfile_docker -t mup-tests-server-docker .');
 }
 
-var location = path.resolve(mupDir, 'tests/fixtures/ssh/new');
+const location = path.resolve(mupDir, 'tests/fixtures/ssh/new');
 if (!fs.existsSync(location)) {
   console.log('creating ssh key');
   sh.cd(path.resolve(mupDir, 'tests/fixtures'));
@@ -67,8 +65,8 @@ if (!fs.existsSync(location)) {
   sh.rm('-rf', 'ssh');
   sh.mkdir('ssh');
   sh.cd('ssh');
-  var pair = keypair();
-  var publicKey = forge.pki.publicKeyFromPem(pair.public);
+  const pair = keypair();
+  const publicKey = forge.pki.publicKeyFromPem(pair.public);
 
   fs.writeFileSync(location, pair.private);
   fs.writeFileSync(

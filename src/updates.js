@@ -1,18 +1,15 @@
-import {
-  flatMap,
-  isEqual
-} from 'lodash';
 import axios from 'axios';
 import boxen from 'boxen';
 import chalk from 'chalk';
 import debug from 'debug';
+import lodash from 'lodash';
 import path from 'path';
 
 const log = debug('mup:updates');
 const SKIP_CHECK_UPDATE = process.env.MUP_SKIP_UPDATE_CHECK === 'true';
 
 function parseVersion(version) {
-  return flatMap(version.split('.'), n =>
+  return lodash.flatMap(version.split('.'), n =>
     n.split('-beta').filter(segment => segment.length > 0).map(Number)
   );
 }
@@ -40,7 +37,7 @@ function compareVersions(local, remote, next) {
 
   if (beta && !available) {
     // check if stable version for beta is available
-    available = isEqual(remote, local.slice(0, 3));
+    available = lodash.isEqual(remote, local.slice(0, 3));
   }
 
   if (beta && !available) {

@@ -1,7 +1,10 @@
 import { Client } from 'ssh2';
 import debug from 'debug';
+import { fileURLToPath } from 'url';
 import nodemiral from '@zodern/nodemiral';
+import path from 'path';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const log = debug('mup:module:mongo');
 
 export function logs(api) {

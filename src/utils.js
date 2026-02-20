@@ -1,3 +1,4 @@
+import bluebird from 'bluebird';
 import { Client } from 'ssh2';
 import debug from 'debug';
 import expandTilde from 'expand-tilde';
@@ -5,7 +6,6 @@ import fs from 'fs';
 import net from 'net';
 import nodemiral from '@zodern/nodemiral';
 import path from 'path';
-import { promisify } from 'bluebird';
 import readline from 'readline';
 import stream from 'stream';
 
@@ -118,7 +118,7 @@ export function getDockerLogs(name, sessions, args, showHost = true) {
       }
     };
 
-    return promisify(session.execute.bind(session))(command, options);
+    return bluebird.promisify(session.execute.bind(session))(command, options);
   });
 
   return Promise.all(promises);

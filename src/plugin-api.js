@@ -1,29 +1,30 @@
-import * as swarmUtils from './swarm-utils';
-import * as tasks from './tasks';
-import * as utils from './utils';
-import configValidator, { showDepreciations, showErrors } from './validate/index';
-import { hooks, runRemoteHooks } from './hooks';
-import { parseDockerInfo, StatusDisplay } from './status';
+import * as swarmUtils from './swarm-utils.js';
+import * as tasks from './tasks/index.js';
+import * as utils from './utils.js';
+import configValidator, { showDepreciations, showErrors } from './validate/index.js';
+import { hooks, runRemoteHooks } from './hooks.js';
+import { parseDockerInfo, StatusDisplay } from './status.js';
 import chalk from 'chalk';
 import childProcess from 'child_process';
-import { cloneDeep } from 'lodash';
-import { commands } from './commands';
+import { commands } from './commands.js';
 import debug from 'debug';
 import fs from 'fs';
-import { getOptions } from './swarm-options';
+import { getOptions } from './swarm-options.js';
+import lodash from 'lodash';
 import nodemiral from '@zodern/nodemiral';
 import parseJson from 'parse-json';
 import path from 'path';
-import { runConfigPreps } from './prepare-config';
-import { scrubConfig } from './scrub-config';
-import serverInfo from './server-info';
+import { runConfigPreps } from './prepare-config.js';
+import { scrubConfig } from './scrub-config.js';
+import serverInfo from './server-info.js';
 
 const { resolvePath, moduleNotFoundIsPath } = utils;
 const log = debug('mup:api');
 
 export default class PluginAPI {
-  constructor(base, filteredArgs, program) {
-    this.base = program.config ? path.dirname(program.config) : base;
+  constructor(configLoader, filteredArgs, program) {
+    this.base = path.dirname(configLoader.configPath);
+    this._configLoader = configLoader;
     this.args = filteredArgs;
     this._origionalConfig = null;
     this.config = null;
@@ -147,30 +148,37 @@ export default class PluginAPI {
     return runConfigPreps(config, this);
   }
   getConfig(validate = true) {
-    if (!this.config) {
-      try {
-        delete require.cache[require.resolve(this.configPath)];
-        // eslint-disable-next-line global-require
-        this.config = require(this.configPath);
-        this._origionalConfig = cloneDeep(this.config);
-      } catch (e) {
-        if (!validate) {
-          return {};
-        }
-        if (e.code === 'MODULE_NOT_FOUND' && moduleNotFoundIsPath(e, this.configPath)) {
-          console.error('"mup.js" file not found at');
-          console.error(`  ${this.configPath}`);
-          console.error('Run "mup init" to create it.');
-        } else {
-          console.error(chalk.red('Error loading config file:'));
-          console.error(e);
-        }
-        process.exit(1);
-      }
-      this.config = this._normalizeConfig(this.config);
-
-      this.validateConfig(this.configPath, validate);
+    if (this.config) {
+      return this.config;
     }
+
+    let error = this._configLoader.loadError;
+
+    if (error) {
+      if (!validate) {
+        return {};
+      }
+
+      if (
+        error.code === 'MODULE_NOT_FOUND' &&
+          moduleNotFoundIsPath(error, this.configPath)
+      ) {
+        console.error('"mup.js" file not found at');
+        console.error(`  ${this.configPath}`);
+        console.error('Run "mup init" to create it.');
+      } else {
+        console.error(chalk.red('Error loading config file:'));
+        console.error(error);
+      }
+
+      process.exit(1);
+    }
+
+    this._origionalConfig = this._configLoader.getConfig();
+    let config = lodash.cloneDeep(this._origionalConfig);
+    this.config = this._normalizeConfig(config);
+
+    this.validateConfig(this.configPath, validate);
 
     return this.config;
   }

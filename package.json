@@ -3,6 +3,7 @@
   "version": "1.5.11",
   "description": "Production Quality Meteor Deployments",
   "main": "lib/index.js",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zodern/meteor-up.git"
@@ -22,13 +23,10 @@
     "mup": "./index.js"
   },
   "scripts": {
-    "prepare": "npm run build -s",
-    "build": "babel src --out-dir lib --copy-files --source-maps",
-    "build:watch": "npm run build -s -- -w",
     "test": "node ./tests/run.js",
-    "test:module": "mocha --require @babel/register",
+    "test:module": "mocha",
     "test:parallel": "bash ./tests/run-parallel.sh",
-    "test:unit": "cross-env NODE_ENV=test nyc --all mocha --require @babel/register src/**/*.unit.js",
+    "test:unit": "cross-env NODE_ENV=test mocha src/**/*.unit.js",
     "lint": "npm run lint:code && npm run lint:defaultConfig && npm run lint:readme && npm run lint:css && npm run lint:docs-configs",
     "lint:defaultConfig": "eslint --ext=\".sample\" -c .eslintrc.yml --rule=\"comma-dangle: 0\" .",
     "lint:code": "eslint .",
@@ -40,16 +38,9 @@
     "clean-shrinkwrap": "cd tests && node clean-shrinkwrap.js"
   },
   "devDependencies": {
-    "@babel/cli": "^7.25.7",
-    "@babel/core": "^7.25.7",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
-    "@babel/plugin-transform-modules-commonjs": "^7.25.7",
-    "@babel/register": "^7.25.7",
     "babel-eslint": "^10.1.0",
-    "babel-plugin-istanbul": "^6.0.0",
     "chai": "^4.2.0",
-    "chai-string": "^1.5.0",
+    "chai-string": "^1.6.0",
     "cross-env": "^6.0.3",
     "eslint": "^4.19.1",
     "eslint-config-es": "^0.8.12",
@@ -57,12 +48,11 @@
     "eslint-plugin-markdown": "^1.0.2",
     "gfm-code-blocks": "^1.0.0",
     "keypair": "^1.0.1",
-    "mocha": "^6.2.3",
+    "mocha": "^9.2.2",
     "node-forge": "^0.7.1",
-    "nyc": "^15.0.1",
     "sinon": "^7.5.0",
-    "stylelint": "^16.9.0",
-    "stylelint-config-standard": "^36.0.1"
+    "stylelint": "^17.3.0",
+    "stylelint-config-standard": "^40.0.0"
   },
   "dependencies": {
     "@hapi/joi": "^15.1.1",
@@ -71,7 +61,7 @@
     "bluebird": "^3.7.2",
     "boxen": "^4.2.0",
     "chalk": "^3.0.0",
-    "debug": "^4.1.1",
+    "debug": "^4.4.3",
     "expand-tilde": "^2.0.2",
     "global-modules": "^2.0.0",
     "lodash": "^4.17.21",
@@ -81,11 +71,11 @@
     "resolve-from": "^5.0.0",
     "shell-escape": "^0.2.0",
     "shelljs": "^0.8.5",
-    "ssh2": "^1.16.0",
+    "ssh2": "^1.17.0",
     "tar": "6.2",
-    "traverse": "^0.6.6",
+    "traverse": "^0.6.11",
     "uuid": "^7.0.3",
-    "www-authenticate": "^0.6.2",
+    "www-authenticate": "^0.6.3",
     "yargs": "^15.4.1"
   },
   "nyc": {
