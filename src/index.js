@@ -4,7 +4,7 @@ import modules, { loadPlugins, locatePluginDir } from './load-plugins.js';
 import chalk from 'chalk';
 import checkUpdates from './updates.js';
 import { createRequire } from 'node:module';
-import { filterArgv } from './utils.js';
+import { filterArgv, resolvePath } from './utils.js';
 import MupAPI from './plugin-api.js';
 import { registerHook } from './hooks.js';
 import yargs from 'yargs';
@@ -21,7 +21,9 @@ const unwantedArgvs = ['_', '$0', 'settings', 'config', 'verbose', 'show-hook-na
 yargs.help(false);
 
 // Load config before creating commands
-let configPath = yargs.argv.config ?? path.join(process.cwd(), 'mup.js');
+let configPath = yargs.argv.config ?
+  resolvePath(yargs.argv.config) :
+  path.join(process.cwd(), 'mup.js');
 let configLoader = new ConfigLoader(configPath);
 
 await configLoader.loadConfig();
@@ -32,11 +34,11 @@ let pluginList = [];
 // Load plugins
 if (config.plugins instanceof Array) {
   const appPath = config.app && config.app.path ? config.app.path : '';
-  const absoluteAppPath = preAPI.resolvePath(preAPI.base, appPath);
+  const absoluteAppPath = resolvePath(path.dirname(configPath), appPath);
 
   pluginList = config.plugins.map(plugin => ({
     name: plugin,
-    path: locatePluginDir(plugin, preAPI.configPath, absoluteAppPath)
+    path: locatePluginDir(plugin, configPath, absoluteAppPath)
   }));
 
   await loadPlugins(pluginList);
