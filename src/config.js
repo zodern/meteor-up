@@ -3,13 +3,13 @@ export default class ConfigLoader {
     this.configPath = configPath;
     this.loadError = null;
     this.loaded = false;
-    this.config = null;
+    this._config = {};
   }
 
   async loadConfig() {
     try {
       const configModule = await import(this.configPath);
-      this.config = configModule.default;
+      this._config = configModule.default;
     } catch (error) {
       this.loadError = error;
 
@@ -26,6 +26,6 @@ export default class ConfigLoader {
       throw new Error('Config has not been loaded');
     }
 
-    return this.config;
+    return this._config;
   }
 }
