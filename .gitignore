@@ -4,9 +4,7 @@ node_modules
 *.log
 .DS_Store
 docs/_site
-coverage
 tests/**/package-lock.json
 
 tests/ssh/
-.nyc_output/
 tests/validate-tmp

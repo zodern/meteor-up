@@ -11,7 +11,7 @@ env:
   mocha: true
 parserOptions:
   sourceType: 'module'
-  ecmaVersion: 2017
+  ecmaVersion: 2022
   ecmaFeatures:
     accessor-pairs: 2
     arrowFunctions: true
@@ -289,4 +289,4 @@ rules:
   newline-per-chained-call: 0
   class-methods-use-this: 0
   no-empty-function: 0
-  sort-imports: [2, { memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'], ignoreCase: true  }]
+  sort-imports: 0
