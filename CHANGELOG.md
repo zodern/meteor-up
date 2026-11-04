@@ -1,3 +1,7 @@
+## Next
+
+- Fix host vars sometimes affecting other hosts
+
 ## 1.5.11 - October 21, 2024
 
 - Node 8 is no longer supported. The minimum node version is 10.16
