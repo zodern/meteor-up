@@ -29,7 +29,7 @@ npm test
 
 ### A note about docker
 
-Since we are using docker inside docker for parallel testing, `Aufs` storage driver for docker(the default) should be disabled. Our test script automatically does this by setting `DOCKER_OPTS="--storage-driver=devicemapper"` in `/etc/default/docker`. In case you installed docker yourself, you should set this manually.
+Since we are using docker inside docker for parallel testing, `Aufs` storage driver for docker (the default) should be disabled. Our test script automatically does this by setting `DOCKER_OPTS="--storage-driver=devicemapper"` in `/etc/default/docker`. In case you installed docker yourself, you should set this manually.
 
 ## Adding Tests
 Write tests for plugins in `<meteor-up dir>/src/plugins/<plugin name>/__tests__/index.js`.
