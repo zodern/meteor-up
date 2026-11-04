@@ -6,7 +6,9 @@ function copy(session, _options, callback) {
   let retries = 0;
 
   if (typeof options.hostVars === 'object' && options.hostVars[session._host]) {
-    options.vars = merge(options.vars, options.hostVars[session._host]);
+    options.vars = merge(
+      {}, options.vars, options.hostVars[session._host]
+    );
   }
 
   function doCopy() {
@@ -44,7 +46,9 @@ function copy(session, _options, callback) {
 function executeScript(session, _options, callback, varsMapper) {
   const options = clone(_options);
   if (typeof options.hostVars === 'object' && options.hostVars[session._host]) {
-    options.vars = merge(options.vars, options.hostVars[session._host]);
+    options.vars = merge(
+      {}, options.vars, options.hostVars[session._host]
+    );
   }
 
   session.executeScript(
