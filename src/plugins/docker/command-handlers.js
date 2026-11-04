@@ -1,9 +1,4 @@
-import { checkVersion, shouldShowDockerWarning } from './utils';
-import {
-  curry,
-  difference,
-  intersection
-} from 'lodash';
+import { checkVersion, shouldShowDockerWarning } from './utils.js';
 import {
   demoteManagers,
   diffLabels,
@@ -12,14 +7,24 @@ import {
   joinNodes,
   promoteNodes,
   updateLabels
-} from './swarm';
-
+} from './swarm.js';
+import bluebird from 'bluebird';
 import chalk from 'chalk';
 import debug from 'debug';
-import { map } from 'bluebird';
+import { fileURLToPath } from 'url';
+import lodash from 'lodash';
 import nodemiral from '@zodern/nodemiral';
+import path from 'path';
+
+const {
+  curry,
+  difference,
+  intersection
+} = lodash;
 
 const log = debug('mup:module:docker');
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function uniqueSessions(api) {
   const { servers } = api.getConfig();
@@ -248,7 +253,7 @@ export async function status(api) {
     return;
   }
 
-  const results = await map(
+  const results = await bluebird.map(
     Object.values(config.servers),
     server => api.runSSHCommand(server, 'sudo docker version --format "{{.Server.Version}}"'),
     { concurrency: 2 }

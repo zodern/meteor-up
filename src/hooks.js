@@ -1,7 +1,7 @@
 import {
   countOccurrences,
   runSSHCommand
-} from './utils';
+} from './utils.js';
 
 export const hooks = {};
 

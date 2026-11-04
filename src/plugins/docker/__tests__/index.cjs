@@ -1,11 +1,12 @@
-import { countOccurrences, resolvePath, runSSHCommand } from '../../../utils';
-import { describe, it } from 'mocha';
-import assert from 'assert';
-import os from 'os';
-import sh from 'shelljs';
+const { countOccurrences, resolvePath, runSSHCommand } = require('../../../test-helpers.cjs');
+const { describe, it } = require('mocha');
+const assert = require('assert');
+const os = require('os');
+const path = require('path');
+const sh = require('shelljs');
 
 sh.config.silent = false;
-const servers = require('../../../../tests/fixtures/servers');
+const servers = require('../../../../tests/fixtures/servers.cjs');
 
 describe('module - docker', function() {
   this.timeout(6000000);
@@ -21,7 +22,7 @@ describe('module - docker', function() {
       return async function() {
         this.timeout(60000);
 
-        sh.cd(resolvePath(os.tmpdir(), 'tests/project-1'));
+        sh.cd(path.resolve(os.tmpdir(), 'tests/project-1'));
         const out = sh.exec('mup docker setup');
         assert.equal(out.code, 0);
 

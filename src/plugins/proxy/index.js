@@ -1,7 +1,7 @@
-import * as _commands from './commands';
-import { addProxyEnv, normalizeUrl } from './utils';
-import { updateProxyForLoadBalancing } from './command-handlers';
-import validator from './validate';
+import * as _commands from './commands.js';
+import { addProxyEnv, normalizeUrl } from './utils.js';
+import { updateProxyForLoadBalancing } from './command-handlers.js';
+import validator from './validate.js';
 
 export const description = 'Setup and manage reverse proxy and ssl';
 

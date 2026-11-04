@@ -1,6 +1,6 @@
+import bluebird from 'bluebird';
 import debug from 'debug';
-import { map } from 'bluebird';
-import { runSSHCommand } from './utils';
+import { runSSHCommand } from './utils.js';
 
 const log = debug('mup:server-info');
 
@@ -160,7 +160,7 @@ export function getServerInfo(server, collectors) {
 export default function serverInfo(servers, collectors = _collectors) {
   log('starting');
 
-  return map(
+  return bluebird.map(
     servers,
     server => getServerInfo(server, collectors),
     { concurrency: Object.keys(servers).length }

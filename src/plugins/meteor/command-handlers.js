@@ -9,14 +9,17 @@ import {
   getNodeVersion,
   getSessions,
   shouldRebuild
-} from './utils';
+} from './utils.js';
 import buildApp, { archiveApp, cleanBuildDir } from './build.js';
-import { checkUrls, createPortInfoLines, displayAvailability, getInformation, withColor } from './status';
-import { map, promisify } from 'bluebird';
-import { prepareBundleLocally, prepareBundleSupported } from './prepare-bundle';
+import { checkUrls, createPortInfoLines, displayAvailability, getInformation, withColor } from './status.js';
+import { prepareBundleLocally, prepareBundleSupported } from './prepare-bundle.js';
+import bluebird from 'bluebird';
 import debug from 'debug';
+import { fileURLToPath } from 'url';
 import nodemiral from '@zodern/nodemiral';
+import path from 'path';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const log = debug('mup:module:meteor');
 
@@ -209,7 +212,7 @@ export async function push(api) {
   const bundlePath = api.resolvePath(buildOptions.buildLocation, 'bundle.tar.gz');
 
   if (shouldRebuild(api)) {
-    await promisify(archiveApp)(buildOptions.buildLocation, api);
+    await bluebird.promisify(archiveApp)(buildOptions.buildLocation, api);
   }
 
   if (appConfig.docker.prepareBundleLocally) {
@@ -632,12 +635,12 @@ export async function status(api) {
       name: key
     }));
 
-  const results = await map(
+  const results = await bluebird.map(
     servers,
     server => getInformation(server, config.app.name, api),
     { concurrency: 2 }
   );
-  const urlResults = await map(
+  const urlResults = await bluebird.map(
     servers,
     server => checkUrls(server, config.app, api),
     { concurrency: 2 }

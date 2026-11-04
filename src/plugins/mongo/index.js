@@ -1,5 +1,5 @@
-import * as _commands from './commands';
-import _validator from './validate';
+import * as _commands from './commands.js';
+import _validator from './validate.js';
 
 export const description = 'Commands to manage MongoDB';
 export const commands = _commands;

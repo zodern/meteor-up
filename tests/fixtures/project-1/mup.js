@@ -2,7 +2,7 @@
 var path = require('path');
 
 var meteorPath = path.resolve('..', 'helloapp');
-var serverFile = path.resolve('..', 'servers');
+var serverFile = path.resolve('..', 'servers.cjs');
 var servers = require(serverFile);
 
 module.exports = {

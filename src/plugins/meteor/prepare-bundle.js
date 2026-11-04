@@ -1,10 +1,10 @@
-import { checkCompatible, renameTag } from './docker-registry';
+import { checkCompatible, renameTag } from './docker-registry.js';
 import {
   escapeEnvQuotes,
   getImagePrefix,
   getNodeVersion,
   runCommand
-} from './utils';
+} from './utils.js';
 import fs from 'fs';
 
 export function prepareBundleSupported(dockerConfig) {

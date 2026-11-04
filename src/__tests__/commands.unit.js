@@ -1,4 +1,4 @@
-import registerCommand, { commands, registerCommandOverrides } from '../commands';
+import registerCommand, { commands, registerCommandOverrides } from '../commands.js';
 import assert from 'assert';
 import sinon from 'sinon';
 

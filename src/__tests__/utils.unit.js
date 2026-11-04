@@ -1,8 +1,10 @@
-import * as utils from '../utils';
+import * as utils from '../utils.js';
 import assert from 'assert';
-import { expect } from 'chai';
+import chai from 'chai';
 import nodemiral from '@zodern/nodemiral';
 import path from 'path';
+
+const { expect } = chai;
 
 describe('utils', () => {
   describe('addStdioHandlers', () => {

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import debug from 'debug';
-import { getOptions } from './swarm-options';
+import { getOptions } from './swarm-options.js';
 
 const log = debug('mup:swarm-utils');
 

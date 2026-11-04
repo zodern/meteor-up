@@ -1,5 +1,5 @@
 var path = require('path');
-var servers = require('../servers');
+var servers = require('../servers.cjs');
 
 var meteorPath = path.resolve('..', 'helloapp');
 

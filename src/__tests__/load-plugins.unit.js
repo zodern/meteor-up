@@ -1,5 +1,7 @@
-import modules, { locatePluginDir } from '../load-plugins';
-import { expect } from 'chai';
+import modules, { locatePluginDir } from '../load-plugins.js';
+import chai from 'chai';
+
+const { expect } = chai;
 
 describe('load-plugins', () => {
   it('should load included plugins', () => {

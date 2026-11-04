@@ -1,6 +1,8 @@
-import { describe, it } from 'mocha';
-import { checkPackageUpdates } from '../../../updates';
-import { expect } from 'chai';
+const { describe, it } = require('mocha');
+const { checkPackageUpdates } = require('../../../updates');
+const chai = require('chai');
+
+const { expect } = chai;
 
 describe('package updates', () => {
   it('should detect update', async () => {

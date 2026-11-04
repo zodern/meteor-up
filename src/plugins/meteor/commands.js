@@ -1,4 +1,4 @@
-import * as commandHandlers from './command-handlers';
+import * as commandHandlers from './command-handlers.js';
 
 export const setup = {
   description: 'Prepare server to deploy meteor apps',

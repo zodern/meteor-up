@@ -1,11 +1,12 @@
-import chai, { expect } from 'chai';
-import { describe, it } from 'mocha';
-import chaiString from 'chai-string';
-import os from 'os';
-import path from 'path';
-import { runSSHCommand } from '../../../utils';
-import sh from 'shelljs';
-const servers = require('../../../../tests/fixtures/servers');
+const chai = require('chai');
+const { expect } = chai;
+const { describe, it } = require('mocha');
+const chaiString = require('chai-string');
+const os = require('os');
+const path = require('path');
+const { runSSHCommand } = require('../../../test-helpers.cjs');
+const sh = require('shelljs');
+const servers = require('../../../../tests/fixtures/servers.cjs');
 
 chai.use(chaiString);
 

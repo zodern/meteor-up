@@ -1,10 +1,10 @@
-import { countOccurrences, runSSHCommand } from '../../../utils';
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
-import os from 'os';
-import path from 'path';
-import sh from 'shelljs';
-const servers = require('../../../../tests/fixtures/servers');
+const { countOccurrences, runSSHCommand } = require('../../../test-helpers.cjs');
+const { describe, it } = require('mocha');
+const { expect } = require('chai');
+const os = require('os');
+const path = require('path');
+const sh = require('shelljs');
+const servers = require('../../../../tests/fixtures/servers.cjs');
 
 sh.config.silent = false;
 

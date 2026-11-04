@@ -1,5 +1,7 @@
-import { _configScrubbers, registerScrubber, scrubConfig, utils } from '../scrub-config';
-import { expect } from 'chai';
+import { _configScrubbers, registerScrubber, scrubConfig, utils } from '../scrub-config.js';
+import chai from 'chai';
+
+const { expect } = chai;
 
 describe('scrub-config', () => {
   beforeEach(() => {

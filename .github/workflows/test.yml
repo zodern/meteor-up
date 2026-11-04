@@ -42,16 +42,16 @@ jobs:
       fail-fast: false
       matrix:
        include:
-         - nodeVersion: 10.x
+         - nodeVersion: 18.x
            testPlugins: "meteor"
            testOptions: "--non-root"
-         - nodeVersion: 10.x
+         - nodeVersion: 18.x
            testPlugins: "docker,mongo,proxy,default"
            testOptions: "--non-root"
-         - nodeVersion: 22.x
+         - nodeVersion: 24.x
            testPlugins: "meteor"
            testOptions: ""
-         - nodeVersion: 22.x
+         - nodeVersion: 24.x
            testPlugins: "docker,mongo,proxy,default"
            testOptions: ""
     steps:
