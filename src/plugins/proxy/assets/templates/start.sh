@@ -2,14 +2,16 @@
 
 APPNAME=<%= appName %>
 APP_PATH=/opt/$APPNAME
-NGINX_PROXY_VERSION="v1.1.0"
-LETSENCRYPT_COMPANION_VERSION="v1.13.1"
 
 # Shared settings
 source $APP_PATH/config/shared-config.sh
 : ${HTTP_PORT:=80}
 : ${HTTPS_PORT:=443}
 : ${CLIENT_UPLOAD_LIMIT="10M"}
+: ${NGINX_PROXY_IMAGE="zodern/nginx-proxy"}
+: ${NGINX_PROXY_VERSION="v1.1.0"}
+: ${LETSENCRYPT_COMPANION_IMAGE="jrcs/letsencrypt-nginx-proxy-companion"}
+: ${LETSENCRYPT_COMPANION_VERSION="v1.13.1"}
 
 ENV_FILE=$APP_PATH/config/env.list
 ENV_FILE_LETSENCRYPT=$APP_PATH/config/env_letsencrypt.list
@@ -18,10 +20,10 @@ ENV_FILE_LETSENCRYPT=$APP_PATH/config/env_letsencrypt.list
 
 # We don't need to fail the deployment because of a docker hub downtime
 set +e
-sudo docker pull jrcs/letsencrypt-nginx-proxy-companion:$LETSENCRYPT_COMPANION_VERSION
-sudo docker pull zodern/nginx-proxy:$NGINX_PROXY_VERSION
+sudo docker pull $LETSENCRYPT_COMPANION_IMAGE:$LETSENCRYPT_COMPANION_VERSION
+sudo docker pull $NGINX_PROXY_IMAGE:$NGINX_PROXY_VERSION
 set -e
-echo "Pulled zodern/nginx-proxy and jrcs/letsencrypt-nginx-proxy-companion"
+echo "Pulled $NGINX_PROXY_IMAGE and $LETSENCRYPT_COMPANION_IMAGE"
 
 # This updates nginx for all vhosts
 NGINX_CONFIG="client_max_body_size $CLIENT_UPLOAD_LIMIT;";
@@ -60,7 +62,7 @@ sudo docker run \
   -v /opt/$APPNAME/config/nginx-default.conf:/etc/nginx/conf.d/my_proxy.conf:ro \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
   -v /opt/$APPNAME/upstream:/etc/nginx/upstream \
-  zodern/nginx-proxy:$NGINX_PROXY_VERSION
+  $NGINX_PROXY_IMAGE:$NGINX_PROXY_VERSION
 echo "Ran nginx-proxy as $APPNAME"
 
 sleep 2s
@@ -78,8 +80,8 @@ sudo docker run \
   --log-opt max-size=100m \
   --log-opt max-file=3 \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
-  jrcs/letsencrypt-nginx-proxy-companion:$LETSENCRYPT_COMPANION_VERSION
-echo "Ran jrcs/letsencrypt-nginx-proxy-companion"
+  $LETSENCRYPT_COMPANION_IMAGE:$LETSENCRYPT_COMPANION_VERSION
+echo "Ran $LETSENCRYPT_COMPANION_IMAGE"
 
 <% if (swarmEnabled) { %>
   docker rm -f $APPNAME-swarm-upstream || true
