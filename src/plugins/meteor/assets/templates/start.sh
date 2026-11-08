@@ -72,7 +72,7 @@ fi
 
 sudo docker run \
   -d \
-  --restart=always \
+  --restart=<%= docker.restartPolicy %> \
   $VOLUME \
   <% if((sslConfig && typeof sslConfig.autogenerate === "object") || (typeof proxyConfig === "object" && !proxyConfig.loadBalancing))  { %> \
   --expose=<%= docker.imagePort %> \
@@ -157,7 +157,7 @@ EOT
     set -e
     sudo docker run \
       -d \
-      --restart=always \
+      --restart=<%= docker.restartPolicy %> \
       --volume=/opt/$APPNAME/config/bundle.crt:/bundle.crt \
       --volume=/opt/$APPNAME/config/private.key:/private.key \
       --link=$APPNAME:backend \

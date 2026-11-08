@@ -49,6 +49,8 @@ export function prepareConfig(config, api) {
     config.app.buildOptions.cleanBuildLocation = true;
   }
 
+  config.app.docker.restartPolicy = config.app.docker.restartPolicy || 'always';
+
   return config;
 }
 
