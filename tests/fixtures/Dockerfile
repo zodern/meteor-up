@@ -24,6 +24,13 @@ RUN apt-get update >/dev/null && \
 #Enable ssh
 RUN rm -f /etc/service/sshd/down
 
+# Generate the ssh host keys once at build time instead of on every start.
+# Makes the container start 0.6s faster
+RUN /etc/my_init.d/00_regen_ssh_host_keys.sh -f
+
+# Normally it waits 1s between checks, which makes starting the container much slower
+RUN sed -i -e 's/seq 1 30/seq 1 300/' -e 's/sleep 1s/sleep 0.1s/' /etc/my_init.d/10_syslog-ng.init
+
 COPY ./docker.conf /etc/init.d/docker
 RUN chmod +x /etc/init.d/docker && \
   update-rc.d docker defaults

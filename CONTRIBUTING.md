@@ -27,10 +27,6 @@ If the server or your local computer can not handle parallel tests, or you are r
 npm test
 ```
 
-### A note about docker
-
-Since we are using docker inside docker for parallel testing, `Aufs` storage driver for docker (the default) should be disabled. Our test script automatically does this by setting `DOCKER_OPTS="--storage-driver=devicemapper"` in `/etc/default/docker`. In case you installed docker yourself, you should set this manually.
-
 ## Adding Tests
 Write tests for plugins in `<meteor-up dir>/src/plugins/<plugin name>/__tests__/index.js`.
 To run the test in parallel, add a matching regex to the `<meteor-up dir>/tests/tests.list` on a new line.

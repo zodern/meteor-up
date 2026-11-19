@@ -7,4 +7,4 @@ RUN apt-get update  && DEBIAN_FRONTEND=noninteractive apt-get install -y docker-
 # Make sure our init script is used instead of the one from the docker-ce package
 COPY ./docker.conf /etc/init.d/docker
 RUN chmod +x /etc/init.d/docker
-RUN echo 'DOCKER_OPTS="--storage-driver=vfs"' >> /etc/default/docker
+RUN echo 'DOCKER_OPTS="--storage-driver=overlay2"' >> /etc/default/docker

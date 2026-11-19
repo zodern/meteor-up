@@ -41,6 +41,19 @@ function startDocker(id) {
   process.exit(1);
 }
 
+function waitForSSH(id) {
+  for (var i = 0; i < 30; i++) {
+    var result = sh.exec(`docker exec ${id} nc -z 127.0.0.1 22`, { silent: true });
+    if (result.code === 0) {
+      return;
+    }
+    sh.exec('sleep 1');
+  }
+
+  console.error('=> sshd did not start in the test container');
+  process.exit(1);
+}
+
 console.log('=> Setting up for tests');
 require('./setup.js');
 
@@ -73,6 +86,8 @@ sh.exec(`docker exec ${containerId} cp ${userPath}/.ssh/authorized_keys2 ${userP
 if (user !== 'root') {
   sh.exec(`docker exec ${containerId} chown -R ${user}:${user} ${userPath}/.ssh`);
 }
+
+waitForSSH(containerId);
 
 
 var watch = argv.watch ? '--watch' : '';
