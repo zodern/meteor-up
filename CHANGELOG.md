@@ -1,4 +1,4 @@
-## Next
+## v1.5.12 - Nov 19, 2026
 
 - Updates nginx from 1.21.6 to 1.30.7 in the shared proxy
 - Fix host vars sometimes affecting other hosts
