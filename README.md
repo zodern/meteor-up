@@ -1,5 +1,4 @@
-# Meteor Up ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zodern/meteor-up/test.yml?branch=master&style=flat-square)
- [![Gitter](https://img.shields.io/gitter/room/meteor-up/Lobby.svg?style=flat-square)](https://gitter.im/meteor-up/Lobby) [![Backers on Open Collective](https://opencollective.com/meteor-up/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/meteor-up/sponsors/badge.svg)](#sponsors)
+# Meteor Up ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zodern/meteor-up/test.yml?branch=master&style=flat-square) [![Gitter](https://img.shields.io/gitter/room/meteor-up/Lobby.svg?style=flat-square)](https://gitter.im/meteor-up/Lobby) [![Backers on Open Collective](https://opencollective.com/meteor-up/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/meteor-up/sponsors/badge.svg)](#sponsors)
 
 #### Production Quality Meteor Deployments
 
