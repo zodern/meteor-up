@@ -250,7 +250,10 @@ describe('module - meteor', function() {
 
       const out = sh.exec('mup meteor push --cached-build --config mup.buildkit.js --verbose');
       expect(out.code).to.equal(0);
-      expect(out.stdout).to.have.entriesCount('#14 naming to docker.io/library/mup-myapp:build done', 1);
+      const namingRegex =
+        /#\d+ naming to docker\.io\/library\/mup-myapp:build done/g;
+      const namingSteps = out.stdout.match(namingRegex) || [];
+      expect(namingSteps).to.have.lengthOf(1);
       expect(out.stdout).to.have.entriesCount('Prepare Bundle: SUCCESS', 1);
     });
 
