@@ -41,7 +41,7 @@ describe('module - mongo', function() {
         countOccurrences('Copying Mongo Config: SUCCESS', out.stdout)
       ).to.be.equal(1);
 
-      const sshOut = await runSSHCommand(serverInfo, 'tree -pufi /opt');
+      const sshOut = await runSSHCommand(serverInfo, 'sudo tree -pufi /opt');
 
       expect(sshOut.code).to.be.equal(0);
       expect(countOccurrences('mongo-start-new.sh', sshOut.output)).to.be.equal(1);
