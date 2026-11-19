@@ -1,6 +1,6 @@
 ## Next
 
-- Disable HTTP/2 in the proxy to mitigate nginx2root temporarily until we update nginx in the next version. Run `mup setup` or `mup proxy setup` to apply the fix.
+- Updates nginx from 1.21.6 to 1.30.7 in the shared proxy
 - Fix host vars sometimes affecting other hosts
 
 ## 1.5.11 - October 21, 2024
