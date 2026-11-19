@@ -43,7 +43,7 @@ containers = sh.exec(
 );
 if (containers.stdout.length > 0) {
   console.log('docker containers');
-  sh.exec(`docker rm -f ${containers.stdout.trim()}`);
+  sh.exec(`docker rm -f ${containers.stdout.trim().split('\n').join(' ')}`);
 }
 
 sh.cd(path.resolve(mupDir, 'tests/fixtures'));

@@ -3,5 +3,8 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor
 RUN echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-RUN apt-get update  && DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io --option=Dpkg::Options::=--force-confdef >/dev/null
+RUN apt-get update  && DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin --option=Dpkg::Options::=--force-confdef >/dev/null
+# Make sure our init script is used instead of the one from the docker-ce package
+COPY ./docker.conf /etc/init.d/docker
+RUN chmod +x /etc/init.d/docker
 RUN echo 'DOCKER_OPTS="--storage-driver=vfs"' >> /etc/default/docker

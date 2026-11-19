@@ -2,23 +2,22 @@
 # sure you lock down to a specific version, not to `latest`!
 # See https://github.com/phusion/baseimage-docker/blob/master/Changelog.md for
 # a list of version numbers.
-FROM phusion/baseimage:18.04-1.0.0
+FROM phusion/baseimage:noble-1.0.3
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 #Install wget
 RUN apt-get update >/dev/null && \
-  apt-get -y install \
+  DEBIAN_FRONTEND=noninteractive apt-get -y install \
     tree \
     curl \
     sudo \
-    netcat \
-    lxc \
+    netcat-openbsd \
     iptables \
     apt-transport-https \
     ca-certificates \
-    curl \
-    gnupg-agent \
+    gnupg \
+    lsb-release \
     software-properties-common >/dev/null && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

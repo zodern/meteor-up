@@ -25,6 +25,22 @@ var image = 'mup-tests-server-docker';
 var dockerVolume = '-v mup-test-docker-data:/var/lib/docker';
 var containerId;
 
+// `service docker start` returns before dockerd is ready
+function startDocker(id) {
+  sh.exec(`docker exec ${id} sudo service docker start`);
+
+  for (var i = 0; i < 15; i++) {
+    if (sh.exec(`docker exec ${id} docker info`, { silent: true }).code === 0) {
+      return;
+    }
+    sh.exec('sleep 1');
+  }
+
+  console.error('=> Docker did not start in the test container. dockerd log:');
+  sh.exec(`docker exec ${id} cat /var/log/docker.log`);
+  process.exit(1);
+}
+
 console.log('=> Setting up for tests');
 require('./setup.js');
 
@@ -32,10 +48,11 @@ console.log('=> Cleaning cache');
 var cleaningContainerId = sh.exec(
   `docker run ${keyVolume} ${publish} ${dockerVolume} --privileged -d -t ${image} /sbin/my_init`
 ).stdout.trim();
-sh.exec(`docker exec ${cleaningContainerId} sudo service docker start`);
+startDocker(cleaningContainerId);
 
 // Stop all running containers
-let containers = sh.exec(`docker exec ${cleaningContainerId} bash -c "docker ps -a -q"`).stdout.trim();
+let containers = sh.exec(`docker exec ${cleaningContainerId} bash -c "docker ps -a -q"`)
+  .stdout.trim().split('\n').join(' ');
 if (containers.length > 0) {
   sh.exec(`docker exec ${cleaningContainerId} bash -c "docker rm -f ${containers}"`);
 }
@@ -50,7 +67,7 @@ containerId = sh.exec(
   `docker run ${keyVolume} ${publish} ${dockerVolume} --privileged -d -t ${image} /sbin/my_init`
 ).stdout.trim();
 
-sh.exec(`docker exec ${containerId} sudo service docker start`);
+startDocker(containerId);
 sh.exec(`docker exec ${containerId} cp ${userPath}/.ssh/authorized_keys2 ${userPath}/.ssh/authorized_keys`);
 
 if (user !== 'root') {
